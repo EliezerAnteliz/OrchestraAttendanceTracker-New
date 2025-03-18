@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "OrchestraAttendanceTracker-New",
-    "slug": "OrchestraAttendanceTracker-New",
+    "name": "Orchestra Attendance Tracker",
+    "slug": "orchestra-attendance-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,8 +23,9 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "scheme": "orchestra-attendance",
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

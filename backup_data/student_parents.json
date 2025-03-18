@@ -1,0 +1,538 @@
+[
+  {
+    "id": "2ed74fb9-6f52-4d6c-aa0f-d95fcfa8f75b",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "parent_id": "425357e1-d1c1-48df-92d7-5c9bf45df0f3",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "54c79942-e6cb-4738-8898-3e826260b8f0",
+    "student_id": "18084299-eefd-4e5f-b8b9-dc6618e947dc",
+    "parent_id": "48922746-0a2d-497a-91e3-87307c2c0723",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "61f501a5-25a5-44fe-a286-fb669b078612",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "parent_id": "3a62f6bd-4d3e-4d15-a7dd-a1d7381bdd55",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "df4f1b5e-451c-49a1-90ad-c3a4b833e8b1",
+    "student_id": "3fac5707-405f-49a7-8fd8-047ccc7f3983",
+    "parent_id": "080e45d7-c0e3-44b7-9d3d-8104f7538cbf",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "1cf387ec-ca98-429f-b8d2-4b4a0069278f",
+    "student_id": "0e58d15c-f47f-4acd-9621-94982114d57d",
+    "parent_id": "ae68460d-5be4-4a23-8c70-0eaac5533470",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "0355e1d3-2e7c-4cbe-97f0-3b25924948bd",
+    "student_id": "74a7df28-3efe-4007-9163-8ad6c7c142b7",
+    "parent_id": "0b316986-e38f-4c33-8194-c5320dcb09ef",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "8b779b6d-2af4-40b8-8875-7d7d459ee087",
+    "student_id": "41dde32e-623a-4fd1-8f48-9ae2f2605d7c",
+    "parent_id": "987232e9-e9f9-4e02-a3bf-e4318f801334",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "77a37ad7-d4fa-4ad0-93b2-3b5c10df968b",
+    "student_id": "cd2915db-5b3f-4aee-9597-721ab0c9c5fc",
+    "parent_id": "48922746-0a2d-497a-91e3-87307c2c0723",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "83d05b54-1e2f-4716-b370-01638da421a2",
+    "student_id": "bd6202ee-ef7d-4ce2-be5e-f3b884b29332",
+    "parent_id": "164af228-128e-463c-82de-989f47c6231e",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "93c1fbb8-c47e-492f-841c-bc5f9510215c",
+    "student_id": "087e975a-dcf0-42cc-bf7f-d7b3ff7ed322",
+    "parent_id": "a0dbd1bc-3007-4c17-a67f-a83b0e0fe48f",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "7c1444f9-a3c1-4fdc-b1b3-86788b1bc0c8",
+    "student_id": "73339309-6ee4-4b5e-8b41-3f948b83c398",
+    "parent_id": "d2cc159f-d95c-45a7-aeb9-f8fac0548a60",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "04181969-8964-45af-938c-054479942870",
+    "student_id": "dcab964e-80b8-43fd-b62e-3b891b8f1376",
+    "parent_id": "914b40df-75b1-45aa-9373-8c63657e7d5b",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "c5e5fd38-5fee-42ef-9652-ffb7f27c52a2",
+    "student_id": "5117e36e-680e-4503-8426-814dbd6dd2de",
+    "parent_id": "425357e1-d1c1-48df-92d7-5c9bf45df0f3",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "aa37a0dc-d5d1-4b82-b68a-06d537ba2e6b",
+    "student_id": "e73a71a4-183e-44d9-a648-e0d43bdfc954",
+    "parent_id": "2596cc85-d199-4304-ae2a-3c715e797a63",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "96e716ac-a6ba-4294-929f-f8fb6e1225b3",
+    "student_id": "bc61f054-2192-4abb-9377-7c2e9ba03324",
+    "parent_id": "fa55cecb-61b7-47f5-8e84-2cc4b3340449",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "a9797a42-0067-4418-9e77-3aaad584607c",
+    "student_id": "892e9a3a-73a0-48ab-97c7-3ced170b8c70",
+    "parent_id": "04ea78fc-61d8-431d-b5e0-a7d8004c7a0a",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "a82fa36b-d53e-40c8-8e8e-167332e8c25b",
+    "student_id": "c437078d-fc29-4a0c-8172-5b33461c31ac",
+    "parent_id": "b33d8cc1-c071-41dc-8dd8-d7d50f8a9817",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "974a371b-393e-451f-a123-5b4cadc7a051",
+    "student_id": "11a1bb8c-5fa5-46d0-a4fd-1c5876f1fc48",
+    "parent_id": "b33d8cc1-c071-41dc-8dd8-d7d50f8a9817",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "656f643a-be70-45cd-9be8-bdc092d745e3",
+    "student_id": "dd3d7f38-dce6-4d3e-88f2-8987a2c76d7a",
+    "parent_id": "9a727a22-fea8-44ad-b404-1a83cfe84afa",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "cbe08243-e1d1-4fed-bbb9-9e8437a35710",
+    "student_id": "0f7227bc-e2e1-4628-bcb6-81b07f65b9de",
+    "parent_id": "987232e9-e9f9-4e02-a3bf-e4318f801334",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:02:26.51294+00:00"
+  },
+  {
+    "id": "9ecf1514-6c5c-4ffd-9d0b-88a7816d0e4c",
+    "student_id": "702af7a9-6c42-48b4-af61-d162d8045f50",
+    "parent_id": "914b40df-75b1-45aa-9373-8c63657e7d5b",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "ed42ba5e-9c82-4e2f-b172-623fecfb4c77",
+    "student_id": "603fcaf0-a536-474d-86de-ea455704aa92",
+    "parent_id": "425357e1-d1c1-48df-92d7-5c9bf45df0f3",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "c38edef2-aa3d-4944-bac3-0a5937304b6f",
+    "student_id": "1ac651e6-0f63-4541-8dec-879482784089",
+    "parent_id": "b0ee3418-2918-4c66-ad8e-d627acc33c92",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "6c3f56ae-4f9e-4c82-9b91-7e4c8547d851",
+    "student_id": "3187cb41-a71c-4df8-9972-a20a0525db4b",
+    "parent_id": "8365a675-8144-4986-8a31-3b0504e697df",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "2af0a8c0-9813-4038-88d2-65fd20d913a3",
+    "student_id": "4fd2e7e2-889e-43a1-b80d-dc7ee2f1d550",
+    "parent_id": "d5b59af2-4b0d-4c15-92c6-04abfd53ded3",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "f722b4e6-b164-408f-8ad4-d94c3dbaab50",
+    "student_id": "ccf31b6b-64b2-4acf-b6f9-a1bc36051abc",
+    "parent_id": "d5b59af2-4b0d-4c15-92c6-04abfd53ded3",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "d4370db3-89c1-4298-9bb8-b6354f2db4db",
+    "student_id": "13c675f7-468c-401a-b182-8662064466bf",
+    "parent_id": "9b0fd97e-8d6e-4e77-af27-167fe3d97966",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "7d1a57cd-4c82-494d-8335-2227f55f31b8",
+    "student_id": "3c46dbf4-59fc-4f2b-8270-96f8f7a0d25c",
+    "parent_id": "ab8a1a92-530e-49a2-8058-9e61203b4324",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "59a3ffbb-49d3-4288-a9cd-1de1bf7c9ace",
+    "student_id": "fa70a5d0-7953-4bd1-a5a1-2e20024a1059",
+    "parent_id": "9e87fdbd-d9e3-4dc2-b814-784ea81861ef",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "0f3b3d80-8eeb-4183-8ebd-50e7bbedf18a",
+    "student_id": "bfb68d2a-abd7-49e1-9745-c65dd306d18a",
+    "parent_id": "aabecf03-c363-4d13-b3c4-80c487145764",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:07:17.69108+00:00"
+  },
+  {
+    "id": "43353bda-237a-4a19-b90d-d17bc41fcfde",
+    "student_id": "cbdad611-199f-4fad-a807-f3eadf4577c9",
+    "parent_id": "a3a6dfb7-7658-46fb-b9c7-c623d51eb193",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "38693a1f-0346-454d-9ef4-596f0be02e8d",
+    "student_id": "e4c8c3d2-34c8-4fe8-b863-920d07d019b6",
+    "parent_id": "c354152d-7f4d-4635-b6b4-622b993e0726",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "c73a809c-9314-493e-87cc-cb218f3e8f47",
+    "student_id": "1dbda475-d6f6-4257-86b5-a227b5017a16",
+    "parent_id": "17e2c50d-3037-476e-8317-32d1bb6bef52",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "c754bafe-e7c3-42e9-866d-61c933e41028",
+    "student_id": "08433f4c-22ce-4811-9ee7-6d1e51f5e730",
+    "parent_id": "71263757-5454-40ec-a07c-8c669eb6b55d",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "dde4b585-47d9-485c-8f26-43f68975a797",
+    "student_id": "ff1bf6f4-fd45-4378-91fc-84436a1b6611",
+    "parent_id": "5b8c1728-e00b-4216-b359-36e21e36f880",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "6e019f03-c624-4579-ae91-3f6d99873ec0",
+    "student_id": "e76b0671-24bf-4527-a6c6-f5d46b3fb9e9",
+    "parent_id": "c686edd6-e1bc-47ff-8ebf-dfe8c14f96bc",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "18770a2d-d17d-48f4-b2c0-051ff252e524",
+    "student_id": "1c3866ec-2192-404e-94be-be8355e321eb",
+    "parent_id": "08a0ee26-1646-4bea-b50d-28097eaa053a",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "cdaf7151-9eb9-4995-8172-bbc4c6f11bab",
+    "student_id": "d9206bd7-e7ce-4944-bce1-ef88263aae6d",
+    "parent_id": "8415e6d8-4eba-48d5-8b6e-a5d1aa94d047",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "7b3000b5-4160-4f63-a043-6bf933804b42",
+    "student_id": "1e4724b5-e679-4859-9da6-e90dbedd4d6e",
+    "parent_id": "8c6c16d3-da0d-4d67-b024-5741a7113294",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "f279294a-a2bc-4271-acc6-fd93525f3ed2",
+    "student_id": "125e51eb-97dc-41bf-a2a4-1c08550959c2",
+    "parent_id": "303eca28-f340-45f7-a87b-c39f925e39ab",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "c025d9f5-72c9-45a6-9649-167245ed1f46",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "parent_id": "ba455219-8d88-448e-afb8-986e5a23d3d0",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "152ff7ed-25e0-4720-a598-23149011704c",
+    "student_id": "502a51e8-c217-4b71-8723-dceeed4da7aa",
+    "parent_id": "aabecf03-c363-4d13-b3c4-80c487145764",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "321c40d9-056c-479c-92e8-9c291d9d7eb8",
+    "student_id": "53b67ec4-0038-4c82-b2f5-9dfdb050cfeb",
+    "parent_id": "0ee57d15-23f5-4254-9a07-c4fcbfaec14a",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "8c4b6a21-c0fb-4b70-ac69-91f1e80c5ba0",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "parent_id": "714efa97-f6c3-4c49-a481-2dada95b4c4d",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "814accd0-313a-4722-a174-710d81fdcb1d",
+    "student_id": "7abeb8a6-5b2a-489c-8ab7-bbbcb827e9fb",
+    "parent_id": "303eca28-f340-45f7-a87b-c39f925e39ab",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "686d9aeb-6780-4128-bc0d-29a8e280e579",
+    "student_id": "bfdac7d7-58fb-4fc5-9de4-d3ec3f996232",
+    "parent_id": "b00a9539-8644-40c2-b68c-5170fe729ed6",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "0e03eeec-3cb4-4974-a5c5-f30572241dca",
+    "student_id": "3f6a45e1-25a7-4321-9996-f4c6c71eae80",
+    "parent_id": "89608c4f-73dc-4e68-90ae-d65016c71216",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "240ca2bd-34ce-40bb-a2bb-d3492ca38f3a",
+    "student_id": "b9367768-e7d7-41cd-b4f8-03364e41d88c",
+    "parent_id": "0634bc09-91c5-4890-bcb1-781ca172ce91",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "7beb7047-0df6-40d6-9fd9-07a3c8ff43d4",
+    "student_id": "3fac7dbe-ff63-4256-98a0-8a1d59541e11",
+    "parent_id": "a5621070-70a0-432e-acfc-08852e9640d0",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "df90a6e3-84ed-4a74-ab7a-b26629ed77d9",
+    "student_id": "494aeef8-fed8-4e92-bbcf-ee79060a6236",
+    "parent_id": "d9c1853e-3aa8-4d7d-9cb5-52170634125d",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:04.551205+00:00"
+  },
+  {
+    "id": "6d10089a-47ab-406a-9553-f8e60b4b953c",
+    "student_id": "b63c9cff-cc21-46a0-8df3-f349b377a72d",
+    "parent_id": "01540f17-510f-491a-ad62-02f61d2f0c36",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "c2bfd7d5-efd7-4dd6-8fc6-dc3b9b7cc345",
+    "student_id": "b829f61b-b68a-4892-8246-2be5ab47ef2f",
+    "parent_id": "01540f17-510f-491a-ad62-02f61d2f0c36",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "580a1ed1-12a1-4f06-b36b-28686af6f167",
+    "student_id": "c0419212-146f-4f79-8938-2b6273c6c2bc",
+    "parent_id": "171feb22-a39d-4655-98e4-a39cc250cbc6",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "73ca576f-d6e6-486e-86c5-c17cf54b055b",
+    "student_id": "87d0bdfb-295f-4499-8b92-19a7e86106c9",
+    "parent_id": "17c7cd51-2aec-4d69-b354-856d1407cad1",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "745fd8e2-de81-48a5-bb31-b5d627543f44",
+    "student_id": "a9abfc40-001b-43f3-90f9-6bbd05ae3e41",
+    "parent_id": "c92ac5c5-d9ef-4916-a746-1f43f820e1f1",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "e99ad650-0d7b-4d09-abaf-796d5681a49b",
+    "student_id": "23a4038b-7278-4e0d-a4f1-b6fa396e5a5a",
+    "parent_id": "43916435-6e98-48b9-9ada-2d84fb183221",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "7dca90a6-c74a-4d20-a44c-11eb59b010e4",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "parent_id": "0a45b66f-5295-4763-bf97-c0afe5031f57",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "9a906b55-9881-47d2-8dca-77d0c1e0fee6",
+    "student_id": "21da6609-0134-4579-8861-af920c1ab967",
+    "parent_id": "6874da23-7632-4e13-a2c1-17864b9ad4df",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "54242427-7d5f-4b3a-b943-8bafbfb1ca69",
+    "student_id": "e88c88b9-d0c7-4dda-9def-09e1b756af47",
+    "parent_id": "b847b8ef-92ac-4a6c-a547-1e037b6b4464",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "9b546183-261c-4441-b7fb-693c5fa8cec0",
+    "student_id": "04b7c06f-1100-46ca-8342-ee590bc436bc",
+    "parent_id": "4a51047a-bc57-4b5c-8155-21491e02303e",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "ff0b0330-8b07-46a7-8798-310423c1657d",
+    "student_id": "833739d6-33e9-4fa1-93c4-ccb681f307d9",
+    "parent_id": "de5c2b14-3cfe-4f1a-bce5-a10ebabb548e",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "460c9d96-22f7-4f51-bb8c-a80665d90ce9",
+    "student_id": "0afab41b-b3b6-45f9-8bab-5d2e3958a970",
+    "parent_id": "f059c5d1-456b-4dcc-b77f-a2806f187428",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "1d0b2c2e-f64f-4d7c-b22c-c15a9664991c",
+    "student_id": "44677d88-12ee-4b72-98f3-1fbe5956febd",
+    "parent_id": "73644ebf-f6c0-4d05-bf2f-c530146e0ab7",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "8ffbe28e-f2b0-4ea0-b899-a6782e26741a",
+    "student_id": "f40fe1b2-d6c2-4e74-bd80-a6e1ae21c9ca",
+    "parent_id": "df983ab7-11fa-4856-9ad7-64d30a3db15c",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "28807cec-f5ad-49f2-ade7-cf5b6ac9a59e",
+    "student_id": "5fd0eae7-2d37-46f7-8034-c72601f818e0",
+    "parent_id": "0abb34f6-38fa-405a-a9ff-136143ca7815",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "a3c6cd70-413b-4d5b-b8ef-19ff638c0a69",
+    "student_id": "e569b46b-8a77-49fe-8e30-66fda6c941ab",
+    "parent_id": "6509bb37-d749-431f-88ac-97749213a08f",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  },
+  {
+    "id": "81a494f3-5bc2-4fc5-93f4-0e34bd05ebb9",
+    "student_id": "b1d029e8-3546-4be0-80a0-9a36b65df6c3",
+    "parent_id": "26c0dd34-138f-4718-b32c-1ff1fc598743",
+    "relationship": null,
+    "is_primary_contact": true,
+    "created_at": "2025-02-24T20:08:44.404543+00:00"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "id": "0b98ff78-0ac3-4732-85c3-215bd08df75a",
+    "organization_id": "a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4",
+    "program_id": "9d7dc91c-7bbe-49cd-bc64-755467bf91da",
+    "attendance_window_start": "08:00:00",
+    "attendance_window_end": "17:00:00",
+    "allow_late_marking": true,
+    "require_notes_for_absence": false,
+    "notification_settings": {
+      "notifyOnLate": true,
+      "notifyOnAbsence": true,
+      "sendSMSNotifications": false,
+      "sendEmailNotifications": true
+    },
+    "created_at": "2025-02-25T01:13:20.972248+00:00",
+    "updated_at": "2025-02-25T01:13:20.972248+00:00"
+  }
+]
