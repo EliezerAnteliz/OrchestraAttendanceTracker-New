@@ -1,0 +1,949 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { 
+  MdSearch, MdFilterList, MdCheckCircle, MdCancel, 
+  MdCalendarToday, MdSave, MdSelectAll, MdDeselect 
+} from 'react-icons/md';
+
+type Student = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  instrument: string;
+  instrument_size?: string;
+  is_active: boolean;
+  current_grade?: string;
+  selected?: boolean;
+  attendance_status?: string;
+};
+
+type AttendanceStatus = {
+  code: string;
+  description: string;
+  color?: string;
+  created_at?: string;
+};
+
+export default function AttendancePage() {
+  const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showActiveOnly, setShowActiveOnly] = useState(true);
+  const [attendanceStatuses, setAttendanceStatuses] = useState<AttendanceStatus[]>([]);
+  const [currentDate, setCurrentDate] = useState<string>(
+    new Date().toISOString().split('T')[0]
+  );
+  const [attendanceMode, setAttendanceMode] = useState(false);
+  const [selectedStudentCount, setSelectedStudentCount] = useState(0);
+
+  // Función para cargar datos de asistencia para una fecha específica
+  const fetchAttendanceData = async (date: string) => {
+    try {
+      console.log(`Cargando datos de asistencia para la fecha: ${date}`);
+      console.log(`Formato de fecha enviado a Supabase: ${date}`);
+      
+      // Validar formato de fecha
+      if (!date || date.trim() === '') {
+        console.error('Error: Fecha inválida o vacía');
+        return null;
+      }
+      
+      // DEPURACIÓN: Mostrar todos los registros de asistencia para entender la estructura
+      const allAttendanceResult = await supabase
+        .from('attendance')
+        .select('*')
+        .limit(5);
+        
+      console.log('DEPURACIÓN - Muestra de registros de asistencia:', {
+        registros: allAttendanceResult.data,
+        columnas: allAttendanceResult.data && allAttendanceResult.data[0] ? Object.keys(allAttendanceResult.data[0]) : [],
+        error: allAttendanceResult.error
+      });
+      
+      // DEPURACIÓN: Obtener todos los registros de asistencia para entender la estructura
+      const allResult = await supabase
+        .from('attendance')
+        .select('*')
+        .limit(5);
+      
+      console.log('DEPURACIÓN - Estructura de la tabla attendance:', {
+        columnas: allResult.data && allResult.data.length > 0 ? Object.keys(allResult.data[0]) : [],
+        ejemploRegistro: allResult.data && allResult.data.length > 0 ? allResult.data[0] : null
+      });
+      
+      // Intentar con diferentes nombres de columna posibles
+      const result = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('date', date);
+      
+      const attendanceData = result.data;
+      const attendanceError = result.error;
+      
+      console.log('Respuesta de asistencia para fecha específica:', { 
+        fecha: date,
+        registrosEncontrados: attendanceData?.length || 0,
+        data: attendanceData, 
+        error: attendanceError,
+        columnas: attendanceData && attendanceData[0] ? Object.keys(attendanceData[0]) : []
+      });
+      
+      // Verificar si hay datos para la fecha seleccionada
+      if (!attendanceData || attendanceData.length === 0) {
+        console.log(`No se encontraron registros de asistencia para la fecha: ${date}`);
+      } else {
+        console.log(`Se encontraron ${attendanceData.length} registros de asistencia para la fecha: ${date}`);
+        // Mostrar los primeros registros para depuración
+        attendanceData.slice(0, 3).forEach((record, index) => {
+          console.log(`Registro ${index + 1}:`, record);
+        });
+      }
+      
+      if (attendanceError) throw attendanceError;
+      
+      // Actualizar el estado de asistencia de los estudiantes
+      setStudents(prevStudents => {
+        const updatedStudents = prevStudents.map(student => {
+          const attendanceRecord = attendanceData?.find(
+            record => record.student_id === student.id
+          );
+          
+          if (!attendanceRecord) {
+            console.log(`No se encontró registro de asistencia para estudiante ${student.id} (${student.first_name} ${student.last_name}) en la fecha seleccionada`);
+            return {
+              ...student,
+              attendance_status: null // Resetear a null para mostrar "No registrado"
+            };
+          }
+          
+          // Identificar la columna de estado de asistencia en el registro
+          const statusColumn = 
+            (attendanceRecord.status_id !== undefined ? 'status_id' : 
+             attendanceRecord.attendance_status_id !== undefined ? 'attendance_status_id' : 
+             attendanceRecord.status !== undefined ? 'status' : null);
+          
+          const attendanceStatus = statusColumn ? attendanceRecord[statusColumn] : null;
+          
+          console.log('Actualizando estado de asistencia para estudiante:', { 
+            studentId: student.id, 
+            nombre: `${student.first_name} ${student.last_name}`,
+            statusColumn, 
+            attendanceStatus,
+            registroCompleto: attendanceRecord
+          });
+          
+          return {
+            ...student,
+            attendance_status: attendanceStatus
+          };
+        });
+        
+        console.log(`Estados de asistencia actualizados para ${updatedStudents.length} estudiantes`);
+        // Mostrar algunos ejemplos para depuración
+        updatedStudents.slice(0, 3).forEach((student, index) => {
+          console.log(`Estudiante ${index + 1} (${student.first_name} ${student.last_name}): Estado = ${student.attendance_status || 'No registrado'}`);
+        });
+        
+        return updatedStudents;
+      });
+      
+      // Actualizar también los estudiantes filtrados
+      setFilteredStudents(prevFiltered => {
+        const updatedFiltered = prevFiltered.map(student => {
+          const attendanceRecord = attendanceData?.find(
+            record => record.student_id === student.id
+          );
+          
+          if (!attendanceRecord) {
+            console.log(`No se encontró registro de asistencia para estudiante filtrado ${student.id} (${student.first_name} ${student.last_name}) en la fecha seleccionada`);
+            return {
+              ...student,
+              attendance_status: null // Resetear a null para mostrar "No registrado"
+            };
+          }
+          
+          // Identificar la columna de estado de asistencia en el registro
+          const statusColumn = 
+            (attendanceRecord.status_id !== undefined ? 'status_id' : 
+             attendanceRecord.attendance_status_id !== undefined ? 'attendance_status_id' : 
+             attendanceRecord.status !== undefined ? 'status' : null);
+          
+          const attendanceStatus = statusColumn ? attendanceRecord[statusColumn] : null;
+          
+          console.log('Actualizando estado de asistencia para estudiante filtrado:', { 
+            studentId: student.id, 
+            nombre: `${student.first_name} ${student.last_name}`,
+            statusColumn, 
+            attendanceStatus
+          });
+          
+          return {
+            ...student,
+            attendance_status: attendanceStatus
+          };
+        });
+        
+        console.log(`Estados de asistencia actualizados para ${updatedFiltered.length} estudiantes filtrados`);
+        return updatedFiltered;
+      });
+      
+      return attendanceData;
+    } catch (err) {
+      console.error('Error al cargar datos de asistencia:', err);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        
+        // Cargar estudiantes
+        console.log('Iniciando carga de estudiantes...');
+        console.log(`Fecha actual seleccionada: ${currentDate}`);
+        
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select('*')
+          .order('first_name', { ascending: true })
+          .order('last_name', { ascending: true });
+        
+        console.log('Respuesta de estudiantes:', { data: studentsData, error: studentsError });
+        
+        if (studentsError) throw studentsError;
+        
+        if (!studentsData || studentsData.length === 0) {
+          console.warn('No se encontraron estudiantes en la base de datos');
+        }
+        
+        // Cargar estados de asistencia
+        const { data: statusesData, error: statusesError } = await supabase
+          .from('attendance_status')
+          .select('*');
+        
+        console.log('Estados de asistencia disponibles:', statusesData);
+        console.log('Detalles de estados de asistencia:', statusesData?.map(s => ({ code: s.code, description: s.description })));
+        
+        if (statusesError) throw statusesError;
+        
+        // Si no hay estados de asistencia, mostrar un mensaje de error
+        if (!statusesData || statusesData.length === 0) {
+          console.error('No hay estados de asistencia definidos en la base de datos');
+          setError('No hay estados de asistencia definidos en la base de datos. Por favor, contacte al administrador.');
+        }
+        
+        // Primero, consultamos la estructura de la tabla attendance para ver las columnas disponibles
+        console.log('Consultando estructura de la tabla attendance...');
+        const { data: attendanceStructure, error: structureError } = await supabase
+          .from('attendance')
+          .select('*')
+          .limit(1);
+          
+        console.log('Estructura de la tabla attendance:', { 
+          data: attendanceStructure, 
+          columnas: attendanceStructure && attendanceStructure[0] ? Object.keys(attendanceStructure[0]) : [],
+          error: structureError 
+        });
+        
+        if (structureError) throw structureError;
+        
+        // Cargar datos de asistencia para la fecha actual
+        console.log(`Cargando datos de asistencia para la fecha: ${currentDate}`);
+        const attendanceData = await fetchAttendanceData(currentDate);
+        
+        // Mapear los estados de asistencia a los estudiantes
+        const studentsWithAttendance = studentsData?.map(student => {
+          const attendanceRecord = attendanceData?.find(
+            record => record.student_id === student.id
+          );
+          
+          // Identificar la columna de estado de asistencia en el registro
+          // Podría ser status_id, attendance_status_id o simplemente status
+          const statusColumn = attendanceRecord ? 
+            (attendanceRecord.status_id !== undefined ? 'status_id' : 
+             attendanceRecord.attendance_status_id !== undefined ? 'attendance_status_id' : 
+             attendanceRecord.status !== undefined ? 'status' : null) : null;
+          
+          const attendanceStatus = statusColumn ? attendanceRecord[statusColumn] : null;
+          console.log('Estado de asistencia para estudiante:', { 
+            studentId: student.id, 
+            nombre: `${student.first_name} ${student.last_name}`,
+            fecha: currentDate,
+            statusColumn, 
+            attendanceStatus,
+            tieneRegistro: !!attendanceRecord
+          });
+          
+          return {
+            ...student,
+            selected: false,
+            attendance_status: attendanceStatus
+          };
+        }) || [];
+        
+        console.log(`Procesados ${studentsWithAttendance.length} estudiantes con sus estados de asistencia para la fecha ${currentDate}`);
+        
+        setStudents(studentsWithAttendance);
+        setFilteredStudents(studentsWithAttendance);
+        setAttendanceStatuses(statusesData || []);
+      } catch (err: any) {
+        console.error('Error al cargar datos:', err);
+        // Mostrar mensaje de error más detallado para facilitar la depuración
+        setError(`Error al cargar datos: ${err.message || JSON.stringify(err)}`);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchData();
+  }, [currentDate]);
+
+  // Filtrar estudiantes cuando cambia la búsqueda o el filtro de activos
+  useEffect(() => {
+    let result = students;
+    
+    // Filtrar por búsqueda
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(student => 
+        student.first_name.toLowerCase().includes(query) || 
+        student.last_name.toLowerCase().includes(query) ||
+        student.instrument?.toLowerCase().includes(query)
+      );
+    }
+    
+    // Filtrar por estado activo
+    if (showActiveOnly) {
+      result = result.filter(student => student.is_active !== false);
+    }
+    
+    setFilteredStudents(result);
+  }, [searchQuery, showActiveOnly, students]);
+
+  // Función para seleccionar/deseleccionar un estudiante
+  const toggleStudentSelection = (studentId: string) => {
+    setStudents(prevStudents => {
+      const newStudents = prevStudents.map(student =>
+        student.id === studentId
+          ? { ...student, selected: !student.selected }
+          : student
+      );
+      
+      // Actualizar el contador después de cambiar la selección
+      setTimeout(() => {
+        const count = newStudents.filter(student => student.selected).length;
+        setSelectedStudentCount(count);
+      }, 0);
+      
+      return newStudents;
+    });
+  };
+
+  // Función para seleccionar/deseleccionar todos los estudiantes
+  const toggleAllStudents = (select: boolean) => {
+    setStudents(prevStudents => 
+      prevStudents.map(student => ({
+        ...student,
+        selected: select && (student.is_active !== false || !showActiveOnly)
+      }))
+    );
+  };
+
+  // Función para actualizar el contador de estudiantes seleccionados
+  const updateSelectedCount = () => {
+    const count = students.filter(student => student.selected).length;
+    setSelectedStudentCount(count);
+  };
+
+  // Función para marcar asistencia
+  const markAttendance = async (statusId: string) => {
+    try {
+      const selectedStudents = students.filter(student => student.selected);
+      
+      if (selectedStudents.length === 0) {
+        setError('Por favor, selecciona al menos un estudiante.');
+        setTimeout(() => setError(null), 3000); // Limpiar mensaje después de 3 segundos
+        return;
+      }
+      
+      if (!statusId) {
+        console.error('Error: statusId es undefined o null');
+        setError('Error: No se pudo determinar el estado de asistencia. Por favor, inténtalo de nuevo.');
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+      
+      // Verificar que el statusId (code) existe en la base de datos
+      const statusExists = attendanceStatuses.some(status => status && status.code === statusId);
+      if (!statusExists) {
+        console.error(`Error: El estado de asistencia con código ${statusId} no existe en la base de datos`);
+        setError(`Error: El estado de asistencia seleccionado no existe en la base de datos. Por favor, contacte al administrador.`);
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+      
+      console.log(`Marcando asistencia para ${selectedStudents.length} estudiantes con estado: ${statusId}`);
+      
+      // Obtener el estado de asistencia para mostrar información detallada
+      const statusInfo = attendanceStatuses.find(status => status && status.code === statusId);
+      console.log(`Marcando asistencia con estado: ${statusInfo?.description || 'Desconocido'} (Código: ${statusId})`);
+      
+      setSaving(true);
+      setError(null);
+      setSuccessMessage(null);
+      
+      // Consultar la estructura de la tabla attendance para determinar el nombre de la columna
+      console.log('Consultando estructura de la tabla attendance para guardar...');
+      const { data: attendanceStructure, error: structureError } = await supabase
+        .from('attendance')
+        .select('*')
+        .limit(1);
+      
+      if (structureError) {
+        console.error('Error al consultar estructura:', structureError);
+        throw structureError;
+      }
+      
+      // Determinar el nombre correcto de la columna para el estado de asistencia
+      let statusColumnName = 'attendance_status_id'; // Cambiamos el valor por defecto
+      
+      // Intentar obtener la estructura de la tabla attendance
+      try {
+        // Primero intentamos una consulta simple para ver las columnas disponibles
+        const { data: sampleData, error: sampleError } = await supabase
+          .from('attendance')
+          .select('*')
+          .limit(1);
+        
+        if (sampleError) {
+          console.error('Error al consultar muestra de attendance:', sampleError);
+        } else if (sampleData && sampleData.length > 0) {
+          // Si tenemos datos, podemos ver las columnas disponibles
+          const columns = Object.keys(sampleData[0]);
+          console.log('Columnas disponibles en attendance:', columns);
+          
+          // Buscar la columna correcta para el estado de asistencia
+          if (columns.includes('status_id')) {
+            statusColumnName = 'status_id';
+          } else if (columns.includes('attendance_status_id')) {
+            statusColumnName = 'attendance_status_id';
+          } else if (columns.includes('status')) {
+            statusColumnName = 'status';
+          } else {
+            // Si no encontramos ninguna de las columnas esperadas, intentemos buscar alguna que contenga 'status'
+            const statusColumn = columns.find((col: string) => col.includes('status'));
+            if (statusColumn) {
+              statusColumnName = statusColumn;
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error al detectar columna de estado:', err);
+        // Continuamos con el valor por defecto si hay error
+      }
+      
+      console.log(`Usando columna '${statusColumnName}' para guardar el estado de asistencia`);
+      
+      // Preparar los datos para la inserción usando el nombre de columna detectado
+      const attendanceRecords = selectedStudents.map(student => {
+        // Crear un objeto dinámico para manejar propiedades con nombres variables
+        const record: Record<string, any> = {
+          student_id: student.id,
+          date: currentDate,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        // Añadir el estado de asistencia con el nombre de columna correcto
+        record[statusColumnName] = statusId;
+        
+        return record;
+      });
+      
+      // Primero eliminar registros existentes para estos estudiantes en esta fecha
+      const { error: deleteError } = await supabase
+        .from('attendance')
+        .delete()
+        .eq('date', currentDate)
+        .in('student_id', selectedStudents.map(s => s.id));
+      
+      if (deleteError) throw deleteError;
+      
+      // Insertar los nuevos registros
+      const { error: insertError } = await supabase
+        .from('attendance')
+        .insert(attendanceRecords);
+      
+      if (insertError) throw insertError;
+      
+      // Actualizar el estado local inmediatamente para mejor feedback visual
+      console.log('Actualizando estado local con statusId:', statusId);
+      
+      // Crear una lista de IDs de estudiantes seleccionados para facilitar la búsqueda
+      const selectedIds = selectedStudents.map(s => s.id);
+      console.log('IDs de estudiantes seleccionados:', selectedIds);
+      
+      setStudents(prevStudents => {
+        const updatedStudents = prevStudents.map(student => {
+          if (selectedIds.includes(student.id)) {
+            console.log(`Actualizando estudiante ${student.id} de estado ${student.attendance_status} a ${statusId}`);
+            return { ...student, selected: false, attendance_status: statusId };
+          }
+          return student;
+        });
+        console.log('Estado de estudiantes actualizado:', updatedStudents);
+        return updatedStudents;
+      });
+      
+      // Actualizar también los estudiantes filtrados para mantener la sincronización
+      setFilteredStudents(prevFiltered => {
+        const updatedFiltered = prevFiltered.map(student => {
+          if (selectedIds.includes(student.id)) {
+            return { ...student, selected: false, attendance_status: statusId };
+          }
+          return student;
+        });
+        return updatedFiltered;
+      });
+      
+      // Recargar los datos de asistencia para asegurar que se muestren correctamente
+      await fetchAttendanceData(currentDate);
+      
+      const statusName = attendanceStatuses.find(s => s.code === statusId)?.description || 'Desconocido';
+      setSuccessMessage(`Asistencia marcada como "${statusName}" para ${selectedStudents.length} estudiante(s).`);
+      setTimeout(() => setSuccessMessage(null), 3000); // Limpiar mensaje después de 3 segundos
+    } catch (err: any) {
+      console.error('Error al guardar asistencia:', err);
+      setError(`Error al guardar la asistencia: ${err.message || 'Intenta de nuevo más tarde.'}`);
+      setTimeout(() => setError(null), 5000); // Limpiar mensaje de error después de 5 segundos
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando datos de asistencia...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mantenemos el error fatal que impide cargar la página
+  if (error && loading) {
+    return (
+      <div className="bg-red-50 p-4 rounded-md border border-red-200">
+        <p className="text-red-700">{error}</p>
+      </div>
+    );
+  }
+
+  const getStatusColor = (statusId: string | null | undefined) => {
+    if (!statusId) return 'bg-gray-200';
+    // Asignar colores basados en el código
+    if (statusId === 'A') return 'bg-green-500';
+    if (statusId === 'UA') return 'bg-red-500';
+    if (statusId === 'EA') return 'bg-yellow-500';
+    return 'bg-gray-200';
+  };
+
+  const getStatusName = (statusId: string | null | undefined) => {
+    if (!statusId) return 'No registrado';
+    
+    // Añadir logs para depuración
+    console.log('getStatusName - statusId:', statusId);
+    console.log('getStatusName - attendanceStatuses:', attendanceStatuses);
+    
+    // Buscar el estado por código, asegurando que la comparación sea correcta
+    const status = attendanceStatuses.find(s => s && s.code && s.code.toString() === statusId.toString());
+    
+    // Log del resultado
+    console.log('getStatusName - status encontrado:', status);
+    
+    return status?.description || 'Desconocido';
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Notificaciones de éxito y error */}
+      {successMessage && (
+        <div className="bg-green-50 p-4 rounded-md border border-green-200 flex items-center">
+          <MdCheckCircle className="text-green-500 mr-2 text-xl" />
+          <p className="text-green-700">{successMessage}</p>
+        </div>
+      )}
+      
+      {error && !loading && (
+        <div className="bg-red-50 p-4 rounded-md border border-red-200 flex items-center">
+          <MdCancel className="text-red-500 mr-2 text-xl" />
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Registro de Asistencia</h1>
+        <div className="flex items-center">
+          <div className="relative mr-4">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MdCalendarToday className="text-gray-400" />
+            </div>
+            <input
+              type="date"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent"
+              value={currentDate}
+              onChange={async (e) => {
+                const newDate = e.target.value;
+                console.log(`Cambiando fecha a: ${newDate}`);
+                setCurrentDate(newDate);
+                
+                // Cargar inmediatamente los datos de asistencia para la nueva fecha
+                try {
+                  setLoading(true);
+                  console.log(`Cargando datos de asistencia para la nueva fecha seleccionada: ${newDate}`);
+                  await fetchAttendanceData(newDate);
+                } catch (error) {
+                  console.error('Error al cargar datos de asistencia para la nueva fecha:', error);
+                  setError(`Error al cargar datos de asistencia: ${error instanceof Error ? error.message : String(error)}`);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            />
+          </div>
+          <button
+            onClick={() => setAttendanceMode(!attendanceMode)}
+            className={`px-4 py-2 rounded-md transition-colors ${
+              attendanceMode 
+                ? 'bg-[#0073ea] text-white' 
+                : 'bg-white border border-gray-300 text-gray-700'
+            }`}
+          >
+            {attendanceMode ? 'Modo Asistencia Activo' : 'Activar Modo Asistencia'}
+          </button>
+        </div>
+      </div>
+
+      {/* Barra de búsqueda y filtros */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <MdSearch className="text-gray-400" size={20} />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar por nombre o instrumento..."
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center">
+          <button
+            onClick={() => setShowActiveOnly(!showActiveOnly)}
+            className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            <MdFilterList className="mr-2" />
+            {showActiveOnly ? 'Mostrar todos' : 'Solo activos'}
+          </button>
+        </div>
+      </div>
+
+      {/* Modo asistencia - Controles */}
+      {attendanceMode && (
+        <div className="bg-[#e5f2ff] p-4 rounded-lg border border-[#0073ea] space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Modo Asistencia</h3>
+              <p className="text-sm text-gray-600">Selecciona estudiantes y marca su asistencia</p>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => toggleAllStudents(true)}
+                className="px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center"
+                disabled={saving}
+              >
+                <MdSelectAll className="mr-1" /> Seleccionar Todos
+              </button>
+              <button
+                onClick={() => toggleAllStudents(false)}
+                className="px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center"
+                disabled={saving}
+              >
+                <MdDeselect className="mr-1" /> Deseleccionar Todos
+              </button>
+            </div>
+          </div>
+          
+          {/* Botones de asistencia predefinidos - Simplificados */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => {
+                console.log('Buscando estado Presente en:', attendanceStatuses);
+                // Intentar encontrar por diferentes nombres posibles para Presente
+                if (!attendanceStatuses || attendanceStatuses.length === 0) {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No hay estados de asistencia definidos. Por favor, contacte al administrador.');
+                  return;
+                }
+                
+                // Buscar el estado por código - asegurarse de manejar undefined/null
+                const presenteStatus = attendanceStatuses.find(s => 
+                  s && s.code && typeof s.code === 'string' && (
+                    s.code === 'A' || 
+                    s.code.toLowerCase() === 'presente' || 
+                    s.code.toLowerCase() === 'present' || 
+                    s.code.toLowerCase().includes('present')
+                  ));
+                
+                if (presenteStatus && presenteStatus.code) {
+                  console.log('Código de Presente encontrado:', presenteStatus.code);
+                  markAttendance(presenteStatus.code);
+                } else if (attendanceStatuses.length > 0) {
+                  // Si no se encuentra, usar el primer estado disponible que tenga un código válido
+                  const firstValidStatus = attendanceStatuses.find(s => s && s.code);
+                  if (firstValidStatus && firstValidStatus.code) {
+                    console.log('No se encontró estado Presente específico, usando estado alternativo:', firstValidStatus.description, firstValidStatus.code);
+                    markAttendance(firstValidStatus.code);
+                  } else {
+                    console.error('No hay estados de asistencia con códigos válidos');
+                    setError('No se encontraron estados de asistencia válidos. Por favor, contacte al administrador.');
+                  }
+                } else {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No se pudo determinar el estado de asistencia. Por favor, contacte al administrador.');
+                }
+              }}
+              className="px-4 py-2 rounded-md text-white flex items-center bg-green-600 hover:bg-green-700"
+              disabled={saving || selectedStudentCount === 0}
+            >
+              <MdCheckCircle className="mr-1" /> Marcar como Presente
+            </button>
+            <button
+              onClick={() => {
+                console.log('Buscando estado Falta Injustificada en:', attendanceStatuses);
+                // Intentar encontrar por diferentes nombres posibles para Falta Injustificada
+                if (!attendanceStatuses || attendanceStatuses.length === 0) {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No hay estados de asistencia definidos. Por favor, contacte al administrador.');
+                  return;
+                }
+                
+                // Buscar el estado por código - asegurarse de manejar undefined/null
+                const faltaInjustificadaStatus = attendanceStatuses.find(s => 
+                  s && s.code && typeof s.code === 'string' && (
+                    s.code === 'UA' || 
+                    s.code.toLowerCase() === 'falta injustificada' || 
+                    s.code.toLowerCase() === 'unexcused' || 
+                    s.code.toLowerCase().includes('injustificada') || 
+                    s.code.toLowerCase().includes('unexcused')
+                  ));
+                
+                if (faltaInjustificadaStatus && faltaInjustificadaStatus.code) {
+                  console.log('Código de Falta Injustificada encontrado:', faltaInjustificadaStatus.code);
+                  markAttendance(faltaInjustificadaStatus.code);
+                } else if (attendanceStatuses.length > 1) {
+                  // Si no se encuentra, buscar el segundo estado con código válido
+                  const secondValidStatus = attendanceStatuses[1];
+                  if (secondValidStatus && secondValidStatus.code) {
+                    console.log('No se encontró estado Falta Injustificada específico, usando estado alternativo:', secondValidStatus.description, secondValidStatus.code);
+                    markAttendance(secondValidStatus.code);
+                  } else {
+                    // Si no hay un segundo estado válido, buscar cualquier estado con código válido
+                    const anyValidStatus = attendanceStatuses.find(s => s && s.code);
+                    if (anyValidStatus && anyValidStatus.code) {
+                      console.log('Usando estado alternativo para Falta Injustificada:', anyValidStatus.description, anyValidStatus.code);
+                      markAttendance(anyValidStatus.code);
+                    } else {
+                      console.error('No hay estados de asistencia con códigos válidos');
+                      setError('No se encontraron estados de asistencia válidos. Por favor, contacte al administrador.');
+                    }
+                  }
+                } else if (attendanceStatuses.length > 0) {
+                  // Si hay menos de 2 estados, buscar cualquier estado con código válido
+                  const anyValidStatus = attendanceStatuses.find(s => s && s.code);
+                  if (anyValidStatus && anyValidStatus.code) {
+                    console.log('No hay suficientes estados, usando estado alternativo para Falta Injustificada:', anyValidStatus.description, anyValidStatus.code);
+                    markAttendance(anyValidStatus.code);
+                  } else {
+                    console.error('No hay estados de asistencia con códigos válidos');
+                    setError('No se encontraron estados de asistencia válidos. Por favor, contacte al administrador.');
+                  }
+                } else {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No se pudo determinar el estado de asistencia. Por favor, contacte al administrador.');
+                }
+              }}
+              className="px-4 py-2 rounded-md text-white flex items-center bg-red-600 hover:bg-red-700"
+              disabled={saving || selectedStudentCount === 0}
+            >
+              <MdCancel className="mr-1" /> Marcar como Falta Injustificada
+            </button>
+            <button
+              onClick={() => {
+                console.log('Buscando estado Falta Justificada en:', attendanceStatuses);
+                // Intentar encontrar por diferentes nombres posibles para Falta Justificada
+                if (!attendanceStatuses || attendanceStatuses.length === 0) {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No hay estados de asistencia definidos. Por favor, contacte al administrador.');
+                  return;
+                }
+                
+                // Buscar el estado por código - asegurarse de manejar undefined/null
+                const faltaJustificadaStatus = attendanceStatuses.find(s => 
+                  s && s.code && typeof s.code === 'string' && (
+                    s.code === 'EA' || 
+                    s.code.toLowerCase() === 'falta justificada' || 
+                    s.code.toLowerCase() === 'excused' || 
+                    s.code.toLowerCase().includes('justificada') || 
+                    s.code.toLowerCase().includes('excused')
+                  ));
+                
+                if (faltaJustificadaStatus && faltaJustificadaStatus.code) {
+                  console.log('Código de Falta Justificada encontrado:', faltaJustificadaStatus.code);
+                  markAttendance(faltaJustificadaStatus.code);
+                } else if (attendanceStatuses.length > 2) {
+                  // Si no se encuentra, buscar el tercer estado con código válido
+                  const thirdValidStatus = attendanceStatuses[2];
+                  if (thirdValidStatus && thirdValidStatus.code) {
+                    console.log('No se encontró estado Falta Justificada específico, usando estado alternativo:', thirdValidStatus.description, thirdValidStatus.code);
+                    markAttendance(thirdValidStatus.code);
+                  } else {
+                    // Si no hay un tercer estado válido, buscar cualquier estado con código válido
+                    const anyValidStatus = attendanceStatuses.find(s => s && s.code);
+                    if (anyValidStatus && anyValidStatus.code) {
+                      console.log('Usando estado alternativo para Falta Justificada:', anyValidStatus.description, anyValidStatus.code);
+                      markAttendance(anyValidStatus.code);
+                    } else {
+                      console.error('No hay estados de asistencia con códigos válidos');
+                      setError('No se encontraron estados de asistencia válidos. Por favor, contacte al administrador.');
+                    }
+                  }
+                } else if (attendanceStatuses.length > 0) {
+                  // Si hay menos de 3 estados, buscar cualquier estado con código válido
+                  const anyValidStatus = attendanceStatuses.find(s => s && s.code);
+                  if (anyValidStatus && anyValidStatus.code) {
+                    console.log('No hay suficientes estados, usando estado alternativo para Falta Justificada:', anyValidStatus.description, anyValidStatus.code);
+                    markAttendance(anyValidStatus.code);
+                  } else {
+                    console.error('No hay estados de asistencia con códigos válidos');
+                    setError('No se encontraron estados de asistencia válidos. Por favor, contacte al administrador.');
+                  }
+                } else {
+                  console.error('No hay estados de asistencia disponibles');
+                  setError('No se pudo determinar el estado de asistencia. Por favor, contacte al administrador.');
+                }
+              }}
+              className="px-4 py-2 rounded-md text-white flex items-center bg-yellow-600 hover:bg-yellow-700"
+              disabled={saving || selectedStudentCount === 0}
+            >
+              <MdCalendarToday className="mr-1" /> Marcar como Falta Justificada
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Contador de estudiantes */}
+      <div className="text-sm text-gray-600">
+        Mostrando {filteredStudents.length} de {students.length} estudiantes
+      </div>
+
+      {/* Lista de estudiantes */}
+      <div className="bg-white shadow rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              {attendanceMode && (
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Seleccionar
+                </th>
+              )}
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Instrumento
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Asistencia
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredStudents.length > 0 ? (
+              filteredStudents.map((student) => (
+                <tr 
+                  key={student.id} 
+                  className={`hover:bg-gray-50 ${student.selected ? 'bg-[#e5f2ff]' : ''}`}
+                  onClick={() => toggleStudentSelection(student.id)}
+                  style={{ cursor: attendanceMode ? 'pointer' : 'default' }}
+                >
+                  {attendanceMode && (
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={student.selected || false}
+                          onChange={() => toggleStudentSelection(student.id)}
+                          className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
+                        />
+                      </div>
+                    </td>
+                  )}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {student.first_name} {student.last_name}
+                      </div>
+                      {student.current_grade && (
+                        <div className="text-xs text-gray-500">
+                          Grado: {student.current_grade}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {student.instrument || 'No asignado'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {student.is_active !== false ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <span 
+                      className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full text-white ${
+                        getStatusColor(student.attendance_status)
+                      }`}
+                    >
+                      {getStatusName(student.attendance_status)}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={attendanceMode ? 5 : 4} className="px-6 py-4 text-center text-gray-500">
+                  No se encontraron estudiantes con los filtros actuales.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

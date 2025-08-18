@@ -1,0 +1,298 @@
+{
+  "sheetName": "Form Responses 1",
+  "recordCount": 9,
+  "columns": [
+    "Timestamp",
+    "How did you hear about CMI Ascend?/ Cómo supo de CMI Ascend?:",
+    "Please select one of these options below/ Por favor seleccione una de estas opciones:",
+    "Name(s)/Nombre(s) and Last Name(s)/Apellido(s):",
+    "Date of Birth/Fecha de Nacimiento:",
+    "Age/Edad:",
+    "Country of Origin/País de Origen:",
+    "Current Grade/Grado Actual:",
+    "Student Phone Number/Número de teléfono del estudiante:",
+    "Gender/Género",
+    "Student Email/Dirección de Correo del Estudiante:",
+    "T-Shirt Size/Talla de Camisa:",
+    "Current School District /Distrito Escolar Actual:",
+    "School Name/Nombre de la Escuela:",
+    "Is the student applying to Ascend engaged in any other extracurricular activities at Stafford or other institutions?/¿El estudiante que aplica a Ascend está participando en otras actividades extracurriculares en Stafford u otras instituciones?:",
+    "Dietary Restrictions:",
+    "Please list any additional dietary restrictions or allergies you would like us to be aware of:",
+    "Please upload a recent profile photo of the student:",
+    "Name(s) and Last Name(s) / Nombre(s) y Apellido(s)",
+    "Country of Origin / Pais de Origen:",
+    "Current Phone Number / Número de Teléfono Actual:",
+    "Current Email Address / Dirección de Correo Actual:",
+    "Physical Address / Dirección Física:",
+    "City / Ciudad:",
+    "State / Estado:",
+    "Zip Code / Código Postal:",
+    "Occupation / Ocupación:",
+    "Does your child require special care or have any disabilities?/¿Su hijo requiere cuidado especial o tiene alguna discapacidad?:",
+    "Is your child currently taking any prescribed medication?/¿Su hijo está tomando algún medicamento recetado actualmente?:",
+    "Does your child have any allergies, existing or previous illness?/¿Su hijo tiene alguna alergia o enfermedad existente o anterior?:",
+    "Has your child been hospitalized in the last 12 months?/¿Su hijo ha sido hospitalizado en los últimos 12 meses?:",
+    "By signing this pledge, we the students agree to:",
+    "In consideration of my child being permitted to participate in the Activities, I, on behalf of myself, my child and spouse, heirs and representatives, agree to:",
+    "Please read and check the boxes:",
+    "Please read and check the boxes:_1",
+    "Photography/Video/Media Release:"
+  ],
+  "columnTypes": {
+    "Timestamp": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "How did you hear about CMI Ascend?/ Cómo supo de CMI Ascend?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Please select one of these options below/ Por favor seleccione una de estas opciones:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Name(s)/Nombre(s) and Last Name(s)/Apellido(s):": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Date of Birth/Fecha de Nacimiento:": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Age/Edad:": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Country of Origin/País de Origen:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Current Grade/Grado Actual:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Student Phone Number/Número de teléfono del estudiante:": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Gender/Género": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Student Email/Dirección de Correo del Estudiante:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "T-Shirt Size/Talla de Camisa:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Current School District /Distrito Escolar Actual:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "School Name/Nombre de la Escuela:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Is the student applying to Ascend engaged in any other extracurricular activities at Stafford or other institutions?/¿El estudiante que aplica a Ascend está participando en otras actividades extracurriculares en Stafford u otras instituciones?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Dietary Restrictions:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Please list any additional dietary restrictions or allergies you would like us to be aware of:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Please upload a recent profile photo of the student:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Name(s) and Last Name(s) / Nombre(s) y Apellido(s)": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Country of Origin / Pais de Origen:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Current Phone Number / Número de Teléfono Actual:": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Current Email Address / Dirección de Correo Actual:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Physical Address / Dirección Física:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "City / Ciudad:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "State / Estado:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Zip Code / Código Postal:": {
+      "type": "number",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Occupation / Ocupación:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Does your child require special care or have any disabilities?/¿Su hijo requiere cuidado especial o tiene alguna discapacidad?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Is your child currently taking any prescribed medication?/¿Su hijo está tomando algún medicamento recetado actualmente?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Does your child have any allergies, existing or previous illness?/¿Su hijo tiene alguna alergia o enfermedad existente o anterior?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Has your child been hospitalized in the last 12 months?/¿Su hijo ha sido hospitalizado en los últimos 12 meses?:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "By signing this pledge, we the students agree to:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "In consideration of my child being permitted to participate in the Activities, I, on behalf of myself, my child and spouse, heirs and representatives, agree to:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Please read and check the boxes:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Please read and check the boxes:_1": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    },
+    "Photography/Video/Media Release:": {
+      "type": "string",
+      "fillRate": "100%",
+      "empty": 0,
+      "total": 9
+    }
+  },
+  "sampleData": {
+    "Timestamp": 45881.568459375005,
+    "How did you hear about CMI Ascend?/ Cómo supo de CMI Ascend?:": "CMI visited my school/CMI visitó mi escuela",
+    "Please select one of these options below/ Por favor seleccione una de estas opciones:": "Returning student/Previo estudiante",
+    "Name(s)/Nombre(s) and Last Name(s)/Apellido(s):": "Sol Flores",
+    "Date of Birth/Fecha de Nacimiento:": 41950,
+    "Age/Edad:": 10,
+    "Country of Origin/País de Origen:": "United States",
+    "Current Grade/Grado Actual:": "5th",
+    "Student Phone Number/Número de teléfono del estudiante:": 2108102870,
+    "Gender/Género": "Female/Femenino",
+    "Student Email/Dirección de Correo del Estudiante:": "solmaggieadrian6@gmail.com",
+    "T-Shirt Size/Talla de Camisa:": "XS",
+    "Current School District /Distrito Escolar Actual:": "Edgewood ISD",
+    "School Name/Nombre de la Escuela:": "Stafford Visual and performing Arts",
+    "Is the student applying to Ascend engaged in any other extracurricular activities at Stafford or other institutions?/¿El estudiante que aplica a Ascend está participando en otras actividades extracurriculares en Stafford u otras instituciones?:": "No",
+    "Dietary Restrictions:": "None",
+    "Please list any additional dietary restrictions or allergies you would like us to be aware of:": "Na",
+    "Please upload a recent profile photo of the student:": "https://drive.google.com/open?id=17Q-7srTZJcjiZpx-2EenQ0lXpel4pwXr",
+    "Name(s) and Last Name(s) / Nombre(s) y Apellido(s)": "Margarita Flores",
+    "Country of Origin / Pais de Origen:": "United States",
+    "Current Phone Number / Número de Teléfono Actual:": 2108102870,
+    "Current Email Address / Dirección de Correo Actual:": "Solmaggieadrian6@gmail.com",
+    "Physical Address / Dirección Física:": "4902 Fortuna Place",
+    "City / Ciudad:": "San Antonio",
+    "State / Estado:": "Texas",
+    "Zip Code / Código Postal:": 78237,
+    "Occupation / Ocupación:": "Unemployed",
+    "Does your child require special care or have any disabilities?/¿Su hijo requiere cuidado especial o tiene alguna discapacidad?:": "No",
+    "Is your child currently taking any prescribed medication?/¿Su hijo está tomando algún medicamento recetado actualmente?:": "No",
+    "Does your child have any allergies, existing or previous illness?/¿Su hijo tiene alguna alergia o enfermedad existente o anterior?:": "No",
+    "Has your child been hospitalized in the last 12 months?/¿Su hijo ha sido hospitalizado en los últimos 12 meses?:": "No",
+    "By signing this pledge, we the students agree to:": "Value student differences and treat others with respect., Not become involved in bullying or cyber bullying incidents or be a bully or cyberbully., Be aware of the school’s policies and support system with regard to bullying/cyber bullying., Report honestly and immediately all incidents of bullying/cyber bullying to a faculty member., Be alert in places around the school where there is less adult supervision such as bathrooms, corridors, and stairwells., Support students who have been or are subjected to bullying/cyber bullying., Talk to teachers and parents about concerns and issues regarding bullying/cyber bullying., Provide a good role model for younger students and support them if bullying/cyber bullying occurs., I acknowledge that whether I am being a bullying/cyber bullying bully or see someone being bullied/cyber bullied, if I don not report or stop the bullying/cyber bullying, I am just as guilty.",
+    "In consideration of my child being permitted to participate in the Activities, I, on behalf of myself, my child and spouse, heirs and representatives, agree to:": "I, the undersigned parent or guardian, hereby CONSENT to my child, participating in activities provided by the Classical Music Institute—CMI at its 2023 Summer Festival Summer Education Program (“Activities”)., If my child has any medical condition, I have listed them above., In the event of a medical emergency, I understand reasonable efforts will be made to contact me or my designated emergency contact, In the event of a medical emergency, I hereby consent and authorize the Classical Music Institute to seek emergency medical treatment for my child., I understand and hereby agree to ASSUME THE RISKS which may be presented from my child’s participation in the Activities, including any preparations and travel related to the Activities., RELEASE and WAIVE any right to sue the Classical Music Institute—CMI, including its officers, employees and agents, for and from any and all liability, claims, causes of action, damages, losses (including personal injury or death) or costs, whether arising now or in the future, in connection with or arising from my child’s use of the CMI facilities and transportation, or participation in the Activities; and INDEMNIFY the Classical Music Institute—CMI, including its officers, employees and agents, for and from any or all liability, claims, causes of action, damages, losses (including personal injury and death) and costs (including attorneys’ fees), whether arising now or in the future, incurred in connection with or arising from my child’s use of the CMI facilities and transportation, or participation in the Activities., I acknowledge that CMI and Stafford will supply my child with a musical instrument for which I hold responsibility in the event of any damage or loss.",
+    "Please read and check the boxes:": "I will arrive to Ascend on time / Llegaré a Ascend a tiempo, I will do my best to safeguarding the health of the people around me./Haré todo lo posible para salvaguardar la salud de las personas a mi alrededor., I will make every effort to attend everyday/Haré todo lo posible por asistir todos los días., I will apply myself 100% to this program/Me aplicaré al 100% en este programa., I will respect my fellow student’s time with faculty/Respetaré el tiempo de mis compañeros de clase con los profesores., I will complete all homework/practice assignments/Completaré todas las tareas/prácticas asignadas., I acknowledge and respect the rule prohibiting the use of my cellphone during the program/ Reconozco y respeto la norma que prohíbe el uso de mi teléfono celular durante el programa.",
+    "Please read and check the boxes:_1": "I understand the significance of my child attending the entire program, and I acknowledge that students failing to do so may result in their removal from Ascend., I will have my child arrive to Ascend on time., I will make sure my child is picked up after Ascend on time., I will make every effort to support my child during Ascend so he/she can be as successful as possible., I understand that there are concerts and my child may be performing in those concerts.",
+    "Photography/Video/Media Release:": "I consent to the use by the Classical Music Institute (CMI) and those acting with its permission and authority of any and all photographs, video recordings, audio recordings, or other images taken of me, or in which I may be included, in connection with my role in the Ascend program. This consent applies to all purposes and in any and all media — including print, digital, broadcast, and online formats — without limitation, and may be used for promotion, advertising, solicitation, educational outreach, or other activities consistent with CMI’s mission., I understand that my likeness may appear in materials available to the general public, students, parents, staff, board members, and individuals outside of the CMI community. I waive any right to inspect or approve the final images, video, or accompanying materials, including advertising copy or printed matter, in which my likeness may appear. I understand that any distribution of my image or recordings will follow CMI’s policies, statements, and values, and that CMI may crop, edit, or otherwise alter images for purposes of design, formatting, or illustration., I release the Classical Music Institute and those acting under its authority from any liability related to the creation, alteration, processing, editing, transmission, display, or publication of these images. I acknowledge that all media in which I appear, including photographs, film, digital files, and video, are the exclusive property of CMI, and I grant CMI the unrestricted right to copyright, publish, and re-publish these materials for purposes related to the Ascend program and other CMI educational and artistic initiatives."
+  }
+}
