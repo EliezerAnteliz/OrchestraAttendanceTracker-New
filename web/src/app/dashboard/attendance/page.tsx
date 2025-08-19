@@ -608,13 +608,42 @@ export default function AttendancePage() {
       // Obtener los IDs de los estudiantes seleccionados
       const selectedStudentIds = selectedStudents.map(student => student.id);
       
+      console.log('Clearing attendance for:', {
+        date: currentDate,
+        program_id: activeProgram.id,
+        student_ids: selectedStudentIds,
+        selected_students: selectedStudents.map(s => ({ id: s.id, name: `${s.first_name} ${s.last_name}` }))
+      });
+      
+      // Primero verificar qué registros existen
+      const { data: existingRecords, error: fetchError } = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('date', currentDate)
+        .eq('program_id', activeProgram.id)
+        .in('student_id', selectedStudentIds);
+      
+      console.log('Existing attendance records to delete:', existingRecords);
+      
+      if (fetchError) {
+        console.error('Error fetching existing records:', fetchError);
+      }
+      
+      if (!existingRecords || existingRecords.length === 0) {
+        alert('No se encontraron registros de asistencia para los estudiantes seleccionados en esta fecha.');
+        return;
+      }
+      
       // Eliminar registros de asistencia solo para los estudiantes seleccionados
-      const { error } = await supabase
+      const { data: deletedData, error } = await supabase
         .from('attendance')
         .delete()
         .eq('date', currentDate)
         .eq('program_id', activeProgram.id)
-        .in('student_id', selectedStudentIds);
+        .in('student_id', selectedStudentIds)
+        .select();
+      
+      console.log('Delete operation result:', { deletedData, error });
 
       if (error) {
         console.error('Error clearing attendance for selected students:', error);
