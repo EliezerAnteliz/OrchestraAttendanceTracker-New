@@ -64,7 +64,6 @@ export default function SignUpPage() {
       <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <MdMusicNote size={32} />
             <span className="text-2xl font-bold">{t('app_title')}</span>
           </Link>
         </div>
