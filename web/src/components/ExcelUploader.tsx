@@ -390,20 +390,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <FiUsers className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{t('bulk_upload_title')}</h3>
-            <p className="text-sm text-gray-600">{t('bulk_upload_subtitle')}</p>
-          </div>
-        </div>
-      </div>
-
+    <div className="bg-white">
       <div className="p-6">
         {/* Instructions */}
         <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
