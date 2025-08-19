@@ -9,8 +9,14 @@ function LanguageFloatingButton() {
     <button
       onClick={toggleLanguage}
       aria-label={lang === "es" ? t("switch_to_en") : t("switch_to_es")}
-      className="fixed bottom-4 right-4 z-50 px-3 py-2 rounded-full shadow-lg border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50"
+      className="fixed bottom-4 right-4 z-50 px-3 py-2 rounded-full shadow-lg border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 transform-gpu"
       title={lang === "es" ? t("switch_to_en") : t("switch_to_es")}
+      style={{ 
+        position: 'fixed',
+        bottom: '1rem',
+        right: '1rem',
+        zIndex: 50
+      }}
     >
       {lang === "es" ? t("lang_en") : t("lang_es")}
     </button>
