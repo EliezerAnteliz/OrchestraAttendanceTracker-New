@@ -30,10 +30,10 @@ export default function Home() {
             {/* Left Content */}
             <div className="lg:w-1/2 space-y-8">
               <div className="space-y-4">
-                <h2 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
+                <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                   {t("landing_headline")}
                 </h2>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl text-gray-800 leading-relaxed">
                   {t("landing_desc")}
                 </p>
               </div>
@@ -86,8 +86,8 @@ export default function Home() {
         <div className="bg-white py-16">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-800 mb-4">¿Por qué elegir Ascend?</h3>
-              <p className="text-xl text-gray-600">Diseñado específicamente para orquestas y programas musicales</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">¿Por qué elegir Ascend?</h3>
+              <p className="text-xl text-gray-800">Diseñado específicamente para orquestas y programas musicales</p>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8">
