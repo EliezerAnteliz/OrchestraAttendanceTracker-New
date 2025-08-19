@@ -261,3 +261,72 @@ body {
 .animate-grow-up {
   animation: growUp 0.8s ease-out forwards;
 }
+
+/* Estilos responsivos para móviles */
+@media (max-width: 640px) {
+  /* Reducir padding en contenedores principales */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Ajustar tamaño de texto en móviles */
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  /* Botones más grandes para touch */
+  button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Tablas responsivas */
+  table {
+    font-size: 0.875rem;
+  }
+  
+  /* Inputs más grandes para móvil */
+  input, select {
+    min-height: 44px;
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+  
+  /* Calendario más pequeño en móvil */
+  .react-datepicker {
+    font-size: 0.875rem;
+    width: 100%;
+    max-width: 320px;
+  }
+  
+  .react-datepicker__day {
+    width: 1.75rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
+    margin: 0.1rem;
+  }
+}
+
+/* Estilos para tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Prevenir zoom en inputs en iOS */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
