@@ -31,10 +31,10 @@ export default function Home() {
             <div className="lg:w-1/2 space-y-8">
               <div className="space-y-4">
                 <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  {t("landing_headline")}
+                  Gestión de Asistencia para el Programa Ascend
                 </h2>
                 <p className="text-xl text-gray-800 leading-relaxed">
-                  {t("landing_desc")}
+                  Una plataforma colaborativa en línea para registrar la asistencia de los estudiantes, elaborar informes claros y asegurar registros precisos y actualizados del Programa Ascend.
                 </p>
               </div>
               
