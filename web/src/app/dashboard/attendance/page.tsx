@@ -58,6 +58,7 @@ export default function AttendancePage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState<string>('all');
   const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   // Función para obtener los datos de asistencia para una fecha específica
