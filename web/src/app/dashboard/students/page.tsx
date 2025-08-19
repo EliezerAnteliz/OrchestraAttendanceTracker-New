@@ -141,10 +141,10 @@ export default function StudentsPage() {
             onClick={() => setShowUploadModal(true)} 
             className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center"
           >
-            <MdUpload className="mr-1" size={16} /> Carga
+            <MdUpload className="mr-1" size={16} /> {t('bulk_upload_short')}
           </button>
           <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center">
-            <MdAdd className="mr-1" size={16} /> Nuevo
+            <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
           </Link>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function StudentsPage() {
               onChange={(e) => setSelectedInstrument(e.target.value)}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-black font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
             >
-              <option value="">Todos los instrumentos</option>
+              <option value="">{t('all_instruments')}</option>
               {availableInstruments.map((instrument) => (
                 <option key={instrument} value={instrument}>{instrument}</option>
               ))}
@@ -183,7 +183,7 @@ export default function StudentsPage() {
               className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-black font-medium whitespace-nowrap"
             >
               <MdFilterList className="mr-2" size={18} />
-              {showActiveOnly ? 'Mostrar todos' : 'Solo activos'}
+              {showActiveOnly ? t('show_all') : t('only_active')}
             </button>
           </div>
         </div>
@@ -261,18 +261,18 @@ export default function StudentsPage() {
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                    {student.is_active !== false ? 'Activo' : 'Inactivo'}
+                    {student.is_active !== false ? t('active') : t('inactive')}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center text-sm mb-2">
                   <div className="flex-1">
-                    <span className="text-gray-600">Instrumento:</span>
-                    <span className="ml-1 font-medium text-gray-900">{student.instrument || 'Sin asignar'}</span>
+                    <span className="text-gray-600">{t('instrument')}:</span>
+                    <span className="ml-1 font-medium text-gray-900">{student.instrument || t('not_assigned')}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-gray-600">Grado:</span>
-                    <span className="ml-1 font-medium text-gray-900">{student.current_grade || 'Sin asignar'}</span>
+                    <span className="text-gray-600">{t('grade')}:</span>
+                    <span className="ml-1 font-medium text-gray-900">{student.current_grade || t('not_assigned')}</span>
                   </div>
                 </div>
                 
@@ -281,7 +281,7 @@ export default function StudentsPage() {
                     href={`/dashboard/students/${student.id}`} 
                     className="flex items-center justify-center w-full px-3 py-2 bg-[#0073ea] text-white rounded-md text-sm font-medium hover:bg-[#0060c0] transition-colors"
                   >
-                    <MdVisibility className="mr-2" size={16} /> Ver Detalles
+                    <MdVisibility className="mr-2" size={16} /> {t('view_details')}
                   </Link>
                 </div>
               </div>
