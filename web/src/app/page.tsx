@@ -30,10 +30,10 @@ export default function Home() {
             <div className="lg:w-1/2 space-y-8">
               <div className="space-y-4">
                 <h2 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Gestión de Asistencia para el Programa Ascend
+                  {t("landing_headline")}
                 </h2>
                 <p className="text-xl text-gray-800 leading-relaxed">
-                  Una plataforma colaborativa en línea para registrar la asistencia de los estudiantes, elaborar informes claros y asegurar registros precisos y actualizados del Programa Ascend.
+                  {t("landing_desc")}
                 </p>
               </div>
               
@@ -44,7 +44,7 @@ export default function Home() {
                 </Link>
                 <Link href="/signup" 
                   className="px-8 py-4 bg-white text-[#0073ea] rounded-xl border-2 border-[#0073ea] hover:bg-[#0073ea] hover:text-white transition-all duration-300 text-center font-semibold">
-                  Comenzar Gratis
+                  {t("start_free")}
                 </Link>
               </div>
             </div>
@@ -54,26 +54,26 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-6">
                 <FeatureCard 
                   icon={<MdPeople size={32} />}
-                  title="Gestión de Estudiantes"
-                  description="Administra perfiles y datos de estudiantes"
+                  title={t("student_management")}
+                  description={t("student_management_desc")}
                   color="bg-blue-500"
                 />
                 <FeatureCard 
                   icon={<MdAssignment size={32} />}
-                  title="Registro de Asistencia"
-                  description="Control diario rápido y eficiente"
+                  title={t("attendance_recording")}
+                  description={t("attendance_recording_desc")}
                   color="bg-green-500"
                 />
                 <FeatureCard 
                   icon={<MdBarChart size={32} />}
-                  title="Reportes Detallados"
-                  description="Análisis y estadísticas completas"
+                  title={t("detailed_reports")}
+                  description={t("detailed_reports_desc")}
                   color="bg-purple-500"
                 />
                 <FeatureCard 
                   icon={<MdSchedule size={32} />}
-                  title="Acceso 24/7"
-                  description="Disponible desde cualquier dispositivo"
+                  title={t("access_247")}
+                  description={t("access_247_desc")}
                   color="bg-orange-500"
                 />
               </div>
@@ -85,25 +85,25 @@ export default function Home() {
         <div className="bg-white py-16">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Beneficios del Ascend Attendance Tracker</h3>
-              <p className="text-xl text-gray-800">Una plataforma colaborativa diseñada para facilitar el registro de asistencia y generar informes precisos para el Programa Ascend</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">{t("benefits_title")}</h3>
+              <p className="text-xl text-gray-800">{t("benefits_desc")}</p>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8">
               <BenefitCard 
                 icon={<MdCheckCircle size={48} />}
-                title="Fácil de Usar"
-                description="Interfaz intuitiva que cualquier instructor puede dominar en minutos"
+                title={t("easy_to_use")}
+                description={t("easy_to_use_desc")}
               />
               <BenefitCard 
                 icon={<MdBarChart size={48} />}
-                title="Reportes Inteligentes"
-                description="Visualiza tendencias y patrones de asistencia con gráficos claros"
+                title={t("smart_reports")}
+                description={t("smart_reports_desc")}
               />
               <BenefitCard 
                 icon={<MdMusicNote size={48} />}
-                title="Para Músicos"
-                description="Creado por y para la comunidad musical, entendemos tus necesidades"
+                title={t("for_musicians")}
+                description={t("for_musicians_desc")}
               />
             </div>
           </div>
