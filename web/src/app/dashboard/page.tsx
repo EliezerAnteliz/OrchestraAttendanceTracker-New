@@ -137,11 +137,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {!activeProgram?.id && (
-        <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 text-black">
-          {t('select_program_to_view_dashboard') || 'Please select a program to view dashboard stats.'}
-        </div>
-      )}
       <div>
         <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
         <p className="text-gray-600 mt-1">
