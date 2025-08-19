@@ -270,6 +270,7 @@ const translations: Translations = {
   instrument_size_placeholder: { es: "Ej: 1/2, 3/4, 4/4", en: "Ex: 1/2, 3/4, 4/4" },
   position_placeholder: { es: "Ej: Primera fila, Segunda fila", en: "Ex: First row, Second row" },
   saving: { es: "Guardando...", en: "Saving..." },
+  complete_student_info: { es: "Complete la información del estudiante", en: "Complete the student information" },
 
   // Bulk upload (students)
   bulk_upload_desc: {
