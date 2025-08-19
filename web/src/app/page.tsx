@@ -114,7 +114,6 @@ export default function Home() {
       <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-6 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <MdMusicNote size={24} />
             <span className="text-xl font-bold">{t("app_title")}</span>
           </div>
           <p className="text-gray-400">{t("footer_copyright", { year: new Date().getFullYear() })}</p>
