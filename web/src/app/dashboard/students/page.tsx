@@ -185,17 +185,17 @@ export default function StudentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-semibold text-black">
                             {student.first_name} {student.last_name}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.instrument || t('not_assigned')}</div>
+                      <div className="text-sm font-medium text-black">{student.instrument || t('not_assigned')}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.current_grade || t('not_assigned')}</div>
+                      <div className="text-sm font-medium text-black">{student.current_grade || t('not_assigned')}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -222,41 +222,39 @@ export default function StudentsPage() {
           </table>
         </div>
         
-        {/* Vista de tarjetas para móviles */}
-        <div className="md:hidden space-y-4">
+        {/* Vista de tarjetas para móviles - Optimizada */}
+        <div className="md:hidden space-y-3">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
-              <div key={student.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-medium text-gray-900">
-                      {student.first_name} {student.last_name}
-                    </h3>
-                  </div>
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+              <div key={student.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-gray-900 text-base">
+                    {student.first_name} {student.last_name}
+                  </h3>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {student.is_active !== false ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
-                  <div>
-                    <span className="text-black font-medium">{t('instrument')}:</span>
-                    <p className="font-medium">{student.instrument || t('not_assigned')}</p>
+                <div className="flex justify-between items-center text-sm mb-2">
+                  <div className="flex-1">
+                    <span className="text-gray-600">Instrumento:</span>
+                    <span className="ml-1 font-medium text-gray-900">{student.instrument || 'Sin asignar'}</span>
                   </div>
-                  <div>
-                    <span className="text-black font-medium">{t('grade')}:</span>
-                    <p className="font-medium">{student.current_grade || t('not_assigned')}</p>
+                  <div className="text-right">
+                    <span className="text-gray-600">Grado:</span>
+                    <span className="ml-1 font-medium text-gray-900">{student.current_grade || 'Sin asignar'}</span>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+                <div className="pt-2 border-t border-gray-100">
                   <Link 
                     href={`/dashboard/students/${student.id}`} 
-                    className="flex items-center px-3 py-1.5 bg-[#e5f2ff] text-[#0073ea] rounded-md text-sm"
+                    className="flex items-center justify-center w-full px-3 py-2 bg-[#0073ea] text-white rounded-md text-sm font-medium hover:bg-[#0060c0] transition-colors"
                   >
-                    <MdVisibility className="mr-1" /> {t('view')}
+                    <MdVisibility className="mr-2" size={16} /> Ver Detalles
                   </Link>
                 </div>
               </div>
