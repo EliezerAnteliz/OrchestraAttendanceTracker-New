@@ -635,12 +635,14 @@ export default function AttendancePage() {
       }
       
       // Eliminar registros de asistencia solo para los estudiantes seleccionados
+      // Usar los IDs específicos de los registros encontrados para mayor precisión
+      const recordIds = existingRecords.map(record => record.id);
+      console.log('Deleting records with IDs:', recordIds);
+      
       const { data: deletedData, error } = await supabase
         .from('attendance')
         .delete()
-        .eq('date', currentDate)
-        .eq('program_id', activeProgram.id)
-        .in('student_id', selectedStudentIds)
+        .in('id', recordIds)
         .select();
       
       console.log('Delete operation result:', { deletedData, error });
@@ -650,6 +652,15 @@ export default function AttendancePage() {
         alert(t('clear_attendance_error', { error: error.message }));
         return;
       }
+
+      // Verificar que se eliminaron registros
+      if (!deletedData || deletedData.length === 0) {
+        console.error('No records were deleted despite no error');
+        alert('No se pudieron eliminar los registros. Verifica los permisos de la base de datos.');
+        return;
+      }
+
+      console.log(`Successfully deleted ${deletedData.length} attendance records`);
 
       // Mostrar mensaje de éxito
       const successMsg = `Asistencia limpiada exitosamente para ${selectedStudents.length} estudiante(s) en ${currentDate}`;
