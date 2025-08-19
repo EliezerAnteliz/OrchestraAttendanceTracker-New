@@ -34,8 +34,8 @@ const translations: Translations = {
   easy_to_use_desc: { es: "Interfaz intuitiva que cualquier instructor puede dominar en minutos", en: "Intuitive interface that any instructor can master in minutes" },
   smart_reports: { es: "Reportes Inteligentes", en: "Smart Reports" },
   smart_reports_desc: { es: "Visualiza tendencias y patrones de asistencia con gráficos claros", en: "Visualize attendance trends and patterns with clear charts" },
-  for_musicians: { es: "Para Músicos", en: "For Musicians" },
-  for_musicians_desc: { es: "Creado por y para la comunidad musical, entendemos tus necesidades", en: "Created by and for the musical community, we understand your needs" },
+  for_musicians: { es: "Para el Programa Ascend", en: "For Ascend Program" },
+  for_musicians_desc: { es: "Diseñado específicamente para el Programa Ascend y sus instructores, facilitando la gestión educativa", en: "Specifically designed for the Ascend Program and its instructors, facilitating educational management" },
   student_management: { es: "Gestión de Estudiantes", en: "Student Management" },
   student_management_desc: { es: "Administra perfiles y datos de estudiantes", en: "Manage student profiles and data" },
   attendance_recording: { es: "Registro de Asistencia", en: "Attendance Recording" },
@@ -45,7 +45,7 @@ const translations: Translations = {
   access_247: { es: "Acceso 24/7", en: "24/7 Access" },
   access_247_desc: { es: "Disponible desde cualquier dispositivo", en: "Available from any device" },
   back_to_home: { es: "Volver al inicio", en: "Back to home" },
-  footer_copyright: { es: "© {year} Ascend Attendance Tracker", en: "© {year} Ascend Attendance Tracker" },
+  footer_copyright: { es: "© {year} Eliezer Anteliz", en: "© {year} Eliezer Anteliz" },
 
   // Auth
   email: { es: "Correo Electrónico", en: "Email" },
@@ -150,13 +150,7 @@ const translations: Translations = {
   show_all: { es: "Mostrar todos", en: "Show all" },
   only_active: { es: "Solo activos", en: "Only active" },
   showing_n_of_total: { es: "Mostrando {n} de {total} estudiantes", en: "Showing {n} of {total} students" },
-  name: { es: "Nombre", en: "Name" },
-  instrument: { es: "Instrumento", en: "Instrument" },
-  grade: { es: "Grado", en: "Grade" },
-  status: { es: "Estado", en: "Status" },
   actions: { es: "Acciones", en: "Actions" },
-  active: { es: "Activo", en: "Active" },
-  inactive: { es: "Inactivo", en: "Inactive" },
   view: { es: "Ver", en: "View" },
   not_assigned: { es: "No asignado", en: "Not assigned" },
   no_students_found: { es: "No se encontraron estudiantes con los filtros actuales.", en: "No students found with current filters." },
@@ -271,7 +265,6 @@ const translations: Translations = {
   refresh_sites: { es: "Refrescar sedes", en: "Refresh sites" },
 
   // Bulk upload (students)
-  bulk_upload_title: { es: "Carga Masiva de Estudiantes", en: "Bulk Upload Students" },
   bulk_upload_desc: {
     es: "Sube un archivo Excel con los datos de los estudiantes. El sistema registrará nuevos estudiantes y actualizará los existentes basándose en el nombre y apellido.",
     en: "Upload an Excel file with student data. The system will create new students and update existing ones based on first and last name."
