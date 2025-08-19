@@ -59,36 +59,6 @@ export default function AttendancePage() {
   const [selectedInstrument, setSelectedInstrument] = useState<string>('all');
   const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
 
-  // Instrumentación temporal: detectar peticiones a attendance con rango (gte/lt) o sin date=eq y registrar el stack
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const anyWin = window as any;
-    if (anyWin.__attendanceFetchPatched) return;
-    const originalFetch = window.fetch.bind(window);
-    anyWin.__attendanceFetchPatched = true;
-    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-      try {
-        const url = typeof input === 'string' ? input : (input as Request).url ?? (input as URL).toString();
-        if (url && url.includes('/rest/v1/attendance')) {
-          const u = new URL(url);
-          const dateParams = u.searchParams.getAll('date');
-          const hasEq = dateParams.some(v => v.startsWith('eq.'));
-          const hasRange = dateParams.some(v => v.startsWith('gte.') || v.startsWith('lt.'));
-          if (!hasEq || hasRange) {
-            console.warn('[ATTN] Attendance request sospechosa:', url);
-            console.warn('[ATTN] Stack de llamada para ubicar origen:', new Error().stack);
-          }
-        }
-      } catch (e) {
-        // ignorar errores del logger
-      }
-      return originalFetch(input as any, init);
-    };
-    return () => {
-      window.fetch = originalFetch;
-      anyWin.__attendanceFetchPatched = false;
-    };
-  }, []);
 
   // Función para obtener los datos de asistencia para una fecha específica
   const fetchAttendanceData = async (date: string) => {
