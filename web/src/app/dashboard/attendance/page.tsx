@@ -582,14 +582,22 @@ export default function AttendancePage() {
     console.log('Todos los estudiantes deseleccionados');
   };
 
-  // Función para limpiar toda la asistencia de una fecha
+  // Función para limpiar la asistencia de los estudiantes seleccionados
   const clearAttendanceForDate = async () => {
     if (!activeProgram?.id) {
       alert('No hay programa activo seleccionado.');
       return;
     }
 
-    const confirmMessage = t('clear_attendance_confirm', { date: currentDate });
+    // Obtener estudiantes seleccionados
+    const selectedStudents = filteredStudents.filter(student => student.selected);
+    
+    if (selectedStudents.length === 0) {
+      alert('No hay estudiantes seleccionados para limpiar la asistencia.');
+      return;
+    }
+
+    const confirmMessage = `¿Estás seguro de que quieres limpiar la asistencia de ${selectedStudents.length} estudiante(s) seleccionado(s) para el ${currentDate}? Esta acción no se puede deshacer.`;
     if (!confirm(confirmMessage)) {
       return;
     }
@@ -597,21 +605,25 @@ export default function AttendancePage() {
     try {
       setIsLoading(true);
       
-      // Eliminar todos los registros de asistencia para la fecha y programa actual
+      // Obtener los IDs de los estudiantes seleccionados
+      const selectedStudentIds = selectedStudents.map(student => student.id);
+      
+      // Eliminar registros de asistencia solo para los estudiantes seleccionados
       const { error } = await supabase
         .from('attendance')
         .delete()
         .eq('date', currentDate)
-        .eq('program_id', activeProgram.id);
+        .eq('program_id', activeProgram.id)
+        .in('student_id', selectedStudentIds);
 
       if (error) {
-        console.error('Error clearing attendance:', error);
+        console.error('Error clearing attendance for selected students:', error);
         alert(t('clear_attendance_error', { error: error.message }));
         return;
       }
 
       // Mostrar mensaje de éxito
-      const successMsg = t('attendance_cleared_success', { date: currentDate });
+      const successMsg = `Asistencia limpiada exitosamente para ${selectedStudents.length} estudiante(s) en ${currentDate}`;
       setSuccessMessage(successMsg);
       setShowSuccessMessage(true);
       
@@ -623,7 +635,7 @@ export default function AttendancePage() {
       // Recargar los datos de asistencia
       await loadAttendanceData(currentDate);
       
-      console.log(`Attendance cleared for date: ${currentDate}, program: ${activeProgram.id}`);
+      console.log(`Attendance cleared for ${selectedStudents.length} selected students on date: ${currentDate}`);
     } catch (error: any) {
       console.error('Unexpected error clearing attendance:', error);
       alert(t('clear_attendance_error', { error: error.message || 'Error inesperado' }));
@@ -1197,9 +1209,13 @@ export default function AttendancePage() {
               {/* Botón para limpiar asistencia */}
               <button
                 onClick={clearAttendanceForDate}
-                className="px-4 py-2 rounded-md flex items-center bg-orange-600 hover:bg-orange-700 text-white"
-                title={t('clear_attendance_confirm', { date: currentDate })}
-                disabled={isLoading}
+                disabled={selectedStudentCount === 0 || isLoading}
+                className={`px-4 py-2 rounded-md flex items-center ${
+                  selectedStudentCount > 0 && !isLoading
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    : 'bg-gray-300 text-black cursor-not-allowed'
+                }`}
+                title={selectedStudentCount > 0 ? `Limpiar asistencia de ${selectedStudentCount} estudiante(s) seleccionado(s)` : 'Selecciona estudiantes para limpiar su asistencia'}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
