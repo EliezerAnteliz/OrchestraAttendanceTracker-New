@@ -197,19 +197,21 @@ function DashboardContent({ children }: { children: ReactNode }) {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header with menu button */}
-        <header className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center gap-3 safe-area-inset-top">
-          <button 
-            className="text-gray-500 hover:text-gray-700 mr-4"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <MdMenu size={24} />
-          </button>
-          <h1 className="text-lg font-semibold text-[#0073ea] flex-1">{t('mobile_header')}</h1>
-          {/* Compact selector for mobile */}
+        <header className="md:hidden bg-white border-b border-gray-200 safe-area-inset-top">
+          <div className="p-3 flex items-center gap-2">
+            <button 
+              className="text-gray-500 hover:text-gray-700 flex-shrink-0"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <MdMenu size={22} />
+            </button>
+            <h1 className="text-base font-semibold text-[#0073ea] truncate flex-1 min-w-0">{t('mobile_header')}</h1>
+          </div>
+          {/* Program selector in separate row for better mobile layout */}
           {programs?.length ? (
-            <div className="flex items-center gap-2 min-w-[160px]">
+            <div className="px-3 pb-3 flex items-center gap-2">
               <select
-                className="flex-1 border border-gray-300 rounded px-2 py-2 text-base text-gray-800 bg-white font-normal"
+                className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-800 bg-white font-normal min-w-0"
                 value={activeProgram?.id || ''}
                 onChange={(e) => setActiveProgramId(e.target.value)}
               >
@@ -222,9 +224,9 @@ function DashboardContent({ children }: { children: ReactNode }) {
                 onClick={() => (typeof window !== 'undefined') && (window as any).requestIdleCallback ? (window as any).requestIdleCallback(() => refreshPrograms()) : refreshPrograms()}
                 title={t('refresh_sites')}
                 aria-label={t('refresh_sites')}
-                className="inline-flex items-center justify-center border border-gray-300 rounded px-2 py-2 text-gray-700 hover:bg-gray-50"
+                className="inline-flex items-center justify-center border border-gray-300 rounded px-2 py-1.5 text-gray-700 hover:bg-gray-50 flex-shrink-0"
               >
-                <MdRefresh size={18} />
+                <MdRefresh size={16} />
               </button>
             </div>
           ) : null}
