@@ -360,94 +360,92 @@ export default function StudentDetail() {
             </h2>
           </div>
           <div className="p-6">
-              
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('first_name')}</label>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('first_name')}</label>
+                  <input
+                    type="text"
+                    name="first_name"
+                    value={editedStudent?.first_name || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('last_name')}</label>
+                  <input
+                    type="text"
+                    name="last_name"
+                    value={editedStudent?.last_name || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('grade')}</label>
+                  <input
+                    type="text"
+                    name="current_grade"
+                    value={editedStudent?.current_grade || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('age')}</label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={editedStudent?.age || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
+                  <div className="flex items-center">
                     <input
-                      type="text"
-                      name="first_name"
-                      value={editedStudent?.first_name || ''}
+                      type="checkbox"
+                      name="is_active"
+                      checked={editedStudent?.is_active || false}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
                     />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('last_name')}</label>
-                    <input
-                      type="text"
-                      name="last_name"
-                      value={editedStudent?.last_name || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('grade')}</label>
-                    <input
-                      type="text"
-                      name="current_grade"
-                      value={editedStudent?.current_grade || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('age')}</label>
-                    <input
-                      type="number"
-                      name="age"
-                      value={editedStudent?.age || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        name="is_active"
-                        checked={editedStudent?.is_active || false}
-                        onChange={handleInputChange}
-                        className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
-                      />
-                      <span className="ml-2 text-gray-700">{t('active')}</span>
-                    </div>
+                    <span className="ml-2 text-gray-700">{t('active')}</span>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('full_name')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.first_name} {student.last_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('grade')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.current_grade || t('not_specified')}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('age')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.age ? `${student.age} ${t('years')}` : t('not_specified')}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('status')}</p>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${
-                      student.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {student.is_active ? t('active') : t('inactive')}
-                    </span>
-                  </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('full_name')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.first_name} {student.last_name}</p>
                 </div>
-              )}
-            </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('grade')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.current_grade || t('not_specified')}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('age')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.age ? `${student.age} ${t('years')}` : t('not_specified')}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('status')}</p>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${
+                    student.is_active 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {student.is_active ? t('active') : t('inactive')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
             
@@ -462,59 +460,57 @@ export default function StudentDetail() {
             </h2>
           </div>
           <div className="p-6">
-              
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument')}</label>
-                    <input
-                      type="text"
-                      name="instrument"
-                      value={editedStudent?.instrument || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument_size')}</label>
-                    <input
-                      type="text"
-                      name="instrument_size"
-                      value={editedStudent?.instrument_size || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('position')}</label>
-                    <input
-                      type="text"
-                      name="position"
-                      value={editedStudent?.position || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                    />
-                  </div>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument')}</label>
+                  <input
+                    type="text"
+                    name="instrument"
+                    value={editedStudent?.instrument || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('instrument')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.instrument || t('not_specified')}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('instrument_size')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.instrument_size || t('not_specified')}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('position')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{student.orchestra_position || t('not_specified')}</p>
-                  </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument_size')}</label>
+                  <input
+                    type="text"
+                    name="instrument_size"
+                    value={editedStudent?.instrument_size || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
                 </div>
-              )}
-            </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('position')}</label>
+                  <input
+                    type="text"
+                    name="orchestra_position"
+                    value={editedStudent?.orchestra_position || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('instrument')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.instrument || t('not_specified')}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('instrument_size')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.instrument_size || t('not_specified')}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700">{t('position')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{student.orchestra_position || t('not_specified')}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
