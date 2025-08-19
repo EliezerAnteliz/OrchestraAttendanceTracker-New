@@ -290,6 +290,25 @@ const translations: Translations = {
   updated_students: { es: "Estudiantes actualizados", en: "Updated students" },
   errors: { es: "Errores", en: "Errors" },
   download_excel_template: { es: "Descargar plantilla Excel", en: "Download Excel template" },
+  
+  // Additional bulk upload translations
+  bulk_upload_subtitle: { es: "Sube un archivo Excel con la información de los estudiantes", en: "Upload an Excel file with student information" },
+  usage_instructions: { es: "Instrucciones de uso", en: "Usage Instructions" },
+  required_fields: { es: "Campos obligatorios", en: "Required fields" },
+  optional_fields: { es: "Campos opcionales", en: "Optional fields" },
+  parent_data: { es: "Datos de padres", en: "Parent data" },
+  bulk_upload_parent_fields: { es: "parent_first_name, parent_last_name, parent_phone_number, parent_email", en: "parent_first_name, parent_last_name, parent_phone_number, parent_email" },
+  drag_excel_file_here: { es: "Arrastra tu archivo Excel aquí", en: "Drag your Excel file here" },
+  drop_file_here: { es: "Suelta el archivo aquí", en: "Drop the file here" },
+  or_click_to_select: { es: "o haz clic para seleccionar", en: "or click to select" },
+  supported_formats: { es: "Formatos soportados", en: "Supported formats" },
+  file_selected: { es: "Archivo seleccionado", en: "File selected" },
+  processing_file: { es: "Procesando archivo", en: "Processing file" },
+  process_completed_successfully: { es: "Proceso completado exitosamente", en: "Process completed successfully" },
+  process_completed_with_warnings: { es: "Proceso completado con advertencias", en: "Process completed with warnings" },
+  errors_found: { es: "Errores encontrados", en: "Errors found" },
+  need_template: { es: "¿Necesitas una plantilla?", en: "Need a template?" },
+  download_template_description: { es: "Descarga nuestra plantilla de Excel con el formato correcto", en: "Download our Excel template with the correct format" },
 };
 
 interface I18nContextValue {
