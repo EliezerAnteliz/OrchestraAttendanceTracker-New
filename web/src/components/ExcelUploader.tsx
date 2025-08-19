@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import { supabase } from '@/lib/supabase';
-import { FiDownload, FiUpload, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiDownload, FiUpload, FiAlertCircle, FiCheckCircle, FiFile, FiX, FiUsers } from 'react-icons/fi';
 import { useI18n } from '@/contexts/I18nContext';
 
 interface Student {
@@ -43,6 +43,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   const [results, setResults] = useState({ added: 0, updated: 0, errors: 0 });
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [tableStructure, setTableStructure] = useState<any>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Obtener la estructura de la tabla students al cargar el componente
   useEffect(() => {
@@ -94,10 +95,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     fetchTableStructure();
   }, []);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-
+  const processFile = async (f: File) => {
     setFile(f);
     setIsUploading(true);
     setProgress({ total: 0, processed: 0 });
@@ -132,6 +130,45 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    await processFile(f);
+  };
+
+  const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    const excelFile = files.find(file => 
+      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.type === 'application/vnd.ms-excel' ||
+      file.name.endsWith('.xlsx') ||
+      file.name.endsWith('.xls')
+    );
+    
+    if (excelFile) {
+      await processFile(excelFile);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const removeFile = () => {
+    setFile(null);
+    setResults({ added: 0, updated: 0, errors: 0 });
+    setErrorMessages([]);
   };
 
   const processStudentRow = async (row: any) => {
@@ -353,94 +390,224 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-
-      <div className="mb-4 bg-gray-50 border border-gray-200 rounded-md p-4">
-        <p className="text-gray-700 mb-2">{t('bulk_upload_desc')}</p>
-        <p className="text-sm text-gray-600">{t('bulk_upload_required_fields')}</p>
-        <p className="text-sm text-gray-600 mb-4">{t('bulk_upload_optional_fields')}</p>
-
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <label htmlFor="excel-file-input" className="inline-flex items-center gap-2 px-3 py-2 bg-[#e5f2ff] text-[#0073ea] rounded-md cursor-pointer hover:bg-[#d7eaff] w-fit">
-            <FiUpload /> {t('select_file')}
-          </label>
-          <input
-            id="excel-file-input"
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileUpload}
-            disabled={isUploading}
-            className="hidden"
-          />
-          <span className="text-sm text-gray-700 truncate">
-            {file ? file.name : t('no_file_selected')}
-          </span>
-          {isUploading && <FiUpload className="animate-pulse text-[#0073ea]" />}
+    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <FiUsers className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Carga Masiva de Estudiantes</h3>
+            <p className="text-sm text-gray-600">Sube un archivo Excel con la información de los estudiantes</p>
+          </div>
         </div>
       </div>
 
-      {isUploading && (
-        <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-1">
-            {t('processing_records', { processed: progress.processed, total: progress.total })}
-          </p>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-blue-600 h-2.5 rounded-full" 
-              style={{ width: `${progress.total ? (progress.processed / progress.total) * 100 : 0}%` }}
-            ></div>
+      <div className="p-6">
+        {/* Instructions */}
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="p-1 bg-blue-100 rounded-full mt-0.5">
+              <FiAlertCircle className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-blue-900 mb-2">Instrucciones de uso</h4>
+              <div className="text-sm text-blue-800 space-y-1">
+                <p><strong>Campos obligatorios:</strong> first_name, last_name</p>
+                <p><strong>Campos opcionales:</strong> instrument, instrument_size, current_grade, age, orchestra_position, active</p>
+                <p><strong>Datos de padres:</strong> parent_first_name, parent_last_name, parent_phone_number, parent_email</p>
+              </div>
+            </div>
           </div>
         </div>
-      )}
 
-      {(results.added > 0 || results.updated > 0 || results.errors > 0) && !isUploading && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-md">
-          <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
-            {results.errors > 0 ? (
-              <FiAlertCircle className="text-yellow-500" />
-            ) : (
-              <FiCheckCircle className="text-green-500" />
-            )}
-            {t('results')}:
-          </h3>
-          <ul className="text-sm text-gray-700">
-            <li className="flex items-center gap-2">
-              <span className="font-medium">{t('new_students')}:</span> 
-              <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full">{results.added}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="font-medium">{t('updated_students')}:</span> 
-              <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">{results.updated}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="font-medium">{t('errors')}:</span> 
-              <span className="bg-red-100 text-red-800 px-2 py-0.5 rounded-full">{results.errors}</span>
-            </li>
-          </ul>
-        </div>
-      )}
-
-      {errorMessages.length > 0 && (
-        <div className="mt-4">
-          <h3 className="font-medium text-red-700 mb-2">{t('errors')}:</h3>
-          <div className="max-h-40 overflow-y-auto bg-red-50 p-3 rounded-md">
-            <ul className="text-sm text-red-800">
-              {errorMessages.map((msg, index) => (
-                <li key={index} className="mb-1">{msg}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-6">
-        <a 
-          href="/student_template_updated.xlsx" 
-          download 
-          className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-2"
+        {/* File Upload Area */}
+        <div 
+          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+            isDragOver 
+              ? 'border-blue-400 bg-blue-50' 
+              : file 
+                ? 'border-green-300 bg-green-50'
+                : 'border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
         >
-          <FiDownload /> {t('download_excel_template')}
-        </a>
+          {!file ? (
+            <div className="space-y-4">
+              <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
+                isDragOver ? 'bg-blue-100' : 'bg-gray-200'
+              }`}>
+                <FiUpload className={`w-8 h-8 ${
+                  isDragOver ? 'text-blue-600' : 'text-gray-500'
+                }`} />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-900 mb-1">
+                  {isDragOver ? 'Suelta el archivo aquí' : 'Arrastra tu archivo Excel aquí'}
+                </p>
+                <p className="text-sm text-gray-600 mb-4">o haz clic para seleccionar</p>
+                <label htmlFor="excel-file-input" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors font-medium">
+                  <FiFile className="w-4 h-4" />
+                  Seleccionar archivo
+                </label>
+                <input
+                  id="excel-file-input"
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs text-gray-500">Formatos soportados: .xlsx, .xls</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <FiFile className="w-8 h-8 text-green-600" />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-900 mb-1">Archivo seleccionado</p>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                  <span className="font-medium">{file.name}</span>
+                  <span className="text-gray-400">({(file.size / 1024).toFixed(1)} KB)</span>
+                  {!isUploading && (
+                    <button
+                      onClick={removeFile}
+                      className="ml-2 p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                    >
+                      <FiX className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {isUploading && (
+                <div className="flex items-center justify-center gap-2 text-blue-600">
+                  <FiUpload className="w-4 h-4 animate-pulse" />
+                  <span className="text-sm font-medium">Procesando archivo...</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Progress Bar */}
+        {isUploading && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-blue-900">
+                Procesando registros: {progress.processed} de {progress.total}
+              </p>
+              <span className="text-sm text-blue-700 font-medium">
+                {progress.total ? Math.round((progress.processed / progress.total) * 100) : 0}%
+              </span>
+            </div>
+            <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300 ease-out" 
+                style={{ width: `${progress.total ? (progress.processed / progress.total) * 100 : 0}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
+        {/* Results Summary */}
+        {(results.added > 0 || results.updated > 0 || results.errors > 0) && !isUploading && (
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              {results.errors > 0 ? (
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <FiAlertCircle className="w-5 h-5 text-yellow-600" />
+                </div>
+              ) : (
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <FiCheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+              )}
+              <h3 className="text-lg font-semibold text-gray-900">
+                {results.errors > 0 ? 'Proceso completado con advertencias' : 'Proceso completado exitosamente'}
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Estudiantes nuevos</p>
+                    <p className="text-2xl font-bold text-green-600">{results.added}</p>
+                  </div>
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <FiUsers className="w-5 h-5 text-green-600" />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-blue-200 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Estudiantes actualizados</p>
+                    <p className="text-2xl font-bold text-blue-600">{results.updated}</p>
+                  </div>
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <FiCheckCircle className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-red-200 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Errores</p>
+                    <p className="text-2xl font-bold text-red-600">{results.errors}</p>
+                  </div>
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <FiAlertCircle className="w-5 h-5 text-red-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Messages */}
+        {errorMessages.length > 0 && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1 bg-red-100 rounded-full">
+                <FiAlertCircle className="w-4 h-4 text-red-600" />
+              </div>
+              <h3 className="font-medium text-red-900">Errores encontrados ({errorMessages.length})</h3>
+            </div>
+            <div className="max-h-48 overflow-y-auto bg-white border border-red-200 rounded-md">
+              <div className="p-3 space-y-2">
+                {errorMessages.map((msg, index) => (
+                  <div key={index} className="flex items-start gap-2 text-sm">
+                    <div className="w-1.5 h-1.5 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-red-800">{msg}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Download Template */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium text-gray-900 mb-1">¿Necesitas una plantilla?</h4>
+              <p className="text-sm text-gray-600">Descarga nuestra plantilla de Excel con el formato correcto</p>
+            </div>
+            <a 
+              href="/student_template_updated.xlsx" 
+              download 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              <FiDownload className="w-4 h-4" />
+              Descargar plantilla
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
