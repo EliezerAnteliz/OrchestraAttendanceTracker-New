@@ -85,39 +85,47 @@ export default function NewStudent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      {/* Header with back button */}
-      <div className="flex items-center mb-6">
-        <Link 
-          href="/dashboard/students" 
-          className="mr-4 p-2 rounded-full hover:bg-gray-100"
-        >
-          <MdArrowBack size={24} />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-800">{t('new_student')}</h1>
-      </div>
-      
-      {/* Error message */}
-      {error && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">
-          <p>{error}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header with back button */}
+        <div className="flex items-center mb-8">
+          <Link 
+            href="/dashboard/students" 
+            className="mr-4 p-3 rounded-full hover:bg-white/80 shadow-md transition-all duration-200 bg-white/60"
+          >
+            <MdArrowBack size={24} className="text-gray-700" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {t('new_student')}
+            </h1>
+            <p className="text-gray-600 mt-1">{t('complete_student_info')}</p>
+          </div>
         </div>
-      )}
       
-      {/* Student form */}
-      <form onSubmit={handleSubmit}>
-        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Error message */}
+        {error && (
+          <div className="max-w-5xl mx-auto mb-6">
+            <div className="p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-r-lg shadow-sm">
+              <p className="font-medium">{error}</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Student form */}
+        <form onSubmit={handleSubmit} className="max-w-5xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden mb-8">
+            <div className="p-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Personal Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
                   <MdPerson className="mr-2 text-[#0073ea]" /> {t('personal_information')}
                 </h2>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       {t('first_name')} <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -126,12 +134,12 @@ export default function NewStudent() {
                       value={student.first_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       {t('last_name')} <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -140,32 +148,32 @@ export default function NewStudent() {
                       value={student.last_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('grade')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('grade')}</label>
                     <input
                       type="text"
                       name="grade"
                       value={student.grade}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
-                    <div className="flex items-center">
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">{t('status')}</label>
+                    <div className="flex items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 hover:bg-white transition-all duration-200">
                       <input
                         type="checkbox"
                         name="is_active"
                         checked={student.is_active}
                         onChange={handleInputChange}
-                        className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
+                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
-                      <span className="ml-2 text-gray-700">{t('active')}</span>
+                      <span className="ml-3 text-gray-700 font-medium">{t('active')}</span>
                     </div>
                   </div>
                 </div>
@@ -177,38 +185,38 @@ export default function NewStudent() {
                   <MdMusicNote className="mr-2 text-[#0073ea]" /> {t('orchestra_info')}
                 </h2>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('instrument')}</label>
                     <input
                       type="text"
                       name="instrument"
                       value={student.instrument}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument_size')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('instrument_size')}</label>
                     <input
                       type="text"
                       name="instrument_size"
                       value={student.instrument_size}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                       placeholder={t('instrument_size_placeholder')}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('position')}</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('position')}</label>
                     <input
                       type="text"
                       name="position"
                       value={student.position}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
                       placeholder={t('position_placeholder')}
                     />
                   </div>
@@ -218,25 +226,26 @@ export default function NewStudent() {
           </div>
         </div>
         
-        {/* Form actions */}
-        <div className="flex justify-end space-x-3">
-          <Link
-            href="/dashboard/students"
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors flex items-center"
-          >
-            <MdCancel className="mr-1" /> {t('cancel')}
-          </Link>
-          <button
-            type="submit"
-            disabled={loading || !student.first_name || !student.last_name}
-            className={`px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center ${
-              (loading || !student.first_name || !student.last_name) ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
-          >
-            <MdSave className="mr-1" /> {loading ? t('saving') : t('save')}
-          </button>
-        </div>
-      </form>
+          {/* Form actions */}
+          <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-200">
+            <Link
+              href="/dashboard/students"
+              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center justify-center font-medium shadow-sm"
+            >
+              <MdCancel className="mr-2" size={20} /> {t('cancel')}
+            </Link>
+            <button
+              type="submit"
+              disabled={loading || !student.first_name || !student.last_name}
+              className={`px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center font-medium shadow-lg ${
+                (loading || !student.first_name || !student.last_name) ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-xl transform hover:-translate-y-0.5'
+              }`}
+            >
+              <MdSave className="mr-2" size={20} /> {loading ? t('saving') : t('save')}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
