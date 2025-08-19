@@ -271,10 +271,15 @@ export default function StudentsPage() {
 
       {/* Modal de carga masiva */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-200">
-            <div className="flex justify-between items-center border-b p-4 bg-transparent rounded-t-lg">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900"><MdUpload /> {t('bulk_upload_title')}</h2>
+        <div className="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-300">
+            <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <MdUpload className="w-5 h-5 text-blue-600" />
+                </div>
+                {t('bulk_upload_title')}
+              </h2>
               <button 
                 onClick={() => {
                   setShowUploadModal(false);
@@ -283,13 +288,13 @@ export default function StudentsPage() {
                     setUploadResults(null);
                   }
                 }} 
-                className="text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0073ea] rounded"
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Close"
               >
-                <MdClose size={22} />
+                <MdClose size={20} />
               </button>
             </div>
-            <div className="p-4">
+            <div className="p-0">
               <ExcelUploader 
                 onComplete={(results) => {
                   setUploadResults(results);
