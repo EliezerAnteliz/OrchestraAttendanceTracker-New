@@ -12,7 +12,6 @@ export default function Home() {
       <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <MdMusicNote size={32} className="text-white" />
             <h1 className="text-2xl font-bold">{t("app_title")}</h1>
           </div>
           <div className="space-x-4">
@@ -86,8 +85,8 @@ export default function Home() {
         <div className="bg-white py-16">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">¿Por qué elegir Ascend?</h3>
-              <p className="text-xl text-gray-800">Diseñado específicamente para orquestas y programas musicales</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Beneficios del Programa Ascend</h3>
+              <p className="text-xl text-gray-800">Una plataforma colaborativa diseñada para facilitar el registro de asistencia y generar informes precisos para el Programa Ascend</p>
             </div>
             
             <div className="grid md:grid-cols-3 gap-8">
