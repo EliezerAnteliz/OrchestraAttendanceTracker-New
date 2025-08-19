@@ -309,6 +309,12 @@ const translations: Translations = {
   errors_found: { es: "Errores encontrados", en: "Errors found" },
   need_template: { es: "¿Necesitas una plantilla?", en: "Need a template?" },
   download_template_description: { es: "Descarga nuestra plantilla de Excel con el formato correcto", en: "Download our Excel template with the correct format" },
+  
+  // Clear attendance translations
+  clear_attendance: { es: "Limpiar Asistencia", en: "Clear Attendance" },
+  clear_attendance_confirm: { es: "¿Estás seguro de que quieres limpiar toda la asistencia del {{date}}? Esta acción no se puede deshacer.", en: "Are you sure you want to clear all attendance for {{date}}? This action cannot be undone." },
+  attendance_cleared_success: { es: "Asistencia limpiada exitosamente para {{date}}", en: "Attendance cleared successfully for {{date}}" },
+  clear_attendance_error: { es: "Error al limpiar la asistencia: {{error}}", en: "Error clearing attendance: {{error}}" },
 };
 
 interface I18nContextValue {
