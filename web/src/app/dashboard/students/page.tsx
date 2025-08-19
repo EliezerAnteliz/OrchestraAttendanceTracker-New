@@ -123,17 +123,17 @@ export default function StudentsPage() {
           {t('select_program_to_view_students') || 'Please select a program to view students.'}
         </div>
       )}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-black">{t('students_title')}</h1>
-        <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('students_title')}</h1>
+        <div className="flex gap-2 w-full sm:w-auto">
           <button 
             onClick={() => setShowUploadModal(true)} 
-            className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center whitespace-nowrap"
+            className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center"
           >
-            <MdUpload className="mr-1" /> {t('bulk_upload')}
+            <MdUpload className="mr-1" size={16} /> Carga
           </button>
-          <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-4 py-2 rounded-md flex items-center whitespace-nowrap">
-            <MdAdd className="mr-1" /> {t('new_student')}
+          <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center">
+            <MdAdd className="mr-1" size={16} /> Nuevo
           </Link>
         </div>
       </div>
