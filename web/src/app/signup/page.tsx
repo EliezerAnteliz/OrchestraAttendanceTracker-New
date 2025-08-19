@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useI18n } from '@/contexts/I18nContext';
+import { MdMusicNote, MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdCheckCircle } from 'react-icons/md';
 
 export default function SignUpPage() {
   const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -52,96 +55,193 @@ export default function SignUpPage() {
     }
   };
 
+  const passwordStrength = password.length >= 6;
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-[#0073ea] text-white p-4 shadow-md">
+      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
         <div className="container mx-auto">
-          <Link href="/" className="text-2xl font-bold">{t('app_title')}</Link>
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <MdMusicNote size={32} />
+            <span className="text-2xl font-bold">{t('app_title')}</span>
+          </Link>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-grow flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8 border border-gray-200">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">{t('create_account')}</h2>
-          
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
+      <main className="flex items-center justify-center p-6 py-16">
+        <div className="w-full max-w-md">
+          {/* Registration Card */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="text-center mb-8">
+              <div className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                <MdMusicNote size={32} className="text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('create_account')}</h2>
+              <p className="text-gray-600">Únete a la comunidad musical</p>
             </div>
-          )}
-          
-          {success ? (
-            <div className="mb-4 p-3 bg-green-100 border border-[#0073ea] text-green-700 rounded">
-              <p>¡Cuenta creada exitosamente! Serás redirigido a la página de inicio de sesión.</p>
+            
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center space-x-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+            
+            {success ? (
+              <div className="text-center py-8">
+                <div className="bg-green-100 p-6 rounded-2xl mb-6">
+                  <MdCheckCircle size={48} className="text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-green-800 mb-2">¡Cuenta creada exitosamente!</h3>
+                  <p className="text-green-700">Serás redirigido a la página de inicio de sesión en unos momentos.</p>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <div className="w-4 h-4 border-2 border-[#0073ea] border-t-transparent rounded-full animate-spin"></div>
+                  <span>Redirigiendo...</span>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSignUp} className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('email')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdEmail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
+                      placeholder="tu@email.com"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('password')}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdLock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
+                      placeholder="••••••••"
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <MdVisibilityOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <MdVisibility className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-2 flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full ${passwordStrength ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className={`text-xs ${passwordStrength ? 'text-green-600' : 'text-gray-500'}`}>
+                      Mínimo 6 caracteres
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Confirmar Contraseña
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdLock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <MdVisibilityOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      ) : (
+                        <MdVisibility className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  {confirmPassword.length > 0 && (
+                    <div className="mt-2 flex items-center space-x-2">
+                      <div className={`w-2 h-2 rounded-full ${passwordsMatch ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <span className={`text-xs ${passwordsMatch ? 'text-green-600' : 'text-red-600'}`}>
+                        {passwordsMatch ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={loading || !passwordStrength || !passwordsMatch}
+                  className={`w-full py-3 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
+                    loading || !passwordStrength || !passwordsMatch ? 'opacity-70 cursor-not-allowed transform-none' : ''
+                  }`}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>{t('creating_account')}</span>
+                    </div>
+                  ) : (
+                    t('create_account')
+                  )}
+                </button>
+              </form>
+            )}
+            
+            {!success && (
+              <div className="mt-8 text-center">
+                <p className="text-gray-600">
+                  {t('already_have_account')}{' '}
+                  <Link href="/login" className="text-[#0073ea] hover:text-[#0060c0] font-semibold hover:underline transition-colors">
+                    {t('sign_in_here')}
+                  </Link>
+                </p>
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="text-center">
+                <Link 
+                  href="/" 
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  ← Volver al inicio
+                </Link>
+              </div>
             </div>
-          ) : (
-            <form onSubmit={handleSignUp} className="space-y-6">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('email')}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                  placeholder="correo@ejemplo.com"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('password')}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                  minLength={6}
-                />
-                <p className="text-xs text-gray-500 mt-1">{t('password_min')}</p>
-              </div>
-              
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('password')}
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                />
-              </div>
-              
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-2 px-4 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors ${
-                  loading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
-              >
-                {loading ? t('creating_account') : t('create_account')}
-              </button>
-            </form>
-          )}
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              {t('already_have_account')}{' '}
-              <Link href="/login" className="text-[#0073ea] hover:underline">
-                {t('sign_in_here')}
-              </Link>
-            </p>
           </div>
         </div>
       </main>

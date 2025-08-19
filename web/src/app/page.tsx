@@ -1,64 +1,161 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "@/contexts/I18nContext";
+import { MdMusicNote, MdPeople, MdAssignment, MdBarChart, MdCheckCircle, MdSchedule } from "react-icons/md";
 
 export default function Home() {
   const { t } = useI18n();
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-[#0073ea] text-white p-4 shadow-md">
+      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t("app_title")}</h1>
+          <div className="flex items-center space-x-3">
+            <MdMusicNote size={32} className="text-white" />
+            <h1 className="text-2xl font-bold">{t("app_title")}</h1>
+          </div>
           <div className="space-x-4">
-            <Link href="/login" className="px-4 py-2 bg-white text-[#0073ea] rounded hover:bg-gray-100 transition-colors">
+            <Link href="/login" className="px-6 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20">
               {t("login")}
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex-grow container mx-auto p-6 md:p-8 flex flex-col md:flex-row items-center justify-center gap-8">
-        <div className="md:w-1/2 space-y-6">
-          <h2 className="text-4xl font-bold text-gray-800">{t("landing_headline")}</h2>
-          <p className="text-xl text-gray-600">
-            {t("landing_desc")}
-          </p>
-          <div className="pt-4">
-            <Link href="/dashboard" 
-              className="px-6 py-3 bg-[#0073ea] text-white rounded-md hover:text-[#0060c0] transition-colors inline-block">
-              {t("access_dashboard")}
-            </Link>
+      {/* Hero Section */}
+      <main className="flex-grow">
+        <div className="container mx-auto px-6 py-16">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            {/* Left Content */}
+            <div className="lg:w-1/2 space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
+                  {t("landing_headline")}
+                </h2>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  {t("landing_desc")}
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/dashboard" 
+                  className="px-8 py-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold">
+                  {t("access_dashboard")}
+                </Link>
+                <Link href="/signup" 
+                  className="px-8 py-4 bg-white text-[#0073ea] rounded-xl border-2 border-[#0073ea] hover:bg-[#0073ea] hover:text-white transition-all duration-300 text-center font-semibold">
+                  Comenzar Gratis
+                </Link>
+              </div>
+            </div>
+            
+            {/* Right Content - Features Grid */}
+            <div className="lg:w-1/2">
+              <div className="grid grid-cols-2 gap-6">
+                <FeatureCard 
+                  icon={<MdPeople size={32} />}
+                  title="Gestión de Estudiantes"
+                  description="Administra perfiles y datos de estudiantes"
+                  color="bg-blue-500"
+                />
+                <FeatureCard 
+                  icon={<MdAssignment size={32} />}
+                  title="Registro de Asistencia"
+                  description="Control diario rápido y eficiente"
+                  color="bg-green-500"
+                />
+                <FeatureCard 
+                  icon={<MdBarChart size={32} />}
+                  title="Reportes Detallados"
+                  description="Análisis y estadísticas completas"
+                  color="bg-purple-500"
+                />
+                <FeatureCard 
+                  icon={<MdSchedule size={32} />}
+                  title="Acceso 24/7"
+                  description="Disponible desde cualquier dispositivo"
+                  color="bg-orange-500"
+                />
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div className="md:w-1/2 flex justify-center">
-          <div className="relative w-full max-w-md h-80 border-2 border-[#0073ea] rounded-lg overflow-hidden shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6200ee] to-[#9c4dff] opacity-10"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center p-6">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">{t("features")}</h3>
-                <ul className="text-left space-y-2">
-                  <li className="flex items-center"><span className="mr-2 text-[#0073ea]">✓</span> {t("feature_attendance")}</li>
-                  <li className="flex items-center"><span className="mr-2 text-[#0073ea]">✓</span> {t("feature_profiles")}</li>
-                  <li className="flex items-center"><span className="mr-2 text-[#0073ea]">✓</span> {t("feature_reports")}</li>
-                  <li className="flex items-center"><span className="mr-2 text-[#0073ea]">✓</span> {t("feature_access_any")}</li>
-                </ul>
-              </div>
+
+        {/* Benefits Section */}
+        <div className="bg-white py-16">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold text-gray-800 mb-4">¿Por qué elegir Ascend?</h3>
+              <p className="text-xl text-gray-600">Diseñado específicamente para orquestas y programas musicales</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <BenefitCard 
+                icon={<MdCheckCircle size={48} />}
+                title="Fácil de Usar"
+                description="Interfaz intuitiva que cualquier instructor puede dominar en minutos"
+              />
+              <BenefitCard 
+                icon={<MdBarChart size={48} />}
+                title="Reportes Inteligentes"
+                description="Visualiza tendencias y patrones de asistencia con gráficos claros"
+              />
+              <BenefitCard 
+                icon={<MdMusicNote size={48} />}
+                title="Para Músicos"
+                description="Creado por y para la comunidad musical, entendemos tus necesidades"
+              />
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 p-4 border-t border-gray-200">
-        <div className="container mx-auto text-center text-gray-600">
-          <p>{t("footer_copyright", { year: new Date().getFullYear() })}</p>
+      <footer className="bg-gray-800 text-white py-8">
+        <div className="container mx-auto px-6 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <MdMusicNote size={24} />
+            <span className="text-xl font-bold">{t("app_title")}</span>
+          </div>
+          <p className="text-gray-400">{t("footer_copyright", { year: new Date().getFullYear() })}</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+// Componente para las tarjetas de características
+function FeatureCard({ icon, title, description, color }: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+  color: string; 
+}) {
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-100">
+      <div className={`${color} p-3 rounded-xl text-white mb-4 w-fit`}>
+        {icon}
+      </div>
+      <h4 className="font-bold text-black mb-2 text-lg">{title}</h4>
+      <p className="text-sm text-black leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+// Componente para las tarjetas de beneficios
+function BenefitCard({ icon, title, description }: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string; 
+}) {
+  return (
+    <div className="text-center p-6">
+      <div className="text-[#0073ea] mb-4 flex justify-center">
+        {icon}
+      </div>
+      <h4 className="text-xl font-bold text-black mb-3">{title}</h4>
+      <p className="text-black leading-relaxed">{description}</p>
     </div>
   );
 }
