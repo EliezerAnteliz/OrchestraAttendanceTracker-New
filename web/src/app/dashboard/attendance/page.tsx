@@ -583,52 +583,6 @@ export default function AttendancePage() {
     console.log('Todos los estudiantes deseleccionados');
   };
   
-  // === DEBUG: Probar permisos RLS para INSERT/UPDATE en attendance ===
-  const testRlsPermissions = async () => {
-    try {
-      const { data: authInfo, error: authErr } = await supabase.auth.getUser();
-      if (authErr || !authInfo?.user) {
-        alert(`No autenticado: ${authErr?.message || 'sin usuario'}`);
-        return;
-      }
-      if (!activeProgram?.id) {
-        alert('No hay program_id activo. Selecciona un programa.');
-        return;
-      }
-      const candidate = filteredStudents[0] || students[0];
-      if (!candidate) {
-        alert('No hay estudiantes para probar.');
-        return;
-      }
-      // Usar la fecha actualmente mostrada en la UI para evitar desfases por zona horaria
-      const today = currentDate;
-      const nowIso = new Date().toISOString();
-      const payload = {
-        student_id: candidate.id,
-        program_id: activeProgram.id,
-        date: today,
-        status_code: 'A',
-        created_at: nowIso,
-        updated_at: nowIso,
-      } as any;
-      console.log('[RLS TEST] Upsert payload:', payload);
-      const { data, error } = await supabase
-        .from('attendance')
-        .upsert(payload, { onConflict: 'student_id,date,program_id' })
-        .select();
-      console.log('[RLS TEST] Result:', { data, error });
-      if (error) {
-        alert(`❌ Permisos insuficientes o error en upsert: ${error.message}`);
-      } else {
-        alert('✅ Upsert exitoso: tienes permisos para actualizar asistencia. Revisa consola.');
-        // Refrescar datos para ver el cambio reflejado
-        await loadAttendanceData(today);
-      }
-    } catch (e: any) {
-      console.error('[RLS TEST] Exception:', e?.message || e);
-      alert(`❌ Error inesperado: ${e?.message || e}`);
-    }
-  };
   
   // Función para marcar asistencia
   // Helper function to find the correct attendance status code - similar to Android version
@@ -1083,14 +1037,6 @@ export default function AttendancePage() {
             }`}
           >
             {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
-          </button>
-          {/* DEBUG: Botón para probar permisos RLS */}
-          <button
-            onClick={testRlsPermissions}
-            className="px-4 py-2 rounded-md flex items-center whitespace-nowrap bg-purple-600 hover:bg-purple-700 text-white"
-            title="Intentará un upsert en attendance para verificar permisos RLS"
-          >
-            Probar permisos RLS
           </button>
         </div>
       </div>
