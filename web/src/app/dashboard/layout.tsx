@@ -197,7 +197,7 @@ function DashboardContent({ children }: { children: ReactNode }) {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header with menu button */}
-        <header className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center gap-3">
+        <header className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center gap-3 safe-area-inset-top">
           <button 
             className="text-gray-500 hover:text-gray-700 mr-4"
             onClick={() => setIsSidebarOpen(true)}
