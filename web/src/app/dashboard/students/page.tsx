@@ -28,6 +28,8 @@ export default function StudentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showActiveOnly, setShowActiveOnly] = useState(true);
+  const [selectedInstrument, setSelectedInstrument] = useState('');
+  const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadResults, setUploadResults] = useState<{ added: number; updated: number; errors: number } | null>(null);
 
@@ -63,6 +65,10 @@ export default function StudentsPage() {
       
       setStudents(sortedData);
       setFilteredStudents(sortedData);
+      
+      // Extraer instrumentos únicos para el filtro
+      const instruments = [...new Set(sortedData.map(s => s.instrument).filter(Boolean))].sort();
+      setAvailableInstruments(instruments);
     } catch (err: any) {
       console.error('Error al cargar estudiantes:', err);
       setError(t('error_loading_students'));
@@ -75,7 +81,7 @@ export default function StudentsPage() {
     fetchStudents();
   }, [activeProgram?.id]);
 
-  // Filtrar estudiantes cuando cambia la búsqueda o el filtro de activos
+  // Filtrar estudiantes cuando cambia la búsqueda, filtro de activos o instrumento
   useEffect(() => {
     let result = students;
     
@@ -89,13 +95,18 @@ export default function StudentsPage() {
       );
     }
     
+    // Filtrar por instrumento
+    if (selectedInstrument) {
+      result = result.filter(student => student.instrument === selectedInstrument);
+    }
+    
     // Filtrar por estado activo
     if (showActiveOnly) {
       result = result.filter(student => student.is_active !== false);
     }
     
     setFilteredStudents(result);
-  }, [searchQuery, showActiveOnly, students]);
+  }, [searchQuery, showActiveOnly, selectedInstrument, students]);
 
   if (loading) {
     return (
@@ -139,8 +150,9 @@ export default function StudentsPage() {
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-          <div className="relative flex-grow">
+        <div className="flex flex-col gap-3 mb-4">
+          {/* Barra de búsqueda */}
+          <div className="relative">
             <input
               type="text"
               placeholder={t('search_student_placeholder')}
@@ -150,13 +162,28 @@ export default function StudentsPage() {
             />
             <MdSearch className="absolute left-3 top-2.5 text-black font-bold" size={20} />
           </div>
-          <div className="flex items-center">
+          
+          {/* Filtros en fila */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Filtro de instrumento */}
+            <select
+              value={selectedInstrument}
+              onChange={(e) => setSelectedInstrument(e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-black font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+            >
+              <option value="">Todos los instrumentos</option>
+              {availableInstruments.map((instrument) => (
+                <option key={instrument} value={instrument}>{instrument}</option>
+              ))}
+            </select>
+            
+            {/* Filtro activo/inactivo */}
             <button
               onClick={() => setShowActiveOnly(!showActiveOnly)}
-              className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-black font-medium"
+              className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-black font-medium whitespace-nowrap"
             >
-              <MdFilterList className="mr-2" />
-              {showActiveOnly ? t('show_all') : t('only_active')}
+              <MdFilterList className="mr-2" size={18} />
+              {showActiveOnly ? 'Mostrar todos' : 'Solo activos'}
             </button>
           </div>
         </div>
