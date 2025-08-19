@@ -369,7 +369,7 @@ export default function StudentDetail() {
                     name="first_name"
                     value={editedStudent?.first_name || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -380,7 +380,7 @@ export default function StudentDetail() {
                     name="last_name"
                     value={editedStudent?.last_name || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -391,7 +391,7 @@ export default function StudentDetail() {
                     name="current_grade"
                     value={editedStudent?.current_grade || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -402,7 +402,7 @@ export default function StudentDetail() {
                     name="age"
                     value={editedStudent?.age || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -469,7 +469,7 @@ export default function StudentDetail() {
                     name="instrument"
                     value={editedStudent?.instrument || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -480,7 +480,7 @@ export default function StudentDetail() {
                     name="instrument_size"
                     value={editedStudent?.instrument_size || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
                 
@@ -491,7 +491,7 @@ export default function StudentDetail() {
                     name="orchestra_position"
                     value={editedStudent?.orchestra_position || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                   />
                 </div>
               </div>
@@ -518,20 +518,12 @@ export default function StudentDetail() {
       {/* Parents information card */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold flex items-center text-gray-900">
-              <div className="p-2 bg-green-100 rounded-lg mr-3">
-                <MdPerson className="text-green-600" size={20} />
-              </div>
-              {t('parents_info')}
-            </h2>
-            <Link 
-              href={`/dashboard/students/${params.id}/contacts`}
-              className="text-green-700 hover:bg-green-100 px-4 py-2 rounded-lg flex items-center text-sm font-medium transition-colors border border-green-200"
-            >
-              <MdEdit size={16} className="mr-2" /> {t('manage_contacts')}
-            </Link>
-          </div>
+          <h2 className="text-lg font-semibold flex items-center text-gray-900">
+            <div className="p-2 bg-green-100 rounded-lg mr-3">
+              <MdPerson className="text-green-600" size={20} />
+            </div>
+            {t('parents_info')}
+          </h2>
         </div>
         <div className="p-6">
           
@@ -579,12 +571,7 @@ export default function StudentDetail() {
                 <MdPerson className="text-gray-400" size={24} />
               </div>
               <p className="text-gray-600 mb-4 font-medium">{t('no_contacts_registered')}</p>
-              <Link 
-                href={`/dashboard/students/${params.id}/contacts`}
-                className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-              >
-                <MdAdd className="mr-2" size={18} /> {t('add_contact')}
-              </Link>
+              <p className="text-gray-500 text-sm">{t('no_contacts_available')}</p>
             </div>
           )}
         </div>
