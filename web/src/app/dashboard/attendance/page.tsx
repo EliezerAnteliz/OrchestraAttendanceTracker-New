@@ -642,7 +642,6 @@ export default function AttendancePage() {
       const { data: updatedData, error } = await supabase
         .from('attendance')
         .update({ 
-          status: null,
           status_code: null,
           updated_at: new Date().toISOString()
         })
