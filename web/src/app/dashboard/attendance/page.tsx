@@ -90,72 +90,103 @@ export default function AttendancePage() {
     };
   }, []);
 
-                                                                                                // Función para obtener los datos de asistencia para una fecha específica
-                                                                                                const fetchAttendanceData = async (date: string) => {
-                                                                                                  try {
-                                                                                                    // Normalizar la fecha a YYYY-MM-DD sin provocar desfase por zona horaria
-                                                                                                    // Si ya viene como 'YYYY-MM-DD', úsala tal cual.
-                                                                                                    let day = /^\d{4}-\d{2}-\d{2}$/.test(date)
-                                                                                                      ? date
-                                                                                                      : format(new Date(date), 'yyyy-MM-dd');
-                                                                                                    // Defensa adicional: si el input es YYYY-MM-DD pero por alguna razón el cálculo difiere, forzar el input
-                                                                                                    if (/^\d{4}-\d{2}-\d{2}$/.test(date) && day !== date) {
-                                                                                                      console.warn('[fetchAttendanceData] Corrección defensiva de fecha. input=', date, 'calc=', day);
-                                                                                                      day = date;
-                                                                                                    }
-                                                                                                    console.log('[fetchAttendanceData] input=', date, 'day=', day, 'tz=', Intl.DateTimeFormat().resolvedOptions().timeZone);
-                                                                                                    // La columna 'date' en DB es de tipo DATE. Usamos igualdad exacta para evitar discrepancias.
+  // Función para obtener los datos de asistencia para una fecha específica
+  const fetchAttendanceData = async (date: string) => {
+    try {
+      // Normalizar la fecha a YYYY-MM-DD sin provocar desfase por zona horaria
+      let day = /^\d{4}-\d{2}-\d{2}$/.test(date)
+        ? date
+        : format(new Date(date), 'yyyy-MM-dd');
+      
+      // Defensa adicional: si el input es YYYY-MM-DD pero por alguna razón el cálculo difiere, forzar el input
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date) && day !== date) {
+        console.warn('[fetchAttendanceData] Corrección defensiva de fecha. input=', date, 'calc=', day);
+        day = date;
+      }
+      console.log('[fetchAttendanceData] input=', date, 'day=', day, 'tz=', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-                                                                                                    // 1) Consulta principal: sin embedding para evitar ambigüedad de múltiples relaciones
-                                                                                                    const main = await supabase
-                                                                                                      .from('attendance')
-                                                                                                      .select('*')
-                                                                                                      .eq('program_id', activeProgram?.id as string)
-                                                                                                      .eq('date', day);
+      // 1) Intentar con JOIN usando status_code (basado en las memorias)
+      try {
+        const withJoin = await supabase
+          .from('attendance')
+          .select(`
+            *,
+            attendance_status:status_code(id, code, name, color)
+          `)
+          .eq('program_id', activeProgram?.id as string)
+          .eq('date', day);
 
-                                                                                                    if (!main.error && main.data?.length) {
-                                                                                                      const dates = Array.from(new Set(main.data.map((r: any) => r.date)));
-                                                                                                      console.log('[Attendance] Filtrado por date=', day, 'rows=', main.data.length, 'dates_in_rows=', dates);
-                                                                                                      return main.data as any[];
-                                                                                                    }
+        if (!withJoin.error && withJoin.data?.length) {
+          const dates = Array.from(new Set(withJoin.data.map((r: any) => r.date)));
+          console.log('[Attendance] JOIN con status_code OK para date=', day, 'rows=', withJoin.data.length, 'dates_in_rows=', dates);
+          return withJoin.data as any[];
+        }
+        
+        if (withJoin.error) {
+          console.log('[Attendance] JOIN con status_code error:', withJoin.error.message);
+        }
+      } catch (joinError) {
+        console.log('[Attendance] JOIN con status_code falló:', joinError);
+      }
 
-                                                                                                    if (main.error) {
-                                                                                                      console.warn('[Attendance] Error en consulta principal (sin embed):', main.error.message);
-                                                                                                    } else {
-                                                                                                      console.log('[Attendance] Consulta principal vacía, usando fallback sin program_id...');
-                                                                                                    }
+      // 2) Fallback: intentar JOIN con status
+      try {
+        const withStatusJoin = await supabase
+          .from('attendance')
+          .select(`
+            *,
+            attendance_status:status(id, code, name, color)
+          `)
+          .eq('program_id', activeProgram?.id as string)
+          .eq('date', day);
 
-                                                                                                    // 2) Fallback simple: sin relación, mismo filtro
-                                                                                                    const fb = await supabase
-                                                                                                      .from('attendance')
-                                                                                                      .select('*')
-                                                                                                      .eq('program_id', activeProgram?.id as string)
-                                                                                                      .eq('date', day);
-                                                                                                    if (!fb.error && fb.data?.length) {
-                                                                                                      const dates = Array.from(new Set(fb.data.map((r: any) => r.date)));
-                                                                                                      console.log('[Attendance] Fallback simple OK para date=', day, 'rows=', fb.data.length, 'dates_in_rows=', dates);
-                                                                                                      return fb.data as any[];
-                                                                                                    }
+        if (!withStatusJoin.error && withStatusJoin.data?.length) {
+          const dates = Array.from(new Set(withStatusJoin.data.map((r: any) => r.date)));
+          console.log('[Attendance] JOIN con status OK para date=', day, 'rows=', withStatusJoin.data.length, 'dates_in_rows=', dates);
+          return withStatusJoin.data as any[];
+        }
+        
+        if (withStatusJoin.error) {
+          console.log('[Attendance] JOIN con status error:', withStatusJoin.error.message);
+        }
+      } catch (joinError) {
+        console.log('[Attendance] JOIN con status falló:', joinError);
+      }
 
-                                                                                                    // 3) Último recurso: datos históricos sin program_id (sin embed)
-                                                                                                    const legacy = await supabase
-                                                                                                      .from('attendance')
-                                                                                                      .select('*')
-                                                                                                      .eq('date', day);
-                                                                                                    if (!legacy.error && legacy.data?.length) {
-                                                                                                      const dates = Array.from(new Set(legacy.data.map((r: any) => r.date)));
-                                                                                                      console.log('[Attendance] Datos históricos sin program_id para date=', day, 'rows=', legacy.data.length, 'dates_in_rows=', dates);
-                                                                                                      return legacy.data as any[];
-                                                                                                    }
+      // 3) Consulta sin JOIN - datos planos
+      const main = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('program_id', activeProgram?.id as string)
+        .eq('date', day);
 
-                                                                                                    if (fb.error) console.error('[Attendance] Fallback error:', fb.error.message);
-                                                                                                    if (legacy.error) console.warn('[Attendance] Legacy error:', legacy.error.message);
-                                                                                                    return [];
-                                                                                                  } catch (error: any) {
-                                                                                                    console.error('Error al obtener datos de asistencia:', error?.message || error);
-                                                                                                    return [];
-                                                                                                  }
-                                                                                                };
+      if (!main.error && main.data?.length) {
+        const dates = Array.from(new Set(main.data.map((r: any) => r.date)));
+        console.log('[Attendance] Filtrado por date=', day, 'rows=', main.data.length, 'dates_in_rows=', dates);
+        return main.data as any[];
+      }
+
+      console.log('[Attendance] JOIN error, intentando fallback:', main.error?.message || 'No data');
+
+      // 4) Fallback sin program_id
+      const fb = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('date', day);
+        
+      if (!fb.error && fb.data?.length) {
+        const dates = Array.from(new Set(fb.data.map((r: any) => r.date)));
+        console.log('[Attendance] Fallback sin program_id OK para date=', day, 'rows=', fb.data.length, 'dates_in_rows=', dates);
+        return fb.data as any[];
+      }
+
+      if (fb.error) console.error('[Attendance] Fallback error:', fb.error.message);
+      return [];
+    } catch (error: any) {
+      console.error('Error al obtener datos de asistencia:', error?.message || error);
+      return [];
+    }
+  };
   
   // Función para cargar y actualizar los datos de asistencia
   const loadAttendanceData = async (date: string) => {
