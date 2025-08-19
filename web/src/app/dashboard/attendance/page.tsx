@@ -634,18 +634,22 @@ export default function AttendancePage() {
         return;
       }
       
-      // Eliminar registros de asistencia solo para los estudiantes seleccionados
-      // Usar los IDs específicos de los registros encontrados para mayor precisión
+      // Limpiar registros de asistencia actualizando status a null (en lugar de eliminar)
+      // Esto evita problemas de permisos RLS y logra el mismo resultado visual
       const recordIds = existingRecords.map(record => record.id);
-      console.log('Deleting records with IDs:', recordIds);
+      console.log('Clearing attendance status for records with IDs:', recordIds);
       
-      const { data: deletedData, error } = await supabase
+      const { data: updatedData, error } = await supabase
         .from('attendance')
-        .delete()
+        .update({ 
+          status: null,
+          status_code: null,
+          updated_at: new Date().toISOString()
+        })
         .in('id', recordIds)
         .select();
       
-      console.log('Delete operation result:', { deletedData, error });
+      console.log('Update operation result:', { updatedData, error });
 
       if (error) {
         console.error('Error clearing attendance for selected students:', error);
@@ -653,14 +657,14 @@ export default function AttendancePage() {
         return;
       }
 
-      // Verificar que se eliminaron registros
-      if (!deletedData || deletedData.length === 0) {
-        console.error('No records were deleted despite no error');
-        alert('No se pudieron eliminar los registros. Verifica los permisos de la base de datos.');
+      // Verificar que se actualizaron registros
+      if (!updatedData || updatedData.length === 0) {
+        console.error('No records were updated despite no error');
+        alert('No se pudieron limpiar los registros. Verifica los permisos de la base de datos.');
         return;
       }
 
-      console.log(`Successfully deleted ${deletedData.length} attendance records`);
+      console.log(`Successfully cleared ${updatedData.length} attendance records`);
 
       // Mostrar mensaje de éxito
       const successMsg = `Asistencia limpiada exitosamente para ${selectedStudents.length} estudiante(s) en ${currentDate}`;
