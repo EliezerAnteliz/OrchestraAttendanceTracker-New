@@ -635,7 +635,6 @@ export default function AttendancePage() {
   // Función para marcar asistencia
   // Helper function to find the correct attendance status code - similar to Android version
   const findAttendanceStatusCode = (statusName: string) => {
-{{ ... }}
     console.log('Finding status code for:', statusName);
     console.log('Available statuses:', attendanceStatuses);
     
