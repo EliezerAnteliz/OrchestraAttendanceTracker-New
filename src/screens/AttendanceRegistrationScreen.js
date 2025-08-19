@@ -1,141 +1,456 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { View, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { Button, Text, Surface, Portal, IconButton, List, ActivityIndicator, Dialog, Appbar, Chip, SegmentedButtons, RadioButton } from 'react-native-paper';
+import { View, StyleSheet, Alert, ScrollView, TouchableOpacity, LogBox, FlatList, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { Button, Text, Surface, Portal, IconButton, List, ActivityIndicator, Dialog, Appbar, Chip, SegmentedButtons, RadioButton, Icon, FAB, Tooltip, Snackbar } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
-import { supabase } from '../config/supabase';
+import { supabase, testSupabaseConnection, pingSupabase } from '../config/supabase';
 import { useRouter } from 'expo-router';
-import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '../theme';
+import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS, THEME_NAMES, mondayStyles } from '../theme';
 import { useAppTheme } from '../theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MondayStudentItem } from '../components';
+import { useFocusEffect } from '@react-navigation/native';
 
+// Ignorar advertencias específicas de rendimiento
+LogBox.ignoreLogs(['VirtualizedList: You have a large list that is slow to update']);
+
+// Mapa de estados a códigos para la base de datos (varchar(2))
+const STATUS_CODES = {
+    present: 'A',
+    excused: 'EA',
+    unexcused: 'UA',
+    unset: 'US'
+};
+
+// Mapa inverso para convertir códigos a estados
+const CODE_TO_STATUS = {
+    A: 'present',
+    EA: 'excused',
+    UA: 'unexcused',
+    US: 'unset'
+};
+
+// Componente principal para cada elemento de estudiante en la lista
 const StudentListItem = memo(({ 
     student, 
     attendanceData, 
-    onStatusChange,
-    isSelected,
+    onStatusChange, 
+    isSelected = false,
     onSelect,
-    selectionMode
+    isSelectionMode = false,
+    themeType
 }) => {
     const { theme } = useAppTheme();
+    const isMondayTheme = themeType === THEME_NAMES.MONDAY;
+    
+    // Obtener el estado de asistencia actual de este estudiante
+    let code = attendanceData[student.id] || 'US';
+    const status = CODE_TO_STATUS[code] || 'unset';
+    
+    // Determinar colores según el estado de asistencia
+    const getStatusColor = (statusCode) => {
+        switch (statusCode) {
+            case 'A':
+                return theme.colors.attendance.present;
+            case 'EA':
+                return theme.colors.attendance.justified;
+            case 'UA':
+                return theme.colors.attendance.unexcused;
+            default:
+                return theme.colors.surfaceDisabled;
+        }
+    };
+
+    return (
+        <TouchableOpacity
+            activeOpacity={isSelectionMode ? 0.7 : 1}
+            onPress={isSelectionMode ? () => onSelect(student.id) : undefined}
+            style={{ marginVertical: isMondayTheme ? 0 : 4 }}
+        >
+            <Surface
+                style={{
+                    marginHorizontal: SPACING.md,
+                    marginVertical: isMondayTheme ? 0 : 6,
+                    borderRadius: isMondayTheme ? BORDER_RADIUS.xs : BORDER_RADIUS.md,
+                    backgroundColor: isSelected 
+                        ? theme.colors.primaryContainer 
+                        : theme.colors.surface,
+                    overflow: 'hidden',
+                    borderWidth: isMondayTheme ? 1 : 0,
+                    borderColor: isMondayTheme 
+                        ? (isSelected ? theme.colors.primary : theme.colors.outline)
+                        : 'transparent',
+                    borderBottomWidth: isMondayTheme ? 1 : 0,
+                    elevation: isMondayTheme ? 0 : (isSelected ? 3 : 1)
+                }}
+            >
+                <View 
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: SPACING.md
+                    }}
+                >
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ 
+                            fontSize: 16, 
+                            fontWeight: '500',
+                            color: isSelected 
+                                ? theme.colors.onPrimaryContainer 
+                                : theme.colors.onSurface 
+                        }}>
+                            {student.first_name} {student.last_name}
+                        </Text>
+                        <Text style={{ 
+                            fontSize: 14, 
+                            color: isSelected 
+                                ? theme.colors.onPrimaryContainer 
+                                : theme.colors.onSurfaceVariant 
+                        }}>
+                            {student.instrument || 'Not Assigned'}
+                        </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                        {isSelectionMode ? (
+                            <View
+                                style={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: isMondayTheme ? 4 : 12,
+                                    borderWidth: 2,
+                                    borderColor: theme.colors.outline,
+                                    backgroundColor: isSelected ? theme.colors.primary : 'transparent',
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                {isSelected && (
+                                    <Icon 
+                                        source="check" 
+                                        size={16} 
+                                        color="white" 
+                                    />
+                                )}
+                            </View>
+                        ) : (
+                            <>
+                                {/* Botón para marcar presente */}
+                                <TouchableOpacity
+                                    onPress={() => onStatusChange(student.id, 'present')}
+                                    style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: isMondayTheme ? 4 : 18,
+                                        backgroundColor: status === 'present' 
+                                            ? theme.colors.attendance.present 
+                                            : theme.colors.surfaceVariant,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.attendance.present,
+                                    }}
+                                >
+                                    <Icon 
+                                        source="check" 
+                                        size={20} 
+                                        color={status === 'present' ? 'white' : theme.colors.attendance.present} 
+                                    />
+                                </TouchableOpacity>
+                                
+                                {/* Botón para marcar falta justificada */}
+                                <TouchableOpacity
+                                    onPress={() => onStatusChange(student.id, 'excused')}
+                                    style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: isMondayTheme ? 4 : 18,
+                                        backgroundColor: status === 'excused' 
+                                            ? theme.colors.attendance.justified 
+                                            : theme.colors.surfaceVariant,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.attendance.justified,
+                                    }}
+                                >
+                                    <Icon 
+                                        source="alert-circle-outline" 
+                                        size={20} 
+                                        color={status === 'excused' ? 'white' : theme.colors.attendance.justified} 
+                                    />
+                                </TouchableOpacity>
+                                
+                                {/* Botón para marcar falta injustificada */}
+                                <TouchableOpacity
+                                    onPress={() => onStatusChange(student.id, 'unexcused')}
+                                    style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: isMondayTheme ? 4 : 18,
+                                        backgroundColor: status === 'unexcused' 
+                                            ? theme.colors.attendance.unexcused 
+                                            : theme.colors.surfaceVariant,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.attendance.unexcused,
+                                    }}
+                                >
+                                    <Icon 
+                                        source="close" 
+                                        size={20} 
+                                        color={status === 'unexcused' ? 'white' : theme.colors.attendance.unexcused} 
+                                    />
+                                </TouchableOpacity>
+                            </>
+                        )}
+                    </View>
+                </View>
+            </Surface>
+        </TouchableOpacity>
+    );
+}, (prevProps, nextProps) => {
+    // Verificación profunda para prevenir re-renderizados innecesarios
+    return prevProps.student.id === nextProps.student.id && 
+           prevProps.isSelected === nextProps.isSelected &&
+           prevProps.isSelectionMode === nextProps.isSelectionMode &&
+           prevProps.attendanceData[prevProps.student.id] === nextProps.attendanceData[nextProps.student.id];
+});
+
+// Componente para el calendario con estilo adaptado al tema
+const ThemedCalendar = ({ theme, isMondayTheme, selectedDate, onDayPress }) => {
+    const calendarTheme = {
+        // Colores principales
+        selectedDayBackgroundColor: theme.colors.primary,
+        todayTextColor: theme.colors.primary,
+        arrowColor: theme.colors.primary,
+        monthTextColor: theme.colors.onSurface,
+        
+        // Texto y tamaños
+        textDayFontSize: 16,
+        textMonthFontSize: 18,
+        textDayHeaderFontSize: 14,
+        
+        // Fondos
+        backgroundColor: '#ffffff',
+        calendarBackground: '#ffffff',
+        
+        // Colores de texto
+        dayTextColor: theme.colors.onSurface,
+        textSectionTitleColor: theme.colors.onSurface,
+        selectedDotColor: '#ffffff',
+        dotColor: theme.colors.primary,
+        textDefaultColor: theme.colors.onSurface,
+        selectedDayTextColor: '#ffffff',
+        textDisabledColor: theme.colors.disabled,
+        
+        // Monday theme específico - con prioridad más alta para forzar estilos
+        'stylesheet.day.single': {
+            base: {
+                width: 36, // Mayor tamaño
+                height: 36, // Mayor tamaño
+                alignItems: 'center',
+                justifyContent: 'center',
+            },
+            selected: {
+                backgroundColor: theme.colors.primary,
+                // Cuadrado en lugar de círculo para Monday - reduciendo mucho el radio
+                borderRadius: isMondayTheme ? 2 : 18,
+            },
+            today: {
+                borderWidth: 1,
+                borderColor: theme.colors.primary,
+                borderRadius: isMondayTheme ? 2 : 18,
+            },
+            leftFiller: {
+                width: 4,
+                height: 36,
+            },
+            rightFiller: {
+                width: 4,
+                height: 36,
+            },
+        },
+        'stylesheet.day.period': {
+            base: {
+                width: 36,
+                height: 36,
+                alignItems: 'center',
+                justifyContent: 'center',
+            },
+            fillerStyle: {
+                backgroundColor: theme.colors.primaryContainer, 
+                borderRadius: 0,
+            },
+        },
+        'stylesheet.calendar.header': {
+            header: {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                paddingLeft: 10,
+                paddingRight: 10,
+                marginTop: 8,
+                alignItems: 'center',
+                backgroundColor: isMondayTheme ? theme.colors.surface : 'transparent',
+                borderBottomWidth: isMondayTheme ? 1 : 0,
+                borderBottomColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                paddingBottom: 10,
+            },
+            monthText: {
+                fontSize: 18,
+                fontWeight: '600',
+                color: theme.colors.onSurface,
+                margin: 10
+            },
+            arrow: {
+                padding: 6,
+                backgroundColor: isMondayTheme ? 'transparent' : 'rgba(0, 0, 0, 0.05)',
+                borderRadius: isMondayTheme ? 2 : 12,
+            }
+        },
+        'stylesheet.calendar.main': {
+            week: {
+                marginTop: 7,
+                marginBottom: 7,
+                flexDirection: 'row',
+                justifyContent: 'space-around'
+            },
+            dayContainer: {
+                flex: 1, // Para que cada día ocupe espacio igual
+                alignItems: 'center',
+            }
+        },
+    };
     
     return (
-    <TouchableOpacity
-        onPress={() => selectionMode ? onSelect(student.id) : null}
-        activeOpacity={0.7}
-    >
         <Surface
-            style={[
-                styles.listItem,
-                { backgroundColor: theme.colors.surface },
-                // Aplicar efectos visuales cuando está seleccionado
-                isSelected && selectionMode && {
-                    borderColor: theme.colors.primary,
-                    borderWidth: 2,
-                    elevation: 4,
-                    shadowColor: theme.colors.primary,
-                    backgroundColor: theme.colors.primaryContainer || 'rgba(103, 80, 164, 0.08)',
-                }
-            ]}
+            style={{
+                width: '100%', // Ocupar todo el ancho disponible
+                marginBottom: SPACING.md,
+                borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                overflow: 'hidden',
+                borderWidth: isMondayTheme ? 1 : 0,
+                borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                elevation: isMondayTheme ? 0 : 2
+            }}
         >
-            <View style={styles.itemContent}>
-                <View style={styles.studentInfo}>
-                    <Text 
-                        style={[
-                            styles.studentName, 
-                            { color: theme.colors.text },
-                            // Cambiar color del texto cuando está seleccionado
-                            isSelected && selectionMode && { color: theme.colors.primary, fontWeight: '700' }
-                        ]}
-                        numberOfLines={1}
-                    >
-                        {student.first_name} {student.last_name}
-                    </Text>
-                    <Text 
-                        style={[
-                            styles.studentInstrument, 
-                            { color: theme.colors.text }
-                        ]}
-                        numberOfLines={1}
-                    >
-                        {student.instrument || 'Sin instrumento'}
-                    </Text>
-                </View>
-                
-                <View style={styles.rightContainer}>
-                    {!selectionMode ? (
-                        <View style={styles.statusButtons}>
-                            <IconButton
-                                icon="check"
-                                size={18}
-                                mode="outlined"
-                                selected={attendanceData[student.id] === 'A'}
-                                onPress={() => onStatusChange(student.id, 'A')}
-                                style={[
-                                    styles.statusButton,
-                                    attendanceData[student.id] === 'A' && styles.selectedButton
-                                ]}
-                                iconColor={attendanceData[student.id] === 'A' ? 'white' : theme.colors.attendance.present}
-                                containerColor={attendanceData[student.id] === 'A' ? theme.colors.attendance.present : 'transparent'}
-                            />
-                            <IconButton
-                                icon="alert"
-                                size={18}
-                                mode="outlined"
-                                selected={attendanceData[student.id] === 'EA'}
-                                onPress={() => onStatusChange(student.id, 'EA')}
-                                style={[
-                                    styles.statusButton,
-                                    attendanceData[student.id] === 'EA' && styles.selectedButton
-                                ]}
-                                iconColor={attendanceData[student.id] === 'EA' ? 'white' : theme.colors.attendance.justified}
-                                containerColor={attendanceData[student.id] === 'EA' ? theme.colors.attendance.justified : 'transparent'}
-                            />
-                            <IconButton
-                                icon="close"
-                                size={18}
-                                mode="outlined"
-                                selected={attendanceData[student.id] === 'UA'}
-                                onPress={() => onStatusChange(student.id, 'UA')}
-                                style={[
-                                    styles.statusButton,
-                                    attendanceData[student.id] === 'UA' && styles.selectedButton
-                                ]}
-                                iconColor={attendanceData[student.id] === 'UA' ? 'white' : theme.colors.attendance.unexcused}
-                                containerColor={attendanceData[student.id] === 'UA' ? theme.colors.attendance.unexcused : 'transparent'}
-                            />
-                        </View>
-                    ) : (
-                        <View 
-                            style={[
-                                styles.selectionIndicator,
-                                isSelected ? 
-                                    { backgroundColor: theme.colors.primary } : 
-                                    { borderColor: theme.colors.outline, borderWidth: 1 }
-                            ]}
-                        >
-                            {isSelected && (
-                                <Text style={styles.checkmark}>✓</Text>
-                            )}
-                        </View>
-                    )}
-                </View>
-            </View>
+            <Calendar
+                current={selectedDate}
+                onDayPress={onDayPress}
+                markedDates={{
+                    [selectedDate]: { 
+                        selected: true,
+                        customStyles: {
+                            container: {
+                                borderRadius: isMondayTheme ? 2 : 18, // Más cuadrado
+                                backgroundColor: theme.colors.primary,
+                            },
+                            text: {
+                                color: 'white',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    }
+                }}
+                markingType={'custom'}
+                theme={calendarTheme}
+                enableSwipeMonths={true}
+            />
         </Surface>
-    </TouchableOpacity>
-)});
+    );
+};
+
+// Componente para los chips de filtro por instrumento
+const InstrumentFilterChip = ({ label, selected, onPress, theme, isMondayTheme }) => {
+    return (
+        <TouchableOpacity
+            style={{
+                backgroundColor: selected 
+                    ? (isMondayTheme ? theme.colors.primaryContainer : theme.colors.primary + '15')
+                    : (isMondayTheme ? '#f0f0f5' : 'transparent'),
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                marginRight: 10,
+                minWidth: 80,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 0, // Completamente cuadrado
+                borderWidth: 1,
+                borderColor: selected 
+                    ? (isMondayTheme ? theme.colors.primary : 'transparent')
+                    : (isMondayTheme ? theme.colors.outline : theme.colors.outline + '80'),
+                elevation: isMondayTheme ? 0 : (selected ? 2 : 0),
+            }}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            <Text style={{
+                color: selected ? theme.colors.primary : theme.colors.onSurfaceVariant,
+                fontWeight: selected ? '600' : '400',
+                fontSize: 14,
+                textAlign: 'center'
+            }}>
+                {label}
+            </Text>
+        </TouchableOpacity>
+    );
+};
+
+// Componente para los chips de filtro por estado de estudiante
+const StatusFilterChip = ({ icon, label, selected, onPress, theme, isMondayTheme }) => {
+    return (
+        <TouchableOpacity
+            onPress={onPress}
+            style={{
+                backgroundColor: selected ? theme.colors.primaryContainer : theme.colors.surfaceVariant,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                marginRight: 8,
+                borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                borderWidth: 1,
+                borderColor: selected 
+                    ? (isMondayTheme ? theme.colors.primary : 'transparent')
+                    : (isMondayTheme ? theme.colors.outline : 'transparent'),
+                elevation: isMondayTheme ? 0 : (selected ? 2 : 1),
+                flexDirection: 'row',
+                alignItems: 'center',
+            }}
+        >
+            <Icon 
+                source={icon} 
+                size={16} 
+                color={selected ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant} 
+                style={{ marginRight: 6 }}
+            />
+            <Text 
+                style={{ 
+                    color: selected ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant,
+                    fontWeight: selected ? '600' : '400',
+                    fontSize: 13,
+                }}
+            >
+                {label}
+            </Text>
+        </TouchableOpacity>
+    );
+};
 
 const AttendanceRegistrationScreen = () => {
     const router = useRouter();
-    const { theme, isDark } = useAppTheme();
+    const { theme, themeType } = useAppTheme();
+    const isMondayTheme = themeType === THEME_NAMES.MONDAY;
+    
     const [selectedDate, setSelectedDate] = useState(() => {
         const today = new Date();
         return new Date(today.getFullYear(), today.getMonth(), today.getDate());
     });
     const [showCalendar, setShowCalendar] = useState(false);
     const [students, setStudents] = useState([]);
+    const [filteredStudents, setFilteredStudents] = useState([]);
     const [attendanceData, setAttendanceData] = useState({});
     const [loading, setLoading] = useState(true);
     const [dateLoading, setDateLoading] = useState(false);
+    const [dbStatus, setDbStatus] = useState('connecting'); // 'connecting', 'awakening', 'ready', 'error'
     const [isSelectionMode, setIsSelectionMode] = useState(false);
     const [selectedStudents, setSelectedStudents] = useState(new Set());
     const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
@@ -146,6 +461,9 @@ const AttendanceRegistrationScreen = () => {
         const today = new Date();
         return { year: today.getFullYear(), month: today.getMonth() + 1 };
     });
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [noSelectionSnackbarVisible, setNoSelectionSnackbarVisible] = useState(false);
     
     const formatDate = useCallback((date) => {
         if (!(date instanceof Date)) {
@@ -186,16 +504,42 @@ const AttendanceRegistrationScreen = () => {
 
     const loadAttendanceData = useCallback(async (date) => {
         setLoading(true);
+        
+        // Función para realizar petición con reintentos
+        const fetchWithRetry = async (fetchFunction, maxRetries = 3) => {
+            let lastError;
+            
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    return await fetchFunction();
+                } catch (error) {
+                    lastError = error;
+                    
+                    // Esperar antes de reintentar (tiempo exponencial)
+                    if (attempt < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+                    }
+                }
+            }
+            
+            throw lastError;
+        };
+        
         try {
+            // Intentar cargar estudiantes con reintentos
             const [studentsResponse, attendanceResponse] = await Promise.all([
-                supabase
-                    .from('students')
-                    .select('*')
-                    .order('first_name'),
-                supabase
-                    .from('attendance')
-                    .select('*')
-                    .eq('date', formatDate(date))
+                fetchWithRetry(() => 
+                    supabase
+                        .from('students')
+                        .select('*')
+                        .order('first_name')
+                ),
+                fetchWithRetry(() => 
+                    supabase
+                        .from('attendance')
+                        .select('*')
+                        .eq('date', formatDate(date))
+                )
             ]);
 
             if (studentsResponse.error) throw studentsResponse.error;
@@ -210,18 +554,166 @@ const AttendanceRegistrationScreen = () => {
             setAttendanceData(attendance);
         } catch (error) {
             console.error('Error cargando datos:', error);
-            Alert.alert('Error', 'No se pudieron cargar los datos');
+            Alert.alert(
+                'Error de conexión', 
+                'No se pudo conectar a la base de datos. Verifica tu conexión a internet e intenta nuevamente.',
+                [
+                    { 
+                        text: 'Reintentar', 
+                        onPress: () => loadAttendanceData(date) 
+                    },
+                    { 
+                        text: 'Entendido', 
+                        style: 'cancel' 
+                    }
+                ]
+            );
         } finally {
             setLoading(false);
         }
     }, [formatDate]);
 
+    const fetchStudents = useCallback(async () => {
+        setLoading(true);
+        setDbStatus('connecting');
+        
+        try {
+            // Intentar conexión directa REST primero (a menudo funciona mejor)
+            const pingResult = await pingSupabase();
+            
+            if (pingResult.success) {
+                try {
+                    // Si el ping REST fue exitoso, intentar cargar estudiantes directamente
+                    const { data, error } = await supabase
+                        .from('students')
+                        .select('*')
+                        .order('first_name');
+                    
+                    if (error) {
+                        throw error;
+                    }
+                    
+                    setStudents(data || []);
+                    setDbStatus('ready');
+                    return;
+                } catch (directError) {
+                    // Continuar con el método completo de prueba de conexión
+                }
+            }
+            
+            // Test completo de conexión (método original)
+            const connectionTest = await testSupabaseConnection();
+            
+            if (!connectionTest.success) {
+                // Si el error es de HTTP y posiblemente relacionado con base de datos inactiva
+                if (connectionTest.stage === 'http') {
+                    setDbStatus('awakening');
+                    throw new Error(`La base de datos parece estar inactiva: ${connectionTest.message || 'Reintentando...'}`);
+                }
+                
+                throw new Error(`Error de conexión en etapa: ${connectionTest.stage}`);
+            }
+            
+            // Función para realizar petición con reintentos
+            const fetchWithRetry = async (fetchFunction, maxRetries = 5) => { 
+                let lastError;
+                
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    try {
+                        return await fetchFunction();
+                    } catch (error) {
+                        lastError = error;
+                        
+                        // Esperar antes de reintentar (tiempo exponencial)
+                        if (attempt < maxRetries - 1) {
+                            const waitTime = attempt === 0 ? 10000 : 5000 * Math.pow(2, attempt); 
+                            await new Promise(resolve => setTimeout(resolve, waitTime));
+                        }
+                    }
+                }
+                
+                throw lastError;
+            };
+            
+            const studentsResponse = await fetchWithRetry(() => 
+                supabase
+                    .from('students')
+                    .select('*')
+                    .order('first_name')
+            );
+
+            if (studentsResponse.error) {
+                throw studentsResponse.error;
+            }
+            
+            setStudents(studentsResponse.data || []);
+            setDbStatus('ready');
+        } catch (error) {
+            console.error('Error cargando estudiantes:', error);
+            
+            // Mensaje personalizado según el error
+            let errorMessage = 'No se pudo conectar a la base de datos.';
+            
+            if (error.message && error.message.includes('inactiva')) {
+                errorMessage = 'La base de datos está inactiva después de un período sin uso y necesita tiempo para reiniciarse. Esto puede tardar hasta 2 minutos la primera vez. ¿Deseas reintentar?';
+                setDbStatus('awakening');
+            } else if (error.message && error.message.includes('etapa: auth')) {
+                errorMessage = 'Problema con la autenticación a Supabase. Intenta cerrar sesión y volver a iniciar.';
+                setDbStatus('error');
+            } else if (error.message && error.message.includes('etapa: data')) {
+                errorMessage = 'No se pudo acceder a los datos de estudiantes. Verifica los permisos en la base de datos.';
+                setDbStatus('error');
+            } else if (error.message && error.message.includes('etapa: fetch')) {
+                errorMessage = 'Problemas de red al conectar con Supabase. Verifica tu conexión a internet.';
+                setDbStatus('error');
+            } else {
+                setDbStatus('error');
+            }
+            
+            Alert.alert(
+                'Error de conexión', 
+                errorMessage,
+                [
+                    { 
+                        text: 'Reintentar', 
+                        onPress: () => fetchStudents() 
+                    },
+                    { 
+                        text: 'Entendido', 
+                        style: 'cancel' 
+                    }
+                ]
+            );
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+    
     useEffect(() => {
-        loadAttendanceData(selectedDate);
-    }, [selectedDate, loadAttendanceData]);
+        fetchStudents();
+    }, [fetchStudents]);
+
+    useFocusEffect(
+        useCallback(() => {
+            // Recargar completamente los datos cuando la pantalla recibe el foco
+            fetchStudents();
+            loadAttendanceData(selectedDate);
+        }, [fetchStudents, selectedDate, loadAttendanceData])
+    );
 
     const handleDateSelect = useCallback((date) => {
-        setSelectedDate(new Date(date.dateString));
+        // Crear una nueva fecha partiendo de la cadena de fecha seleccionada en el calendario
+        // Asegurarnos de usar la fecha local para evitar problemas de zona horaria
+        // El formato de date.dateString es 'YYYY-MM-DD'
+        const parts = date.dateString.split('-');
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Los meses en JS son 0-11
+        const day = parseInt(parts[2], 10);
+        
+        // Crear un nuevo objeto Date con los componentes
+        const selectedDay = new Date(year, month, day);
+        
+        setSelectedDate(selectedDay);
         setShowCalendar(false);
     }, []);
 
@@ -229,7 +721,7 @@ const AttendanceRegistrationScreen = () => {
         try {
             setAttendanceData(prev => ({
                 ...prev,
-                [studentId]: status
+                [studentId]: STATUS_CODES[status]
             }));
 
             // Primero intentamos actualizar si existe
@@ -249,7 +741,7 @@ const AttendanceRegistrationScreen = () => {
                 const { error: updateError } = await supabase
             .from('attendance')
                     .update({
-                        status_code: status,
+                        status_code: STATUS_CODES[status],
                         updated_at: new Date().toISOString()
                     })
                     .eq('student_id', studentId)
@@ -263,23 +755,54 @@ const AttendanceRegistrationScreen = () => {
                     .insert({
                         student_id: studentId,
                         date: formatDate(selectedDate),
-                        status_code: status,
+                        status_code: STATUS_CODES[status],
                         updated_at: new Date().toISOString()
                     });
 
                 if (insertError) throw insertError;
             }
-        } catch (error) {
-            console.error('Error updating attendance:', error);
-            Alert.alert('Error', 'No se pudo actualizar la asistencia');
             
-            setAttendanceData(prev => ({
-                ...prev,
-                [studentId]: prev[studentId]
-            }));
+            // Aquí agregamos el feedback visual para una asistencia individual
+            if (isSelectionMode === false) {
+                const student = students.find(s => s.id === studentId);
+                if (student) {
+                    const statusText = status === 'present' ? 'presente' : 
+                                      status === 'excused' ? 'falta justificada' : 
+                                      status === 'unexcused' ? 'falta injustificada' : '';
+                    
+                    setSnackbarMessage(`${student.first_name} ${student.last_name} marcado como ${statusText}`);
+                    setSnackbarVisible(true);
+                }
+            }
+        } catch (error) {
+            console.error('Error actualizando asistencia:', error);
+            Alert.alert('Error', 'No se pudo actualizar la asistencia');
         }
-    }, [selectedDate, formatDate]);
+    }, [formatDate, selectedDate, students, isSelectionMode]);
 
+    // Nuevo método para manejar asistencia grupal con feedback
+    const handleGroupStatusChange = useCallback((status) => {
+        if (selectedStudents.size > 0) {
+            Array.from(selectedStudents).forEach(id => handleStatusChange(id, status));
+            
+            // Feedback visual para grupo
+            const statusText = status === 'present' ? 'presentes' : 
+                              status === 'excused' ? 'falta justificada' : 
+                              status === 'unexcused' ? 'falta injustificada' : '';
+            
+            setSnackbarMessage(`${selectedStudents.size} estudiantes marcados como ${statusText}`);
+            setSnackbarVisible(true);
+            
+            // Cerrar el modo selección después de un breve retraso para que el usuario vea los cambios
+            setTimeout(() => {
+                setIsSelectionMode(false);
+                setSelectedStudents(new Set());
+            }, 1000);
+        } else {
+            Alert.alert('Información', 'Selecciona al menos un estudiante');
+        }
+    }, [selectedStudents, handleStatusChange]);
+    
     const getStatusColor = (status) => {
         switch (status) {
             case 'A':
@@ -293,28 +816,31 @@ const AttendanceRegistrationScreen = () => {
         }
     };
 
-    const toggleStudentSelection = useCallback((id) => {
-        setSelectedStudents(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(id)) {
-                newSet.delete(id);
+    const toggleStudentSelection = useCallback((studentId) => {
+        setSelectedStudents(prevSelected => {
+            const newSelected = new Set(prevSelected);
+            if (newSelected.has(studentId)) {
+                newSelected.delete(studentId);
             } else {
-                newSet.add(id);
+                newSelected.add(studentId);
             }
-            return newSet;
+            return newSelected;
         });
     }, []);
 
-    const renderListItem = useCallback(({ item: student }) => (
-        <StudentListItem
-            student={student}
-            attendanceData={attendanceData}
-            onStatusChange={handleStatusChange}
-            isSelected={selectedStudents.has(student.id)}
-            onSelect={toggleStudentSelection}
-            selectionMode={isSelectionMode}
-        />
-    ), [attendanceData, handleStatusChange, selectedStudents, isSelectionMode, toggleStudentSelection]);
+    const renderListItem = useCallback(({ item: student }) => {
+        return (
+            <StudentListItem
+                student={student}
+                attendanceData={attendanceData}
+                onStatusChange={handleStatusChange}
+                isSelected={selectedStudents.has(student.id)}
+                onSelect={() => toggleStudentSelection(student.id)}
+                isSelectionMode={isSelectionMode}
+                themeType={themeType}
+            />
+        );
+    }, [attendanceData, handleStatusChange, selectedStudents, isSelectionMode, toggleStudentSelection, themeType]);
 
     const calendarTheme = useMemo(() => ({
         selectedDayBackgroundColor: theme.colors.primary,
@@ -335,781 +861,817 @@ const AttendanceRegistrationScreen = () => {
         textDisabledColor: 'rgba(0, 0, 0, 0.4)',
     }), [theme]);
 
-    const loadInstruments = useCallback(async () => {
-        try {
-            const { data, error } = await supabase
-                .from('students')
-                .select('instrument')
-                .not('instrument', 'is', null);
+    // Función para normalizar los nombres de instrumentos (quitar acentos, minúsculas)
+    const normalizeInstrumentName = (instrument) => {
+        if (!instrument) return '';
+        return instrument
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+    };
 
-            if (error) throw error;
-
-            // Orden específico para los instrumentos
-            const instrumentOrder = ['Violin', 'Viola', 'Cello', 'Bass', 'Not assigned'];
-            
-            // Obtener instrumentos únicos
-            const uniqueInstruments = [...new Set(data.map(item => item.instrument))];
-            
-            // Ordenar los instrumentos según el orden especificado
-            const sortedInstruments = uniqueInstruments.sort((a, b) => {
-                const indexA = instrumentOrder.indexOf(a);
-                const indexB = instrumentOrder.indexOf(b);
+    // Extraer instrumentos únicos normalizados
+    const uniqueNormalizedInstruments = useMemo(() => {
+        const instrumentMap = new Map(); // Usamos Map para mantener la forma original
+        
+        students.forEach(student => {
+            if (student.instrument) {
+                const normalizedName = normalizeInstrumentName(student.instrument);
+                // Solo guardamos el primer nombre encontrado para cada instrumento normalizado
+                if (!instrumentMap.has(normalizedName)) {
+                    instrumentMap.set(normalizedName, student.instrument);
+                }
+            }
+        });
+        
+        // Orden específico para los instrumentos
+        const instrumentOrder = ['violin', 'viola', 'cello', 'bass', 'not assigned'];
+        
+        // Convertir el Map a un array y ordenarlo
+        const instrumentEntries = Array.from(instrumentMap.entries());
+        return instrumentEntries
+            .sort((a, b) => {
+                const indexA = instrumentOrder.indexOf(a[0]);
+                const indexB = instrumentOrder.indexOf(b[0]);
                 
                 // Si ambos instrumentos están en la lista de orden
                 if (indexA >= 0 && indexB >= 0) {
                     return indexA - indexB;
                 }
                 // Si solo a está en la lista de orden
-                if (indexA >= 0) {
-                    return -1;
-                }
+                if (indexA >= 0) return -1;
                 // Si solo b está en la lista de orden
-                if (indexB >= 0) {
-                    return 1;
-                }
+                if (indexB >= 0) return 1;
                 // Si ninguno está en la lista de orden, ordenar alfabéticamente
-                return a.localeCompare(b);
-            });
+                return a[0].localeCompare(b[0]);
+            })
+            .map(entry => entry[1]); // Devolvemos los nombres originales ordenados
+    }, [students]);
 
-            setInstruments(sortedInstruments);
-        } catch (error) {
-            console.error('Error cargando instrumentos:', error);
-        }
-    }, []);
-
+    // Filtrado de estudiantes por instrumento y estado activo
     useEffect(() => {
-        loadInstruments();
-    }, [loadInstruments]);
-
-    // Filtrar estudiantes por instrumento
-    const filteredStudents = useMemo(() => {
-        if (selectedInstrument === 'all') return students;
-        return students.filter(student => student.instrument === selectedInstrument);
+        if (students.length > 0) {
+            let filtered = [...students];
+            
+            // Mostrar solo estudiantes activos (is_active !== false)
+            filtered = filtered.filter(student => student.is_active !== false);
+            
+            // Aplicar filtro por instrumento
+            if (selectedInstrument !== 'all') {
+                filtered = filtered.filter(student => 
+                    normalizeInstrumentName(student.instrument) === selectedInstrument
+                );
+            }
+            
+            setFilteredStudents(filtered);
+        }
     }, [students, selectedInstrument]);
 
+    // Función para manejar acción grupal con validación
+    const handleGroupActionWithValidation = (action) => {
+        if (selectedStudents.size === 0) {
+            setNoSelectionSnackbarVisible(true);
+            return;
+        }
+        
+        if (action === 'present' || action === 'excused' || action === 'unexcused') {
+            handleGroupStatusChange(action);
+        }
+    };
+
+    // Componente de estado de carga personalizado
+    const renderLoadingState = () => {
+        if (!loading) return null;
+        
+        let message = 'Cargando estudiantes...';
+        let icon = 'loading';
+        
+        if (dbStatus === 'awakening') {
+            message = 'La base de datos se está reactivando después de un período de inactividad.\nEsto puede tardar hasta 2 minutos la primera vez.';
+            icon = 'database-sync';
+        } else if (dbStatus === 'error') {
+            message = 'Error al conectar con la base de datos.\nIntenta nuevamente o contacta al administrador.';
+            icon = 'database-remove';
+        }
+        
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <View style={{height: 20}} />
+                <Text style={styles.loadingText}>{message}</Text>
+                {dbStatus === 'awakening' && (
+                    <Button 
+                        mode="text" 
+                        onPress={() => fetchStudents()}
+                        style={{marginTop: 16}}
+                    >
+                        Reintentar conexión
+                    </Button>
+                )}
+            </View>
+        );
+    };
+
     return (
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-            <Appbar.Header style={[styles.header, { backgroundColor: theme.colors.surface }]}>
-                <Appbar.Content title="Registro de Asistencia" />
-                {!loading && (isSelectionMode ? (
-                    <>
-                        <Appbar.Action 
-                            icon="card-multiple-outline" 
-                            onPress={() => setSelectedStudents(new Set(filteredStudents.map(s => s.id)))}
-                            tooltip="Seleccionar todos"
-                            color={selectedStudents.size > 0 ? theme.colors.primary : undefined}
-                        />
-                        <Appbar.Action 
-                            icon="card-off-outline" 
-                            onPress={() => setSelectedStudents(new Set())}
-                            tooltip="Deseleccionar todos"
-                            disabled={selectedStudents.size === 0}
-                            color={selectedStudents.size === 0 ? theme.colors.disabled : undefined}
-                        />
-                        <Appbar.Action 
-                            icon="check-circle-outline" 
-                            onPress={() => setShowAttendanceDialog(true)}
-                            disabled={selectedStudents.size === 0}
-                            tooltip="Marcar asistencia"
-                            color={selectedStudents.size === 0 ? theme.colors.disabled : theme.colors.primary}
-                        />
-                        <Appbar.Action 
-                            icon="close-circle-outline" 
-                            onPress={() => {
-                                setIsSelectionMode(false);
-                                setSelectedStudents(new Set());
-                            }}
-                            tooltip="Cancelar selección"
-                        />
-                    </>
-                ) : (
-                    <Appbar.Action 
-                        icon="clipboard-outline" 
-                        onPress={() => setIsSelectionMode(true)}
-                        tooltip="Modo selección múltiple"
-                    />
-                ))}
-            </Appbar.Header>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]}>
+            <StatusBar backgroundColor={theme.colors.background} barStyle="dark-content" />
             
-            <Surface style={[styles.dateSelector, { backgroundColor: theme.colors.surface }]}>
-                <View style={styles.dateRow}>
-                    <Button 
-                        mode="outlined"
-                        onPress={() => !loading && setShowCalendar(true)}
-                        style={[
-                            styles.dateButton,
-                            { borderColor: theme.colors.primary + '50' }
-                        ]}
-                        contentStyle={styles.dateButtonContent}
-                        icon="calendar"
-                        disabled={loading}
-                        textColor={theme.colors.primary}
-                        labelStyle={styles.dateButtonLabel}
-                    >
-                        {formatDisplayDate(selectedDate)}
-                    </Button>
-                    <Button 
-                        mode="outlined"
-                        onPress={() => !loading && setSelectedDate(new Date())}
-                        disabled={loading}
-                        style={[
-                            styles.todayButton,
-                            { borderColor: theme.colors.outline }
-                        ]}
-                        contentStyle={styles.todayButtonContent}
-                        icon="calendar-today"
-                        textColor={theme.colors.primary}
-                        labelStyle={styles.todayButtonLabel}
-                    >
-                        Hoy
-                    </Button>
-                </View>
-            </Surface>
-
-            <Surface style={[styles.filterContainer, { backgroundColor: theme.colors.surface }]}>
-                <View style={styles.filtersContainer}>
-                    <View style={styles.filtersRow}>
-                        <Chip
-                            selected={selectedInstrument === 'all'}
-                            onPress={() => setSelectedInstrument('all')}
-                            style={[
-                                styles.instrumentChip,
-                                selectedInstrument === 'all' && { 
-                                    backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                                    borderColor: theme.colors.primary 
-                                }
-                            ]}
-                            mode="outlined"
-                            selectedColor={theme.colors.primary}
-                            textStyle={{ 
-                                color: selectedInstrument === 'all' ? theme.colors.primary : theme.colors.text,
-                                fontSize: 15,
-                                fontWeight: selectedInstrument === 'all' ? '600' : '500',
-                                paddingHorizontal: 2,
-                                textAlign: 'center',
-                                textAlignVertical: 'center',
-                                lineHeight: 20
-                            }}
-                        >
-                            Todos
-                        </Chip>
-                        
-                        {/* Instrumentos específicos */}
-                        {instruments.map((instrument) => (
-                            <Chip
-                                key={instrument}
-                                selected={selectedInstrument === instrument}
-                                onPress={() => setSelectedInstrument(instrument)}
-                                style={[
-                                    styles.instrumentChip,
-                                    selectedInstrument === instrument && { 
-                                        backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                                        borderColor: theme.colors.primary 
-                                    }
-                                ]}
-                                mode="outlined"
-                                selectedColor={theme.colors.primary}
-                                textStyle={{ 
-                                    color: selectedInstrument === instrument ? theme.colors.primary : theme.colors.text,
-                                    fontSize: 15,
-                                    fontWeight: selectedInstrument === instrument ? '600' : '500',
-                                    paddingHorizontal: 2,
-                                    textAlign: 'center',
-                                    textAlignVertical: 'center',
-                                    lineHeight: 20
-                                }}
-                            >
-                                {instrument}
-                            </Chip>
-                        ))}
-                    </View>
-                </View>
-            </Surface>
-
-            {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={theme.colors.primary} />
-                    <Text style={[styles.loadingText, { color: theme.colors.text }]}>Cargando datos...</Text>
-                </View>
-            ) : (
-                <ScrollView 
-                    style={styles.scrollView}
-                    contentContainerStyle={styles.scrollViewContent}
-                >
-                    {filteredStudents.length > 0 ? (
-                        filteredStudents.map(student => (
-                            <StudentListItem
-                                key={student.id}
-                                student={student}
-                                attendanceData={attendanceData}
-                                onStatusChange={handleStatusChange}
-                                isSelected={selectedStudents.has(student.id)}
-                                onSelect={toggleStudentSelection}
-                                selectionMode={isSelectionMode}
-                            />
-                        ))
-                    ) : (
-                        <View style={styles.emptyState}>
-                            <Text style={[styles.emptyStateText, { color: theme.colors.text }]}>
-                                No hay estudiantes para el instrumento seleccionado
+            <View style={[styles.container, { backgroundColor: theme.colors.background, paddingTop: Platform.OS === 'android' ? 30 : 0 }]}>
+                {/* Selector de fecha con contador de estudiantes */}
+                <Surface style={[
+                    styles.dateSelector, 
+                    { 
+                        backgroundColor: theme.colors.surface, 
+                        elevation: isMondayTheme ? 0 : 3, 
+                        borderWidth: isMondayTheme ? 1 : 0, 
+                        borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                        borderRadius: 0, // Completamente cuadrado
+                        marginTop: Platform.OS === 'ios' ? 15 : 25, // Aumentar margen superior
+                        marginBottom: SPACING.md,
+                        marginHorizontal: SPACING.md,
+                    }
+                ]}>
+                    <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'stretch',
+                        height: 50, // Altura fija para todos los elementos
+                    }}>
+                        {/* Contador de estudiantes activos - Izquierda */}
+                        <View style={{
+                            width: '25%',
+                            backgroundColor: theme.colors.primary,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRightWidth: 1,
+                            borderRightColor: '#fff',
+                        }}>
+                            <Text style={{
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: 20
+                            }}>
+                                {filteredStudents.length}
+                            </Text>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 13,
+                                fontWeight: '500'
+                            }}>
+                                Activos
                             </Text>
                         </View>
-                    )}
-                </ScrollView>
-            )}
 
-            <Portal>
-                <Dialog
-                    visible={showCalendar}
-                    onDismiss={() => setShowCalendar(false)}
-                    style={{ 
-                        borderRadius: 16,
-                        backgroundColor: 'white',
-                        width: '94%',
-                        maxWidth: 420,
-                        alignSelf: 'center',
-                        overflow: 'hidden',
-                        margin: 0,
-                        padding: 0,
-                        elevation: 4
-                    }}
-                    dismissable={true}
-                    theme={{ colors: { backdrop: 'rgba(0, 0, 0, 0.5)' } }}
-                >
-                    <View style={{
-                        padding: 16,
-                        paddingTop: 16,
-                        paddingBottom: 16,
-                        width: '100%',
-                        alignItems: 'center',
-                    }}>
-                        <Calendar
-                            current={formatDate(selectedDate)}
-                            onDayPress={handleDateSelect}
-                            markedDates={{
-                                [formatDate(selectedDate)]: {
-                                    selected: true,
-                                    selectedColor: theme.colors.primary
-                                }
-                            }}
-                            theme={{
-                                backgroundColor: '#ffffff',
-                                calendarBackground: '#ffffff',
-                                textSectionTitleColor: '#666666',
-                                selectedDayBackgroundColor: theme.colors.primary,
-                                selectedDayTextColor: '#ffffff',
-                                todayTextColor: theme.colors.primary,
-                                dayTextColor: '#333333',
-                                textDisabledColor: '#d9e1e8',
-                                dotColor: theme.colors.primary,
-                                selectedDotColor: '#ffffff',
-                                arrowColor: theme.colors.primary,
-                                monthTextColor: theme.colors.primary,
-                                textDayFontSize: 16,
-                                textMonthFontSize: 18,
-                                textDayHeaderFontSize: 14,
-                                'stylesheet.calendar.header': {
-                                    dayHeader: {
-                                        marginTop: 4,
-                                        marginBottom: 6,
-                                        textAlign: 'center',
-                                        fontSize: 14,
-                                        fontWeight: '600',
-                                        color: '#666666',
-                                        width: 36,
-                                        alignSelf: 'center',
-                                        paddingHorizontal: 0,
-                                    },
-                                    header: {
-                                        flexDirection: 'row',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        marginBottom: 10,
-                                        width: '100%',
-                                    },
-                                    arrow: {
-                                        padding: 0,
-                                        margin: 0,
-                                        paddingHorizontal: 15,
-                                    },
-                                    monthText: {
-                                        fontSize: 18,
-                                        fontWeight: '700',
-                                        color: theme.colors.primary,
-                                        margin: 0,
-                                        padding: 0,
-                                    },
-                                },
-                                'stylesheet.day.basic': {
-                                    base: {
-                                        width: 36,
-                                        height: 36,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    },
-                                    selected: {
-                                        backgroundColor: theme.colors.primary,
-                                        borderRadius: 18,
-                                    },
-                                    today: {
-                                        backgroundColor: 'rgba(103, 80, 164, 0.1)',
-                                        borderRadius: 18,
-                                    },
-                                },
-                                'stylesheet.calendar.main': {
-                                    week: {
-                                        marginVertical: 2,
-                                        flexDirection: 'row',
-                                        justifyContent: 'space-around',
-                                        paddingHorizontal: 20,
-                                        width: '100%',
-                                    },
-                                    container: {
-                                        width: '100%',
-                                        paddingHorizontal: 10,
-                                    }
-                                },
-                            }}
+                        {/* Selector de fecha - Centro */}
+                        <TouchableOpacity 
+                            onPress={() => setShowCalendar(true)}
                             style={{
-                                width: '100%',
-                                height: 350
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flex: 1,
+                                paddingHorizontal: 12,
+                                backgroundColor: 'white',
+                                borderLeftWidth: 1,
+                                borderRightWidth: 1,
+                                borderLeftColor: theme.colors.outline,
+                                borderRightColor: theme.colors.outline,
                             }}
-                            enableSwipeMonths={true}
-                            hideExtraDays={false}
-                            firstDay={1}
-                            showWeekNumbers={false}
-                            onPressArrowLeft={subtractMonth => subtractMonth()}
-                            onPressArrowRight={addMonth => addMonth()}
-                            dayNames={['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']}
-                            dayNamesShort={['D', 'L', 'M', 'X', 'J', 'V', 'S']}
-                            monthNames={[
-                                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-                            ]}
-                        />
-                        
-                        <Button 
-                            mode="contained"
-                            onPress={() => setShowCalendar(false)}
-                            style={{
-                                marginTop: -30,
-                                borderRadius: 24,
-                                height: 48,
-                                width: '100%',
-                                elevation: 2
-                            }}
-                            buttonColor={theme.colors.primary}
-                            icon="check"
-                            labelStyle={{
+                        >
+                            <Icon 
+                                source="calendar" 
+                                size={24} 
+                                color={theme.colors.primary} 
+                                style={{ 
+                                    marginRight: 8, 
+                                }} 
+                            />
+                            <Text style={{ 
+                                color: theme.colors.primary,
                                 fontSize: 16,
-                                fontWeight: '600',
-                                letterSpacing: 0.5,
+                                fontWeight: '500'
+                            }}>
+                                {formatDisplayDate(selectedDate)}
+                            </Text>
+                        </TouchableOpacity>
+                        
+                        {/* Botón Hoy - Derecha */}
+                        <TouchableOpacity
+                            onPress={() => {
+                                // Crear una nueva fecha usando el mismo patrón para consistencia
+                                const now = new Date();
+                                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                setSelectedDate(today);
+                            }}
+                            style={{
+                                width: '25%',
+                                backgroundColor: theme.colors.primary,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderLeftWidth: 1,
+                                borderLeftColor: '#fff',
                             }}
                         >
-                            Aceptar
-                        </Button>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 18,
+                                fontWeight: '600'
+                            }}>
+                                Hoy
+                            </Text>
+                        </TouchableOpacity>
                     </View>
-                </Dialog>
+                </Surface>
 
-                <Dialog
-                    visible={showAttendanceDialog}
-                    onDismiss={() => setShowAttendanceDialog(false)}
-                    style={{ 
-                        borderRadius: BORDER_RADIUS.lg,
-                        backgroundColor: 'white',
-                        width: '85%',
-                        maxWidth: 320,
-                        alignSelf: 'center',
-                        elevation: 5,
-                        margin: 0
-                    }}
-                    dismissable={true}
-                    theme={{ colors: { backdrop: 'rgba(0, 0, 0, 0.5)' } }}
-                >
-                    <Dialog.Title style={{ color: theme.colors.text, textAlign: 'center', fontSize: 18, marginTop: 4 }}>
-                        Marcar Asistencia
-                    </Dialog.Title>
-                    <Dialog.Content>
-                        <Text style={{ color: theme.colors.text, textAlign: 'center', marginBottom: SPACING.sm, fontSize: 14 }}>
-                            ¿Qué estado deseas asignar a los {selectedStudents.size} estudiantes seleccionados?
+                <View style={styles.filtersContainer}>
+                    {/* Filtro por instrumento */}
+                    <Surface style={[
+                        styles.filterSection,
+                        {
+                            marginBottom: SPACING.md,
+                            borderRadius: 0, // Completamente cuadrado
+                            borderWidth: isMondayTheme ? 1 : 0,
+                            borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                            elevation: isMondayTheme ? 0 : 1,
+                        }
+                    ]}>
+                        <Text style={[
+                            styles.filterTitle, 
+                            { 
+                                color: theme.colors.onSurfaceVariant,
+                                paddingHorizontal: SPACING.md,
+                                paddingTop: SPACING.sm,
+                                paddingBottom: SPACING.xs,
+                                fontWeight: '500',
+                                fontSize: 15
+                            }
+                        ]}>
+                            Filtrar por Instrumento
                         </Text>
-                    </Dialog.Content>
-                    <Dialog.Actions style={{
-                        flexDirection: 'column',
-                        paddingHorizontal: 16,
-                        paddingTop: 0,
-                        paddingBottom: 16,
-                        gap: 8
-                    }}>
-                        <Button 
-                            mode="contained" 
-                            onPress={() => {
-                                Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'A'));
-                                setShowAttendanceDialog(false);
-                                setSelectedStudents(new Set());
-                                setIsSelectionMode(false);
+                        <ScrollView 
+                            horizontal 
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ 
+                                paddingHorizontal: SPACING.md, 
+                                paddingBottom: SPACING.sm,
+                                paddingTop: SPACING.xs
                             }}
-                            style={{
-                                width: '100%',
-                                borderRadius: 4,
-                                height: 44,
-                                justifyContent: 'center',
-                                marginBottom: 8,
-                                elevation: 1
-                            }}
-                            buttonColor={theme.colors.attendance.present}
-                            contentStyle={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                            labelStyle={{
-                                fontSize: 15,
-                                fontWeight: '500',
-                                letterSpacing: 0.5
-                            }}
-                            icon="check"
                         >
-                            Presente (A)
-                        </Button>
-                        <Button 
-                            mode="contained"
-                            onPress={() => {
-                                Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'EA'));
-                                setShowAttendanceDialog(false);
-                                setSelectedStudents(new Set());
-                                setIsSelectionMode(false);
-                            }}
-                            style={{
-                                width: '100%',
-                                borderRadius: 4,
-                                height: 44,
-                                justifyContent: 'center',
-                                marginBottom: 8,
-                                elevation: 1
-                            }}
-                            buttonColor={theme.colors.attendance.justified}
-                            contentStyle={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                            labelStyle={{
-                                fontSize: 15,
-                                fontWeight: '500',
-                                letterSpacing: 0.5
-                            }}
-                            icon="alert"
-                        >
-                            Ausencia Justificada (EA)
-                        </Button>
-                        <Button 
-                            mode="contained"
-                            onPress={() => {
-                                Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'UA'));
-                                setShowAttendanceDialog(false);
-                                setSelectedStudents(new Set());
-                                setIsSelectionMode(false);
-                            }}
-                            style={{
-                                width: '100%',
-                                borderRadius: 4,
-                                height: 44,
-                                justifyContent: 'center',
-                                marginBottom: 12,
-                                elevation: 1
-                            }}
-                            buttonColor={theme.colors.attendance.unexcused}
-                            contentStyle={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                            labelStyle={{
-                                fontSize: 15,
-                                fontWeight: '500',
-                                letterSpacing: 0.5
-                            }}
-                            icon="close"
-                        >
-                            Ausencia Injustificada (UA)
-                        </Button>
-                        <Button 
-                            mode="text"
-                            onPress={() => {
-                                setShowAttendanceDialog(false);
-                            }}
-                            style={{
-                                width: '100%',
-                                borderRadius: 4,
-                                height: 44,
-                                justifyContent: 'center'
-                            }}
-                            textColor={theme.colors.primary}
-                            contentStyle={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                            labelStyle={{
-                                fontSize: 15,
-                                fontWeight: '500',
-                                letterSpacing: 0.5
-                            }}
-                            icon="close"
-                        >
-                            Cancelar
-                        </Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
-        </View>
+                            <InstrumentFilterChip
+                                label="Todos"
+                                selected={selectedInstrument === 'all'}
+                                onPress={() => setSelectedInstrument('all')}
+                                theme={theme}
+                                isMondayTheme={isMondayTheme}
+                            />
+                            {/* Mostrar instrumentos en orden específico */}
+                            {['violin', 'viola', 'cello', 'bass'].map(instrument => (
+                                <InstrumentFilterChip
+                                    key={instrument}
+                                    label={instrument.charAt(0).toUpperCase() + instrument.slice(1)}
+                                    selected={selectedInstrument === instrument}
+                                    onPress={() => setSelectedInstrument(instrument)}
+                                    theme={theme}
+                                    isMondayTheme={isMondayTheme}
+                                />
+                            ))}
+                            <InstrumentFilterChip
+                                label="Not Assigned"
+                                selected={selectedInstrument === 'not assigned'}
+                                onPress={() => setSelectedInstrument('not assigned')}
+                                theme={theme}
+                                isMondayTheme={isMondayTheme}
+                            />
+                        </ScrollView>
+                    </Surface>
+                </View>
+                {/* Lista de estudiantes */}
+                {renderLoadingState()}
+                {filteredStudents.length === 0 ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.lg }}>
+                        <View style={{ alignItems: 'center', marginTop: 16 }}>
+                            <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 16, marginBottom: 8 }}>
+                                No se encontraron estudiantes
+                            </Text>
+                            <Icon source="close-circle-outline" size={48} color={theme.colors.onSurfaceVariant} />
+                        </View>
+                    </View>
+                ) : (
+                    <FlatList
+                        data={filteredStudents}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            renderListItem({ item })
+                        )}
+                        contentContainerStyle={{ 
+                            paddingBottom: 80, 
+                            paddingTop: isMondayTheme ? 0 : SPACING.xs,
+                            paddingHorizontal: isMondayTheme ? 0 : SPACING.sm 
+                        }}
+                        ListEmptyComponent={
+                            <View style={{ padding: SPACING.lg, alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 16, color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
+                                    No hay estudiantes registrados
+                                </Text>
+                            </View>
+                        }
+                        initialNumToRender={10}
+                        maxToRenderPerBatch={8}
+                        windowSize={5}
+                        removeClippedSubviews={true}
+                        getItemLayout={(data, index) => ({
+                            length: 75, // altura aproximada de cada elemento
+                            offset: 75 * index,
+                            index,
+                        })}
+                    />
+                )}
+                <Portal>
+                    <Dialog
+                        visible={showCalendar}
+                        onDismiss={() => setShowCalendar(false)}
+                        style={{ 
+                            borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.lg,
+                            backgroundColor: 'white',
+                            width: '100%', // Usar todo el ancho disponible
+                            maxWidth: 460, // Mayor tamaño máximo
+                            alignSelf: 'center',
+                            overflow: 'hidden',
+                            margin: 0,
+                            padding: 0,
+                            elevation: isMondayTheme ? 0 : 4,
+                            borderWidth: isMondayTheme ? 1 : 0,
+                            borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                        }}
+                        dismissable={true}
+                        theme={{ 
+                            colors: { 
+                                backdrop: 'rgba(0, 0, 0, 0.5)',
+                                // Forzar a que los elementos internos sigan el mismo radio
+                                elevation: { level0: 0 }
+                            },
+                            roundness: isMondayTheme ? 1 : BORDER_RADIUS.lg // Más cuadrado con roundness 1
+                        }}
+                    >
+                        <View style={{
+                            padding: 12, // Menos padding
+                            width: '100%',
+                            alignItems: 'center',
+                        }}>
+                            <ThemedCalendar 
+                                theme={theme} 
+                                isMondayTheme={isMondayTheme} 
+                                selectedDate={formatDate(selectedDate)} 
+                                onDayPress={handleDateSelect}
+                            />
+                            
+                            <Button 
+                                mode="contained"
+                                onPress={() => setShowCalendar(false)}
+                                style={{
+                                    marginTop: 16,
+                                    borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.lg, // Más cuadrado
+                                    height: 48,
+                                    width: '100%',
+                                    elevation: isMondayTheme ? 0 : 2,
+                                    borderWidth: isMondayTheme ? 1 : 0,
+                                    borderColor: isMondayTheme ? theme.colors.primary : 'transparent',
+                                }}
+                                buttonColor={theme.colors.primary}
+                                icon="check"
+                                labelStyle={{
+                                    fontSize: 16,
+                                    fontWeight: '600',
+                                    letterSpacing: 0.5,
+                                }}
+                            >
+                                Aceptar
+                            </Button>
+                        </View>
+                    </Dialog>
+
+                    <Dialog
+                        visible={showAttendanceDialog}
+                        onDismiss={() => {
+                            setShowAttendanceDialog(false);
+                            setSelectedStudents(new Set());
+                            setIsSelectionMode(false);
+                        }}
+                        style={{ 
+                            borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.lg,
+                            borderWidth: isMondayTheme ? 1 : 0,
+                            borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                        }}
+                    >
+                        <Dialog.Title style={{ fontSize: 18 }}>
+                            Marcar asistencia ({selectedStudents.size} estudiantes)
+                        </Dialog.Title>
+                        
+                        <Dialog.Content style={styles.dialogContent}>
+                            <Text style={{ marginBottom: SPACING.md, color: theme.colors.onSurfaceVariant }}>
+                                Selecciona el estado de asistencia para los estudiantes seleccionados:
+                            </Text>
+                            
+                            <Button 
+                                mode="contained" 
+                                onPress={() => {
+                                    Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'present'));
+                                    setShowAttendanceDialog(false);
+                                    setSelectedStudents(new Set());
+                                    setIsSelectionMode(false);
+                                }}
+                                style={{ 
+                                    backgroundColor: theme.colors.attendance.present,
+                                    marginTop: SPACING.md,
+                                    marginBottom: SPACING.sm,
+                                    borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                                    borderWidth: isMondayTheme ? 1 : 0,
+                                    borderColor: isMondayTheme ? theme.colors.attendance.present : 'transparent',
+                                    elevation: isMondayTheme ? 0 : 2
+                                }}
+                                labelStyle={{
+                                    fontSize: 15,
+                                    fontWeight: '500',
+                                    letterSpacing: 0.5
+                                }}
+                            >
+                                Presente
+                            </Button>
+                            
+                            <Button 
+                                mode="contained"
+                                onPress={() => {
+                                    Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'excused'));
+                                    setShowAttendanceDialog(false);
+                                    setSelectedStudents(new Set());
+                                    setIsSelectionMode(false);
+                                }}
+                                style={{ 
+                                    backgroundColor: theme.colors.attendance.justified,
+                                    marginVertical: SPACING.sm,
+                                    borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                                    borderWidth: isMondayTheme ? 1 : 0,
+                                    borderColor: isMondayTheme ? theme.colors.attendance.justified : 'transparent',
+                                    opacity: selectedStudents.size === 0 ? 0.7 : 1,
+                                }}
+                                labelStyle={{
+                                    fontSize: 15,
+                                    fontWeight: '500',
+                                    letterSpacing: 0.5
+                                }}
+                            >
+                                Falta Justificada
+                            </Button>
+                            
+                            <Button 
+                                mode="contained"
+                                onPress={() => {
+                                    Array.from(selectedStudents).forEach(id => handleStatusChange(id, 'unexcused'));
+                                    setShowAttendanceDialog(false);
+                                    setSelectedStudents(new Set());
+                                    setIsSelectionMode(false);
+                                }}
+                                style={{ 
+                                    backgroundColor: theme.colors.attendance.unexcused,
+                                    marginVertical: SPACING.sm,
+                                    borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                                    borderWidth: isMondayTheme ? 1 : 0,
+                                    borderColor: isMondayTheme ? theme.colors.attendance.unexcused : 'transparent',
+                                }}
+                                labelStyle={{
+                                    fontSize: 15,
+                                    fontWeight: '500',
+                                    letterSpacing: 0.5
+                                }}
+                            >
+                                Falta Injustificada
+                            </Button>
+                        </Dialog.Content>
+                    </Dialog>
+                </Portal>
+                {/* Modo de selección - Acciones de asistencia con FABs independientes */}
+                {isSelectionMode && (
+                    <View style={{ position: 'absolute', right: 16, bottom: 80, zIndex: 10 }}>
+                        <View style={{ alignItems: 'flex-end', marginBottom: 0 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500'
+                                }}>
+                                    Seleccionar todos
+                                </Text>
+                                <FAB
+                                    icon="select-all"
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.secondary,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => setSelectedStudents(new Set(filteredStudents.map(s => s.id)))}
+                                />
+                            </View>
+                            
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500'
+                                }}>
+                                    Desmarcar todos
+                                </Text>
+                                <FAB
+                                    icon="select-remove"
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.secondary,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => setSelectedStudents(new Set())}
+                                />
+                            </View>
+                            
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500',
+                                    opacity: selectedStudents.size === 0 ? 0.5 : 1
+                                }}>
+                                    Marcar presentes
+                                </Text>
+                                <FAB
+                                    icon="check-circle"
+                                    disabled={selectedStudents.size === 0}
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.attendance.present,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => handleGroupActionWithValidation('present')}
+                                />
+                            </View>
+                            
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500',
+                                    opacity: selectedStudents.size === 0 ? 0.5 : 1
+                                }}>
+                                    Falta justificada
+                                </Text>
+                                <FAB
+                                    icon="alert-circle"
+                                    disabled={selectedStudents.size === 0}
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.attendance.justified,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => handleGroupActionWithValidation('excused')}
+                                />
+                            </View>
+                            
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500',
+                                    opacity: selectedStudents.size === 0 ? 0.5 : 1
+                                }}>
+                                    Falta injustificada
+                                </Text>
+                                <FAB
+                                    icon="close-circle"
+                                    disabled={selectedStudents.size === 0}
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.attendance.unexcused,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => handleGroupActionWithValidation('unexcused')}
+                                />
+                            </View>
+                            
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                                <Text style={{ 
+                                    color: '#000000', 
+                                    backgroundColor: 'transparent',
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    marginRight: 8,
+                                    fontSize: 14,
+                                    fontWeight: '500'
+                                }}>
+                                    Cancelar
+                                </Text>
+                                <FAB
+                                    icon="close"
+                                    color="white"
+                                    style={{
+                                        backgroundColor: theme.colors.error,
+                                        borderRadius: isMondayTheme ? 2 : 28,
+                                    }}
+                                    onPress={() => {
+                                        setIsSelectionMode(false);
+                                        setSelectedStudents(new Set());
+                                    }}
+                                />
+                            </View>
+                        </View>
+                    </View>
+                )}
+                
+                {!isSelectionMode && (
+                    <FAB
+                        icon="account-multiple-check"
+                        label="Asistencia"
+                        color="white"
+                        onPress={() => setIsSelectionMode(true)}
+                        style={{
+                            position: 'absolute',
+                            margin: 16,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: theme.colors.primary,
+                            elevation: isMondayTheme ? 0 : 4,
+                            borderWidth: isMondayTheme ? 1 : 0,
+                            borderColor: isMondayTheme ? theme.colors.primary : 'transparent',
+                            borderRadius: isMondayTheme ? 2 : 28,
+                        }}
+                        uppercase={false}
+                    />
+                )}
+                
+                {/* Snackbar para feedback visual */}
+                <Snackbar
+                    visible={snackbarVisible}
+                    onDismiss={() => setSnackbarVisible(false)}
+                    duration={2000}
+                    style={{
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                        borderWidth: isMondayTheme ? 1 : 0,
+                        borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+                        marginBottom: 70, // Espacio para evitar que se superponga con los botones
+                    }}
+                    action={{
+                        label: 'OK',
+                        onPress: () => setSnackbarVisible(false),
+                    }}
+                >
+                    <Text style={{ color: theme.colors.onSurfaceVariant }}>{snackbarMessage}</Text>
+                </Snackbar>
+                
+                {/* Snackbar para notificación de estudiantes no seleccionados */}
+                <Snackbar
+                    visible={noSelectionSnackbarVisible}
+                    onDismiss={() => setNoSelectionSnackbarVisible(false)}
+                    duration={3000}
+                    style={{
+                        backgroundColor: '#f8d7da', // Fondo rojo claro para alerta
+                        borderRadius: isMondayTheme ? 2 : BORDER_RADIUS.md,
+                        borderWidth: 1,
+                        borderColor: '#f5c6cb',
+                        marginBottom: 140, // Posición más alta para no interferir con otras acciones
+                    }}
+                    action={{
+                        label: 'Entendido',
+                        onPress: () => setNoSelectionSnackbarVisible(false),
+                    }}
+                >
+                    <Text style={{ color: '#721c24', fontWeight: '500' }}>
+                        No hay estudiantes seleccionados. Por favor, selecciona al menos un estudiante.
+                    </Text>
+                </Snackbar>
+            </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5', // COLORS.background,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    scrollViewContent: {
-        paddingVertical: SPACING.sm,
     },
     dateSelector: {
         padding: SPACING.md,
-        margin: SPACING.md,
-        borderRadius: BORDER_RADIUS.md,
-        ...SHADOWS.small,
-        elevation: 3,
-        borderWidth: 1,
-        borderColor: 'rgba(103, 80, 164, 0.08)',
     },
     dateRow: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: SPACING.sm,
     },
     dateButton: {
-        flex: 1,
-        borderRadius: BORDER_RADIUS.lg,
-        borderWidth: 1,
-        height: 48,
-        elevation: 1,
+        marginRight: SPACING.xs,
+        height: 40,
     },
     dateButtonContent: {
-        height: 48,
-        paddingHorizontal: SPACING.md,
+        paddingHorizontal: SPACING.sm,
     },
     dateButtonLabel: {
-        fontSize: 15,
-        fontWeight: '500',
-        letterSpacing: 0.1,
+        fontSize: 16,
     },
     todayButton: {
-        borderWidth: 1,
-        borderColor: 'rgba(103, 80, 164, 0.12)',
-        borderRadius: BORDER_RADIUS.lg,
-        height: 48,
-        minWidth: 100,
+        height: 40,
     },
     todayButtonContent: {
-        height: 48,
-        paddingHorizontal: SPACING.md,
+        paddingHorizontal: SPACING.sm,
     },
     todayButtonLabel: {
-        fontSize: 15,
-        fontWeight: '500',
-        letterSpacing: 0.1,
-    },
-    sectionLabel: {
-        ...TYPOGRAPHY.subtitle2,
-        marginBottom: SPACING.sm,
         fontSize: 16,
-        fontWeight: '600',
-        letterSpacing: 0.15,
     },
-    listItem: {
+    filtersContainer: {
         marginHorizontal: SPACING.md,
-        marginVertical: SPACING.xs,
-        borderRadius: BORDER_RADIUS.md,
-        overflow: 'hidden',
-        ...SHADOWS.small,
-        elevation: 2,
-        borderWidth: 1,
-        borderColor: 'transparent',
     },
-    itemContent: {
+    filterSection: {
+        overflow: 'hidden',
+    },
+    filterTitle: {
+        fontSize: 14,
+        marginBottom: SPACING.xs,
+    },
+    studentsList: {
+        paddingHorizontal: SPACING.md,
+    },
+    studentItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: SPACING.md,
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.md,
+        marginBottom: SPACING.sm,
     },
     studentInfo: {
         flex: 1,
-        marginRight: SPACING.md,
     },
-    studentName: { 
-        ...TYPOGRAPHY.body1,
-        fontWeight: '600',
+    studentName: {
         fontSize: 16,
-        letterSpacing: 0.15,
+        fontWeight: '500',
     },
-    studentInstrument: { 
-        ...TYPOGRAPHY.body2,
-        marginTop: 2,
-        opacity: 0.8,
+    studentInstrument: {
         fontSize: 14,
-        letterSpacing: 0.1,
+        marginTop: 2,
     },
-    rightContainer: {
+    actionsContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-    },
-    statusButtons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        gap: SPACING.sm,
-        paddingRight: SPACING.xs,
-        minWidth: 120,
     },
     statusButton: {
-        margin: 0,
-        borderWidth: 1,
-        width: 32,
-        height: 32,
+        marginHorizontal: 4,
     },
-    selectedButton: {
-        ...SHADOWS.small,
+    fabContainer: {
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
+        flexDirection: 'row',
     },
-    selectionIndicator: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
+    dialogContent: {
+        minWidth: 250,
     },
-    checkmark: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    dialogContainer: {
-        position: 'relative',
-        width: '100%',
-        maxWidth: 350,
-        alignSelf: 'center',
-        ...SHADOWS.medium,
-        borderRadius: BORDER_RADIUS.lg,
-        margin: 0,
-        padding: 0,
-        overflow: 'hidden',
+    bottomActions: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(0,0,0,0.1)',
+        elevation: 4,
+        zIndex: 100,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        padding: SPACING.lg,
     },
     loadingText: {
-        marginTop: SPACING.md,
-        ...TYPOGRAPHY.body1,
         fontSize: 16,
-        letterSpacing: 0.15,
-    },
-    header: {
-        backgroundColor: '#ffffff', // COLORS.surface,
-        elevation: 4,
-    },
-    dialogText: {
+        color: '#333333',
         textAlign: 'center',
-        marginBottom: SPACING.md,
-        ...TYPOGRAPHY.body1,
-        fontSize: 16,
-        letterSpacing: 0.15,
-    },
-    dialogActions: {
-        flexDirection: 'column',
-        padding: SPACING.md,
-        paddingTop: 0,
-        gap: SPACING.xs,
-    },
-    button: {
-        width: '100%',
-        marginVertical: SPACING.xxs,
-        borderRadius: BORDER_RADIUS.lg,
-        height: 48,
-        justifyContent: 'center',
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonIcon: {
-        marginRight: SPACING.xs,
-    },
-    buttonLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        letterSpacing: 0.5,
-    },
-    cancelButton: {
-        marginTop: SPACING.xs,
-    },
-    attendanceDialog: {
-        backgroundColor: '#ffffff', // COLORS.surface,
-    },
-    filterContainer: {
-        padding: SPACING.md,
-        paddingVertical: SPACING.md,
-        marginHorizontal: SPACING.md,
-        marginBottom: SPACING.md,
-        borderRadius: BORDER_RADIUS.md,
-        ...SHADOWS.small,
-        elevation: 3,
-    },
-    filtersContainer: {
-        flexDirection: 'column',
-        width: '100%',
-    },
-    filtersRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        gap: SPACING.xs,
-        width: '100%',
-    },
-    instrumentChip: {
-        marginVertical: SPACING.xs,
-        height: 40,
-        borderRadius: 20,
-        paddingHorizontal: 6,
-        borderWidth: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    emptyState: {
-        flex: 1,
-        padding: SPACING.lg,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: '50%',
-    },
-    emptyStateText: {
-        ...TYPOGRAPHY.body1,
-        textAlign: 'center',
-        fontSize: 16,
-        letterSpacing: 0.15,
-    },
-    calendarIconContainer: {
-        marginRight: SPACING.sm,
-        width: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
+        marginTop: 16,
     },
 });
 

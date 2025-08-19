@@ -105,14 +105,14 @@ export default function ReportsPage() {
       const startDate = firstDay.toISOString().split('T')[0];
       const endDate = lastDay.toISOString().split('T')[0];
       
-      // Construir la consulta para obtener datos de asistencia
+      // Construir la consulta para obtener datos de asistencia SIN embebidos ambiguos
+      // Usamos el campo plano status_code directamente para clasificar A/EA/UA
       let query = supabase
         .from('attendance')
         .select(`
           date,
-          status,
-          student_id,
-          attendance_status:status(id, code, name, color)
+          status_code,
+          student_id
         `)
         .gte('date', startDate)
         .lte('date', endDate);
@@ -134,7 +134,7 @@ export default function ReportsPage() {
       
       attendanceData.forEach(record => {
         total++;
-        const statusCode = record.attendance_status?.code || '';
+        const statusCode = (record.status_code || '').toUpperCase();
         
         if (statusCode === 'A') {
           present++;

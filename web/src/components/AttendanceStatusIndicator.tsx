@@ -5,7 +5,9 @@ interface AttendanceStatusIndicatorProps {
 }
 
 const AttendanceStatusIndicator: React.FC<AttendanceStatusIndicatorProps> = ({ statusCode }) => {
-  if (!statusCode) return <span className="text-sm font-medium text-gray-900">No registrado</span>;
+  if (!statusCode || (typeof statusCode === 'string' && statusCode.trim() === '')) {
+    return <span className="text-sm font-medium text-gray-900">No registrado</span>;
+  }
 
   let displayName = "";
   let bgColor = "";

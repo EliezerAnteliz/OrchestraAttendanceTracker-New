@@ -21,10 +21,8 @@ type Student = {
 };
 
 type AttendanceStatus = {
-  id: string;
   code: string;
-  name: string;
-  color?: string;
+  description?: string;
   [key: string]: any; // For other properties
 };
 
@@ -61,122 +59,103 @@ export default function AttendancePage() {
   const [selectedInstrument, setSelectedInstrument] = useState<string>('all');
   const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
 
-  // Función para obtener los datos de asistencia para una fecha específica
-  const fetchAttendanceData = async (date: string) => {
-    try {
-      // Primero obtener todos los registros para ver la estructura
-      const allResult = await supabase
-        .from('attendance')
-        .select('*')
-        .limit(1);
-      
-      if (allResult.data && allResult.data.length > 0) {
-        console.log('DEPURACIÓN - Estructura de la tabla attendance:', {
-          columnas: Object.keys(allResult.data[0]),
-          ejemploRegistro: allResult.data[0]
-        });
-        
-        // Mostrar información detallada sobre las columnas
-        const columns = Object.keys(allResult.data[0]);
-        console.log('\nColumnas en la tabla attendance:');
-        columns.forEach(column => {
-          console.log(`- ${column}: ${typeof allResult.data[0][column]}`);
-        });
-        
-        // Verificar específicamente si existe la columna 'status'
-        if (columns.includes('status')) {
-          console.log('\n✅ La columna "status" SÍ existe en la tabla attendance');
-        } else {
-          console.log('\n❌ La columna "status" NO existe en la tabla attendance');
-          console.log('Esto explica por qué la consulta con JOIN está fallando.');
-        }
-        
-        // Verificar otras columnas que se están intentando usar
-        const columnsToCheck = ['status_code', 'status_id', 'attendance_status_id'];
-        columnsToCheck.forEach(column => {
-          if (columns.includes(column)) {
-            console.log(`✅ La columna "${column}" SÍ existe en la tabla attendance`);
-          } else {
-            console.log(`❌ La columna "${column}" NO existe en la tabla attendance`);
+  // Instrumentación temporal: detectar peticiones a attendance con rango (gte/lt) o sin date=eq y registrar el stack
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const anyWin = window as any;
+    if (anyWin.__attendanceFetchPatched) return;
+    const originalFetch = window.fetch.bind(window);
+    anyWin.__attendanceFetchPatched = true;
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      try {
+        const url = typeof input === 'string' ? input : (input as Request).url ?? (input as URL).toString();
+        if (url && url.includes('/rest/v1/attendance')) {
+          const u = new URL(url);
+          const dateParams = u.searchParams.getAll('date');
+          const hasEq = dateParams.some(v => v.startsWith('eq.'));
+          const hasRange = dateParams.some(v => v.startsWith('gte.') || v.startsWith('lt.'));
+          if (!hasEq || hasRange) {
+            console.warn('[ATTN] Attendance request sospechosa:', url);
+            console.warn('[ATTN] Stack de llamada para ubicar origen:', new Error().stack);
           }
-        });
-      } else {
-        console.log('No se encontraron registros de ejemplo en la tabla attendance');
-      }
-      
-      // Calcular rango del día [fecha, fecha+1)
-      const base = new Date(date);
-      const y = base.getFullYear();
-      const m = String(base.getMonth() + 1).padStart(2, '0');
-      const d = String(base.getDate()).padStart(2, '0');
-      const startStr = `${y}-${m}-${d}`;
-      const next = new Date(base);
-      next.setDate(base.getDate() + 1);
-      const y2 = next.getFullYear();
-      const m2 = String(next.getMonth() + 1).padStart(2, '0');
-      const d2 = String(next.getDate()).padStart(2, '0');
-      const endStr = `${y2}-${m2}-${d2}`;
-
-      // Intentar primero con la relación status_code (JOIN)
-      const { data: resultData, error: resultError, status: resultStatus } = await supabase
-        .from('attendance')
-        .select(`
-          *,
-          attendance_status:status_code(id, code, name, color)
-        `)
-        .gte('date', startStr)
-        .lt('date', endStr)
-        .eq('program_id', activeProgram?.id as string);
-      
-      console.log('Respuesta de asistencia para fecha específica (JOIN):', { 
-        cantidad: resultData?.length || 0,
-        status: resultStatus,
-        tieneError: !!resultError
-      });
-      
-      // Si hay un error o no hay datos, intentar sin la relación (fallback)
-      if (resultError || (resultData && resultData.length === 0)) {
-        if (resultError) {
-          console.warn('[Attendance] JOIN error, intentando fallback:', resultError?.message || resultError, { resultStatus, resultError });
-        } else {
-          console.log('[Attendance] Sin datos con JOIN, intentando fallback simple...');
         }
-
-        const { data: fbData, error: fbError, status: fbStatus } = await supabase
-          .from('attendance')
-          .select('*')
-          .gte('date', startStr)
-          .lt('date', endStr)
-          .eq('program_id', activeProgram?.id as string);
-
-        if (fbError) {
-          console.error('Error en consulta fallback:', fbError?.message || fbError, { fbStatus, fbError });
-          return [];
-        }
-
-        console.log('Usando resultado fallback sin JOIN', { cantidad: fbData?.length || 0 });
-        return fbData || [];
+      } catch (e) {
+        // ignorar errores del logger
       }
-      
-      // Mostrar los primeros registros para depuración
-      if (resultData && resultData.length > 0) {
-        resultData.slice(0, 3).forEach((record: any, index: number) => {
-          console.log(`Registro ${index + 1}:`, record);
-          // Mostrar específicamente la relación con attendance_status si existe
-          if (record.attendance_status) {
-            console.log(`  - Estado de asistencia para registro ${index + 1}:`, record.attendance_status);
-          }
-        });
-      } else {
-        console.log('No se encontraron registros de asistencia para la fecha:', date);
-      }
-      
-      return resultData || [];
-    } catch (error: any) {
-      console.error('Error al obtener datos de asistencia:', error?.message || error);
-      return [];
-    }
-  };
+      return originalFetch(input as any, init);
+    };
+    return () => {
+      window.fetch = originalFetch;
+      anyWin.__attendanceFetchPatched = false;
+    };
+  }, []);
+
+                                                                                                // Función para obtener los datos de asistencia para una fecha específica
+                                                                                                const fetchAttendanceData = async (date: string) => {
+                                                                                                  try {
+                                                                                                    // Normalizar la fecha a YYYY-MM-DD sin provocar desfase por zona horaria
+                                                                                                    // Si ya viene como 'YYYY-MM-DD', úsala tal cual.
+                                                                                                    let day = /^\d{4}-\d{2}-\d{2}$/.test(date)
+                                                                                                      ? date
+                                                                                                      : format(new Date(date), 'yyyy-MM-dd');
+                                                                                                    // Defensa adicional: si el input es YYYY-MM-DD pero por alguna razón el cálculo difiere, forzar el input
+                                                                                                    if (/^\d{4}-\d{2}-\d{2}$/.test(date) && day !== date) {
+                                                                                                      console.warn('[fetchAttendanceData] Corrección defensiva de fecha. input=', date, 'calc=', day);
+                                                                                                      day = date;
+                                                                                                    }
+                                                                                                    console.log('[fetchAttendanceData] input=', date, 'day=', day, 'tz=', Intl.DateTimeFormat().resolvedOptions().timeZone);
+                                                                                                    // La columna 'date' en DB es de tipo DATE. Usamos igualdad exacta para evitar discrepancias.
+
+                                                                                                    // 1) Consulta principal: sin embedding para evitar ambigüedad de múltiples relaciones
+                                                                                                    const main = await supabase
+                                                                                                      .from('attendance')
+                                                                                                      .select('*')
+                                                                                                      .eq('program_id', activeProgram?.id as string)
+                                                                                                      .eq('date', day);
+
+                                                                                                    if (!main.error && main.data?.length) {
+                                                                                                      const dates = Array.from(new Set(main.data.map((r: any) => r.date)));
+                                                                                                      console.log('[Attendance] Filtrado por date=', day, 'rows=', main.data.length, 'dates_in_rows=', dates);
+                                                                                                      return main.data as any[];
+                                                                                                    }
+
+                                                                                                    if (main.error) {
+                                                                                                      console.warn('[Attendance] Error en consulta principal (sin embed):', main.error.message);
+                                                                                                    } else {
+                                                                                                      console.log('[Attendance] Consulta principal vacía, usando fallback sin program_id...');
+                                                                                                    }
+
+                                                                                                    // 2) Fallback simple: sin relación, mismo filtro
+                                                                                                    const fb = await supabase
+                                                                                                      .from('attendance')
+                                                                                                      .select('*')
+                                                                                                      .eq('program_id', activeProgram?.id as string)
+                                                                                                      .eq('date', day);
+                                                                                                    if (!fb.error && fb.data?.length) {
+                                                                                                      const dates = Array.from(new Set(fb.data.map((r: any) => r.date)));
+                                                                                                      console.log('[Attendance] Fallback simple OK para date=', day, 'rows=', fb.data.length, 'dates_in_rows=', dates);
+                                                                                                      return fb.data as any[];
+                                                                                                    }
+
+                                                                                                    // 3) Último recurso: datos históricos sin program_id (sin embed)
+                                                                                                    const legacy = await supabase
+                                                                                                      .from('attendance')
+                                                                                                      .select('*')
+                                                                                                      .eq('date', day);
+                                                                                                    if (!legacy.error && legacy.data?.length) {
+                                                                                                      const dates = Array.from(new Set(legacy.data.map((r: any) => r.date)));
+                                                                                                      console.log('[Attendance] Datos históricos sin program_id para date=', day, 'rows=', legacy.data.length, 'dates_in_rows=', dates);
+                                                                                                      return legacy.data as any[];
+                                                                                                    }
+
+                                                                                                    if (fb.error) console.error('[Attendance] Fallback error:', fb.error.message);
+                                                                                                    if (legacy.error) console.warn('[Attendance] Legacy error:', legacy.error.message);
+                                                                                                    return [];
+                                                                                                  } catch (error: any) {
+                                                                                                    console.error('Error al obtener datos de asistencia:', error?.message || error);
+                                                                                                    return [];
+                                                                                                  }
+                                                                                                };
   
   // Función para cargar y actualizar los datos de asistencia
   const loadAttendanceData = async (date: string) => {
@@ -193,46 +172,24 @@ export default function AttendancePage() {
       setStudents(prevStudents => {
         const updatedStudents = prevStudents.map(student => {
           const attendanceRecord = attendanceData?.find(
-            record => record.student_id === student.id
+            record => record.student_id === student.id && record.date === date
           );
           
           if (!attendanceRecord) {
-            console.log(`No se encontró registro de asistencia para estudiante ${student.id} (${student.first_name} ${student.last_name}) en la fecha seleccionada`);
+            console.log(`No se encontró registro de asistencia para estudiante ${student.id} (${student.first_name} ${student.last_name}) en la fecha seleccionada. Estableciendo estado como no registrado (null).`);
+            // Mostrar exactamente lo que hay en DB: si no hay registro, no hay estado
             return {
               ...student,
-              attendance_status: null // Resetear a null para mostrar "No registrado"
+              attendance_status: null
             };
           }
           
           // DEPURACIÓN: Mostrar el registro completo para ver todas las propiedades
           console.log(`Registro de asistencia para estudiante ${student.id}:`, attendanceRecord);
           
-          // Verificar si tenemos la relación con attendance_status
-          let attendanceStatus = null;
-          
-          // Si tenemos la relación con attendance_status (del JOIN)
-          if (attendanceRecord.attendance_status && typeof attendanceRecord.attendance_status === 'object') {
-            // Usar el código del estado relacionado
-            attendanceStatus = attendanceRecord.attendance_status.code || attendanceRecord.attendance_status.id;
-            console.log('Usando estado de la relación:', attendanceRecord.attendance_status);
-          } 
-          // Si no tenemos la relación, buscar en los campos directos
-          else {
-            // Priorizar status_code ya que es el campo que usamos para guardar
-            if (attendanceRecord.status_code !== undefined && attendanceRecord.status_code !== null) {
-              attendanceStatus = attendanceRecord.status_code;
-            } else if (attendanceRecord.status_id !== undefined && attendanceRecord.status_id !== null) {
-              attendanceStatus = attendanceRecord.status_id;
-            } else if (attendanceRecord.attendance_status_id !== undefined && attendanceRecord.attendance_status_id !== null) {
-              attendanceStatus = attendanceRecord.attendance_status_id;
-            } else if (attendanceRecord.status !== undefined && attendanceRecord.status !== null) {
-              attendanceStatus = attendanceRecord.status;
-            } else if (typeof attendanceRecord.attendance_status === 'string' && attendanceRecord.attendance_status !== null) {
-              attendanceStatus = attendanceRecord.attendance_status;
-            } else if (attendanceRecord.code !== undefined && attendanceRecord.code !== null) {
-              attendanceStatus = attendanceRecord.code;
-            }
-          }
+          // Simplificar: usar exactamente lo que diga la base de datos en status_code
+          // y dejar que el componente lo traduzca a etiqueta/colores
+          const attendanceStatus = attendanceRecord.status_code ?? null;
           
           console.log('Actualizando estado de asistencia para estudiante:', { 
             studentId: student.id, 
@@ -260,41 +217,19 @@ export default function AttendancePage() {
       setFilteredStudents(prevFiltered => {
         const updatedFiltered = prevFiltered.map(student => {
           const attendanceRecord = attendanceData?.find(
-            record => record.student_id === student.id
+            record => record.student_id === student.id && record.date === date
           );
           
           if (!attendanceRecord) {
+            // Si no hay registro devuelto para la fecha/programa, reflejar "no registrado"
             return {
               ...student,
-              attendance_status: null // Resetear a null para mostrar "No registrado"
+              attendance_status: null
             };
           }
           
-          // Verificar si tenemos la relación con attendance_status
-          let attendanceStatus = null;
-          
-          // Si tenemos la relación con attendance_status (del JOIN)
-          if (attendanceRecord.attendance_status && typeof attendanceRecord.attendance_status === 'object') {
-            // Usar el código del estado relacionado
-            attendanceStatus = attendanceRecord.attendance_status.code || attendanceRecord.attendance_status.id;
-          } 
-          // Si no tenemos la relación, buscar en los campos directos
-          else {
-            // Priorizar status_code ya que es el campo que usamos para guardar
-            if (attendanceRecord.status_code !== undefined && attendanceRecord.status_code !== null) {
-              attendanceStatus = attendanceRecord.status_code;
-            } else if (attendanceRecord.status_id !== undefined && attendanceRecord.status_id !== null) {
-              attendanceStatus = attendanceRecord.status_id;
-            } else if (attendanceRecord.attendance_status_id !== undefined && attendanceRecord.attendance_status_id !== null) {
-              attendanceStatus = attendanceRecord.attendance_status_id;
-            } else if (attendanceRecord.status !== undefined && attendanceRecord.status !== null) {
-              attendanceStatus = attendanceRecord.status;
-            } else if (typeof attendanceRecord.attendance_status === 'string' && attendanceRecord.attendance_status !== null) {
-              attendanceStatus = attendanceRecord.attendance_status;
-            } else if (attendanceRecord.code !== undefined && attendanceRecord.code !== null) {
-              attendanceStatus = attendanceRecord.code;
-            }
-          }
+          // Simplificar: usar exactamente status_code desde la DB
+          const attendanceStatus = attendanceRecord.status_code ?? null;
           
           return {
             ...student,
@@ -341,6 +276,14 @@ export default function AttendancePage() {
         }
         
         console.log('Conexión a Supabase exitosa');
+        // Depuración: mostrar usuario autenticado y programa activo
+        const ures = await supabase.auth.getUser();
+        console.log('[Auth] Usuario actual:', {
+          error: ures.error?.message,
+          userId: ures.data?.user?.id,
+          email: ures.data?.user?.email,
+          activeProgramId: activeProgram?.id
+        });
         
         // Cargar estudiantes activos
         const { data: studentsData, error: studentsError } = await supabase
@@ -381,11 +324,12 @@ export default function AttendancePage() {
         // Cargar datos de asistencia para la fecha actual
         console.log(`Cargando datos de asistencia para la fecha: ${currentDate}`);
         const attendanceData = await fetchAttendanceData(currentDate);
+        console.log('[Attendance] student_ids devueltos:', attendanceData?.map(r => r.student_id));
         
         // Mapear los estados de asistencia a los estudiantes
         const studentsWithAttendance = studentsData?.map(student => {
           const attendanceRecord = attendanceData?.find(
-            record => record.student_id === student.id
+            record => record.student_id === student.id && record.date === currentDate
           );
           
           let attendanceStatus = null;
@@ -394,7 +338,7 @@ export default function AttendancePage() {
             // Si tenemos la relación con attendance_status (del JOIN)
             if (attendanceRecord.attendance_status && typeof attendanceRecord.attendance_status === 'object') {
               // Usar el código del estado relacionado
-              attendanceStatus = attendanceRecord.attendance_status.code || attendanceRecord.attendance_status.id;
+              attendanceStatus = attendanceRecord.attendance_status.code;
               console.log(`Usando estado de la relación para ${student.first_name} ${student.last_name}:`, attendanceRecord.attendance_status);
             } 
             // Si no tenemos la relación, buscar en los campos directos
@@ -455,6 +399,55 @@ export default function AttendancePage() {
     
     fetchData();
   }, [currentDate, activeProgram?.id]);
+
+  // Suscripción en tiempo real a cambios en la tabla attendance para la fecha/programa actuales
+  useEffect(() => {
+    if (!activeProgram?.id || !currentDate) return;
+    console.log('[Realtime] Subscribing to attendance changes for', { program_id: activeProgram.id, date: currentDate });
+    const channel = supabase
+      .channel(`attendance-${activeProgram.id}-${currentDate}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'attendance',
+          filter: `program_id=eq.${activeProgram.id}`
+        },
+        (payload: any) => {
+          const changedDate = (payload.new?.date || payload.old?.date || '') as string;
+          // Solo recargar si el cambio corresponde al día actual mostrado
+          if (changedDate && changedDate.startsWith(currentDate)) {
+            console.log('[Realtime] Cambio detectado en attendance, recargando datos...', payload);
+            loadAttendanceData(currentDate);
+          }
+        }
+      )
+      .subscribe((status: any) => {
+        console.log('[Realtime] Channel status:', status);
+      });
+
+    return () => {
+      try {
+        console.log('[Realtime] Removing channel');
+        supabase.removeChannel(channel);
+      } catch (e) {
+        console.warn('[Realtime] Error removing channel', e);
+      }
+    };
+  }, [activeProgram?.id, currentDate]);
+
+  // Refrescar al volver a la pestaña/ventana
+  useEffect(() => {
+    const onVisible = () => {
+      if (!document.hidden && activeProgram?.id && currentDate) {
+        console.log('[Visibility] Tab visible, recargando datos de asistencia');
+        loadAttendanceData(currentDate);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [activeProgram?.id, currentDate]);
   
   // Función para filtrar estudiantes
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -589,6 +582,53 @@ export default function AttendancePage() {
     console.log('Todos los estudiantes deseleccionados');
   };
   
+  // === DEBUG: Probar permisos RLS para INSERT/UPDATE en attendance ===
+  const testRlsPermissions = async () => {
+    try {
+      const { data: authInfo, error: authErr } = await supabase.auth.getUser();
+      if (authErr || !authInfo?.user) {
+        alert(`No autenticado: ${authErr?.message || 'sin usuario'}`);
+        return;
+      }
+      if (!activeProgram?.id) {
+        alert('No hay program_id activo. Selecciona un programa.');
+        return;
+      }
+      const candidate = filteredStudents[0] || students[0];
+      if (!candidate) {
+        alert('No hay estudiantes para probar.');
+        return;
+      }
+      // Usar la fecha actualmente mostrada en la UI para evitar desfases por zona horaria
+      const today = currentDate;
+      const nowIso = new Date().toISOString();
+      const payload = {
+        student_id: candidate.id,
+        program_id: activeProgram.id,
+        date: today,
+        status_code: 'A',
+        created_at: nowIso,
+        updated_at: nowIso,
+      } as any;
+      console.log('[RLS TEST] Upsert payload:', payload);
+      const { data, error } = await supabase
+        .from('attendance')
+        .upsert(payload, { onConflict: 'student_id,date,program_id' })
+        .select();
+      console.log('[RLS TEST] Result:', { data, error });
+      if (error) {
+        alert(`❌ Permisos insuficientes o error en upsert: ${error.message}`);
+      } else {
+        alert('✅ Upsert exitoso: tienes permisos para actualizar asistencia. Revisa consola.');
+        // Refrescar datos para ver el cambio reflejado
+        await loadAttendanceData(today);
+      }
+    } catch (e: any) {
+      console.error('[RLS TEST] Exception:', e?.message || e);
+      alert(`❌ Error inesperado: ${e?.message || e}`);
+    }
+  };
+  
   // Función para marcar asistencia
   // Helper function to find the correct attendance status code - similar to Android version
   const findAttendanceStatusCode = (statusName: string) => {
@@ -616,7 +656,7 @@ export default function AttendancePage() {
       // Look for present status
       status = attendanceStatuses.find(s => 
         (s.code && presentMatches.includes(s.code.toLowerCase())) || 
-        (s.name && presentMatches.includes(s.name.toLowerCase()))
+        (s.description && presentMatches.includes(s.description.toLowerCase()))
       );
       
       // If not found, use the first status as fallback
@@ -628,7 +668,7 @@ export default function AttendancePage() {
       // Look for justified absence status
       status = attendanceStatuses.find(s => 
         (s.code && justifiedMatches.includes(s.code.toLowerCase())) || 
-        (s.name && justifiedMatches.includes(s.name.toLowerCase()))
+        (s.description && justifiedMatches.includes(s.description.toLowerCase()))
       );
       
       // If not found, use the third status as fallback (if available)
@@ -640,7 +680,7 @@ export default function AttendancePage() {
       // Look for unjustified absence status
       status = attendanceStatuses.find(s => 
         (s.code && unjustifiedMatches.includes(s.code.toLowerCase())) || 
-        (s.name && justifiedMatches.includes(s.name.toLowerCase()))
+        (s.description && unjustifiedMatches.includes(s.description.toLowerCase()))
       );
       
       // If not found, use the second status as fallback (if available)
@@ -769,153 +809,35 @@ export default function AttendancePage() {
       
       console.log('Código de estado verificado y válido:', statusCodeToUse);
       
-      // Procesar cada estudiante seleccionado
+      // Procesar cada estudiante seleccionado con una sola operación atómica (upsert)
       let successCount = 0;
       for (const studentId of selectedStudentIds) {
         try {
-          // Verificar si ya existe un registro de asistencia para este estudiante en esta fecha
-          const { data: existingRecord, error: checkError } = await supabase
+          const now = new Date().toISOString();
+          const row = {
+            student_id: studentId,
+            date: currentDate,
+            program_id: activeProgram?.id as string,
+            status_code: statusCodeToUse,
+            updated_at: now,
+            created_at: now,
+          } as any;
+
+          console.log('Upsert de asistencia con payload:', row);
+
+          const { data: upsertData, error: upsertError } = await supabase
             .from('attendance')
-            .select('*')
-            .eq('student_id', studentId)
-            .eq('date', currentDate)
-            .eq('program_id', activeProgram?.id as string)
-            .single();
-          
-          if (checkError && checkError.code !== 'PGRST116') { // PGRST116 es el código para "no se encontraron registros"
-            console.error(`Error al verificar asistencia para estudiante ${studentId}:`, checkError);
+            .upsert(row, { onConflict: 'student_id,date,program_id' })
+            .select();
+
+          if (upsertError) {
+            console.error(`Error en upsert de asistencia para estudiante ${studentId}:`, upsertError);
             continue;
           }
-          
-          if (existingRecord) {
-            // Mostrar el registro existente para depuración
-            console.log('Registro existente:', existingRecord);
-            console.log('Columnas disponibles:', Object.keys(existingRecord));
-            
-            // Actualizar el registro existente usando student_id y date en lugar de id
-            // Intentar con status en lugar de status_code si es necesario
-            const updatePayload: Record<string, any> = { updated_at: new Date().toISOString() };
-            
-            // Usar el nombre de columna 'status_code' que es el que existe en la tabla attendance
-            updatePayload.status_code = statusCodeToUse;
-            console.log('Actualizando columna status_code con valor:', statusCodeToUse);
-            
-            // Mostrar información detallada para depuración
-            console.log('Registro existente:', existingRecord);
-            console.log('Columnas disponibles:', Object.keys(existingRecord));
-            console.log('Payload de actualización:', updatePayload);
-            
-            console.log('Payload de actualización:', updatePayload);
-            
-            const { data: updateData, error: updateError } = await supabase
-              .from('attendance')
-              .update(updatePayload)
-              .eq('student_id', studentId)
-              .eq('date', currentDate)
-              .eq('program_id', activeProgram?.id as string)
-              .select();
-            
-            if (updateError) {
-              console.error(`Error al actualizar asistencia para estudiante ${studentId}:`, updateError);
-              console.error('Detalles del error:', JSON.stringify(updateError));
-              console.error('Payload utilizado:', JSON.stringify(updatePayload));
-              console.error('Fecha actual:', currentDate);
-              console.error('Código de estado:', statusCodeToUse);
-              
-              // Intentar con un enfoque alternativo si el primer intento falla
-              try {
-                console.log('Intentando actualización alternativa...');
-                const alternativePayload = {
-                  status_code: statusCodeToUse,
-                  status: statusCodeToUse,
-                  updated_at: new Date().toISOString()
-                };
-                
-                const { data: altUpdateData, error: altUpdateError } = await supabase
-                  .from('attendance')
-                  .update(alternativePayload)
-                  .eq('student_id', studentId)
-                  .eq('date', currentDate)
-                  .eq('program_id', activeProgram?.id as string);
-                  
-                if (altUpdateError) {
-                  console.error('Error en actualización alternativa:', altUpdateError);
-                  continue;
-                }
-                
-                console.log('Actualización alternativa exitosa');
-                successCount++;
-              } catch (altError: any) {
-                console.error('Error en intento alternativo:', altError);
-                console.error('Detalles del error:', altError?.message || String(altError));
-                continue;
-              }
-            }
-            
-            console.log(`Asistencia actualizada para estudiante ${studentId}:`, updateData);
-            successCount++;
-          } else {
-            // Crear un nuevo registro
-            // Usar el mismo enfoque para determinar el nombre correcto de la columna
-            const insertPayload: Record<string, any> = {
-              student_id: studentId,
-              date: currentDate,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              program_id: activeProgram?.id as string
-            };
-            
-            // Usar el nombre de columna 'status_code' que es el que existe en la tabla attendance
-            insertPayload.status_code = statusCodeToUse;
-            console.log('Insertando con columna status_code y valor:', statusCodeToUse);
-            
-            console.log('Payload de inserción:', insertPayload);
-            
-            const { data: insertData, error: insertError } = await supabase
-              .from('attendance')
-              .insert(insertPayload)
-              .select();
-            
-            if (insertError) {
-              console.error(`Error al insertar asistencia para estudiante ${studentId}:`, insertError);
-              console.error('Detalles del error:', JSON.stringify(insertError));
-              console.error('Payload utilizado:', JSON.stringify(insertPayload));
-              console.error('Fecha actual:', currentDate);
-              console.error('Código de estado:', statusCodeToUse);
-              
-              // Intentar con un enfoque alternativo si el primer intento falla
-              try {
-                console.log('Intentando inserción alternativa...');
-                const alternativePayload = {
-                  student_id: studentId,
-                  date: currentDate,
-                  status_code: statusCodeToUse,
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                  program_id: activeProgram?.id as string
-                };
-                
-                const { data: altInsertData, error: altInsertError } = await supabase
-                  .from('attendance')
-                  .insert(alternativePayload);
-                  
-                if (altInsertError) {
-                  console.error('Error en inserción alternativa:', altInsertError);
-                  continue;
-                }
-                
-                console.log('Inserción alternativa exitosa');
-                successCount++;
-              } catch (altError: any) {
-                console.error('Error en intento alternativo de inserción:', altError?.message || String(altError));
-                continue;
-              }
-            }
-            
-            console.log(`Asistencia insertada para estudiante ${studentId}:`, insertData);
-            successCount++;
-          }
-          
+
+          console.log(`Upsert exitoso para estudiante ${studentId}:`, upsertData);
+          successCount++;
+
           // Actualizar el estado local para reflejar el cambio inmediatamente
           setStudents(prevStudents => {
             return prevStudents.map(student => {
@@ -1034,42 +956,39 @@ export default function AttendancePage() {
   };
 
   // Función para obtener el nombre del estado de asistencia
-  const getAttendanceStatusName = (statusId: string | null | undefined) => {
-    if (!statusId) return t('not_recorded');
+  const getAttendanceStatusName = (statusCode: string | null | undefined) => {
+    if (!statusCode) return t('not_recorded');
     
-    console.log('Buscando nombre para el estado con ID/código:', statusId);
+    console.log('Buscando nombre para el estado con código:', statusCode);
     console.log('Estados disponibles:', attendanceStatuses);
     
-    // Primero intentar encontrar por ID exacto
-    let status = attendanceStatuses.find(s => s.id === statusId);
+    // Buscar por código exacto (preferido)
+    let status = attendanceStatuses.find(
+      s => s.code && s.code.toLowerCase() === statusCode.toLowerCase()
+    );
     
-    // Si no se encuentra por ID, intentar por código
+    // Si no se encuentra exacto, intentar coincidencia parcial por código o descripción
     if (!status) {
-      status = attendanceStatuses.find(s => s.code && s.code.toLowerCase() === statusId.toLowerCase());
-    }
-    
-    // Si aún no se encuentra, intentar por coincidencia parcial
-    if (!status) {
-      status = attendanceStatuses.find(s => 
-        (s.id && s.id.toString().includes(statusId)) || 
-        (s.code && s.code.toLowerCase().includes(statusId.toLowerCase()))
+      const lower = statusCode.toLowerCase();
+      status = attendanceStatuses.find(s =>
+        (s.code && s.code.toLowerCase().includes(lower)) ||
+        (s.description && s.description.toLowerCase().includes(lower))
       );
     }
     
-    // Mapeo manual para códigos conocidos si no se encuentra en la base de datos
-    if (!status) {
-      const lowerStatusId = statusId.toLowerCase();
-      if (lowerStatusId === 'a') {
-        return 'Presente';
-      } else if (lowerStatusId === 'ua') {
-        return 'Falta Injustificada';
-      } else if (lowerStatusId === 'ea') {
-        return 'Falta Justificada';
-      }
+    if (status) {
+      console.log('Estado encontrado:', status);
+      // Preferir descripción si existe; si no, mostrar el código
+      return status.description || status.code || 'Desconocido';
     }
     
-    console.log('Estado encontrado:', status);
-    return status ? status.name : 'Desconocido';
+    // Fallback para códigos conocidos
+    const lower = statusCode.toLowerCase();
+    if (lower === 'a') return 'Asistió';
+    if (lower === 'ea') return 'Excusa';
+    if (lower === 'ua') return 'Falta';
+    
+    return statusCode;
   };
 
   // Componente para mostrar indicador de estado de asistencia
@@ -1163,6 +1082,14 @@ export default function AttendancePage() {
             }`}
           >
             {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
+          </button>
+          {/* DEBUG: Botón para probar permisos RLS */}
+          <button
+            onClick={testRlsPermissions}
+            className="px-4 py-2 rounded-md flex items-center whitespace-nowrap bg-purple-600 hover:bg-purple-700 text-white"
+            title="Intentará un upsert en attendance para verificar permisos RLS"
+          >
+            Probar permisos RLS
           </button>
         </div>
       </div>
@@ -1338,7 +1265,10 @@ export default function AttendancePage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {student.attendance_status ? (
-                            <AttendanceStatusIndicator statusCode={student.attendance_status} />
+                            <AttendanceStatusIndicator
+                              key={`${student.id}-${student.attendance_status || 'none'}`}
+                              statusCode={student.attendance_status}
+                            />
                           ) : (
                             <span className="text-sm font-medium text-gray-900">{t('not_recorded')}</span>
                           )}
@@ -1396,7 +1326,10 @@ export default function AttendancePage() {
                         <span className="text-black">{t('attendance')}:</span>
                         <div className="font-medium">
                           {student.attendance_status ? (
-                            <AttendanceStatusIndicator statusCode={student.attendance_status} />
+                            <AttendanceStatusIndicator
+                              key={`${student.id}-${student.attendance_status || 'none'}`}
+                              statusCode={student.attendance_status}
+                            />
                           ) : (
                             <span className="text-sm font-medium text-gray-900">{t('not_recorded')}</span>
                           )}

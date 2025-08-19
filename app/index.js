@@ -1,13 +1,10 @@
-import { useAuth } from '../src/contexts/AuthContext';
-import LoginScreen from '../src/screens/LoginScreen';
+import { LogBox } from 'react-native';
+
+// Ignorar el log específico de VirtualizedList
+LogBox.ignoreLogs(['VirtualizedList: You have a large list that is slow to update']);
+
 import StudentsListScreen from '../src/screens/StudentsListScreen';
 
 export default function Index() {
-    const { user } = useAuth();
-
-    if (!user) {
-        return <LoginScreen />;
-    }
-
     return <StudentsListScreen />;
 }

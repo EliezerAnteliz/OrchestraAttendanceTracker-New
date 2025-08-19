@@ -1,0 +1,92 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# REGLAS DEL PROYECTO
+
+## Estructura y Navegación
+
+1. **Acceso a archivos**: Utiliza siempre el archivo `project-files-index.md` como referencia para navegar por el proyecto.
+   
+2. **Estructura del proyecto**: 
+   - Frontend: React Native con Expo Router
+   - Backend: Supabase 
+   - Navegación: Estructura basada en archivos (Expo Router)
+
+3. **Convenciones de código**:
+   - Componentes: PascalCase (ej. StudentItem.js)
+   - Archivos de utilidad: camelCase (ej. supabase.js)
+   - Constantes: SNAKE_CASE_MAÚSCULAS
+   - Variables CSS: kebab-case
+
+## Estándares de Desarrollo
+
+1. **Consulta de archivos**:
+   - Al iniciar trabajo en una característica, revisa TODOS los archivos relacionados
+   - Mantén sincronizados los cambios entre pantallas y componentes relacionados
+   - Para características de asistencia, revisa siempre las pantallas `AttendanceRegistrationScreen.js` y `ReportsScreen.js`
+
+2. **Estilo y presentación**:
+   - Usa SIEMPRE los estilos definidos en `/src/theme/index.js`
+   - Respeta la paleta de colores existente
+   - Mantén coherencia con el espaciado existente
+   - Sigue el patrón de tarjetas ya implementado
+
+3. **Gestión del estado**:
+   - Usa el contexto de estudiantes para operaciones globales
+   - Evita la gestión de estado redundante
+   - Implementa caché adecuadamente según los patrones existentes
+
+## Funcionalidades Clave
+
+1. **Sistema de asistencia**:
+   - Tres estados: Presente, Falta Justificada, Falta Injustificada
+   - Implementa siempre la validación adecuada
+   - Mantén la consistencia visual de los indicadores de estado
+
+2. **Reportes**:
+   - Respeta el formato actual de visualización de tendencias
+   - Mantén la consistencia en el cálculo de porcentajes
+   - Conserva los colores indicativos para cada tipo de asistencia
+
+3. **Gestión de estudiantes**:
+   - Usa la estructura de datos existente
+   - Mantén la sincronización con Supabase
+   - Implementa filtrado eficiente
+
+## Base de Datos (Supabase)
+
+1. **Estructura**:
+   - No modificar las tablas existentes sin consulta previa
+   - Verificar relaciones entre tablas antes de modificar consultas
+   - Respetar los tipos de datos existentes
+
+2. **Consultas**:
+   - Optimizar para rendimiento y menor número de llamadas
+   - Implementar caché cuando sea posible
+   - Seguir el patrón de manejo de errores existente
+
+## Rendimiento
+
+1. **Optimizaciones**:
+   - Priorizar la eficiencia en listas largas
+   - Implementar carga perezosa cuando sea posible
+   - Evitar re-renderizados innecesarios
+
+2. **Interfaces de usuario**:
+   - Mantener tiempos de respuesta rápidos
+   - Implementar indicadores de carga adecuados
+   - Optimizar imágenes y recursos
+
+## Procedimiento al Trabajar
+
+1. Al iniciar trabajo en cualquier característica:
+   - Revisar el archivo index para ubicar archivos relevantes
+   - Consultar archivos relacionados usando `grep_search` o `file_search`
+   - Identificar componentes reutilizables antes de crear nuevos
+
+2. Al implementar cambios:
+   - Mantener coherencia con el código existente
+   - Seguir los patrones de diseño ya implementados
+   - Verificar impacto en otras partes de la aplicación 

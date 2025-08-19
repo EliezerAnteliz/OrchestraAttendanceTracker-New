@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 import { router } from 'expo-router';
 import { supabase } from '../config/supabase';
+import { StyledInput, StyledCard } from '../components';
+import { useAppTheme, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../theme';
 
 export default function SignUpScreen() {
   const [firstName, setFirstName] = useState('');
@@ -12,6 +14,7 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const { theme } = useAppTheme();
   
   const handleSignUp = async () => {
     if (loading) return;
@@ -23,11 +26,11 @@ export default function SignUpScreen() {
 
       // Validaciones básicas
       if (!firstName || !lastName || !email || !password) {
-        throw new Error('Please fill in all fields');
+        throw new Error('Por favor, completa todos los campos');
       }
 
       if (password.length < 6) {
-        throw new Error('Password must be at least 6 characters long');
+        throw new Error('La contraseña debe tener al menos 6 caracteres');
       }
 
       // Intento de registro con metadata adicional
@@ -63,10 +66,10 @@ export default function SignUpScreen() {
         setEmail('');
         setPassword('');
       } else {
-        throw new Error('Registration failed: No user data returned');
+        throw new Error('Registro fallido: No se devolvieron datos de usuario');
       }
     } catch (error) {
-      const errorMessage = error.message || 'An unknown error occurred';
+      const errorMessage = error.message || 'Ocurrió un error desconocido';
       console.error('Final error:', {
         message: errorMessage,
         type: error.constructor.name,
@@ -79,112 +82,128 @@ export default function SignUpScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.title}>Create Account</Text>
-      
-      {success && (
-        <Text style={styles.success}>
-          Registration successful! You can now use these credentials to log in.
-        </Text>
-      )}
+    <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.container}>
+        <Text style={[styles.title, { color: theme.colors.primary }]}>Crear Cuenta</Text>
+        
+        <StyledCard style={styles.card} elevation={2}>
+          {success && (
+            <View style={[styles.successContainer, { backgroundColor: theme.colors.success, borderColor: theme.colors.onSuccess }]}>
+              <Text style={styles.successText}>
+                ¡Registro exitoso! Ahora puedes usar estas credenciales para iniciar sesión.
+              </Text>
+            </View>
+          )}
 
-      <TextInput
-        label="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-        autoCapitalize="words"
-        textContentType="givenName"
-        style={styles.input}
-      />
+          <StyledInput
+            label="Nombre"
+            value={firstName}
+            onChangeText={setFirstName}
+            autoCapitalize="words"
+            textContentType="givenName"
+            error={error && !firstName ? "Nombre es requerido" : ""}
+            placeholder="Juan"
+          />
 
-      <TextInput
-        label="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-        autoCapitalize="words"
-        textContentType="familyName"
-        style={styles.input}
-      />
+          <StyledInput
+            label="Apellido"
+            value={lastName}
+            onChangeText={setLastName}
+            autoCapitalize="words"
+            textContentType="familyName"
+            error={error && !lastName ? "Apellido es requerido" : ""}
+            placeholder="Pérez"
+          />
 
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-        style={styles.input}
-      />
+          <StyledInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            textContentType="emailAddress"
+            keyboardType="email-address"
+            error={error && !email ? "Email es requerido" : ""}
+            placeholder="juan.perez@ejemplo.com"
+          />
 
-      <TextInput
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-        autoCompleteType="password"
-        textContentType="password"
-        style={styles.input}
-      />
+          <StyledInput
+            label="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            textContentType="password"
+            error={error && (!password || password.length < 6) ? 
+              (!password ? "Contraseña es requerida" : "Mínimo 6 caracteres") : ""}
+            placeholder="••••••••"
+          />
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text> : null}
 
-      <Button
-        mode="contained"
-        onPress={handleSignUp}
-        loading={loading}
-        disabled={loading}
-        style={styles.button}
-      >
-        Sign Up
-      </Button>
+          <Button
+            mode="contained"
+            onPress={handleSignUp}
+            loading={loading}
+            disabled={loading}
+            style={styles.button}
+          >
+            Registrarse
+          </Button>
 
-      <Button
-        mode="text"
-        onPress={() => router.replace('/')}
-        style={styles.linkButton}
-      >
-        Already have an account? Login
-      </Button>
-    </View>
+          <Button
+            mode="text"
+            onPress={() => router.replace('/')}
+            style={styles.linkButton}
+          >
+            ¿Ya tienes cuenta? Inicia sesión
+          </Button>
+        </StyledCard>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
-    padding: 20,
+    padding: SPACING.lg,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: 'center',
   },
   title: {
+    ...TYPOGRAPHY.h1,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: SPACING.xl,
   },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#f0f0f0',
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    padding: SPACING.md,
   },
   button: {
-    marginTop: 8,
-    marginBottom: 16,
-    paddingVertical: 8,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.md,
+    paddingVertical: SPACING.xs,
   },
   linkButton: {
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
   error: {
-    color: '#B00020',
-    marginBottom: 16,
+    ...TYPOGRAPHY.body2,
+    marginBottom: SPACING.md,
     textAlign: 'center',
   },
-  success: {
-    color: '#4CAF50',
-    marginBottom: 16,
+  successContainer: {
+    marginBottom: SPACING.md,
+    padding: SPACING.sm,
+    borderRadius: BORDER_RADIUS.sm,
+    borderWidth: 1,
+  },
+  successText: {
+    ...TYPOGRAPHY.body2,
     textAlign: 'center',
-    padding: 10,
-    backgroundColor: '#E8F5E9',
-    borderRadius: 4,
   }
 });

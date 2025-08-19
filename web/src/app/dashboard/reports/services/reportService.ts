@@ -131,16 +131,14 @@ export const calculateAttendanceStats = async (
   students: any[] = []
 ) => {
   try {
+    // Consultar asistencia sin embebidos de attendance_status para evitar ambigüedades
+    // y clasificar usando directamente status_code. No necesitamos unir con students aquí
+    // porque los filtros por instrumento llegan vía argumento 'students'.
     let query = supabase
       .from('attendance')
-      .select(`
-        *,
-        attendance_status:status(id, name, color),
-        students(id, first_name, last_name, instrument, is_active)
-      `)
+      .select('*')
       .gte('date', startDate.toISOString().split('T')[0])
-      .lte('date', endDate.toISOString().split('T')[0])
-      .eq('students.is_active', true);
+      .lte('date', endDate.toISOString().split('T')[0]);
 
     if (studentId) {
       query = query.eq('student_id', studentId);
@@ -162,19 +160,9 @@ export const calculateAttendanceStats = async (
 
     // Calcular totales
     const totals = data.reduce((acc: {[key: string]: number}, record) => {
-      // Determinar el código basado en el nombre del estado
-      let statusCode = 'UA'; // Por defecto, ausencia injustificada
-      
-      if (record.attendance_status) {
-        const statusName = record.attendance_status.name.toLowerCase();
-        if (statusName.includes('present')) {
-          statusCode = 'A'; // Asistencia
-        } else if (statusName.includes('excused') || statusName.includes('justified')) {
-          statusCode = 'EA'; // Ausencia justificada
-        }
-      }
-      
-      acc[statusCode] = (acc[statusCode] || 0) + 1;
+      // Clasificar directamente por status_code (A, EA, UA). Fallback a 'UA' si no existe.
+      const code = (record.status_code ? String(record.status_code).toUpperCase() : 'UA');
+      acc[code] = (acc[code] || 0) + 1;
       return acc;
     }, {});
 
@@ -285,17 +273,12 @@ export const getAttendanceByDate = async (
   students: any[] = []
 ) => {
   try {
+    // Seleccionar campos planos para evitar embebidos ambiguos
     let query = supabase
       .from('attendance')
-      .select(`
-        date,
-        status,
-        attendance_status:status(id, name, color),
-        students(id, first_name, last_name, instrument, is_active)
-      `)
+      .select('date, status_code, student_id')
       .gte('date', startDate)
-      .lte('date', endDate)
-      .eq('students.is_active', true);
+      .lte('date', endDate);
 
     if (studentId) {
       query = query.eq('student_id', studentId);
@@ -323,20 +306,12 @@ export const getAttendanceByDate = async (
         attendanceByDate[record.date] = { present: 0, absent: 0, excused: 0 };
       }
       
-      // Determinar el tipo de asistencia basado en el nombre del estado
-      if (record.attendance_status) {
-        const statusName = record.attendance_status.name.toLowerCase();
-        if (statusName.includes('present')) {
-          attendanceByDate[record.date].present += 1;
-        } else if (statusName.includes('excused') || statusName.includes('justified')) {
-          attendanceByDate[record.date].excused += 1;
-        } else {
-          attendanceByDate[record.date].absent += 1;
-        }
-      } else {
-        // Si no hay información de estado, contar como ausencia
-        attendanceByDate[record.date].absent += 1;
-      }
+      // Clasificar por código directamente
+      const code = record.status_code ? String(record.status_code).toUpperCase() : '';
+      if (code === 'A') attendanceByDate[record.date].present += 1;
+      else if (code === 'EA') attendanceByDate[record.date].excused += 1;
+      else if (code === 'UA') attendanceByDate[record.date].absent += 1;
+      else attendanceByDate[record.date].absent += 1; // desconocido => ausencia
     });
 
     // Convertir a array y calcular totales
@@ -367,11 +342,12 @@ export const getAttendanceByInstrument = async (
   selectedInstrument: string = 'all'
 ) => {
   try {
+    // Mantener solo el embed de students (necesario para filtrar por instrumento),
+    // y quitar el embed de attendance_status. Usar status_code para clasificar.
     let query = supabase
       .from('attendance')
       .select(`
-        status,
-        attendance_status:status(id, name, color),
+        status_code,
         students(id, first_name, last_name, instrument, is_active)
       `)
       .gte('date', startDate)
@@ -402,20 +378,12 @@ export const getAttendanceByInstrument = async (
         instrumentMap[instrument] = { present: 0, absent: 0, excused: 0 };
       }
       
-      // Clasificar según el estado
-      if (record.attendance_status) {
-        const statusName = record.attendance_status.name.toLowerCase();
-        if (statusName.includes('present')) {
-          instrumentMap[instrument].present += 1;
-        } else if (statusName.includes('excused') || statusName.includes('justified')) {
-          instrumentMap[instrument].excused += 1;
-        } else {
-          instrumentMap[instrument].absent += 1;
-        }
-      } else {
-        // Si no hay información de estado, contar como ausencia
-        instrumentMap[instrument].absent += 1;
-      }
+      // Clasificar según status_code
+      const code = record.status_code ? String(record.status_code).toUpperCase() : '';
+      if (code === 'A') instrumentMap[instrument].present += 1;
+      else if (code === 'EA') instrumentMap[instrument].excused += 1;
+      else if (code === 'UA') instrumentMap[instrument].absent += 1;
+      else instrumentMap[instrument].absent += 1; // desconocido => ausencia
     });
 
     // Convertir a array y calcular totales

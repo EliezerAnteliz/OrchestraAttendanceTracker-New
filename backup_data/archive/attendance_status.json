@@ -1,0 +1,17 @@
+[
+  {
+    "code": "A",
+    "description": "ATTENDANCE",
+    "created_at": "2025-02-24T19:48:43.265031+00:00"
+  },
+  {
+    "code": "EA",
+    "description": "EXCUSED ABSENCE",
+    "created_at": "2025-02-24T19:48:43.265031+00:00"
+  },
+  {
+    "code": "UA",
+    "description": "UNEXCUSED ABSENCE",
+    "created_at": "2025-02-24T19:48:43.265031+00:00"
+  }
+]

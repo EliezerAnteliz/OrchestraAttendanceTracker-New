@@ -1,0 +1,160 @@
+warning: in the working copy of 'src/screens/StudentProfileScreen.js', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/screens/StudentProfileScreen.js b/src/screens/StudentProfileScreen.js[m
+[1mindex 3f44453..67e5c60 100644[m
+[1m--- a/src/screens/StudentProfileScreen.js[m
+[1m+++ b/src/screens/StudentProfileScreen.js[m
+[36m@@ -1,491 +1,1261 @@[m
+[31m-import React, { useState, useEffect } from 'react';[m
+[31m-import { View, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, StatusBar, Linking } from 'react-native';[m
+[31m-import { Surface, Text, useTheme, Divider, Card, Avatar, Portal, Dialog, Button, TextInput, List, Appbar, IconButton } from 'react-native-paper';[m
+[31m-import { useLocalSearchParams, useNavigation } from 'expo-router';[m
+[32m+[m[32mimport React, { useState, useEffect, useCallback } from 'react';[m
+[32m+[m[32mimport { View, ScrollView, StyleSheet, ActivityIndicator, SafeAreaView, StatusBar, Linking, Alert, TextInput } from 'react-native';[m
+[32m+[m[32mimport { Surface, Text, Divider, Avatar, Portal, Dialog, Button, List, Appbar, IconButton, Switch, Menu } from 'react-native-paper';[m
+[32m+[m[32mimport { useLocalSearchParams, useRouter } from 'expo-router';[m
+[32m+[m[32mimport { useAppTheme, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS, theme as defaultTheme, THEME_NAMES } from '../theme';[m
+[32m+[m[32mimport { StyledCard, StyledInput } from '../components';[m
+ import { supabase } from '../config/supabase';[m
+ [m
+[31m-export default function StudentProfileScreen() {[m
+[31m-    const theme = useTheme();[m
+[31m-    const isDark = theme.dark;[m
+[31m-    const params = useLocalSearchParams();[m
+[31m-    const navigation = useNavigation();[m
+[31m-    const [student, setStudent] = useState(null);[m
+[31m-    const [loading, setLoading] = useState(true);[m
+[31m-    const [editMode, setEditMode] = useState(false);[m
+[31m-    const [editedStudent, setEditedStudent] = useState({});[m
+[31m-    const [saving, setSaving] = useState(false);[m
+[31m-    [m
+[31m-    const instruments = ["Violín", "Viola", "Cello", "Contrabajo", "Flauta", "Clarinete", "Oboe", "Fagot", "Trompeta", "Trombón", "Trompa", "Tuba", "Percusión", "Piano", "Arpa"];[m
+[31m-    const positions = ["Principal", "Section", "Concert Master", "Assistant"];[m
+[31m-[m
+[31m-    useEffect(() => {[m
+[31m-        async function fetchStudentData() {[m
+[31m-            if (!params.id) return;[m
+[31m-            [m
+[31m-            const { data, error } = await supabase[m
+[31m-                .from('students')[m
+[31m-                .select(`[m
+[31m-                    *,[m
+[31m-                    student_parents!inner([m
+[31m-                        parents([m
+[31m-                            full_name,[m
+[31m-                            phone_number,[m
+[31m-                            email[m
+[31m-                        )[m
+[31m-                    )[m
+[31m-                `)[m
+[31m-                .eq('id', params.id)[m
+[31m-                .single();[m
+[31m-[m
+[31m-            if (error) {[m
+[31m-                console.error('Error fetching student:', error);[m
+[31m-                return;[m
+[31m-            }[m
+[31m-[m
+[31m-            if (data) {[m
+[31m-                const studentData = {[m
+[31m-                    ...data,[m
+[31m-                    firstName: data.first_name,[m
+[31m-                    lastName: data.last_name,[m
+[31m-                    grade: data.current_grade,[m
+[31m-                    position: data.orchestra_position,[m
+[31m-                    parentName: data.student_parents?.[0]?.parents?.full_name,[m
+[31m-                    phone: data.student_parents?.[0]?.parents?.phone_number,[m
+[31m-                    age: data.age ? data.age.toString() : ''[m
+[31m-                };[m
+[31m-                setStudent(studentData);[m
+[31m-                setEditedStudent(studentData);[m
+[31m-            }[m
+[31m-            setLoading(false);[m
+[31m-        }[m
+[31m-[m
+[31m-        fetchStudentData();[m
+[31m-    }, [params.id]);[m
+[31m-[m
+[31m-    useEffect(() => {[m
+[31m-        navigation.setOptions({[m
+[31m-            title: 'Perfil del Estudiante',[m
+[31m-            headerRight: () => ([m
+[31m-                <Appbar.Action icon="pencil" onPress={() => setEditMode(true)} />[m
+[31m-            ),[m
+[31m-        });[m
+[31m-    }, [navigation]);[m
+[31m-[m
+[31m-    const handleSaveChanges = async () => {[m
+[31m-        setSaving(true);[m
+[31m-        try {[m
+[31m-            // Convertir la edad a número si es posible[m
+[31m-            const updatedStudent = {[m
+[31m-                ...editedStudent,[m
+[31m-                age: editedStudent.age !== '' ? editedStudent.age : null[m
+[31m-            };[m
+[31m-            [m
+[31m-            // Aquí iría la lógica para guardar los cambios en la base de datos[m
+[31m-            // Por ahora solo actualizamos el estado local[m
+[31m-            setStudent(updatedStudent);[m
+[31m-            setEditMode(false);[m
+[31m-        } catch (error) {[m
+[31m-            console.error('Error saving changes:', error);[m
+[31m-        } finally {[m
+[31m-            setSaving(false);[m
+[31m-        }[m
+[31m-    };[m
+[31m-[m
+[31m-    const handleCall = (phoneNumber) => {[m
+[31m-        Linking.openURL(`tel:${phoneNumber}`);[m
+[31m-    };[m
+[31m-    [m
+[31m-    const handleMessage = (phoneNumber) => {[m
+[31m-        Linking.openURL(`sms:${phoneNumber}`);[m
+[31m-    };[m
+[31m-[m
+[31m-    if (loading) return <ActivityIndicator style={{flex: 1, justifyContent: 'center'}} />;[m
+[31m-    if (!student) return <Text>No se encontró el estudiante</Text>;[m
+[31m-[m
+[31m-    const {[m
+[31m-        id = '',[m
+[31m-        firstName = '',[m
+[31m-        lastName = '',[m
+[31m-        grade = '',[m
+[31m-        age = '',[m
+[31m-        instrument = '',[m
+[31m-        position = '',[m
+[31m-        parentName = '',[m
+[31m-        phone = ''[m
+[31m-    } = student;[m
+[31m-[m
+[31m-    const initials = `${firstName[0] || ''}${lastName[0] || ''}`;[m
+[31m-[m
+[31m-    return ([m
+[31m-        <SafeAreaView style={[styles.safeArea, { backgroundColor: isDark ? '#121212' : 'white' }]}>[m
+[31m-            <StatusBar backgroundColor={isDark ? '#121212' : 'white'} barStyle={isDark ? "light-content" : "dark-content"} />[m
+[31m-            [m
+[31m-            <ScrollView [m
+[31m-                style={[styles.container, { backgroundColor: isDark ? '#121212' : 'white' }]} [m
+[31m-                contentContainerStyle={styles.contentContainer}[m
+[31m-                showsVerticalScrollIndicator={false}[m
+[31m-            >[m
+[31m-                <View style={styles.content}>[m
+[31m-                    <View style={[styles.header, { backgroundColor: isDark ? '#121212' : 'white' }]}>[m
+[31m-                        <Avatar.Text [m
+[31m-                            size={80} [m
+[31m-                            label={initials}[m
+[31m-                            style={styles.avatar}[m
+[31m-                            color="white"[m
+[31m-                            backgroundColor="#673AB7"[m
+[31m-                        />[m
+[31m-                        <Text variant="headlineMedium" style={[styles.name, { color: isDark ? 'white' : '#333' }]}>[m
+[31m-                            {`${firstName} ${lastName}`}[m
+[31m-                        </Text>[m
+[31m-                    </View>[m
+[31m-[m
+[31m-                    <Card style={[styles.infoCard, { backgroundColor: isDark ? '#1E1E1E' : 'white' }]}>[m
+[31m-                        <Card.Content>[m
+[31m-                            <Text variant="titleLarge" style={[styles.sectionTitle, { color: '#673AB7' }]}>[m
+[31m-                                Información del Estudiante[m
+[31m-                            </Text>[m
+[31m-                            <Divider style={[styles.divider, { backgroundColor: isDark ? '#333' : '#EEEEEE' }]} />[m
+[31m-          

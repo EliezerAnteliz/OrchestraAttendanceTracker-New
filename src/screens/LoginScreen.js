@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { View, StyleSheet, Image } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 import { useAuth } from '../contexts/AuthContext';
 import { router } from 'expo-router';
+import { StyledInput, StyledCard } from '../components';
+import { useAppTheme, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../theme';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   
   const { signIn } = useAuth();
+  const { theme } = useAppTheme();
 
   const handleLogin = async () => {
     if (loading) return;
@@ -34,44 +37,48 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Orchestra Attendance</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.primary }]}>Orchestra Attendance</Text>
       
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      
-      <TextInput
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        loading={loading}
-        style={styles.button}
-      >
-        Login
-      </Button>
+      <StyledCard style={styles.card} elevation={2}>
+        {error ? <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text> : null}
+        
+        <StyledInput
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          error={error && !email ? "Email es requerido" : ""}
+          placeholder="tucorreo@ejemplo.com"
+        />
+        
+        <StyledInput
+          label="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          error={error && !password ? "Contraseña es requerida" : ""}
+          placeholder="••••••••"
+        />
+        
+        <Button
+          mode="contained"
+          onPress={handleLogin}
+          loading={loading}
+          style={styles.button}
+        >
+          Iniciar Sesión
+        </Button>
 
-      <Button
-        mode="text"
-        onPress={() => router.push('/signup')}
-        style={styles.button}
-      >
-        Don't have an account? Sign Up
-      </Button>
+        <Button
+          mode="text"
+          onPress={() => router.push('/signup')}
+          style={styles.button}
+        >
+          ¿No tienes cuenta? Regístrate
+        </Button>
+      </StyledCard>
     </View>
   );
 }
@@ -79,24 +86,26 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: SPACING.lg,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...TYPOGRAPHY.h1,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: SPACING.xl,
   },
-  input: {
-    marginBottom: 15,
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    padding: SPACING.md,
   },
   button: {
-    marginTop: 10,
+    marginTop: SPACING.md,
   },
   error: {
-    color: 'red',
+    ...TYPOGRAPHY.body2,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: SPACING.md,
   },
 });

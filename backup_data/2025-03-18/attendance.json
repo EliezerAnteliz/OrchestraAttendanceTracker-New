@@ -1,0 +1,992 @@
+[
+  {
+    "id": "e07cc787-9248-4836-b90e-bd3676c11eae",
+    "student_id": "11a1bb8c-5fa5-46d0-a4fd-1c5876f1fc48",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "5ef2c130-c5b6-46ea-8b86-aebc3f8e250f",
+    "student_id": "c437078d-fc29-4a0c-8172-5b33461c31ac",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "2dd7206f-6829-42ce-9cf9-8e4767ce0bd7",
+    "student_id": "4fd2e7e2-889e-43a1-b80d-dc7ee2f1d550",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "f5344a20-32d5-442f-a604-cb9d48118b0f",
+    "student_id": "08433f4c-22ce-4811-9ee7-6d1e51f5e730",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "331d8e31-2eaa-4ac5-aebc-cdb579521d0f",
+    "student_id": "a9abfc40-001b-43f3-90f9-6bbd05ae3e41",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:58:19.799775+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "5425c49a-04ef-4d3c-805e-e68d91c3cfc9",
+    "student_id": "3c46dbf4-59fc-4f2b-8270-96f8f7a0d25c",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "7d105840-dd05-43b0-8331-a99eae6ef744",
+    "student_id": "125e51eb-97dc-41bf-a2a4-1c08550959c2",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "a2fa9f36-5113-4379-892e-8d9b9b72f13e",
+    "student_id": "7abeb8a6-5b2a-489c-8ab7-bbbcb827e9fb",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:47.943248+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "7bbbfec4-e359-4df5-a893-aa9dc3a83be6",
+    "student_id": "1c3866ec-2192-404e-94be-be8355e321eb",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T03:33:32.856027+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "085175b0-5420-4adb-9725-63cacfd143bc",
+    "student_id": "13c675f7-468c-401a-b182-8662064466bf",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:54:02.612482+00:00",
+    "updated_at": "2025-02-26T05:42:12.093952+00:00"
+  },
+  {
+    "id": "ea866855-1897-42a3-ab21-32d831d9be70",
+    "student_id": "bfb68d2a-abd7-49e1-9745-c65dd306d18a",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T03:33:47.608261+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "deae9569-8cb3-4f49-a065-6b014d540438",
+    "student_id": "23a4038b-7278-4e0d-a4f1-b6fa396e5a5a",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "598efb86-73b3-456a-895d-2f48a2655843",
+    "student_id": "502a51e8-c217-4b71-8723-dceeed4da7aa",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:57:20.584141+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "740301f8-07f8-4b5d-bd0e-9c32686fecd6",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-02-26",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-02-26T02:40:03.467806+00:00",
+    "updated_at": "2025-02-26T05:45:40.720198+00:00"
+  },
+  {
+    "id": "da4ef89d-bb9c-4444-a96b-1b4e47407434",
+    "student_id": "087e975a-dcf0-42cc-bf7f-d7b3ff7ed322",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T03:46:13.472702+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "4db606fb-09a6-49b4-8c80-632eebe0046f",
+    "student_id": "3e06491d-4537-4460-84d8-745bd25ced37",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T03:46:13.46221+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "7d4f27ad-8f10-4c19-8ca0-d2c3879f529f",
+    "student_id": "c0419212-146f-4f79-8938-2b6273c6c2bc",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T04:54:29.384552+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "65c344c3-830c-45ef-ab72-b30fd99c86c7",
+    "student_id": "18084299-eefd-4e5f-b8b9-dc6618e947dc",
+    "date": "2025-02-26",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-02-26T02:35:29.67305+00:00",
+    "updated_at": "2025-02-26T05:45:40.720198+00:00"
+  },
+  {
+    "id": "912d75a0-fe55-4814-bfd9-0008523b6915",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-02-26",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-02-26T02:35:21.619909+00:00",
+    "updated_at": "2025-02-26T05:48:10.085479+00:00"
+  },
+  {
+    "id": "57975c28-af66-42d9-8d1c-72c531a4d616",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "date": "2025-02-26",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-02-26T02:35:35.148778+00:00",
+    "updated_at": "2025-02-26T05:48:10.085479+00:00"
+  },
+  {
+    "id": "46b7aa99-b854-4d91-ad72-d7990e01f265",
+    "student_id": "d9206bd7-e7ce-4944-bce1-ef88263aae6d",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "724d76c3-9c8c-42f2-abdf-1880b63bdd76",
+    "student_id": "cd2915db-5b3f-4aee-9597-721ab0c9c5fc",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "9e1c77fc-821d-4f20-97bb-3de9e02d37a2",
+    "student_id": "44677d88-12ee-4b72-98f3-1fbe5956febd",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "87197f08-440e-4d69-a8cc-583621816889",
+    "student_id": "5117e36e-680e-4503-8426-814dbd6dd2de",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "0d5929a6-35f0-4d1d-b02b-d8a10aae828f",
+    "student_id": "603fcaf0-a536-474d-86de-ea455704aa92",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "0613d7ef-b421-4aa8-bd6a-750e8a30c508",
+    "student_id": "e73a71a4-183e-44d9-a648-e0d43bdfc954",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "01699636-9d78-49c6-bfd7-0048ebd17728",
+    "student_id": "892e9a3a-73a0-48ab-97c7-3ced170b8c70",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:03.005797+00:00",
+    "updated_at": "2025-02-26T05:41:01.029+00:00"
+  },
+  {
+    "id": "4d464435-46fc-41ab-9502-20562fa81587",
+    "student_id": "ccf31b6b-64b2-4acf-b6f9-a1bc36051abc",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "27032132-8d0d-40c6-97db-1a8ba3090773",
+    "student_id": "b63c9cff-cc21-46a0-8df3-f349b377a72d",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:02:23.828606+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "bd7bd983-2539-40cf-a034-b1496a5d869b",
+    "student_id": "bc61f054-2192-4abb-9377-7c2e9ba03324",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:02:23.828606+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "a74f0b0a-e896-49b9-8ee8-4e7f62872cba",
+    "student_id": "b9367768-e7d7-41cd-b4f8-03364e41d88c",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:02:23.828606+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "84207b0c-d699-4c15-a72c-dc20273ef62e",
+    "student_id": "1ac651e6-0f63-4541-8dec-879482784089",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:21.011525+00:00",
+    "updated_at": "2025-02-26T05:41:54.799733+00:00"
+  },
+  {
+    "id": "8e800e4e-5342-4e52-8153-d31134d5e1f4",
+    "student_id": "3187cb41-a71c-4df8-9972-a20a0525db4b",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "2c6fe027-b33b-4892-a344-b76162afaebf",
+    "student_id": "04b7c06f-1100-46ca-8342-ee590bc436bc",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:57:20.584141+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "a0915623-1dad-4d34-bc6e-4031e31d0e32",
+    "student_id": "e88c88b9-d0c7-4dda-9def-09e1b756af47",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "58832302-7193-4708-adbe-62dfe1e5e27e",
+    "student_id": "0afab41b-b3b6-45f9-8bab-5d2e3958a970",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "177e695d-496b-4105-b995-b2f45fc2e864",
+    "student_id": "3fac7dbe-ff63-4256-98a0-8a1d59541e11",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "3a71aa1f-37aa-4711-96f3-2170530176b8",
+    "student_id": "21da6609-0134-4579-8861-af920c1ab967",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "1df9ee49-16a1-4640-8749-480bc6e0ac0c",
+    "student_id": "e4c8c3d2-34c8-4fe8-b863-920d07d019b6",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "154ddc73-fa84-407a-8f42-f827f22ed349",
+    "student_id": "1e4724b5-e679-4859-9da6-e90dbedd4d6e",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "7a4c5fde-aebb-4101-974f-569a965cfc18",
+    "student_id": "1dbda475-d6f6-4257-86b5-a227b5017a16",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "2191b4af-a2b1-4a93-9865-6b710ec66220",
+    "student_id": "41dde32e-623a-4fd1-8f48-9ae2f2605d7c",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:06.209131+00:00",
+    "updated_at": "2025-02-26T05:41:04.182+00:00"
+  },
+  {
+    "id": "3f9c94e6-6c2d-431d-99ba-cbce896e179c",
+    "student_id": "73339309-6ee4-4b5e-8b41-3f948b83c398",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "fd032a48-3a89-41bb-8409-01a1796d526a",
+    "student_id": "0f7227bc-e2e1-4628-bcb6-81b07f65b9de",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "daa6d21a-46e1-46ed-a378-b79934cfd786",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:36:08.383826+00:00",
+    "updated_at": "2025-02-26T05:41:09.344798+00:00"
+  },
+  {
+    "id": "1d119af8-40ca-4da0-a542-cd01af0ec433",
+    "student_id": "dd3d7f38-dce6-4d3e-88f2-8987a2c76d7a",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "0e41abac-06ad-4ca0-8722-672fd9699e97",
+    "student_id": "494aeef8-fed8-4e92-bbcf-ee79060a6236",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "84ad208a-be5d-432a-af0d-7979b37a8cdb",
+    "student_id": "bfdac7d7-58fb-4fc5-9de4-d3ec3f996232",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "f49851a9-fe47-4704-a9a1-68d7b730e1e6",
+    "student_id": "e569b46b-8a77-49fe-8e30-66fda6c941ab",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:41:09.344798+00:00",
+    "updated_at": "2025-02-26T05:41:07.297+00:00"
+  },
+  {
+    "id": "7e377cc8-75ce-4305-8cf8-095ac3973080",
+    "student_id": "87d0bdfb-295f-4499-8b92-19a7e86106c9",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "72be9dd4-2a97-4594-b539-dd47d33b9507",
+    "student_id": "bd6202ee-ef7d-4ce2-be5e-f3b884b29332",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "93a4d8c2-6714-41e2-9308-658c6333e930",
+    "student_id": "ff1bf6f4-fd45-4378-91fc-84436a1b6611",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "83b46535-7337-4dd8-8d5c-1c140ab5d791",
+    "student_id": "0e58d15c-f47f-4acd-9621-94982114d57d",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "e7a638d1-f7be-40d4-91ab-0a81f6cb8ff3",
+    "student_id": "b1d029e8-3546-4be0-80a0-9a36b65df6c3",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:54:15.326359+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "38148475-758e-4ce8-93b4-41627ce2502b",
+    "student_id": "53b67ec4-0038-4c82-b2f5-9dfdb050cfeb",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "c4f40b30-842b-4ec3-978e-26e56a01f6b7",
+    "student_id": "dcab964e-80b8-43fd-b62e-3b891b8f1376",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "6c484179-429f-4219-baf0-f012b77218f8",
+    "student_id": "702af7a9-6c42-48b4-af61-d162d8045f50",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:28.397953+00:00",
+    "updated_at": "2025-02-26T05:42:02.915144+00:00"
+  },
+  {
+    "id": "39e2cf7e-a7d2-4dc9-82aa-d6aec8f84ad3",
+    "student_id": "b829f61b-b68a-4892-8246-2be5ab47ef2f",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "c8fb945d-6753-47b3-ab4d-e0cbb712d108",
+    "student_id": "3fac5707-405f-49a7-8fd8-047ccc7f3983",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:57:20.584141+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "a6f636b0-2a0a-4c7c-ad14-6a3168a3985b",
+    "student_id": "74a7df28-3efe-4007-9163-8ad6c7c142b7",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "4e5deb3a-e326-4357-a1cf-2a029a2554d9",
+    "student_id": "e76b0671-24bf-4527-a6c6-f5d46b3fb9e9",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "c234d095-309e-47f2-b66e-558d0c3caf6f",
+    "student_id": "cbdad611-199f-4fad-a807-f3eadf4577c9",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "bccac0d2-7f5c-44fc-adf4-57cebacf4324",
+    "student_id": "5fd0eae7-2d37-46f7-8034-c72601f818e0",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "f666175b-acb7-4047-b7f3-90c46fc7ea40",
+    "student_id": "833739d6-33e9-4fa1-93c4-ccb681f307d9",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "bd9935f6-82a7-475e-89d4-b2a6cd5cb24f",
+    "student_id": "3f6a45e1-25a7-4321-9996-f4c6c71eae80",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T05:40:57.355096+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "4f8b7fc3-5b7b-4c7e-967e-46b94452c0f5",
+    "student_id": "fa70a5d0-7953-4bd1-a5a1-2e20024a1059",
+    "date": "2025-02-26",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-26T02:58:19.799775+00:00",
+    "updated_at": "2025-02-26T05:42:20.346543+00:00"
+  },
+  {
+    "id": "96b4ab4c-54e1-4a43-bae7-aa0a8c94fcdf",
+    "student_id": "f40fe1b2-d6c2-4e74-bd80-a6e1ae21c9ca",
+    "date": "2025-02-26",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-02-26T02:35:43.818311+00:00",
+    "updated_at": "2025-02-26T05:48:10.085479+00:00"
+  },
+  {
+    "id": "81106e04-49df-4ac2-8b75-c4fb57465da6",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-02-26",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-02-26T02:35:07.834193+00:00",
+    "updated_at": "2025-02-27T21:39:09.479175+00:00"
+  },
+  {
+    "id": "dc89a0e3-e862-44ed-b2a2-e13ead78c465",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-02-27",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-02-27T03:51:03.504536+00:00",
+    "updated_at": "2025-02-27T03:51:02.691+00:00"
+  },
+  {
+    "id": "12ddeb1f-5e0c-4967-942c-30e24612b328",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-02-27",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-02-27T01:33:55.601104+00:00",
+    "updated_at": "2025-02-27T21:39:25.062809+00:00"
+  },
+  {
+    "id": "2d2d4d8d-ac48-4eec-9d30-80566c05078d",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-02-27",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-02-27T02:07:31.746859+00:00",
+    "updated_at": "2025-02-27T08:14:38.246755+00:00"
+  },
+  {
+    "id": "f546b2c6-2159-446f-b31d-10aebdc87e3e",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-02-28",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-02-28T05:36:50.984242+00:00",
+    "updated_at": "2025-02-28T05:51:04.902445+00:00"
+  },
+  {
+    "id": "9320d7ed-0c77-4967-ab18-09f0f6cff9bd",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-02-27",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-02-27T02:07:31.746578+00:00",
+    "updated_at": "2025-02-27T21:38:03.399707+00:00"
+  },
+  {
+    "id": "ae5a756b-b5ba-41f2-a73f-ae339cc8f3e8",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-03-07",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-07T21:57:28.026756+00:00",
+    "updated_at": "2025-03-07T21:57:26.918+00:00"
+  },
+  {
+    "id": "a4b14144-7698-4266-b2f9-e55fc200677d",
+    "student_id": "18084299-eefd-4e5f-b8b9-dc6618e947dc",
+    "date": "2025-03-08",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:15.070626+00:00",
+    "updated_at": "2025-03-08T00:25:33.81247+00:00"
+  },
+  {
+    "id": "10158f4a-c3ac-4ffa-b008-f68175a150f7",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T21:57:28.003492+00:00",
+    "updated_at": "2025-03-07T21:57:54.370935+00:00"
+  },
+  {
+    "id": "e86eda85-7089-4eac-92d6-eedad18b987a",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T21:57:27.995318+00:00",
+    "updated_at": "2025-03-07T22:37:00.712505+00:00"
+  },
+  {
+    "id": "66464f09-b2b5-4715-8ab6-4a5ce507b2c0",
+    "student_id": "18084299-eefd-4e5f-b8b9-dc6618e947dc",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T22:37:14.426223+00:00",
+    "updated_at": "2025-03-07T22:37:13.424+00:00"
+  },
+  {
+    "id": "ab4b952a-3fa4-4c40-9c5c-7ac1ea8a317b",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T22:37:14.485253+00:00",
+    "updated_at": "2025-03-07T22:37:13.407+00:00"
+  },
+  {
+    "id": "4e3c9d24-1b82-4e60-a039-d7d885827045",
+    "student_id": "f40fe1b2-d6c2-4e74-bd80-a6e1ae21c9ca",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T22:37:14.501143+00:00",
+    "updated_at": "2025-03-07T22:37:13.504+00:00"
+  },
+  {
+    "id": "ba217840-938a-4916-be1f-0a52d6bb3ece",
+    "student_id": "13c675f7-468c-401a-b182-8662064466bf",
+    "date": "2025-03-07",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-07T22:37:14.595315+00:00",
+    "updated_at": "2025-03-07T22:37:13.503+00:00"
+  },
+  {
+    "id": "bb4f5fea-5f24-408b-838f-3eee750b94da",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-03-07",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-07T22:37:20.438121+00:00",
+    "updated_at": "2025-03-07T22:37:19.438+00:00"
+  },
+  {
+    "id": "854e9dee-f2da-4654-a4ce-de6e7194242b",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-03-08",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:15.070626+00:00",
+    "updated_at": "2025-03-08T00:25:13.565+00:00"
+  },
+  {
+    "id": "11da77e1-8694-4eb1-9e98-d2457df0868b",
+    "student_id": "13c675f7-468c-401a-b182-8662064466bf",
+    "date": "2025-03-08",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:15.070626+00:00",
+    "updated_at": "2025-03-08T00:25:13.565+00:00"
+  },
+  {
+    "id": "49049c8f-fd87-44db-b27e-b0c5a7cf3a07",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-08",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:23.525764+00:00",
+    "updated_at": "2025-03-08T00:25:22.007+00:00"
+  },
+  {
+    "id": "f7f924b3-fe21-4f7d-a3b1-4d797223ed2b",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-03-08",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:23.525764+00:00",
+    "updated_at": "2025-03-08T00:25:22.007+00:00"
+  },
+  {
+    "id": "a6693350-e5fe-4142-af83-0de55509f437",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "date": "2025-03-08",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:23.525764+00:00",
+    "updated_at": "2025-03-08T00:25:22.007+00:00"
+  },
+  {
+    "id": "da76ba5b-6f16-46bd-aa3f-09b796101404",
+    "student_id": "f40fe1b2-d6c2-4e74-bd80-a6e1ae21c9ca",
+    "date": "2025-03-08",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:23.525764+00:00",
+    "updated_at": "2025-03-08T00:25:22.007+00:00"
+  },
+  {
+    "id": "f1d96653-2576-4701-b93d-61cd4299fc9d",
+    "student_id": "b1d029e8-3546-4be0-80a0-9a36b65df6c3",
+    "date": "2025-03-08",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:15.070626+00:00",
+    "updated_at": "2025-03-08T00:25:33.81247+00:00"
+  },
+  {
+    "id": "fb0df0f0-ebbc-4faa-bfba-b6a365736877",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-08",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-08T00:25:15.070626+00:00",
+    "updated_at": "2025-03-08T23:10:27.258356+00:00"
+  },
+  {
+    "id": "b19c80cd-b928-4b68-8494-bf43610addac",
+    "student_id": "cbdad611-199f-4fad-a807-f3eadf4577c9",
+    "date": "2025-03-10",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-10T01:01:44.585295+00:00",
+    "updated_at": "2025-03-10T01:01:44.043+00:00"
+  },
+  {
+    "id": "b23cd7c7-d23c-407f-9ede-5f5468ad54fd",
+    "student_id": "bfb68d2a-abd7-49e1-9745-c65dd306d18a",
+    "date": "2025-03-10",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-10T01:01:44.640289+00:00",
+    "updated_at": "2025-03-10T01:01:44.114+00:00"
+  },
+  {
+    "id": "45c99c5d-b45d-4d82-a7bb-0356d630d5f6",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-10",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-10T01:02:02.311997+00:00",
+    "updated_at": "2025-03-10T01:02:01.79+00:00"
+  },
+  {
+    "id": "56e06649-09d4-4c59-826a-f9b74813fcca",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "date": "2025-03-10",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-10T01:02:02.327221+00:00",
+    "updated_at": "2025-03-10T01:02:01.81+00:00"
+  },
+  {
+    "id": "a86a207a-64b3-4b7c-89f3-e107dd7992e6",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-12",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-12T18:23:58.785029+00:00",
+    "updated_at": "2025-03-12T18:23:49.587+00:00"
+  },
+  {
+    "id": "33725ade-6d58-4ba6-9fa2-b02bce101ecc",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-03-12",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-12T18:23:58.790791+00:00",
+    "updated_at": "2025-03-12T18:23:49.583+00:00"
+  },
+  {
+    "id": "406487b9-e389-4bd6-9c8d-d45ff14ed418",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-12",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-12T18:23:58.867072+00:00",
+    "updated_at": "2025-03-12T18:23:49.585+00:00"
+  },
+  {
+    "id": "9b0530c0-e2f0-4ca8-9311-95100020e96f",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-13",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-13T03:43:24.640628+00:00",
+    "updated_at": "2025-03-13T03:43:37.927401+00:00"
+  },
+  {
+    "id": "570b242d-fc77-4ec9-bbaf-926bc525039b",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-13",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-13T03:51:32.014276+00:00",
+    "updated_at": "2025-03-13T03:51:31.604+00:00"
+  },
+  {
+    "id": "8aba5615-da08-401f-9834-2d0df83c65ca",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-03-13",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-13T03:56:15.621833+00:00",
+    "updated_at": "2025-03-13T03:56:15.204+00:00"
+  },
+  {
+    "id": "61eadd43-b159-4dc9-9e1b-54a72f76d2ed",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-03-13",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-13T03:56:19.613984+00:00",
+    "updated_at": "2025-03-13T03:56:19.195+00:00"
+  },
+  {
+    "id": "c9fff64e-0fe4-4956-af3b-0b292f75ae37",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-15",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-15T19:58:20.835723+00:00",
+    "updated_at": "2025-03-15T19:58:20.743+00:00"
+  },
+  {
+    "id": "b88afa50-327d-4759-ab0b-bb08c3e9cef0",
+    "student_id": "81af485f-ce25-485f-900f-d5a2b9d098ec",
+    "date": "2025-03-15",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-15T19:58:20.874124+00:00",
+    "updated_at": "2025-03-15T19:58:37.365957+00:00"
+  },
+  {
+    "id": "94891ed9-63ce-4445-b90f-31fffc4e12b4",
+    "student_id": "18084299-eefd-4e5f-b8b9-dc6618e947dc",
+    "date": "2025-03-15",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-15T19:58:37.374151+00:00",
+    "updated_at": "2025-03-15T19:58:37.287+00:00"
+  },
+  {
+    "id": "b946eea9-60a6-4df0-80a6-79cfff9f3fe7",
+    "student_id": "d15dfa79-407b-419f-8832-729afc6be5a6",
+    "date": "2025-03-15",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-15T19:58:47.941932+00:00",
+    "updated_at": "2025-03-15T19:58:47.76+00:00"
+  },
+  {
+    "id": "c8b50d68-7595-467b-adec-f78c2fa6d4be",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-15",
+    "status_code": "UA",
+    "notes": null,
+    "created_at": "2025-03-15T19:58:20.894955+00:00",
+    "updated_at": "2025-03-15T19:58:51.406425+00:00"
+  },
+  {
+    "id": "15cced54-0357-4947-8806-b90a09ad30cb",
+    "student_id": "7fa5e45c-a4e5-4586-a08f-d2ea72c6b68b",
+    "date": "2025-03-17",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-17T16:52:43.662242+00:00",
+    "updated_at": "2025-03-17T16:52:33.613+00:00"
+  },
+  {
+    "id": "e9013df0-96bc-4bfa-88dd-797c0bdbcf80",
+    "student_id": "3fac5707-405f-49a7-8fd8-047ccc7f3983",
+    "date": "2025-03-17",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-17T16:52:43.674482+00:00",
+    "updated_at": "2025-03-17T16:52:33.617+00:00"
+  },
+  {
+    "id": "a5446f22-08e0-4d26-8d50-1c8a4e8c4e45",
+    "student_id": "642ca165-c878-4c8f-b96c-f8218051aa96",
+    "date": "2025-03-17",
+    "status_code": "EA",
+    "notes": null,
+    "created_at": "2025-03-17T16:52:43.604999+00:00",
+    "updated_at": "2025-03-17T16:53:06.104978+00:00"
+  },
+  {
+    "id": "512fed6e-f38b-48f0-9812-7fcf9e72d6bb",
+    "student_id": "2fcf566b-938c-41c9-98e6-8b1d1993dfe9",
+    "date": "2025-03-17",
+    "status_code": "A",
+    "notes": null,
+    "created_at": "2025-03-17T16:53:11.688896+00:00",
+    "updated_at": "2025-03-17T16:53:01.647+00:00"
+  }
+]

@@ -1,0 +1,748 @@
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { Text, Card, Chip, Button, SegmentedButtons, Portal, Modal, List, useTheme } from 'react-native-paper';
+import { supabase } from '../config/supabase';
+import { PieChart, BarChart } from 'react-native-chart-kit';
+
+const screenWidth = Dimensions.get('window').width;
+
+// IDs correctos de la base de datos
+const ORGANIZATION_ID = 'a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4';
+const PROGRAM_ID = '9d7dc91c-7bbe-49cd-bc64-755467bf91da';
+
+export default function ReportsScreen() {
+  const theme = useTheme();
+  const [reportType, setReportType] = useState('group');
+  const [periodType, setPeriodType] = useState('week');
+  const [selectedInstrument, setSelectedInstrument] = useState('all');
+  const [instruments, setInstruments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentModalVisible, setStudentModalVisible] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [reportData, setReportData] = useState(null);
+  const [weeklyData, setWeeklyData] = useState(null);
+
+  // Cargar estudiantes
+  const loadStudents = async () => {
+    try {
+      console.log('Iniciando carga de estudiantes...');
+      const { data, error } = await supabase
+        .from('students')
+        .select('id, first_name, last_name, instrument, student_id')
+        .eq('organization_id', ORGANIZATION_ID)
+        .eq('program_id', PROGRAM_ID)
+        .eq('is_active', true)
+        .order('first_name');
+
+      if (error) {
+        console.error('Error en la consulta de estudiantes:', error);
+        return;
+      }
+
+      console.log('Estudiantes cargados:', data?.length || 0);
+
+      // Filtrar por instrumento si es necesario
+      const filteredData = selectedInstrument === 'all' 
+        ? data 
+        : data.filter(student => student.instrument === selectedInstrument);
+
+      console.log('Estudiantes filtrados:', filteredData?.length || 0);
+      setStudents(filteredData || []);
+    } catch (error) {
+      console.error('Error en loadStudents:', error.message);
+    }
+  };
+
+  // Cargar instrumentos
+  const loadInstruments = async () => {
+    try {
+      console.log('Iniciando carga de instrumentos...');
+      const { data, error } = await supabase
+        .from('students')
+        .select('instrument')
+        .not('instrument', 'is', null);
+
+      if (error) {
+        console.error('Error en la consulta de instrumentos:', error);
+        return;
+      }
+
+      console.log('Datos de instrumentos recibidos:', data?.length || 0);
+
+      const instrumentOrder = ['Violin', 'Viola', 'Cello', 'Bass', 'Not assigned'];
+      const uniqueInstruments = [...new Set(data.map(item => item.instrument))];
+      const sortedInstruments = uniqueInstruments.sort((a, b) => {
+        const indexA = instrumentOrder.indexOf(a);
+        const indexB = instrumentOrder.indexOf(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+
+      console.log('Instrumentos únicos ordenados:', sortedInstruments);
+      setInstruments(sortedInstruments);
+    } catch (error) {
+      console.error('Error en loadInstruments:', error.message);
+    }
+  };
+
+  // Calcular estadísticas de asistencia
+  const calculateAttendanceStats = async (startDate, endDate, studentId = null) => {
+    try {
+      let query = supabase
+        .from('attendance')
+        .select('*')
+        .gte('date', startDate.toISOString().split('T')[0])
+        .lte('date', endDate.toISOString().split('T')[0]);
+
+      if (studentId) {
+        query = query.eq('student_id', studentId);
+      } else if (selectedInstrument !== 'all') {
+        const studentIds = students
+          .filter(s => s.instrument === selectedInstrument)
+          .map(s => s.id);
+        if (studentIds.length > 0) {
+          query = query.in('student_id', studentIds);
+        }
+      }
+
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error in attendance query:', error.message);
+        throw error;
+      }
+
+      // Calcular totales
+      const totals = data.reduce((acc, record) => {
+        acc[record.status_code] = (acc[record.status_code] || 0) + 1;
+        return acc;
+      }, {});
+
+      const total = data.length || 0;
+      const present = totals['A'] || 0;
+      const excused = totals['EA'] || 0;
+      const unexcused = totals['UA'] || 0;
+
+      return {
+        total_attendance: present,
+        total_excused_absences: excused,
+        total_unexcused_absences: unexcused,
+        attendance_percentage: total > 0 ? (present / total) * 100 : 0,
+        excused_percentage: total > 0 ? (excused / total) * 100 : 0,
+        unexcused_percentage: total > 0 ? (unexcused / total) * 100 : 0
+      };
+    } catch (error) {
+      console.error('Error calculating stats:', error.message);
+      throw error;
+    }
+  };
+
+  // Después de calculateAttendanceStats, agregar:
+  const calculateWeeklyStats = async (numberOfWeeks = 4) => {
+    try {
+      const weeks = [];
+      const now = new Date();
+      
+      for (let i = 0; i < numberOfWeeks; i++) {
+        const endDate = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+        const startDate = new Date(endDate.getTime() - (7 * 24 * 60 * 60 * 1000));
+        
+        const weekStats = await calculateAttendanceStats(startDate, endDate);
+        weeks.unshift({
+          weekLabel: `Semana ${numberOfWeeks - i}`,
+          ...weekStats
+        });
+      }
+      
+      return weeks;
+    } catch (error) {
+      console.error('Error calculating weekly stats:', error.message);
+      throw error;
+    }
+  };
+
+  // Generar reporte
+  const generateReport = async () => {
+    setLoading(true);
+    try {
+      const now = new Date();
+      let startDate, endDate;
+      
+      // Calcular fechas según el período
+      switch (periodType) {
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          endDate = now;
+          // Obtener datos de las últimas 4 semanas
+          const weeklyStats = await calculateWeeklyStats(4);
+          setWeeklyData(weeklyStats);
+          break;
+        case 'month':
+          startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          endDate = now;
+          setWeeklyData(null);
+          break;
+        case 'year':
+          startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+          endDate = now;
+          setWeeklyData(null);
+          break;
+      }
+
+      // Calcular estadísticas
+      const stats = await calculateAttendanceStats(
+        startDate,
+        endDate,
+        reportType === 'individual' ? selectedStudent : null
+      );
+
+      // Actualizar el estado con los resultados
+      setReportData({
+        report_type: reportType,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        report_scope: reportType === 'individual' ? 'student' : 'group',
+        student_id: reportType === 'individual' ? selectedStudent : null,
+        instrument_filter: selectedInstrument === 'all' ? null : selectedInstrument,
+        ...stats
+      });
+
+    } catch (error) {
+      console.error('Error generating report:', error.message);
+      setWeeklyData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Inicializar datos
+  useEffect(() => {
+    console.log('Efecto de inicialización activado');
+    loadInstruments();
+    loadStudents();
+  }, []);
+
+  // Efecto para recargar estudiantes cuando cambia el instrumento seleccionado
+  useEffect(() => {
+    console.log('Instrumento seleccionado cambiado:', selectedInstrument);
+    loadStudents();
+  }, [selectedInstrument]);
+
+  // Función para formatear fechas
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // Función para formatear porcentajes
+  const formatPercentage = (value) => {
+    return `${value.toFixed(1)}%`;
+  };
+
+  // Datos para el gráfico circular
+  const getPieChartData = (data) => {
+    if (!data) return [];
+
+    return [
+      {
+        name: 'Asistencias',
+        population: data.total_attendance,
+        color: theme.colors.attendance.present,
+        legendFontColor: '#7F7F7F',
+      },
+      {
+        name: 'Faltas Justificadas',
+        population: data.total_excused_absences,
+        color: theme.colors.attendance.justified,
+        legendFontColor: '#7F7F7F',
+      },
+      {
+        name: 'Faltas Injustificadas',
+        population: data.total_unexcused_absences,
+        color: theme.colors.attendance.unexcused,
+        legendFontColor: '#7F7F7F',
+      },
+    ];
+  };
+
+  // Después de getPieChartData, agregar:
+  const getWeeklyComparisonData = (weeklyData) => {
+    if (!weeklyData || weeklyData.length === 0) return null;
+
+    return {
+      labels: weeklyData.map(week => week.weekLabel),
+      datasets: [
+        {
+          data: weeklyData.map(week => week.total_attendance),
+          color: (opacity = 1) => theme.colors.attendance.present,
+          label: 'Asistencias'
+        },
+        {
+          data: weeklyData.map(week => week.total_excused_absences),
+          color: (opacity = 1) => theme.colors.attendance.justified,
+          label: 'Justificadas'
+        },
+        {
+          data: weeklyData.map(week => week.total_unexcused_absences),
+          color: (opacity = 1) => theme.colors.attendance.unexcused,
+          label: 'Injustificadas'
+        }
+      ],
+      legend: ['Asistencias', 'Justificadas', 'Injustificadas']
+    };
+  };
+
+  // Después de getWeeklyComparisonData, agregar:
+  const calculateTrends = (weeklyData) => {
+    if (!weeklyData || weeklyData.length < 2) return null;
+
+    const trends = [];
+    
+    // Calcular cambios porcentuales entre semanas consecutivas
+    for (let i = 1; i < weeklyData.length; i++) {
+      const currentWeek = weeklyData[i];
+      const previousWeek = weeklyData[i-1];
+      
+      const attendanceChange = ((currentWeek.total_attendance - previousWeek.total_attendance) / previousWeek.total_attendance) * 100;
+      const justifiedChange = ((currentWeek.total_excused_absences - previousWeek.total_excused_absences) / (previousWeek.total_excused_absences || 1)) * 100;
+      const unjustifiedChange = ((currentWeek.total_unexcused_absences - previousWeek.total_unexcused_absences) / (previousWeek.total_unexcused_absences || 1)) * 100;
+
+      trends.push({
+        weekLabel: currentWeek.weekLabel,
+        attendanceChange: isFinite(attendanceChange) ? attendanceChange : 0,
+        justifiedChange: isFinite(justifiedChange) ? justifiedChange : 0,
+        unjustifiedChange: isFinite(unjustifiedChange) ? unjustifiedChange : 0
+      });
+    }
+
+    return trends;
+  };
+
+  // Configuración común para los gráficos
+  const chartConfig = {
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false,
+  };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      paddingHorizontal: 16,
+      paddingTop: 48,
+    },
+    card: {
+      marginBottom: 16,
+      elevation: 2,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      color: theme.colors.primary,
+    },
+    section: {
+      marginBottom: 24,
+    },
+    sectionTitle: {
+      marginBottom: 8,
+    },
+    instrumentsScroll: {
+      flexGrow: 0,
+      marginBottom: 8,
+    },
+    chip: {
+      marginRight: 8,
+    },
+    generateButton: {
+      marginTop: 8,
+    },
+    reportCard: {
+      minHeight: 200,
+    },
+    modalContainer: {
+      padding: 20,
+      backgroundColor: 'white',
+      margin: 20,
+      borderRadius: 8,
+    },
+    modalTitle: {
+      marginBottom: 16,
+    },
+    studentList: {
+      maxHeight: 400,
+    },
+    studentButton: {
+      marginTop: 8,
+    },
+    statsGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 24,
+    },
+    statCard: {
+      flex: 1,
+      marginHorizontal: 4,
+      elevation: 2,
+    },
+    statNumber: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 4,
+    },
+    chartContainer: {
+      marginVertical: 16,
+      alignItems: 'center',
+    },
+    chartTitle: {
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    percentagesContainer: {
+      marginTop: 16,
+      padding: 16,
+      backgroundColor: '#f5f5f5',
+      borderRadius: 8,
+    },
+    percentageText: {
+      fontSize: 16,
+      marginBottom: 8,
+    },
+    periodText: {
+      fontSize: 16,
+      marginBottom: 16,
+      color: theme.colors.secondary,
+    },
+    trendContainer: {
+      marginBottom: 16,
+      padding: 12,
+      backgroundColor: '#f9f9f9',
+      borderRadius: 8,
+    },
+    trendWeekLabel: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      color: theme.colors.primary,
+    },
+    trendItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 6,
+      borderBottomWidth: 1,
+      borderBottomColor: '#eeeeee',
+    },
+    trendLabel: {
+      fontSize: 14,
+    },
+    trendValue: {
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    reportTitle: {
+      fontWeight: 'bold',
+      marginBottom: 12,
+    },
+    statLabel: {
+      textAlign: 'center',
+    },
+  });
+
+  return (
+    <ScrollView style={styles.container}>
+      <Card style={styles.card}>
+        <Card.Content>
+          <Text variant="titleLarge" style={styles.title}>Reportes de Asistencia</Text>
+          
+          {/* Selector de Tipo de Reporte */}
+          <View style={styles.section}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Tipo de Reporte</Text>
+            <SegmentedButtons
+              value={reportType}
+              onValueChange={(value) => {
+                setReportType(value);
+                setSelectedStudent(null);
+                setReportData(null);
+              }}
+              buttons={[
+                { value: 'group', label: 'Grupal' },
+                { value: 'individual', label: 'Individual' },
+              ]}
+            />
+          </View>
+
+          {/* Selector de Estudiante para reportes individuales */}
+          {reportType === 'individual' && (
+            <View style={styles.section}>
+              <Text variant="titleMedium" style={styles.sectionTitle}>Estudiante</Text>
+              <Button
+                mode="outlined"
+                onPress={() => setStudentModalVisible(true)}
+                style={styles.studentButton}
+              >
+                {selectedStudent ? 
+                  students.find(s => s.id === selectedStudent)?.first_name || 'Seleccionar Estudiante' 
+                  : 'Seleccionar Estudiante'}
+              </Button>
+            </View>
+          )}
+
+          {/* Selector de Período */}
+          <View style={styles.section}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Período</Text>
+            <SegmentedButtons
+              value={periodType}
+              onValueChange={(value) => {
+                setPeriodType(value);
+                setReportData(null);
+              }}
+              buttons={[
+                { value: 'week', label: 'Semanal' },
+                { value: 'month', label: 'Mensual' },
+                { value: 'year', label: 'Anual' },
+              ]}
+            />
+          </View>
+
+          {/* Filtro de Instrumentos */}
+          <View style={styles.section}>
+            <Text variant="titleMedium" style={styles.sectionTitle}>Instrumento</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.instrumentsScroll}>
+              <Chip
+                selected={selectedInstrument === 'all'}
+                onPress={() => setSelectedInstrument('all')}
+                style={styles.chip}
+              >
+                Todos
+              </Chip>
+              {instruments.map((instrument) => (
+                <Chip
+                  key={instrument}
+                  selected={selectedInstrument === instrument}
+                  onPress={() => setSelectedInstrument(instrument)}
+                  style={styles.chip}
+                >
+                  {instrument}
+                </Chip>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Botón Generar Reporte */}
+          <Button
+            mode="contained"
+            onPress={generateReport}
+            style={styles.generateButton}
+            loading={loading}
+            disabled={reportType === 'individual' && !selectedStudent}
+          >
+            Generar Reporte
+          </Button>
+        </Card.Content>
+      </Card>
+
+      {/* Área para mostrar el reporte */}
+      {reportData && (
+        <>
+          <Card style={[styles.card, styles.reportCard]}>
+            <Card.Content>
+              <Text variant="titleMedium" style={[styles.reportTitle, styles.sectionTitle]}>
+                Resultados del Reporte
+                {reportType === 'individual' && selectedStudent && (
+                  ` - ${students.find(s => s.id === selectedStudent)?.first_name || ''}`
+                )}
+              </Text>
+
+              {/* Período del reporte */}
+              <Text style={styles.periodText}>
+                Período: {formatDate(reportData.start_date)} - {formatDate(reportData.end_date)}
+              </Text>
+
+              {/* Totales en cards individuales */}
+              <View style={styles.statsGrid}>
+                <Card style={styles.statCard}>
+                  <Card.Content>
+                    <Text variant="titleLarge" style={[styles.statNumber, { color: theme.colors.attendance.present }]}>
+                      {reportData.total_attendance}
+                    </Text>
+                    <Text variant="bodyMedium" style={styles.statLabel}>Asistencias</Text>
+                  </Card.Content>
+                </Card>
+
+                <Card style={styles.statCard}>
+                  <Card.Content>
+                    <Text variant="titleLarge" style={[styles.statNumber, { color: theme.colors.attendance.justified }]}>
+                      {reportData.total_excused_absences}
+                    </Text>
+                    <Text variant="bodyMedium" style={styles.statLabel}>Justificadas</Text>
+                  </Card.Content>
+                </Card>
+
+                <Card style={styles.statCard}>
+                  <Card.Content>
+                    <Text variant="titleLarge" style={[styles.statNumber, { color: theme.colors.attendance.unexcused }]}>
+                      {reportData.total_unexcused_absences}
+                    </Text>
+                    <Text variant="bodyMedium" style={styles.statLabel}>Injustificadas</Text>
+                  </Card.Content>
+                </Card>
+              </View>
+
+              {/* Porcentajes en formato de texto */}
+              <View style={styles.percentagesContainer}>
+                <Text style={[styles.percentageText, { color: theme.colors.attendance.present }]}>
+                  Asistencia: {formatPercentage(reportData.attendance_percentage)}
+                </Text>
+                <Text style={[styles.percentageText, { color: theme.colors.attendance.justified }]}>
+                  Faltas Justificadas: {formatPercentage(reportData.excused_percentage)}
+                </Text>
+                <Text style={[styles.percentageText, { color: theme.colors.attendance.unexcused }]}>
+                  Faltas Injustificadas: {formatPercentage(reportData.unexcused_percentage)}
+                </Text>
+              </View>
+
+              {/* Gráfico circular */}
+              <View style={styles.chartContainer}>
+                <Text variant="titleSmall" style={styles.chartTitle}>Distribución de Asistencia</Text>
+                <PieChart
+                  data={getPieChartData(reportData)}
+                  width={screenWidth - 64}
+                  height={220}
+                  chartConfig={chartConfig}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="15"
+                  absolute
+                />
+              </View>
+            </Card.Content>
+          </Card>
+
+          {/* Comparación semanal (solo si es reporte semanal) */}
+          {weeklyData && periodType === 'week' && (
+            <Card style={styles.card}>
+              <Card.Content>
+                <Text variant="titleMedium" style={styles.sectionTitle}>Comparación Últimas 4 Semanas</Text>
+                <BarChart
+                  data={getWeeklyComparisonData(weeklyData)}
+                  width={screenWidth - 64}
+                  height={250}
+                  yAxisLabel=""
+                  chartConfig={{
+                    backgroundColor: '#ffffff',
+                    backgroundGradientFrom: '#ffffff',
+                    backgroundGradientTo: '#ffffff',
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    style: {
+                      borderRadius: 16,
+                    },
+                    barPercentage: 0.8,
+                    groupSpacing: 0.2,
+                  }}
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 16,
+                  }}
+                  fromZero={true}
+                  showValuesOnTopOfBars={true}
+                  withInnerLines={true}
+                  segments={4}
+                />
+              </Card.Content>
+            </Card>
+          )}
+
+          {/* Tendencias de asistencia (solo si es reporte semanal) */}
+          {weeklyData && periodType === 'week' && (
+            <Card style={[styles.card, styles.reportCard]}>
+              <Card.Content>
+                <Text variant="titleMedium" style={styles.sectionTitle}>Tendencias de Asistencia</Text>
+                
+                {calculateTrends(weeklyData)?.map((trend, index) => (
+                  <View key={index} style={styles.trendContainer}>
+                    <Text style={styles.trendWeekLabel}>{trend.weekLabel}</Text>
+                    
+                    <View style={styles.trendItem}>
+                      <Text style={styles.trendLabel}>Asistencias</Text>
+                      <Text style={[
+                        styles.trendValue,
+                        { color: trend.attendanceChange > 0 ? theme.colors.attendance.present : theme.colors.attendance.unexcused }
+                      ]}>
+                        {trend.attendanceChange > 0 ? '↑' : '↓'} {Math.abs(trend.attendanceChange).toFixed(1)}%
+                      </Text>
+                    </View>
+
+                    <View style={styles.trendItem}>
+                      <Text style={styles.trendLabel}>Faltas Justificadas</Text>
+                      <Text style={[
+                        styles.trendValue,
+                        { color: trend.justifiedChange <= 0 ? theme.colors.attendance.present : theme.colors.attendance.justified }
+                      ]}>
+                        {trend.justifiedChange > 0 ? '↑' : '↓'} {Math.abs(trend.justifiedChange).toFixed(1)}%
+                      </Text>
+                    </View>
+
+                    <View style={styles.trendItem}>
+                      <Text style={styles.trendLabel}>Faltas Injustificadas</Text>
+                      <Text style={[
+                        styles.trendValue,
+                        { color: trend.unjustifiedChange <= 0 ? theme.colors.attendance.present : theme.colors.attendance.unexcused }
+                      ]}>
+                        {trend.unjustifiedChange > 0 ? '↑' : '↓'} {Math.abs(trend.unjustifiedChange).toFixed(1)}%
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </Card.Content>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Modal de selección de estudiante */}
+      <Portal>
+        <Modal
+          visible={studentModalVisible}
+          onDismiss={() => setStudentModalVisible(false)}
+          contentContainerStyle={styles.modalContainer}
+        >
+          <Card>
+            <Card.Content>
+              <Text variant="titleMedium" style={styles.modalTitle}>Seleccionar Estudiante</Text>
+              <ScrollView style={styles.studentList}>
+                {students.length > 0 ? (
+                  students.map((student) => (
+                    <List.Item
+                      key={student.id}
+                      title={`${student.first_name} ${student.last_name}`}
+                      description={`${student.instrument} - ${student.student_id}`}
+                      onPress={() => {
+                        setSelectedStudent(student.id);
+                        setStudentModalVisible(false);
+                        setReportData(null);
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Text>No hay estudiantes disponibles</Text>
+                )}
+              </ScrollView>
+            </Card.Content>
+          </Card>
+        </Modal>
+      </Portal>
+    </ScrollView>
+  );
+} 

@@ -108,6 +108,33 @@ CREATE INDEX idx_student_parents_parent ON student_parents(parent_id);
 CREATE INDEX idx_attendance_student ON attendance(student_id);
 CREATE INDEX idx_attendance_date ON attendance(date);
 
+-- Índices adicionales para optimizar consultas de reportes
+CREATE INDEX idx_attendance_status_code ON attendance(status_code);
+CREATE INDEX idx_attendance_date_status ON attendance(date, status_code);
+CREATE INDEX idx_students_instrument ON students(instrument);
+CREATE INDEX idx_attendance_student_date ON attendance(student_id, date);
+
+-- Vistas materializadas para reportes frecuentes
+CREATE MATERIALIZED VIEW IF NOT EXISTS monthly_attendance_stats AS
+SELECT 
+    student_id,
+    date_trunc('month', date) as month,
+    status_code,
+    COUNT(*) as count
+FROM attendance
+GROUP BY student_id, date_trunc('month', date), status_code;
+
+CREATE INDEX idx_monthly_stats_student ON monthly_attendance_stats(student_id);
+CREATE INDEX idx_monthly_stats_month ON monthly_attendance_stats(month);
+
+-- Función para refrescar estadísticas
+CREATE OR REPLACE FUNCTION refresh_attendance_stats()
+RETURNS void AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW monthly_attendance_stats;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Trigger para actualizar updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

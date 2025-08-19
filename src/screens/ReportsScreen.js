@@ -1,9 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions, SafeAreaView } from 'react-native';
-import { Text, Card, Chip, Button, SegmentedButtons, Portal, Modal, List, Appbar } from 'react-native-paper';
+import { 
+  View, 
+  StyleSheet, 
+  ScrollView, 
+  Dimensions, 
+  SafeAreaView, 
+  TouchableOpacity, 
+  Platform, 
+  StatusBar 
+} from 'react-native';
+import { 
+  Text, 
+  Card, 
+  Chip, 
+  Button, 
+  SegmentedButtons, 
+  Portal, 
+  Modal, 
+  List, 
+  Appbar, 
+  Surface, 
+  Icon 
+} from 'react-native-paper';
 import { supabase } from '../config/supabase';
 import { PieChart, BarChart } from 'react-native-chart-kit';
-import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '../theme';
+import { 
+  COLORS, 
+  SPACING, 
+  TYPOGRAPHY, 
+  BORDER_RADIUS, 
+  SHADOWS, 
+  THEME_NAMES, 
+  mondayStyles 
+} from '../theme';
 import { useAppTheme } from '../theme';
 
 const screenWidth = Dimensions.get('window').width;
@@ -12,8 +41,16 @@ const screenWidth = Dimensions.get('window').width;
 const ORGANIZATION_ID = 'a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4';
 const PROGRAM_ID = '9d7dc91c-7bbe-49cd-bc64-755467bf91da';
 
+// Colores de asistencia para los gráficos
+const ATTENDANCE_COLORS = {
+  present: '#4CAF50',    // Verde
+  justified: '#FF9800',  // Naranja
+  unexcused: '#F44336'   // Rojo
+};
+
 export default function ReportsScreen() {
-  const { theme, isDark } = useAppTheme();
+  const { theme, isDark, themeType } = useAppTheme();
+  const isMondayTheme = themeType === THEME_NAMES.MONDAY;
   const [reportType, setReportType] = useState('group');
   const [periodType, setPeriodType] = useState('week');
   const [selectedInstrument, setSelectedInstrument] = useState('all');
@@ -158,6 +195,12 @@ export default function ReportsScreen() {
 
   // Generar reporte
   const generateReport = async () => {
+    if (reportType === 'individual' && !selectedStudent) {
+      // Si es un reporte individual y no hay estudiante seleccionado, mostrar error
+      alert('Por favor seleccione un estudiante para generar el reporte individual');
+      return;
+    }
+
     setLoading(true);
     try {
       const now = new Date();
@@ -188,7 +231,7 @@ export default function ReportsScreen() {
       const stats = await calculateAttendanceStats(
         startDate,
         endDate,
-        reportType === 'individual' ? selectedStudent : null
+        reportType === 'individual' ? selectedStudent.id : null
       );
 
       // Actualizar el estado con los resultados
@@ -197,7 +240,7 @@ export default function ReportsScreen() {
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
         report_scope: reportType === 'individual' ? 'student' : 'group',
-        student_id: reportType === 'individual' ? selectedStudent : null,
+        student_id: reportType === 'individual' ? selectedStudent.id : null,
         instrument_filter: selectedInstrument === 'all' ? null : selectedInstrument,
         ...stats
       });
@@ -230,36 +273,34 @@ export default function ReportsScreen() {
   };
 
   // Función para formatear porcentajes
-  const formatPercentage = (value) => {
-    return `${value.toFixed(1)}%`;
+  const formatPercentage = (percentage) => {
+    const rounded = Math.round(percentage * 10) / 10;
+    return rounded.toFixed(1);
   };
 
   // Datos para el gráfico circular modificado
   const getPieChartData = (data) => {
     if (!data) return [];
-
+    
     return [
-      {
-        name: `${data.total_attendance} Asistencias`,
-        population: data.total_attendance || 0.1,
-        color: COLORS.attendance.present,
-        legendFontColor: theme.colors.text,
-        legendFontSize: 16,
-      },
-      {
-        name: `${data.total_excused_absences} Faltas Justificadas`,
-        population: data.total_excused_absences || 0.1,
-        color: COLORS.attendance.justified,
-        legendFontColor: theme.colors.text,
-        legendFontSize: 16,
-      },
-      {
-        name: `${data.total_unexcused_absences} Faltas Injustificadas`, 
-        population: data.total_unexcused_absences || 0.1,
-        color: COLORS.attendance.unexcused,
-        legendFontColor: theme.colors.text,
-        legendFontSize: 16,
-      },
+        {
+            name: 'Presentes',
+            population: data.total_attendance || 0,
+            color: ATTENDANCE_COLORS.present,
+            legendFontColor: theme.colors.text
+        },
+        {
+            name: 'Faltas Justificadas',
+            population: data.total_excused_absences || 0,
+            color: ATTENDANCE_COLORS.justified,
+            legendFontColor: theme.colors.text
+        },
+        {
+            name: 'Faltas Injustificadas',
+            population: data.total_unexcused_absences || 0,
+            color: ATTENDANCE_COLORS.unexcused,
+            legendFontColor: theme.colors.text
+        }
     ];
   };
 
@@ -333,12 +374,19 @@ export default function ReportsScreen() {
 
   // Configuración común para los gráficos
   const chartConfig = {
-    backgroundGradientFrom: theme.colors.surface,
-    backgroundGradientTo: theme.colors.surface,
-    color: (opacity = 1) => theme.colors.text,
+    backgroundGradientFrom: isMondayTheme ? theme.colors.surface : theme.colors.surface,
+    backgroundGradientTo: isMondayTheme ? theme.colors.surface : theme.colors.surface,
+    color: (opacity = 1) => isMondayTheme 
+      ? `rgba(${parseInt(theme.colors.primary.slice(1, 3), 16)}, ${parseInt(theme.colors.primary.slice(3, 5), 16)}, ${parseInt(theme.colors.primary.slice(5, 7), 16)}, ${opacity})`
+      : `rgba(33, 150, 243, ${opacity})`,
     strokeWidth: 2,
     barPercentage: 0.5,
     useShadowColorFromDataset: false,
+    labelColor: (opacity = 1) => theme.colors.text,
+    decimalPlaces: 1,
+    propsForLabels: {
+      fontWeight: isMondayTheme ? '600' : '500',
+    }
   };
 
   const styles = StyleSheet.create({
@@ -346,207 +394,139 @@ export default function ReportsScreen() {
       flex: 1,
       backgroundColor: theme.colors.background,
     },
+    safeArea: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
     contentContainer: {
       padding: SPACING.md,
-      paddingTop: SPACING.xs,
+      paddingTop: SPACING.md,
       paddingBottom: SPACING.xl,
     },
-    header: {
-      backgroundColor: theme.colors.surface,
-      elevation: 1,
+    appBar: {
+      backgroundColor: isMondayTheme ? theme.colors.surface : theme.colors.elevation.level1,
+      elevation: isMondayTheme ? 0 : 4,
+      shadowOpacity: isMondayTheme ? 0 : 0.3,
+      borderBottomWidth: isMondayTheme ? 1 : 0,
+      borderBottomColor: isMondayTheme ? theme.colors.outline : 'transparent'
     },
     card: {
       marginVertical: SPACING.xs,
+      marginHorizontal: SPACING.xs,
       backgroundColor: theme.colors.surface,
-      ...SHADOWS.small,
-      borderRadius: BORDER_RADIUS.lg,
-      overflow: 'hidden',
-      elevation: 1,
+      borderRadius: isMondayTheme ? BORDER_RADIUS.sm : BORDER_RADIUS.md,
+      ...(isMondayTheme ? {} : SHADOWS.md),
     },
-    section: {
-      marginBottom: SPACING.sm,
-    },
-    sectionTitle: {
-      marginBottom: SPACING.xs,
-      color: theme.colors.primary,
-      fontSize: 16,
-      fontWeight: '600',
-      letterSpacing: 0.5,
-      textAlign: 'center',
-    },
-    chip: {
-      margin: SPACING.xs / 2,
-      height: 40,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: theme.colors.outline,
-      paddingHorizontal: 6,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    selectedChip: {
-      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-      borderColor: theme.colors.primary,
-    },
-    chipLabel: {
-      fontSize: 15,
-      fontWeight: '500',
-      paddingHorizontal: 2,
-      textAlign: 'center',
-      lineHeight: 20,
-    },
-    selectedChipLabel: {
-      color: theme.colors.primary,
-      fontWeight: '600',
-    },
-    generateButton: {
-      marginTop: SPACING.sm,
-      marginBottom: SPACING.xs,
-      borderRadius: 28,
-      height: 52,
-      ...SHADOWS.medium,
-      elevation: 3,
-    },
-    generateButtonContent: {
-      height: 52,
-      paddingHorizontal: SPACING.md,
-    },
-    generateButtonLabel: {
-      fontSize: 16,
-      fontWeight: '600',
-      letterSpacing: 0.5,
-    },
-    segmentedButtons: {
+    chartCard: {
       marginVertical: SPACING.xs,
-      height: 40,
-    },
-    reportCard: {
-      minHeight: 200,
+      marginHorizontal: SPACING.xs,
       backgroundColor: theme.colors.surface,
-      borderRadius: BORDER_RADIUS.lg,
-      overflow: 'hidden',
-    },
-    modalContainer: {
-      backgroundColor: theme.colors.surface,
-      margin: SPACING.lg,
-      borderRadius: BORDER_RADIUS.lg,
-      ...SHADOWS.medium,
-      elevation: 3,
-      maxWidth: 350,
-      alignSelf: 'center',
-      width: '90%',
-    },
-    modalTitle: {
-      marginBottom: SPACING.md,
-      color: theme.colors.primary,
-      fontSize: 18,
-      fontWeight: '600',
-      textAlign: 'center',
-      letterSpacing: 0.25,
-    },
-    studentList: {
-      maxHeight: 350,
-    },
-    studentItem: {
-      borderBottomWidth: 1,
-      borderBottomColor: 'rgba(0, 0, 0, 0.06)',
-      paddingVertical: SPACING.xs,
-    },
-    studentName: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: theme.colors.text,
-    },
-    studentDescription: {
-      fontSize: 14,
-      color: theme.colors.text,
-      opacity: 0.7,
+      borderRadius: isMondayTheme ? BORDER_RADIUS.sm : BORDER_RADIUS.md,
+      padding: SPACING.sm,
+      ...(isMondayTheme ? {} : SHADOWS.md),
     },
     studentButton: {
-      borderRadius: BORDER_RADIUS.lg,
       borderColor: theme.colors.outline,
-      height: 48,
+      borderRadius: isMondayTheme ? BORDER_RADIUS.xs : BORDER_RADIUS.sm,
+      marginTop: SPACING.xs,
     },
     studentButtonContent: {
       height: 48,
+      justifyContent: 'flex-start',
     },
-    statsGrid: {
+    section: {
+      marginVertical: SPACING.xs,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: SPACING.xs,
+      color: theme.colors.primary,
+    },
+    segmentedButtons: {
+      marginTop: SPACING.xs,
+      height: 40,
+    },
+    filterChip: {
+      margin: SPACING.xs / 2,
+      backgroundColor: theme.colors.surfaceVariant,
+      borderRadius: isMondayTheme ? BORDER_RADIUS.xs : BORDER_RADIUS.md,
+    },
+    filtersContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: SPACING.md,
+      flexWrap: 'wrap',
+      margin: -SPACING.xs / 2,
     },
     statCard: {
       flex: 1,
+      marginVertical: SPACING.xxs,
       marginHorizontal: SPACING.xxs,
       backgroundColor: theme.colors.surface,
-      ...SHADOWS.medium,
-      borderRadius: BORDER_RADIUS.md,
-      padding: 0,
-      elevation: 4,
-      borderWidth: 0.5,
-      borderColor: 'rgba(0, 0, 0, 0.05)',
+      borderRadius: isMondayTheme ? BORDER_RADIUS.xs : BORDER_RADIUS.md,
+      elevation: isMondayTheme ? 0 : 2,
+      borderWidth: isMondayTheme ? 1 : 0,
+      borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+      padding: SPACING.xs,
     },
-    statNumber: {
-      ...TYPOGRAPHY.title1,
-      textAlign: 'center',
-      marginBottom: 0,
-      marginTop: SPACING.xs,
-      fontSize: 30,
-      fontWeight: '700',
-    },
-    statLabel: {
-      textAlign: 'center',
-      color: theme.colors.text,
+    statTitle: {
       fontSize: 15,
-      marginBottom: 2,
       fontWeight: '500',
+      color: theme.colors.onSurface,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    statValue: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginVertical: 4,
     },
     percentageValue: {
+      fontSize: 16,
       textAlign: 'center',
-      fontSize: 17,
-      fontWeight: '600',
-      marginBottom: SPACING.xs,
+      color: theme.colors.onSurfaceVariant,
+      fontWeight: '500',
     },
     chartContainer: {
-      marginTop: SPACING.sm,
-      marginBottom: SPACING.md,
-      alignItems: 'center',
-      paddingHorizontal: 0,
+      width: '100%',
+      marginVertical: SPACING.md,
     },
     chartContent: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      alignItems: 'center',
+      justifyContent: 'center',
       width: '100%',
-      marginTop: SPACING.sm,
       paddingHorizontal: SPACING.sm,
     },
     pieContainer: {
-      width: '42%',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingLeft: 150,
+      height: 180,
+      width: '50%',
+      paddingRight: SPACING.xs,
     },
     legendContainer: {
-      width: '58%',
+      flexDirection: 'column',
       justifyContent: 'center',
+      width: '50%',
       paddingLeft: SPACING.sm,
+      alignItems: 'flex-start',
     },
     legendItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: SPACING.md,
+      marginBottom: SPACING.sm,
     },
     legendColor: {
-      width: 16,
-      height: 16,
-      borderRadius: 8,
+      width: 14,
+      height: 14,
+      borderRadius: isMondayTheme ? 2 : 7,
       marginRight: SPACING.sm,
     },
     legendText: {
-      fontSize: 16,
-      fontWeight: '500',
       color: theme.colors.text,
-      flexShrink: 1,
+      fontSize: 13,
+      fontWeight: isMondayTheme ? '500' : '400',
     },
     chartTitle: {
       marginBottom: SPACING.sm,
@@ -612,228 +592,900 @@ export default function ReportsScreen() {
       marginVertical: SPACING.xxs,
       gap: 8,
     },
+    studentList: {
+      maxHeight: 350,
+    },
+    studentItem: {
+      paddingVertical: SPACING.xs,
+      borderBottomWidth: 1,
+      borderBottomColor: theme => theme.colors.outlineVariant,
+    },
+    studentName: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: theme => theme.colors.text,
+    },
+    studentDescription: {
+      fontSize: 14,
+      color: theme => theme.colors.onSurfaceVariant,
+    },
+    modalContainer: {
+      backgroundColor: 'white',
+      width: '80%',
+      alignSelf: 'center',
+      maxHeight: '80%',
+      borderRadius: 0,
+      borderWidth: 1,
+      borderColor: theme.colors.outline,
+      overflow: 'hidden'
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '500',
+      color: theme.colors.primary,
+      marginBottom: SPACING.md,
+      textAlign: 'center'
+    },
+    generateButton: {
+      marginVertical: SPACING.md,
+      borderRadius: BORDER_RADIUS.sm,
+    },
+    filterSection: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: isMondayTheme ? 0 : BORDER_RADIUS.md,
+      borderWidth: isMondayTheme ? 1 : 0,
+      borderColor: isMondayTheme ? theme.colors.outline : 'transparent',
+      elevation: isMondayTheme ? 0 : 1,
+      overflow: 'hidden',
+      marginBottom: SPACING.md,
+    },
+    filterTitle: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: theme.colors.onSurfaceVariant,
+      paddingHorizontal: SPACING.md,
+      paddingTop: SPACING.sm,
+      paddingBottom: SPACING.xs,
+    },
   });
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Appbar.Header style={[styles.header, { elevation: 0, height: 48 }]}>
-        <Appbar.Content title="Reportes y Estadísticas" titleStyle={{ fontWeight: '500', fontSize: 18 }} />
-      </Appbar.Header>
-      
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Card style={styles.card} mode="elevated">
-          <Card.Content style={{ padding: SPACING.sm, paddingBottom: SPACING.xs }}>
-            {/* Selector de Tipo de Reporte */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Tipo de Reporte</Text>
-              <SegmentedButtons
-                value={reportType}
-                onValueChange={(value) => {
-                  setReportType(value);
-                  setSelectedStudent(null);
-                  setReportData(null);
-                }}
-                buttons={[
-                  { value: 'group', label: 'Grupal', icon: 'account-group' },
-                  { value: 'individual', label: 'Individual', icon: 'account' },
-                ]}
-                style={styles.segmentedButtons}
-                theme={{
-                  colors: {
-                    secondaryContainer: 'rgba(103, 80, 164, 0.15)',
-                    onSecondaryContainer: theme.colors.primary,
-                    outline: 'rgba(121, 116, 126, 0.12)'
-                  }
-                }}
-                density="medium"
+  // Estilos para los chips de filtro
+  const getChipStyle = (isSelected) => [
+    styles.filterChip,
+    isMondayTheme && {
+      backgroundColor: isSelected ? theme.colors.primary + '20' : theme.colors.surface,
+      borderWidth: 1,
+      borderColor: isSelected ? theme.colors.primary : theme.colors.outline,
+      borderRadius: BORDER_RADIUS.xs
+    }
+  ];
+
+  // Obtiene el estilo del texto para los chips
+  const getChipTextStyle = (isSelected) => ({ 
+    color: isSelected ? theme.colors.primary : theme.colors.onSurfaceVariant,
+    fontWeight: isSelected && isMondayTheme ? '600' : '400'
+  });
+
+  // Renderizar la sección de selección de estudiante
+  const renderStudentSelector = () => (
+    <Surface 
+      style={{
+        width: '100%',
+        marginBottom: SPACING.md,
+        borderRadius: 0,
+        borderWidth: 1,
+        borderColor: theme.colors.outline,
+        elevation: 0,
+        overflow: 'hidden'
+      }}
+    >
+      <View
+        style={{
+          height: 56,
+          width: '100%',
+          flexDirection: 'row',
+        }}
+      >
+        {/* Área izquierda - Reporte Individual */}
+        <TouchableOpacity
+          onPress={() => {
+            setReportType('individual');
+            setSelectedStudent(null);
+            setReportData(null);
+          }}
+          style={{
+            width: '33%',
+            backgroundColor: reportType === 'individual' ? theme.colors.primary : '#f0f0f5',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRightWidth: 1,
+            borderRightColor: theme.colors.outline,
+          }}
+        >
+          <Icon 
+            source="account" 
+            size={22} 
+            color={reportType === 'individual' ? 'white' : theme.colors.primary} 
+            style={{marginBottom: 2}} 
+          />
+          <Text style={{
+            color: reportType === 'individual' ? 'white' : theme.colors.primary,
+            fontSize: 13,
+            fontWeight: '500'
+          }}>
+            Individual
+          </Text>
+        </TouchableOpacity>
+
+        {/* Área central - Icono de Reporte */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            paddingHorizontal: 12,
+            backgroundColor: 'white',
+            borderLeftWidth: 1,
+            borderRightWidth: 1,
+            borderLeftColor: theme.colors.outline,
+            borderRightColor: theme.colors.outline,
+          }}
+        >
+          <Icon 
+            source="file-chart" 
+            size={28} 
+            color={theme.colors.primary} 
+          />
+          <Text style={{ 
+            color: theme.colors.primary,
+            fontSize: 16,
+            fontWeight: '500',
+            marginLeft: 8
+          }}>
+            Reportes
+          </Text>
+        </View>
+        
+        {/* Área derecha - Reporte Grupal */}
+        <TouchableOpacity
+          onPress={() => {
+            setReportType('group');
+            setReportData(null);
+          }}
+          style={{
+            width: '33%',
+            backgroundColor: reportType === 'group' ? theme.colors.primary : '#f0f0f5',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderLeftWidth: 1,
+            borderLeftColor: theme.colors.outline,
+          }}
+        >
+          <Icon 
+            source="account-group" 
+            size={22} 
+            color={reportType === 'group' ? 'white' : theme.colors.primary} 
+            style={{marginBottom: 2}} 
+          />
+          <Text style={{
+            color: reportType === 'group' ? 'white' : theme.colors.primary,
+            fontSize: 13,
+            fontWeight: '500'
+          }}>
+            Grupal
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </Surface>
+  );
+
+  const renderStatCard = (title, value, percentage, color) => (
+    <Card 
+      style={[
+        styles.statCard, 
+        isMondayTheme && mondayStyles.card(theme)
+      ]} 
+      elevation={isMondayTheme ? 0 : 2}
+    >
+      <Card.Content style={{ padding: SPACING.sm, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={styles.statTitle}>{title}</Text>
+        <Text style={[styles.statValue, { color: color || theme.colors.primary }]}>
+          {value}
+        </Text>
+        {percentage !== undefined && (
+          <Text style={[styles.percentageValue, { color: color || theme.colors.onSurfaceVariant }]}>
+            {percentage}%
+          </Text>
+        )}
+      </Card.Content>
+    </Card>
+  );
+
+  // Renderizar el modal de selección de estudiante
+  const renderStudentModal = () => (
+    <Portal>
+      <Modal
+        visible={studentModalVisible}
+        onDismiss={() => setStudentModalVisible(false)}
+        contentContainerStyle={{
+          backgroundColor: 'white',
+          width: '80%',
+          alignSelf: 'center',
+          maxHeight: '80%',
+          borderRadius: 0, 
+          borderWidth: 1,
+          borderColor: theme.colors.outline,
+          overflow: 'hidden'
+        }}
+      >
+        <ScrollView style={{ paddingTop: 8 }}>
+          {students.map(student => (
+            <TouchableOpacity
+              key={student.id}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 12,
+                borderBottomWidth: 1,
+                borderBottomColor: '#f0f0f5',
+                backgroundColor: selectedStudent && selectedStudent.id === student.id ? `${theme.colors.primary}15` : 'transparent'
+              }}
+              onPress={() => {
+                setSelectedStudent(student);
+                setStudentModalVisible(false);
+                setReportData(null);
+              }}
+            >
+              <Icon 
+                source="account" 
+                size={24} 
+                color={theme.colors.primary} 
+                style={{ marginRight: 12 }} 
               />
-            </View>
-
-            {/* Selector de Estudiante para reportes individuales */}
-            {reportType === 'individual' && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Estudiante</Text>
-                <Button
-                  mode="outlined"
-                  onPress={() => setStudentModalVisible(true)}
-                  style={styles.studentButton}
-                  contentStyle={styles.studentButtonContent}
-                  labelStyle={{ fontSize: 15 }}
-                  icon="account"
-                >
-                  {selectedStudent ? 
-                    (() => {
-                      const student = students.find(s => s.id === selectedStudent);
-                      return student ? `${student.first_name} ${student.last_name}` : 'Seleccionar Estudiante';
-                    })()
-                    : 'Seleccionar Estudiante'}
-                </Button>
-              </View>
-            )}
-
-            {/* Selector de Período */}
-            <View style={[styles.section, {marginBottom: SPACING.xs}]}>
-              <Text style={styles.sectionTitle}>Período</Text>
-              <SegmentedButtons
-                value={periodType}
-                onValueChange={(value) => {
-                  setPeriodType(value);
-                  setReportData(null);
-                }}
-                buttons={[
-                  { value: 'week', label: 'Semanal' },
-                  { value: 'month', label: 'Mensual' },
-                  { value: 'year', label: 'Anual' },
-                ]}
-                style={styles.segmentedButtons}
-                theme={{
-                  colors: {
-                    secondaryContainer: 'rgba(103, 80, 164, 0.15)',
-                    onSecondaryContainer: theme.colors.primary,
-                    outline: 'rgba(121, 116, 126, 0.12)'
-                  },
-                  fonts: {
-                    labelMedium: { fontSize: 14 }
-                  },
-                  icon: {
-                    size: 24
-                  }
-                }}
-                density="medium"
-              />
-            </View>
-
-            {/* Filtro de Instrumentos */}
-            <View style={[styles.filtersContainer, {marginTop: SPACING.xs}]}>
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
-                  Instrumento
+              <View style={{ paddingLeft: 20 }}>
+                <Text style={{ 
+                  fontWeight: '500',
+                  fontSize: 16,
+                  color: theme.colors.text
+                }}>
+                  {student.first_name} {student.last_name}
+                </Text>
+                <Text style={{ 
+                  fontSize: 14,
+                  color: theme.colors.outline,
+                  marginTop: 2
+                }}>
+                  {student.instrument || 'Not assigned'}
                 </Text>
               </View>
-              
-              {/* Primera fila: Violin, Viola, Cello, Bass */}
-              <View style={styles.filtersRow}>
-                <Chip
-                  selected={selectedInstrument === 'Violin'}
-                  onPress={() => setSelectedInstrument('Violin')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'Violin' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                >
-                  Violin
-                </Chip>
-                
-                <Chip
-                  selected={selectedInstrument === 'Viola'}
-                  onPress={() => setSelectedInstrument('Viola')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'Viola' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                >
-                  Viola
-                </Chip>
-                
-                <Chip
-                  selected={selectedInstrument === 'Cello'}
-                  onPress={() => setSelectedInstrument('Cello')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'Cello' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                >
-                  Cello
-                </Chip>
-                
-                <Chip
-                  selected={selectedInstrument === 'Bass'}
-                  onPress={() => setSelectedInstrument('Bass')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'Bass' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                >
-                  Bass
-                </Chip>
+              {selectedStudent && selectedStudent.id === student.id && (
+                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                  <Icon 
+                    source="check-circle" 
+                    size={20} 
+                    color={theme.colors.primary} 
+                  />
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        
+        <TouchableOpacity
+          style={{
+            padding: 16,
+            alignItems: 'center',
+            borderTopWidth: 1,
+            borderTopColor: theme.colors.outline,
+          }}
+          onPress={() => setStudentModalVisible(false)}
+        >
+          <Text style={{ 
+            color: theme.colors.primary,
+            fontWeight: '500'
+          }}>
+            Cancelar
+          </Text>
+        </TouchableOpacity>
+      </Modal>
+    </Portal>
+  );
+
+  // Renderizar la sección de reportes de grupo
+  const renderGroupFilters = () => (
+    <Card 
+      style={[
+        styles.card, 
+        isMondayTheme && mondayStyles.card(theme)
+      ]} 
+      elevation={isMondayTheme ? 0 : 1}
+    >
+      <Card.Content>
+        <Text style={[styles.sectionTitle, isMondayTheme && { color: theme.colors.primary }]}>
+          Filtros de Grupo
+        </Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          <Chip 
+            selected={selectedInstrument === 'all'} 
+            onPress={() => setSelectedInstrument('all')}
+            style={[
+              styles.filterChip,
+              isMondayTheme && {
+                backgroundColor: selectedInstrument === 'all' 
+                  ? theme.colors.primary + '20' : theme.colors.surface
+              }
+            ]}
+            textStyle={{ 
+              color: selectedInstrument === 'all' ? 
+                theme.colors.primary : theme.colors.onSurfaceVariant 
+            }}
+          >
+            Todos
+          </Chip>
+          
+          {instruments.map(instrument => (
+            <Chip
+              key={instrument}
+              selected={selectedInstrument === instrument}
+              onPress={() => setSelectedInstrument(instrument)}
+              style={[
+                styles.filterChip,
+                isMondayTheme && {
+                  backgroundColor: selectedInstrument === instrument ? 
+                    theme.colors.primary + '20' : theme.colors.surface
+                }
+              ]}
+              textStyle={{ 
+                color: selectedInstrument === instrument ? 
+                  theme.colors.primary : theme.colors.onSurfaceVariant 
+              }}
+            >
+              {instrument}
+            </Chip>
+          ))}
+        </ScrollView>
+      </Card.Content>
+    </Card>
+  );
+
+  // Renderizar la sección de gráficos
+  const renderChart = () => {
+    // Solo renderizar si tenemos datos
+    if (!reportData) return null;
+    
+    const chartData = getPieChartData(reportData);
+    
+    return (
+      <Card 
+        style={[
+          styles.chartCard, 
+          isMondayTheme && mondayStyles.card(theme)
+        ]} 
+        elevation={isMondayTheme ? 0 : 2}
+      >
+        <Card.Title
+          title="Resumen de Asistencia"
+          titleStyle={{
+            color: theme.colors.primary,
+            fontWeight: isMondayTheme ? '600' : '500',
+            fontSize: 16
+          }}
+        />
+        <Card.Content>
+          <View style={styles.chartContainer}>
+            <View style={styles.chartContent}>
+              <View style={[
+                styles.pieContainer, 
+                isMondayTheme && { borderRadius: BORDER_RADIUS.sm }
+              ]}>
+                <PieChart
+                  data={chartData}
+                  width={screenWidth * 0.45}
+                  height={180}
+                  chartConfig={{
+                    ...chartConfig,
+                    color: (opacity = 1) => theme.colors.text,
+                  }}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  absolute={false}
+                  hasLegend={false}
+                  paddingLeft={screenWidth * 0.06}
+                />
               </View>
               
-              {/* Segunda fila: Todos y Not Assigned */}
-              <View style={[styles.filtersRow, { marginTop: 8 }]}>
-                <Chip
-                  selected={selectedInstrument === 'all'}
-                  onPress={() => setSelectedInstrument('all')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'all' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                  icon={selectedInstrument === 'all' ? 'check' : null}
-                >
-                  Todos
-                </Chip>
-                
-                <Chip
-                  selected={selectedInstrument === 'Not assigned'}
-                  onPress={() => setSelectedInstrument('Not assigned')}
-                  style={[
-                    styles.chip,
-                    selectedInstrument === 'Not assigned' && { 
-                      backgroundColor: 'rgba(103, 80, 164, 0.08)',
-                      borderColor: theme.colors.primary
-                    }
-                  ]}
-                  mode="outlined"
-                  selectedColor={theme.colors.primary}
-                >
-                  Not Assigned
-                </Chip>
+              <View style={styles.legendContainer}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.present }]} />
+                  <Text style={styles.legendText}>{reportData.total_attendance} Asistencias</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.justified }]} />
+                  <Text style={styles.legendText}>{reportData.total_excused_absences} Faltas Justificadas</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.unexcused }]} />
+                  <Text style={styles.legendText}>{reportData.total_unexcused_absences} Faltas Injustificadas</Text>
+                </View>
               </View>
             </View>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
 
-            {/* Botón Generar Reporte */}
-            <Button
-              mode="contained"
-              onPress={generateReport}
-              style={[styles.generateButton, {marginTop: SPACING.md}]}
-              contentStyle={styles.generateButtonContent}
-              loading={loading}
-              disabled={reportType === 'individual' && !selectedStudent}
-              icon="chart-box"
-              labelStyle={styles.generateButtonLabel}
+  // Renderizar el botón de generación de reporte
+  const renderGenerateButton = () => (
+    <Button
+      mode={isMondayTheme ? "outlined" : "contained"}
+      icon="chart-bar"
+      onPress={generateReport}
+      style={[
+        styles.generateButton,
+        isMondayTheme ? {
+          borderColor: theme.colors.primary,
+          borderWidth: 2,
+          backgroundColor: 'transparent',
+          elevation: 0
+        } : {
+          backgroundColor: theme.colors.primary,
+          elevation: 2
+        }
+      ]}
+      contentStyle={{ height: 48 }}
+      labelStyle={{ 
+        fontSize: 16, 
+        fontWeight: '600',
+        color: isMondayTheme ? theme.colors.primary : theme.colors.onPrimary
+      }}
+      loading={loading}
+      disabled={loading || (reportType === 'individual' && !selectedStudent)}
+    >
+      Generar Reporte
+    </Button>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        {/* Cabecera con tipo de reporte - estructura como AttendanceRegistrationScreen */}
+        <Surface
+          style={{
+            width: '100%',
+            marginBottom: SPACING.md,
+            marginTop: Platform.OS === 'ios' ? 35 : 45,
+            borderRadius: 0,
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+            elevation: 0,
+            overflow: 'hidden'
+          }}
+        >
+          <View
+            style={{
+              height: 56,
+              width: '100%',
+              flexDirection: 'row',
+            }}
+          >
+            {/* Área izquierda - Reporte Individual */}
+            <TouchableOpacity
+              onPress={() => {
+                setReportType('individual');
+                setSelectedStudent(null);
+                setReportData(null);
+              }}
+              style={{
+                width: '33%',
+                backgroundColor: reportType === 'individual' ? theme.colors.primary : '#f0f0f5',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRightWidth: 1,
+                borderRightColor: theme.colors.outline,
+              }}
             >
-              Generar Reporte
-            </Button>
-          </Card.Content>
-        </Card>
+              <Icon 
+                source="account" 
+                size={22} 
+                color={reportType === 'individual' ? 'white' : theme.colors.primary} 
+                style={{marginBottom: 2}} 
+              />
+              <Text style={{
+                color: reportType === 'individual' ? 'white' : theme.colors.primary,
+                fontSize: 13,
+                fontWeight: '500'
+              }}>
+                Individual
+              </Text>
+            </TouchableOpacity>
+
+            {/* Área central - Icono de Reporte */}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+                paddingHorizontal: 12,
+                backgroundColor: 'white',
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderLeftColor: theme.colors.outline,
+                borderRightColor: theme.colors.outline,
+              }}
+            >
+              <Icon 
+                source="file-chart" 
+                size={28} 
+                color={theme.colors.primary} 
+              />
+              <Text style={{ 
+                color: theme.colors.primary,
+                fontSize: 16,
+                fontWeight: '500',
+                marginLeft: 8
+              }}>
+                Reportes
+              </Text>
+            </View>
+            
+            {/* Área derecha - Reporte Grupal */}
+            <TouchableOpacity
+              onPress={() => {
+                setReportType('group');
+                setReportData(null);
+              }}
+              style={{
+                width: '33%',
+                backgroundColor: reportType === 'group' ? theme.colors.primary : '#f0f0f5',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderLeftWidth: 1,
+                borderLeftColor: theme.colors.outline,
+              }}
+            >
+              <Icon 
+                source="account-group" 
+                size={22} 
+                color={reportType === 'group' ? 'white' : theme.colors.primary} 
+                style={{marginBottom: 2}} 
+              />
+              <Text style={{
+                color: reportType === 'group' ? 'white' : theme.colors.primary,
+                fontSize: 13,
+                fontWeight: '500'
+              }}>
+                Grupal
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Surface>
+        
+        {reportType === 'individual' && (
+          <Surface 
+            style={{
+              width: '100%',
+              marginBottom: SPACING.md,
+              borderRadius: 0,
+              borderWidth: 1,
+              borderColor: theme.colors.outline,
+              elevation: 0,
+              overflow: 'hidden'
+            }}
+          >
+            <View
+              style={{
+                height: 56,
+                width: '100%',
+                flexDirection: 'row',
+                backgroundColor: theme.colors.primary, // Color azul
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{
+                  color: 'white',
+                  fontSize: 16,
+                  fontWeight: '500',
+                }}>
+                  Estudiante
+                </Text>
+              </View>
+            </View>
+            
+            <TouchableOpacity
+              onPress={() => setStudentModalVisible(true)}
+              style={{
+                height: 56,
+                paddingHorizontal: SPACING.md,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                backgroundColor: '#f0f0f5',
+                flexDirection: 'row',
+                borderTopWidth: 1,
+                borderTopColor: theme.colors.outline,
+              }}
+            >
+              <View style={{ width: 40, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon 
+                  source={selectedStudent ? "account-check" : "account-plus"} 
+                  size={22} 
+                  color={theme.colors.primary} 
+                />
+              </View>
+              <Text style={{ 
+                color: selectedStudent ? theme.colors.text : '#666666',
+                fontSize: 15,
+                fontWeight: selectedStudent ? '500' : '400',
+                marginLeft: 16
+              }}>
+                {selectedStudent ? 
+                  `${selectedStudent.first_name} ${selectedStudent.last_name}`
+                  : 'Seleccionar Estudiante'
+                }
+              </Text>
+            </TouchableOpacity>
+          </Surface>
+        )}
+        
+        {/* Selector de período - Estilo similar a la cabecera */}
+        <Surface 
+          style={{
+            width: '100%',
+            marginBottom: SPACING.md,
+            borderRadius: 0,
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+            elevation: 0,
+            overflow: 'hidden'
+          }}
+        >
+          <View
+            style={{
+              height: 56,
+              width: '100%',
+              flexDirection: 'row',
+            }}
+          >
+            {/* Período Semanal */}
+            <TouchableOpacity
+              onPress={() => {
+                setPeriodType('week');
+                setReportData(null);
+              }}
+              style={{
+                flex: 1,
+                backgroundColor: periodType === 'week' ? theme.colors.primary : '#f0f0f5',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRightWidth: 1,
+                borderRightColor: theme.colors.outline,
+              }}
+            >
+              <Icon 
+                source="calendar-week" 
+                size={22} 
+                color={periodType === 'week' ? 'white' : theme.colors.primary} 
+                style={{marginBottom: 2}} 
+              />
+              <Text style={{
+                color: periodType === 'week' ? 'white' : theme.colors.primary,
+                fontSize: 13,
+                fontWeight: '500'
+              }}>
+                Semanal
+              </Text>
+            </TouchableOpacity>
+
+            {/* Período Mensual */}
+            <TouchableOpacity
+              onPress={() => {
+                setPeriodType('month');
+                setReportData(null);
+              }}
+              style={{
+                flex: 1,
+                backgroundColor: periodType === 'month' ? theme.colors.primary : '#f0f0f5',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderLeftColor: theme.colors.outline,
+                borderRightColor: theme.colors.outline,
+              }}
+            >
+              <Icon 
+                source="calendar-month" 
+                size={22} 
+                color={periodType === 'month' ? 'white' : theme.colors.primary} 
+                style={{marginBottom: 2}} 
+              />
+              <Text style={{
+                color: periodType === 'month' ? 'white' : theme.colors.primary,
+                fontSize: 13,
+                fontWeight: '500'
+              }}>
+                Mensual
+              </Text>
+            </TouchableOpacity>
+            
+            {/* Período Anual */}
+            <TouchableOpacity
+              onPress={() => {
+                setPeriodType('year');
+                setReportData(null);
+              }}
+              style={{
+                flex: 1,
+                backgroundColor: periodType === 'year' ? theme.colors.primary : '#f0f0f5',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderLeftWidth: 1,
+                borderLeftColor: theme.colors.outline,
+              }}
+            >
+              <Icon 
+                source="calendar-today" 
+                size={22} 
+                color={periodType === 'year' ? 'white' : theme.colors.primary} 
+                style={{marginBottom: 2}} 
+              />
+              <Text style={{
+                color: periodType === 'year' ? 'white' : theme.colors.primary,
+                fontSize: 13,
+                fontWeight: '500'
+              }}>
+                Anual
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Surface>
+
+        {/* Filtro de instrumentos - con diseño mejorado */}
+        <Surface 
+          style={{
+            width: '100%',
+            marginBottom: SPACING.md,
+            borderRadius: 0,
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+            elevation: 0,
+            overflow: 'hidden'
+          }}
+        >
+          <View style={{
+            paddingHorizontal: SPACING.md,
+            paddingTop: SPACING.sm,
+            paddingBottom: SPACING.xs
+          }}>
+            <Text style={{ 
+              color: theme.colors.onSurfaceVariant,
+              fontSize: 15,
+              fontWeight: '500'
+            }}>
+              Filtrar por Instrumento
+            </Text>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ 
+              paddingHorizontal: SPACING.md, 
+              paddingBottom: SPACING.sm,
+              paddingTop: SPACING.xs
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                backgroundColor: selectedInstrument === 'all' 
+                  ? '#e8e0ff' : '#F5F5F5',
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                marginRight: 10,
+                minWidth: 80,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 0,
+                borderWidth: 1,
+                borderColor: selectedInstrument === 'all' 
+                  ? theme.colors.primary
+                  : theme.colors.outline,
+                elevation: 0,
+              }}
+              onPress={() => setSelectedInstrument('all')}
+              activeOpacity={0.7}
+            >
+              <Text style={{
+                color: selectedInstrument === 'all' ? theme.colors.primary : theme.colors.onSurfaceVariant,
+                fontWeight: selectedInstrument === 'all' ? '600' : '400',
+                fontSize: 14,
+                textAlign: 'center'
+              }}>
+                Todos
+              </Text>
+            </TouchableOpacity>
+            
+            {instruments.map(instrument => (
+              <TouchableOpacity
+                key={instrument}
+                style={{
+                  backgroundColor: selectedInstrument === instrument 
+                    ? '#e8e0ff' : '#F5F5F5',
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  marginRight: 10,
+                  minWidth: 80,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 0,
+                  borderWidth: 1,
+                  borderColor: selectedInstrument === instrument 
+                    ? theme.colors.primary
+                    : theme.colors.outline,
+                  elevation: 0,
+                }}
+                onPress={() => setSelectedInstrument(instrument)}
+                activeOpacity={0.7}
+              >
+                <Text style={{
+                  color: selectedInstrument === instrument ? theme.colors.primary : theme.colors.onSurfaceVariant,
+                  fontWeight: selectedInstrument === instrument ? '600' : '400',
+                  fontSize: 14,
+                  textAlign: 'center'
+                }}>
+                  {instrument}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </Surface>
+
+        {/* Botón de Generar Reporte */}
+        <View style={{
+          alignItems: 'center',
+          marginBottom: SPACING.md
+        }}>
+          <Button
+            mode="outlined"
+            icon="chart-bar"
+            onPress={generateReport}
+            style={{
+              height: 50,
+              borderRadius: 0,
+              borderWidth: 2,
+              borderColor: theme.colors.primary,
+              backgroundColor: 'transparent',
+              width: '60%'
+            }}
+            contentStyle={{
+              height: 50
+            }}
+            labelStyle={{ 
+              fontSize: 16, 
+              fontWeight: '600',
+              color: theme.colors.primary
+            }}
+            loading={loading}
+            disabled={loading || (reportType === 'individual' && !selectedStudent)}
+          >
+            Generar Reporte
+          </Button>
+        </View>
 
         {/* Área para mostrar el reporte */}
         {reportData && (
-          <Card style={[styles.reportCard, { marginTop: SPACING.md }]} mode="elevated">
+          <Card style={[styles.card, { marginTop: SPACING.md }]} mode="elevated">
             <Card.Content style={{ padding: SPACING.md }}>
               {/* Período del reporte */}
               <Text style={[styles.periodText, { fontSize: 18, fontWeight: '500', textAlign: 'center' }]}>
@@ -842,41 +1494,24 @@ export default function ReportsScreen() {
 
               {/* Totales en cards individuales */}
               <View style={[styles.statsGrid, { marginVertical: SPACING.md }]}>
-                <Card style={styles.statCard}>
-                  <Card.Content style={{ padding: SPACING.sm }}>
-                    <Text variant="titleLarge" style={[styles.statNumber, { color: COLORS.attendance.present }]}>
-                      {reportData.total_attendance}
-                    </Text>
-                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 0}]}>Asistencias</Text>
-                    <Text style={[styles.percentageValue, { color: COLORS.attendance.present }]}>
-                      {formatPercentage(reportData.attendance_percentage)}
-                    </Text>
-                  </Card.Content>
-                </Card>
-
-                <Card style={styles.statCard}>
-                  <Card.Content style={{ padding: SPACING.sm }}>
-                    <Text variant="titleLarge" style={[styles.statNumber, { color: COLORS.attendance.justified }]}>
-                      {reportData.total_excused_absences}
-                    </Text>
-                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 0}]}>Justificadas</Text>
-                    <Text style={[styles.percentageValue, { color: COLORS.attendance.justified }]}>
-                      {formatPercentage(reportData.excused_percentage)}
-                    </Text>
-                  </Card.Content>
-                </Card>
-
-                <Card style={styles.statCard}>
-                  <Card.Content style={{ padding: SPACING.sm }}>
-                    <Text variant="titleLarge" style={[styles.statNumber, { color: COLORS.attendance.unexcused }]}>
-                      {reportData.total_unexcused_absences}
-                    </Text>
-                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 0}]}>Injustificadas</Text>
-                    <Text style={[styles.percentageValue, { color: COLORS.attendance.unexcused }]}>
-                      {formatPercentage(reportData.unexcused_percentage)}
-                    </Text>
-                  </Card.Content>
-                </Card>
+                {renderStatCard(
+                  'Asistencias', 
+                  reportData.total_attendance, 
+                  formatPercentage(reportData.attendance_percentage),
+                  ATTENDANCE_COLORS.present
+                )}
+                {renderStatCard(
+                  'Faltas Justificadas', 
+                  reportData.total_excused_absences,
+                  formatPercentage(reportData.excused_percentage),
+                  ATTENDANCE_COLORS.justified
+                )}
+                {renderStatCard(
+                  'Faltas Injustificadas', 
+                  reportData.total_unexcused_absences,
+                  formatPercentage(reportData.unexcused_percentage),
+                  ATTENDANCE_COLORS.unexcused
+                )}
               </View>
 
               {/* Gráfico circular */}
@@ -884,10 +1519,13 @@ export default function ReportsScreen() {
                 {/* Implementación personalizada del gráfico y leyenda */}
                 <View style={styles.chartContent}>
                   {/* Gráfico a la izquierda */}
-                  <View style={styles.pieContainer}>
+                  <View style={[
+                    styles.pieContainer, 
+                    isMondayTheme && { borderRadius: BORDER_RADIUS.sm }
+                  ]}>
                     <PieChart
                       data={getPieChartData(reportData)}
-                      width={screenWidth * 0.80}
+                      width={screenWidth * 0.45}
                       height={180}
                       chartConfig={{
                         ...chartConfig,
@@ -897,21 +1535,22 @@ export default function ReportsScreen() {
                       backgroundColor="transparent"
                       absolute={false}
                       hasLegend={false}
+                      paddingLeft={screenWidth * 0.06}
                     />
                   </View>
                   
                   {/* Leyenda a la derecha */}
                   <View style={styles.legendContainer}>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendColor, { backgroundColor: COLORS.attendance.present }]} />
+                      <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.present }]} />
                       <Text style={styles.legendText}>{reportData.total_attendance} Asistencias</Text>
                     </View>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendColor, { backgroundColor: COLORS.attendance.justified }]} />
+                      <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.justified }]} />
                       <Text style={styles.legendText}>{reportData.total_excused_absences} Faltas Justificadas</Text>
                     </View>
                     <View style={styles.legendItem}>
-                      <View style={[styles.legendColor, { backgroundColor: COLORS.attendance.unexcused }]} />
+                      <View style={[styles.legendColor, { backgroundColor: ATTENDANCE_COLORS.unexcused }]} />
                       <Text style={styles.legendText}>{reportData.total_unexcused_absences} Faltas Injustificadas</Text>
                     </View>
                   </View>
@@ -956,7 +1595,7 @@ export default function ReportsScreen() {
                                 <View style={{
                                   width: 20,
                                   height: `${(chartData.attendance[weekIndex] / chartData.maxValue) * 80}%`,
-                                  backgroundColor: COLORS.attendance.present,
+                                  backgroundColor: ATTENDANCE_COLORS.present,
                                   borderRadius: 3,
                                   marginHorizontal: 2,
                                   minHeight: 4,
@@ -969,7 +1608,7 @@ export default function ReportsScreen() {
                                       top: -16,
                                       fontSize: 10,
                                       fontWeight: 'bold',
-                                      color: isDark ? '#ffffff' : COLORS.attendance.present,
+                                      color: isDark ? '#ffffff' : ATTENDANCE_COLORS.present,
                                       backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'transparent',
                                       paddingHorizontal: isDark ? 3 : 0,
                                       borderRadius: isDark ? 2 : 0
@@ -983,7 +1622,7 @@ export default function ReportsScreen() {
                                 <View style={{
                                   width: 20,
                                   height: `${(chartData.justified[weekIndex] / chartData.maxValue) * 80}%`,
-                                  backgroundColor: COLORS.attendance.justified,
+                                  backgroundColor: ATTENDANCE_COLORS.justified,
                                   borderRadius: 3,
                                   marginHorizontal: 2,
                                   minHeight: 4,
@@ -996,7 +1635,7 @@ export default function ReportsScreen() {
                                       top: -16,
                                       fontSize: 10,
                                       fontWeight: 'bold',
-                                      color: isDark ? '#ffffff' : COLORS.attendance.justified,
+                                      color: isDark ? '#ffffff' : ATTENDANCE_COLORS.justified,
                                       backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'transparent',
                                       paddingHorizontal: isDark ? 3 : 0,
                                       borderRadius: isDark ? 2 : 0
@@ -1010,7 +1649,7 @@ export default function ReportsScreen() {
                                 <View style={{
                                   width: 20,
                                   height: `${(chartData.unexcused[weekIndex] / chartData.maxValue) * 80}%`,
-                                  backgroundColor: COLORS.attendance.unexcused,
+                                  backgroundColor: ATTENDANCE_COLORS.unexcused,
                                   borderRadius: 3,
                                   marginHorizontal: 2,
                                   minHeight: 4,
@@ -1023,7 +1662,7 @@ export default function ReportsScreen() {
                                       top: -16,
                                       fontSize: 10,
                                       fontWeight: 'bold',
-                                      color: isDark ? '#ffffff' : COLORS.attendance.unexcused,
+                                      color: isDark ? '#ffffff' : ATTENDANCE_COLORS.unexcused,
                                       backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'transparent',
                                       paddingHorizontal: isDark ? 3 : 0,
                                       borderRadius: isDark ? 2 : 0
@@ -1081,15 +1720,15 @@ export default function ReportsScreen() {
                     {/* Leyenda */}
                     <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 16, flexWrap: 'wrap'}}>
                       <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 16, marginBottom: 5}}>
-                        <View style={{width: 12, height: 12, backgroundColor: COLORS.attendance.present, marginRight: 5, borderRadius: 2}} />
+                        <View style={{width: 12, height: 12, backgroundColor: ATTENDANCE_COLORS.present, marginRight: 5, borderRadius: 2}} />
                         <Text style={{ color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)' }}>Asistencias</Text>
                       </View>
                       <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 16, marginBottom: 5}}>
-                        <View style={{width: 12, height: 12, backgroundColor: COLORS.attendance.justified, marginRight: 5, borderRadius: 2}} />
+                        <View style={{width: 12, height: 12, backgroundColor: ATTENDANCE_COLORS.justified, marginRight: 5, borderRadius: 2}} />
                         <Text style={{ color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)' }}>Justificadas</Text>
                       </View>
                       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}>
-                        <View style={{width: 12, height: 12, backgroundColor: COLORS.attendance.unexcused, marginRight: 5, borderRadius: 2}} />
+                        <View style={{width: 12, height: 12, backgroundColor: ATTENDANCE_COLORS.unexcused, marginRight: 5, borderRadius: 2}} />
                         <Text style={{ color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)' }}>Injustificadas</Text>
                       </View>
                     </View>
@@ -1134,12 +1773,12 @@ export default function ReportsScreen() {
                     // Función para determinar el color según el tipo y valor
                     const getTrendColor = (type, value) => {
                       if (type === 'attendance') {
-                        return value > 0 ? COLORS.attendance.present : value < 0 ? COLORS.attendance.unexcused : 
+                        return value > 0 ? ATTENDANCE_COLORS.present : value < 0 ? ATTENDANCE_COLORS.unexcused : 
                           isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
                       } else if (type === 'justified') {
-                        return value <= 0 ? COLORS.attendance.present : COLORS.attendance.justified;
+                        return value <= 0 ? ATTENDANCE_COLORS.present : ATTENDANCE_COLORS.justified;
                       } else { // unjustified
-                        return value <= 0 ? COLORS.attendance.present : COLORS.attendance.unexcused;
+                        return value <= 0 ? ATTENDANCE_COLORS.present : ATTENDANCE_COLORS.unexcused;
                       }
                     };
                     
@@ -1186,17 +1825,17 @@ export default function ReportsScreen() {
                                 {isWeek1 ? (
                                   // Para Semana 1 mostrar valores reales con porcentaje simplificado (estilo consistente)
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
-                                      color: COLORS.attendance.present,
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
+                                      color: ATTENDANCE_COLORS.present,
                                       fontSize: 24,
                                       marginTop: 10,
                                       marginBottom: 4
                                     }]}>
                                       {week1Data ? week1Data.total_attendance : 0}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Asistencias</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Asistencias</Text>
                                     <Text style={[styles.percentageValue, { 
-                                      color: COLORS.attendance.present,
+                                      color: ATTENDANCE_COLORS.present,
                                       marginBottom: 10
                                     }]}>
                                       %
@@ -1205,7 +1844,7 @@ export default function ReportsScreen() {
                                 ) : (
                                   // Para el resto de semanas mostrar tendencia
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
                                       color: getTrendColor('attendance', trend.attendanceChange),
                                       fontSize: 24,
                                       marginTop: 10,
@@ -1214,7 +1853,7 @@ export default function ReportsScreen() {
                                       {trend.attendanceChange > 0 ? '+' : ''}
                                       {Math.abs(limitPercentage(trend.attendanceChange)).toFixed(1)}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Asistencias</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Asistencias</Text>
                                     <Text style={[styles.percentageValue, { 
                                       color: getTrendColor('attendance', trend.attendanceChange),
                                       marginBottom: 10
@@ -1242,17 +1881,17 @@ export default function ReportsScreen() {
                                 {isWeek1 ? (
                                   // Para Semana 1 mostrar valores reales con porcentaje simplificado (estilo consistente)
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
-                                      color: COLORS.attendance.justified,
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
+                                      color: ATTENDANCE_COLORS.justified,
                                       fontSize: 24,
                                       marginTop: 10,
                                       marginBottom: 4
                                     }]}>
                                       {week1Data ? week1Data.total_excused_absences : 0}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Justificadas</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Justificadas</Text>
                                     <Text style={[styles.percentageValue, { 
-                                      color: COLORS.attendance.justified,
+                                      color: ATTENDANCE_COLORS.justified,
                                       marginBottom: 10
                                     }]}>
                                       %
@@ -1261,7 +1900,7 @@ export default function ReportsScreen() {
                                 ) : (
                                   // Para el resto de semanas mostrar tendencia
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
                                       color: getTrendColor('justified', trend.justifiedChange),
                                       fontSize: 24,
                                       marginTop: 10,
@@ -1270,7 +1909,7 @@ export default function ReportsScreen() {
                                       {trend.justifiedChange > 0 ? '+' : ''}
                                       {Math.abs(limitPercentage(trend.justifiedChange)).toFixed(1)}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Justificadas</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Justificadas</Text>
                                     <Text style={[styles.percentageValue, { 
                                       color: getTrendColor('justified', trend.justifiedChange),
                                       marginBottom: 10
@@ -1298,17 +1937,17 @@ export default function ReportsScreen() {
                                 {isWeek1 ? (
                                   // Para Semana 1 mostrar valores reales con porcentaje simplificado (estilo consistente)
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
-                                      color: COLORS.attendance.unexcused,
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
+                                      color: ATTENDANCE_COLORS.unexcused,
                                       fontSize: 24,
                                       marginTop: 10,
                                       marginBottom: 4
                                     }]}>
                                       {week1Data ? week1Data.total_unexcused_absences : 0}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Injustificadas</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Injustificadas</Text>
                                     <Text style={[styles.percentageValue, { 
-                                      color: COLORS.attendance.unexcused,
+                                      color: ATTENDANCE_COLORS.unexcused,
                                       marginBottom: 10
                                     }]}>
                                       %
@@ -1317,7 +1956,7 @@ export default function ReportsScreen() {
                                 ) : (
                                   // Para el resto de semanas mostrar tendencia
                                   <>
-                                    <Text variant="titleLarge" style={[styles.statNumber, { 
+                                    <Text variant="titleLarge" style={[styles.statValue, { 
                                       color: getTrendColor('unjustified', trend.unjustifiedChange),
                                       fontSize: 24,
                                       marginTop: 10,
@@ -1326,7 +1965,7 @@ export default function ReportsScreen() {
                                       {trend.unjustifiedChange > 0 ? '+' : ''}
                                       {Math.abs(limitPercentage(trend.unjustifiedChange)).toFixed(1)}
                                     </Text>
-                                    <Text variant="bodyMedium" style={[styles.statLabel, {marginBottom: 4}]}>Injustificadas</Text>
+                                    <Text variant="bodyMedium" style={[styles.statTitle, {marginBottom: 4}]}>Injustificadas</Text>
                                     <Text style={[styles.percentageValue, { 
                                       color: getTrendColor('unjustified', trend.unjustifiedChange),
                                       marginBottom: 10
@@ -1363,46 +2002,8 @@ export default function ReportsScreen() {
         )}
 
         {/* Modal de selección de estudiante */}
-        <Portal>
-          <Modal
-            visible={studentModalVisible}
-            onDismiss={() => setStudentModalVisible(false)}
-            contentContainerStyle={styles.modalContainer}
-            dismissableBackButton={true}
-            theme={{ colors: { backdrop: 'transparent' } }}
-          >
-            <Card elevation={0} style={{borderRadius: BORDER_RADIUS.lg, overflow: 'hidden'}}>
-              <Card.Content style={{padding: SPACING.md}}>
-                <Text style={styles.modalTitle}>Seleccionar Estudiante</Text>
-                <ScrollView style={styles.studentList}>
-                  {students.length > 0 ? (
-                    students.map((student) => (
-                      <List.Item
-                        key={student.id}
-                        title={`${student.first_name} ${student.last_name}`}
-                        description={`${student.instrument || 'Sin instrumento'}`}
-                        onPress={() => {
-                          setSelectedStudent(student.id);
-                          setStudentModalVisible(false);
-                          setReportData(null);
-                        }}
-                        titleStyle={styles.studentName}
-                        descriptionStyle={styles.studentDescription}
-                        style={styles.studentItem}
-                        left={props => <List.Icon {...props} icon="account" color={theme.colors.primary} />}
-                      />
-                    ))
-                  ) : (
-                    <Text style={{ color: theme.colors.text, textAlign: 'center', padding: SPACING.md }}>
-                      No hay estudiantes disponibles
-                    </Text>
-                  )}
-                </ScrollView>
-              </Card.Content>
-            </Card>
-          </Modal>
-        </Portal>
+        {renderStudentModal()}
       </ScrollView>
     </SafeAreaView>
   );
-} 
+}
