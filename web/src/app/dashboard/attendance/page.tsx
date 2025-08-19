@@ -565,14 +565,12 @@ export default function AttendancePage() {
   
   // Función para deseleccionar todos los estudiantes
   const deselectAllStudents = () => {
-    if (!attendanceMode) return;
-    
-    // Actualizar la lista principal de estudiantes
+    // Deseleccionar todos los estudiantes en el estado local
     setStudents(prevStudents => 
       prevStudents.map(student => ({ ...student, selected: false }))
     );
     
-    // Actualizar la lista filtrada de estudiantes
+    // Deseleccionar todos los estudiantes en la lista filtrada
     setFilteredStudents(prevFiltered => 
       prevFiltered.map(student => ({ ...student, selected: false }))
     );
@@ -582,11 +580,62 @@ export default function AttendancePage() {
     
     console.log('Todos los estudiantes deseleccionados');
   };
+
+  // Función para limpiar toda la asistencia de una fecha
+  const clearAttendanceForDate = async () => {
+    if (!activeProgram?.id) {
+      alert('No hay programa activo seleccionado.');
+      return;
+    }
+
+    const confirmMessage = t('clear_attendance_confirm', { date: currentDate });
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Eliminar todos los registros de asistencia para la fecha y programa actual
+      const { error } = await supabase
+        .from('attendance')
+        .delete()
+        .eq('date', currentDate)
+        .eq('program_id', activeProgram.id);
+
+      if (error) {
+        console.error('Error clearing attendance:', error);
+        alert(t('clear_attendance_error', { error: error.message }));
+        return;
+      }
+
+      // Mostrar mensaje de éxito
+      const successMsg = t('attendance_cleared_success', { date: currentDate });
+      setSuccessMessage(successMsg);
+      setShowSuccessMessage(true);
+      
+      // Ocultar mensaje después de 3 segundos
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
+
+      // Recargar los datos de asistencia
+      await loadAttendanceData(currentDate);
+      
+      console.log(`Attendance cleared for date: ${currentDate}, program: ${activeProgram.id}`);
+    } catch (error: any) {
+      console.error('Unexpected error clearing attendance:', error);
+      alert(t('clear_attendance_error', { error: error.message || 'Error inesperado' }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   
   // Función para marcar asistencia
   // Helper function to find the correct attendance status code - similar to Android version
   const findAttendanceStatusCode = (statusName: string) => {
+{{ ... }}
     console.log('Finding status code for:', statusName);
     console.log('Available statuses:', attendanceStatuses);
     
@@ -1037,6 +1086,19 @@ export default function AttendancePage() {
             }`}
           >
             {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
+          </button>
+          
+          {/* Botón para limpiar asistencia */}
+          <button
+            onClick={clearAttendanceForDate}
+            className="px-4 py-2 rounded-md flex items-center whitespace-nowrap bg-orange-600 hover:bg-orange-700 text-white"
+            title={t('clear_attendance_confirm', { date: currentDate })}
+            disabled={isLoading}
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            {t('clear_attendance')}
           </button>
         </div>
       </div>
