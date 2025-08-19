@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { MdArrowBack, MdSave, MdCancel, MdPerson, MdMusicNote } from 'react-icons/md';
 import { theme } from '@/styles/theme';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface NewStudent {
   first_name: string;
@@ -19,6 +20,7 @@ interface NewStudent {
 
 export default function NewStudent() {
   const router = useRouter();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [student, setStudent] = useState<NewStudent>({
@@ -51,7 +53,7 @@ export default function NewStudent() {
       
       // Validate required fields
       if (!student.first_name || !student.last_name) {
-        throw new Error('Nombre y apellido son campos obligatorios');
+        throw new Error(t('required_fields_error'));
       }
       
       // Insert new student
@@ -77,7 +79,7 @@ export default function NewStudent() {
       router.push(`/dashboard/students/${data.id}`);
     } catch (err) {
       console.error('Error creating student:', err);
-      setError(err instanceof Error ? err.message : 'Error al crear estudiante');
+      setError(err instanceof Error ? err.message : t('error_creating_student'));
       setLoading(false);
     }
   };
@@ -92,7 +94,7 @@ export default function NewStudent() {
         >
           <MdArrowBack size={24} />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-800">Nuevo Estudiante</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('new_student')}</h1>
       </div>
       
       {/* Error message */}
@@ -110,13 +112,13 @@ export default function NewStudent() {
               {/* Personal Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                  <MdPerson className="mr-2 text-[#0073ea]" /> Información Personal
+                  <MdPerson className="mr-2 text-[#0073ea]" /> {t('personal_information')}
                 </h2>
                 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre <span className="text-red-500">*</span>
+                      {t('first_name')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -130,7 +132,7 @@ export default function NewStudent() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Apellido <span className="text-red-500">*</span>
+                      {t('last_name')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -143,7 +145,7 @@ export default function NewStudent() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Grado</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('grade')}</label>
                     <input
                       type="text"
                       name="grade"
@@ -154,7 +156,7 @@ export default function NewStudent() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -163,7 +165,7 @@ export default function NewStudent() {
                         onChange={handleInputChange}
                         className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
                       />
-                      <span className="ml-2 text-gray-700">Activo</span>
+                      <span className="ml-2 text-gray-700">{t('active')}</span>
                     </div>
                   </div>
                 </div>
@@ -172,12 +174,12 @@ export default function NewStudent() {
               {/* Orchestra Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                  <MdMusicNote className="mr-2 text-[#0073ea]" /> Información de Orquesta
+                  <MdMusicNote className="mr-2 text-[#0073ea]" /> {t('orchestra_info')}
                 </h2>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Instrumento</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument')}</label>
                     <input
                       type="text"
                       name="instrument"
@@ -188,26 +190,26 @@ export default function NewStudent() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tamaño del Instrumento</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('instrument_size')}</label>
                     <input
                       type="text"
                       name="instrument_size"
                       value={student.instrument_size}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                      placeholder="Ej: 1/2, 3/4, 4/4"
+                      placeholder={t('instrument_size_placeholder')}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Posición</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('position')}</label>
                     <input
                       type="text"
                       name="position"
                       value={student.position}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
-                      placeholder="Ej: Primera fila, Segunda fila"
+                      placeholder={t('position_placeholder')}
                     />
                   </div>
                 </div>
@@ -222,7 +224,7 @@ export default function NewStudent() {
             href="/dashboard/students"
             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors flex items-center"
           >
-            <MdCancel className="mr-1" /> Cancelar
+            <MdCancel className="mr-1" /> {t('cancel')}
           </Link>
           <button
             type="submit"
@@ -231,7 +233,7 @@ export default function NewStudent() {
               (loading || !student.first_name || !student.last_name) ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
-            <MdSave className="mr-1" /> Guardar
+            <MdSave className="mr-1" /> {loading ? t('saving') : t('save')}
           </button>
         </div>
       </form>
