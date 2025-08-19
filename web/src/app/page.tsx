@@ -85,7 +85,7 @@ export default function Home() {
         <div className="bg-white py-16">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Beneficios del Programa Ascend</h3>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Beneficios del Ascend Attendance Tracker</h3>
               <p className="text-xl text-gray-800">Una plataforma colaborativa diseñada para facilitar el registro de asistencia y generar informes precisos para el Programa Ascend</p>
             </div>
             
