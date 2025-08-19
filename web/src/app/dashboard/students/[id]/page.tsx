@@ -254,40 +254,46 @@ export default function StudentDetail() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="h-full">
       {!activeProgram?.id && (
         <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
           {t('select_program_to_view_student') || 'Please select a program to view this student.'}
         </div>
       )}
-      {/* Header with back button */}
-      <div className="flex items-center justify-between mb-6">
+      
+      {/* Header - Monday.com style */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center">
           <Link 
             href="/dashboard/students" 
-            className="mr-4 p-2 rounded-full hover:bg-gray-100"
+            className="mr-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <MdArrowBack size={24} />
+            <MdArrowBack size={20} className="text-gray-600" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-800">
-            {isEditing ? t('edit_student') : t('student_details_tab')}
-          </h1>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              {student?.first_name} {student?.last_name}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {isEditing ? t('edit_student') : t('student_details_tab')}
+            </p>
+          </div>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           {!isEditing ? (
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center"
+                className="flex-1 sm:flex-none px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
               >
-                <MdEdit className="mr-1" /> {t('edit')}
+                <MdEdit className="mr-2" size={16} /> {t('edit')}
               </button>
               <button
                 onClick={() => setDeleteConfirm(true)}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors flex items-center"
+                className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm font-medium"
               >
-                <MdDelete className="mr-1" /> {t('delete')}
+                <MdDelete className="mr-2" size={16} /> {t('delete')}
               </button>
             </>
           ) : (
@@ -295,20 +301,20 @@ export default function StudentDetail() {
               <button
                 onClick={handleSaveChanges}
                 disabled={loading}
-                className={`px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center ${
+                className={`flex-1 sm:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center text-sm font-medium ${
                   loading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
-                <MdSave className="mr-1" /> {t('save')}
+                <MdSave className="mr-2" size={16} /> {t('save')}
               </button>
               <button
                 onClick={() => {
                   setIsEditing(false);
                   setEditedStudent(student);
                 }}
-                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors flex items-center"
+                className="flex-1 sm:flex-none px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center text-sm font-medium"
               >
-                <MdCancel className="mr-1" /> {t('cancel')}
+                <MdCancel className="mr-2" size={16} /> {t('cancel')}
               </button>
             </>
           )}
@@ -341,15 +347,19 @@ export default function StudentDetail() {
         </div>
       )}
 
-      {/* Student information */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Personal Information */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                <MdPerson className="mr-2 text-[#0073ea]" /> {t('personal_info')}
-              </h2>
+      {/* Student information cards - Monday.com style */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Personal Information Card */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold flex items-center text-gray-900">
+              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                <MdPerson className="text-blue-600" size={20} />
+              </div>
+              {t('personal_info')}
+            </h2>
+          </div>
+          <div className="p-6">
               
               {isEditing ? (
                 <div className="space-y-4">
@@ -438,12 +448,20 @@ export default function StudentDetail() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
             
-            {/* Orchestra Information */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                <MdMusicNote className="mr-2 text-[#0073ea]" /> {t('orchestra_info')}
-              </h2>
+        {/* Orchestra Information Card */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold flex items-center text-gray-900">
+              <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                <MdMusicNote className="text-purple-600" size={20} />
+              </div>
+              {t('orchestra_info')}
+            </h2>
+          </div>
+          <div className="p-6">
               
               {isEditing ? (
                 <div className="space-y-4">
@@ -501,57 +519,75 @@ export default function StudentDetail() {
         </div>
       </div>
 
-      {/* Parents information */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center text-gray-800">
-              <MdPerson className="mr-2 text-[#0073ea]" /> {t('parents_info')}
+      {/* Parents information card */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold flex items-center text-gray-900">
+              <div className="p-2 bg-green-100 rounded-lg mr-3">
+                <MdPerson className="text-green-600" size={20} />
+              </div>
+              {t('parents_info')}
             </h2>
             <Link 
               href={`/dashboard/students/${params.id}/contacts`}
-              className="text-[#0073ea] hover:bg-blue-50 px-3 py-1 rounded-md flex items-center text-sm transition-colors"
+              className="text-green-700 hover:bg-green-100 px-4 py-2 rounded-lg flex items-center text-sm font-medium transition-colors border border-green-200"
             >
-              <MdEdit size={16} className="mr-1" /> {t('manage_contacts')}
+              <MdEdit size={16} className="mr-2" /> {t('manage_contacts')}
             </Link>
           </div>
+        </div>
+        <div className="p-6">
           
           {parents.length > 0 ? (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {parents.map((parent, index) => (
-                <div key={parent.id} className="border-l-4 border-[#0073ea] pl-4 py-2">
-                  <h3 className="font-medium text-lg text-gray-800 mb-2">
+                <div key={parent.id} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                  <h3 className="font-semibold text-lg text-gray-900 mb-3">
                     {parent.full_name}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="flex items-center">
-                      <MdPhone className="text-[#0073ea] mr-2" size={18} />
-                      {parent.phone_number ? (
-                        <p className="text-gray-700">{parent.phone_number}</p>
-                      ) : (
-                        <p className="text-gray-500 italic">{t('phone_not_registered')}</p>
-                      )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
+                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                        <MdPhone className="text-blue-600" size={16} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Teléfono</p>
+                        {parent.phone_number ? (
+                          <p className="text-gray-900 font-medium truncate">{parent.phone_number}</p>
+                        ) : (
+                          <p className="text-gray-400 italic text-sm">{t('phone_not_registered')}</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <MdEmail className="text-[#0073ea] mr-2" size={18} />
-                      {parent.email ? (
-                        <p className="text-gray-700">{parent.email}</p>
-                      ) : (
-                        <p className="text-gray-500 italic">{t('email_not_registered')}</p>
-                      )}
+                    <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
+                      <div className="p-2 bg-green-100 rounded-lg mr-3">
+                        <MdEmail className="text-green-600" size={16} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Email</p>
+                        {parent.email ? (
+                          <p className="text-gray-900 font-medium truncate">{parent.email}</p>
+                        ) : (
+                          <p className="text-gray-400 italic text-sm">{t('email_not_registered')}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 border border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500 mb-3">{t('no_contacts_registered')}</p>
+            <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+              <div className="p-3 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <MdPerson className="text-gray-400" size={24} />
+              </div>
+              <p className="text-gray-600 mb-4 font-medium">{t('no_contacts_registered')}</p>
               <Link 
                 href={`/dashboard/students/${params.id}/contacts`}
-                className="inline-flex items-center px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
               >
-                <MdAdd className="mr-1" /> {t('add_contact')}
+                <MdAdd className="mr-2" size={18} /> {t('add_contact')}
               </Link>
             </div>
           )}
