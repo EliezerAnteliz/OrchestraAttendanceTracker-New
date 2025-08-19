@@ -244,7 +244,6 @@ const translations: Translations = {
   enable_attendance_mode: { es: "Activar Modo Asistencia", en: "Enable Attendance Mode" },
   disable_attendance_mode: { es: "Desactivar Modo Asistencia", en: "Disable Attendance Mode" },
   search_name_or_instrument: { es: "Buscar por nombre o instrumento...", en: "Search by name or instrument..." },
-  filter_by_instrument: { es: "Filtrar por instrumento", en: "Filter by instrument" },
   all_instruments: { es: "Todos los instrumentos", en: "All instruments" },
   select_all: { es: "Seleccionar Todos", en: "Select All" },
   deselect_all: { es: "Deseleccionar Todos", en: "Deselect All" },
@@ -263,6 +262,14 @@ const translations: Translations = {
   select_site_label: { es: "Selecciona la sede", en: "Select site" },
   no_sites_assigned: { es: "No tienes sedes asignadas.", en: "You have no sites assigned." },
   refresh_sites: { es: "Refrescar sedes", en: "Refresh sites" },
+
+  // New student form
+  personal_information: { es: "Información Personal", en: "Personal Information" },
+  required_fields_error: { es: "Nombre y apellido son campos obligatorios", en: "First name and last name are required fields" },
+  error_creating_student: { es: "Error al crear estudiante", en: "Error creating student" },
+  instrument_size_placeholder: { es: "Ej: 1/2, 3/4, 4/4", en: "Ex: 1/2, 3/4, 4/4" },
+  position_placeholder: { es: "Ej: Primera fila, Segunda fila", en: "Ex: First row, Second row" },
+  saving: { es: "Guardando...", en: "Saving..." },
 
   // Bulk upload (students)
   bulk_upload_desc: {
