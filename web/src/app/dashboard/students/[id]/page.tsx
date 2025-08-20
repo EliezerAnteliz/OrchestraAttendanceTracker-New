@@ -200,167 +200,160 @@ export default function StudentDetail() {
   const handleDeleteStudent = async () => {
     try {
       setLoading(true);
-      console.log('Iniciando eliminación del estudiante:', params.id);
+      console.log('=== INICIO ELIMINACIÓN ESTUDIANTE ===');
+      console.log('ID del estudiante:', params.id);
       
-      // Get current user and program context for RLS
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log('Usuario actual:', user?.id);
-      
-      // First delete student-parent relationships
-      console.log('Eliminando relaciones estudiante-padre...');
-      const { data: deletedRelations, error: spError } = await supabase
-        .from('student_parents')
-        .delete()
-        .eq('student_id', params.id)
-        .select();
-      
-      console.log('Relaciones eliminadas:', deletedRelations);
-      
-      if (spError) {
-        console.error('Error eliminando relaciones:', spError);
-        throw spError;
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error('Error obteniendo usuario:', userError);
+        throw new Error('No se pudo verificar el usuario actual');
       }
-
-      // Then delete attendance records
-      console.log('Eliminando registros de asistencia...');
-      const { data: deletedAttendance, error: attError } = await supabase
-        .from('attendance')
-        .delete()
-        .eq('student_id', params.id)
-        .select();
+      console.log('Usuario autenticado:', user?.id);
       
-      console.log('Registros de asistencia eliminados:', deletedAttendance);
-      
-      if (attError) {
-        console.error('Error eliminando asistencia:', attError);
-        throw attError;
-      }
-
-      // Check if student exists and user has permission to delete
-      console.log('Verificando existencia del estudiante...');
-      const { data: studentCheck, error: checkError } = await supabase
+      // Get student data first
+      console.log('Obteniendo datos del estudiante...');
+      const { data: studentData, error: studentError } = await supabase
         .from('students')
         .select('*')
         .eq('id', params.id)
         .single();
       
-      console.log('Estudiante encontrado para eliminar:', studentCheck);
+      if (studentError) {
+        console.error('Error obteniendo estudiante:', studentError);
+        throw new Error(`No se pudo encontrar el estudiante: ${studentError.message}`);
+      }
       
-      if (checkError) {
-        console.error('Error verificando estudiante:', checkError);
-        throw new Error(`No se puede acceder al estudiante: ${checkError.message}`);
+      console.log('Datos del estudiante:', studentData);
+      
+      // Delete related records first
+      console.log('1. Eliminando relaciones estudiante-padre...');
+      const { error: spError } = await supabase
+        .from('student_parents')
+        .delete()
+        .eq('student_id', params.id);
+      
+      if (spError) {
+        console.warn('Advertencia eliminando relaciones:', spError.message);
+        // Continue anyway, might not have relations
       }
 
-      if (!studentCheck) {
-        throw new Error('El estudiante no existe o no tienes permisos para eliminarlo');
+      console.log('2. Eliminando registros de asistencia...');
+      const { error: attError } = await supabase
+        .from('attendance')
+        .delete()
+        .eq('student_id', params.id);
+      
+      if (attError) {
+        console.warn('Advertencia eliminando asistencia:', attError.message);
+        // Continue anyway, might not have attendance records
       }
 
-      // Try direct deletion with all context fields
-      console.log('Eliminando estudiante con contexto completo...');
-      const { data: deletedData, error } = await supabase
+      // Try multiple deletion strategies
+      console.log('3. Intentando eliminación del estudiante...');
+      
+      // Strategy 1: Simple deletion
+      console.log('Estrategia 1: Eliminación simple');
+      const { data: result1, error: error1 } = await supabase
         .from('students')
         .delete()
         .eq('id', params.id)
-        .eq('program_id', studentCheck.program_id)
-        .eq('organization_id', studentCheck.organization_id)
         .select();
-
-      console.log('Resultado de eliminación:', { deletedData, error });
-
-      if (error) {
-        console.error('Error eliminando estudiante:', error);
-        throw error;
+      
+      console.log('Resultado estrategia 1:', { result1, error1 });
+      
+      if (!error1 && result1 && result1.length > 0) {
+        console.log('✅ ELIMINACIÓN EXITOSA con estrategia 1');
+        setDeleteConfirm(false);
+        router.push('/dashboard/students');
+        return;
       }
-
-      if (!deletedData || deletedData.length === 0) {
-        console.error('CRÍTICO: No se eliminó ningún registro a pesar de tener contexto completo');
-        
-        // Check current user's role and permissions
-        console.log('Verificando rol y permisos del usuario...');
-        const { data: userRole } = await supabase
-          .from('user_program_memberships')
-          .select('role')
-          .eq('user_id', user?.id)
-          .eq('program_id', studentCheck.program_id)
-          .single();
-          
-        console.log('Rol del usuario:', userRole);
-        
-        // Try using admin privileges if user is admin
-        if (userRole?.role === 'admin') {
-          console.log('Usuario es admin, intentando eliminación con privilegios elevados...');
-          
-          // Try with explicit admin context
-          const { data: adminDeleteData, error: adminDeleteError } = await supabase
-            .from('students')
-            .delete()
-            .eq('id', params.id)
-            .eq('program_id', studentCheck.program_id)
-            .eq('organization_id', studentCheck.organization_id);
-            
-          console.log('Resultado eliminación admin:', { adminDeleteData, adminDeleteError });
-          
-          if (!adminDeleteError) {
-            console.log('Eliminación exitosa con privilegios admin');
-            return; // Exit early if successful
-          }
-        }
-        
-        // Try simple deletion without additional context
-        console.log('Intentando eliminación simple...');
-        const { data: simpleDeleteData, error: simpleDeleteError } = await supabase
-          .from('students')
-          .delete()
-          .eq('id', params.id);
-          
-        console.log('Resultado eliminación simple:', { simpleDeleteData, simpleDeleteError });
-        
-        if (!simpleDeleteError && simpleDeleteData) {
-          console.log('Eliminación exitosa con método simple');
-          return; // Exit early if successful
-        }
-        
-        // If all deletion methods fail, offer user the choice
-        const confirmDeactivate = window.confirm(
-          'No es posible eliminar completamente el registro debido a las políticas de seguridad de la base de datos.\n\n' +
-          '¿Deseas marcarlo como INACTIVO en su lugar?\n\n' +
-          'Esto ocultará el estudiante de todas las listas pero preservará los datos para auditoría.'
-        );
-        
-        if (!confirmDeactivate) {
-          throw new Error('Eliminación cancelada por el usuario');
-        }
-        
-        // Final attempt: mark as inactive instead of deleting
-        console.log('Marcando estudiante como inactivo por elección del usuario...');
-        const { data: deactivateData, error: deactivateError } = await supabase
-          .from('students')
-          .update({ 
-            is_active: false,
-            deactivation_reason: 'Eliminado por duplicado - RLS impidió eliminación física',
-            withdrawal_date: new Date().toISOString()
-          })
-          .eq('id', params.id)
-          .eq('program_id', studentCheck.program_id)
-          .eq('organization_id', studentCheck.organization_id)
-          .select();
-          
-        console.log('Resultado desactivación:', { deactivateData, deactivateError });
-        
-        if (deactivateError || !deactivateData || deactivateData.length === 0) {
-          throw new Error(`No se puede eliminar ni desactivar el estudiante. Las políticas RLS están completamente bloqueando el acceso. Error: ${deactivateError?.message || 'Sin permisos'}`);
-        }
-        
-        console.log('Estudiante marcado como inactivo exitosamente');
-        alert('El estudiante ha sido marcado como INACTIVO ya que las políticas de seguridad impiden la eliminación física del registro.');
+      
+      // Strategy 2: With program context
+      console.log('Estrategia 2: Con contexto de programa');
+      const { data: result2, error: error2 } = await supabase
+        .from('students')
+        .delete()
+        .eq('id', params.id)
+        .eq('program_id', studentData.program_id)
+        .select();
+      
+      console.log('Resultado estrategia 2:', { result2, error2 });
+      
+      if (!error2 && result2 && result2.length > 0) {
+        console.log('✅ ELIMINACIÓN EXITOSA con estrategia 2');
+        setDeleteConfirm(false);
+        router.push('/dashboard/students');
+        return;
       }
-
-      console.log('Estudiante eliminado exitosamente');
+      
+      // Strategy 3: With full context
+      console.log('Estrategia 3: Con contexto completo');
+      const { data: result3, error: error3 } = await supabase
+        .from('students')
+        .delete()
+        .eq('id', params.id)
+        .eq('program_id', studentData.program_id)
+        .eq('organization_id', studentData.organization_id)
+        .select();
+      
+      console.log('Resultado estrategia 3:', { result3, error3 });
+      
+      if (!error3 && result3 && result3.length > 0) {
+        console.log('✅ ELIMINACIÓN EXITOSA con estrategia 3');
+        setDeleteConfirm(false);
+        router.push('/dashboard/students');
+        return;
+      }
+      
+      // All deletion strategies failed
+      console.log('❌ TODAS LAS ESTRATEGIAS DE ELIMINACIÓN FALLARON');
+      console.log('Errores:', { error1: error1?.message, error2: error2?.message, error3: error3?.message });
+      
+      // Offer deactivation as alternative
+      const confirmDeactivate = window.confirm(
+        `No fue posible eliminar físicamente el registro del estudiante "${studentData.first_name} ${studentData.last_name}".\n\n` +
+        'Esto puede deberse a políticas de seguridad de la base de datos.\n\n' +
+        '¿Deseas marcarlo como INACTIVO en su lugar?\n\n' +
+        'El estudiante se ocultará de todas las listas pero se preservarán los datos.'
+      );
+      
+      if (!confirmDeactivate) {
+        throw new Error('Operación cancelada por el usuario');
+      }
+      
+      // Deactivate student
+      console.log('4. Marcando estudiante como inactivo...');
+      const { data: deactivateResult, error: deactivateError } = await supabase
+        .from('students')
+        .update({ 
+          is_active: false,
+          deactivation_reason: 'Marcado como inactivo - Eliminación física bloqueada por RLS',
+          withdrawal_date: new Date().toISOString()
+        })
+        .eq('id', params.id)
+        .select();
+        
+      console.log('Resultado desactivación:', { deactivateResult, deactivateError });
+      
+      if (deactivateError) {
+        throw new Error(`No se pudo desactivar el estudiante: ${deactivateError.message}`);
+      }
+      
+      if (!deactivateResult || deactivateResult.length === 0) {
+        throw new Error('No se pudo desactivar el estudiante - Sin resultados');
+      }
+      
+      console.log('✅ ESTUDIANTE MARCADO COMO INACTIVO');
+      alert(`El estudiante "${studentData.first_name} ${studentData.last_name}" ha sido marcado como INACTIVO y se ocultará de las listas.`);
+      
       setDeleteConfirm(false);
       router.push('/dashboard/students');
+      
     } catch (err) {
-      console.error('Error deleting student:', err);
-      setError(err instanceof Error ? err.message : 'Error al eliminar estudiante');
+      console.error('=== ERROR EN ELIMINACIÓN ===');
+      console.error('Error completo:', err);
+      setError(err instanceof Error ? err.message : 'Error desconocido al eliminar estudiante');
       setLoading(false);
       setDeleteConfirm(false);
     }
