@@ -1307,7 +1307,7 @@ export default function ReportsPage() {
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-blue-600 transition-colors" flex items-center justify-center text-sm font-medium w-full sm:w-auto"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center"
             >
               <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
