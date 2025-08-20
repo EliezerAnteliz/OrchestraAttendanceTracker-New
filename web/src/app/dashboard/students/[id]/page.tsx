@@ -493,24 +493,37 @@ export default function StudentDetail() {
 
       {/* Delete confirmation modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold mb-4">{t('confirm_delete_title')}</h3>
-            <p className="mb-6">
-              ¿Estás seguro de que deseas eliminar a {student.first_name} {student.last_name}? Esta acción no se puede deshacer.
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div className="text-center mb-6">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.75 0a9 9 0 018.25-8.25 9 9 0 018.25 8.25A9 9 0 0112 21.75 9 9 0 012.25 12.75z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('confirm_delete_title')}</h3>
+            </div>
+            <p className="text-gray-700 text-center mb-8 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar a <span className="font-semibold text-gray-900">{student.first_name} {student.last_name}</span>?
+              <br />
+              <span className="text-sm text-gray-600 mt-2 block">Esta acción no se puede deshacer.</span>
             </p>
-            <div className="flex justify-end space-x-3">
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
               <button
                 onClick={() => setDeleteConfirm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+                className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors font-medium"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleDeleteStudent}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                disabled={loading}
+                className={`px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors font-medium ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                {t('delete')}
+                {loading ? 'Eliminando...' : t('delete')}
               </button>
             </div>
           </div>
