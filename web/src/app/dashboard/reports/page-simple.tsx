@@ -12,7 +12,7 @@ const LoadingIndicator = ({ message = 'Cargando...' }) => (
   </div>
 );
 
-const ErrorDisplay = ({ message, severity = 'error' }) => (
+const ErrorDisplay = ({ message, severity = 'error' }: { message: string; severity?: string }) => (
   <div className={`p-4 rounded-md ${severity === 'error' ? 'bg-red-50 text-red-800' : 'bg-yellow-50 text-yellow-800'}`}>
     <div className="flex items-center">
       <MdPieChart className="mr-2" />
