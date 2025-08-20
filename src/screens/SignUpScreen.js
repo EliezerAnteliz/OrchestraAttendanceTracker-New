@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { Button, Text, Menu, ActivityIndicator, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import { supabase } from '../config/supabase';
 import { StyledInput, StyledCard } from '../components';
@@ -11,10 +11,51 @@ export default function SignUpScreen() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedOrganization, setSelectedOrganization] = useState(null);
+  const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [organizationsLoading, setOrganizationsLoading] = useState(true);
+  const [showOrgMenu, setShowOrgMenu] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const { theme } = useAppTheme();
+
+  // Load organizations on component mount
+  useEffect(() => {
+    loadOrganizations();
+  }, []);
+
+  const loadOrganizations = async () => {
+    try {
+      setOrganizationsLoading(true);
+      console.log('Loading organizations...');
+      
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) {
+        console.error('Error loading organizations:', error);
+        Alert.alert('Error', 'No se pudieron cargar las organizaciones disponibles');
+        return;
+      }
+
+      console.log('Organizations loaded:', data);
+      setOrganizations(data || []);
+      
+      if (data && data.length === 0) {
+        Alert.alert('Información', 'No hay organizaciones disponibles en este momento');
+      }
+    } catch (error) {
+      console.error('Error loading organizations:', error);
+      Alert.alert('Error', 'No se pudieron cargar las organizaciones disponibles');
+    } finally {
+      setOrganizationsLoading(false);
+    }
+  };
   
   const handleSignUp = async () => {
     if (loading) return;
@@ -25,12 +66,16 @@ export default function SignUpScreen() {
       setSuccess(false);
 
       // Validaciones básicas
-      if (!firstName || !lastName || !email || !password) {
+      if (!firstName || !lastName || !email || !password || !confirmPassword || !selectedOrganization) {
         throw new Error('Por favor, completa todos los campos');
       }
 
       if (password.length < 6) {
         throw new Error('La contraseña debe tener al menos 6 caracteres');
+      }
+
+      if (password !== confirmPassword) {
+        throw new Error('Las contraseñas no coinciden');
       }
 
       // Intento de registro con metadata adicional
@@ -41,7 +86,10 @@ export default function SignUpScreen() {
           data: {
             first_name: firstName.trim(),
             last_name: lastName.trim(),
+            full_name: `${firstName.trim()} ${lastName.trim()}`,
             email: email.trim(),
+            organization_id: selectedOrganization.id,
+            organization_name: selectedOrganization.name,
             created_at: new Date().toISOString()
           }
         }
@@ -59,12 +107,31 @@ export default function SignUpScreen() {
       }
 
       if (data?.user) {
+        // Crear perfil de usuario en la tabla user_profiles
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: data.user.id,
+            email: email.trim(),
+            full_name: `${firstName.trim()} ${lastName.trim()}`,
+            organization_id: selectedOrganization.id,
+            role: 'viewer',
+            is_active: true
+          });
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          Alert.alert('Advertencia', 'Usuario creado pero hubo un problema configurando el perfil. Contacta al administrador.');
+        }
+
         setSuccess(true);
         // Limpiar los campos después del registro exitoso
         setFirstName('');
         setLastName('');
         setEmail('');
         setPassword('');
+        setConfirmPassword('');
+        setSelectedOrganization(null);
       } else {
         throw new Error('Registro fallido: No se devolvieron datos de usuario');
       }
@@ -126,8 +193,72 @@ export default function SignUpScreen() {
             placeholder="juan.perez@ejemplo.com"
           />
 
+          {/* Organization Selector */}
+          <View style={styles.organizationContainer}>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>
+              Sede/Organización
+            </Text>
+            {organizationsLoading ? (
+              <View style={[styles.organizationSelector, { 
+                borderColor: theme.colors.outline,
+                backgroundColor: theme.colors.surface 
+              }]}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}>
+                  Cargando sedes...
+                </Text>
+              </View>
+            ) : (
+              <Menu
+                visible={showOrgMenu}
+                onDismiss={() => setShowOrgMenu(false)}
+                anchor={
+                  <Button
+                    mode="outlined"
+                    onPress={() => setShowOrgMenu(true)}
+                    style={[styles.organizationSelector, { 
+                      borderColor: theme.colors.outline,
+                      backgroundColor: theme.colors.surface 
+                    }]}
+                    contentStyle={styles.organizationSelectorContent}
+                    labelStyle={[styles.organizationText, { 
+                      color: selectedOrganization ? theme.colors.onSurface : theme.colors.onSurfaceVariant 
+                    }]}
+                    icon={() => (
+                      <Text style={styles.inputIcon}>🏢</Text>
+                    )}
+                  >
+                    {selectedOrganization ? selectedOrganization.name : 'Selecciona tu sede...'}
+                  </Button>
+                }
+              >
+                {organizations.map((org) => (
+                  <Menu.Item
+                    key={org.id}
+                    onPress={() => {
+                      setSelectedOrganization(org);
+                      setShowOrgMenu(false);
+                    }}
+                    title={org.name}
+                  />
+                ))}
+                {organizations.length === 0 && (
+                  <Menu.Item
+                    title="No hay organizaciones disponibles"
+                    disabled
+                  />
+                )}
+              </Menu>
+            )}
+            {error && !selectedOrganization && (
+              <Text style={[styles.fieldError, { color: theme.colors.error }]}>
+                Selecciona una sede
+              </Text>
+            )}
+          </View>
+
           <StyledInput
-            label="Contraseña"
+            label="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -138,16 +269,28 @@ export default function SignUpScreen() {
             placeholder="••••••••"
           />
 
+          <StyledInput
+            label="Confirmar Contraseña"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            textContentType="password"
+            error={error && (!confirmPassword || password !== confirmPassword) ? 
+              (!confirmPassword ? "Confirma tu contraseña" : "Las contraseñas no coinciden") : ""}
+            placeholder="••••••••"
+          />
+
           {error ? <Text style={[styles.error, { color: theme.colors.error }]}>{error}</Text> : null}
 
           <Button
             mode="contained"
             onPress={handleSignUp}
             loading={loading}
-            disabled={loading}
+            disabled={loading || organizationsLoading}
             style={styles.button}
           >
-            Registrarse
+            Create Account
           </Button>
 
           <Button
@@ -205,5 +348,40 @@ const styles = StyleSheet.create({
   successText: {
     ...TYPOGRAPHY.body2,
     textAlign: 'center',
-  }
+  },
+  organizationContainer: {
+    marginBottom: SPACING.md,
+  },
+  organizationLabel: {
+    ...TYPOGRAPHY.body1,
+    marginBottom: SPACING.xs,
+    fontWeight: '500',
+  },
+  organizationSelector: {
+    justifyContent: 'flex-start',
+    borderWidth: 1,
+    borderRadius: BORDER_RADIUS.sm,
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  organizationSelectorContent: {
+    justifyContent: 'flex-start',
+    paddingHorizontal: SPACING.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  organizationText: {
+    ...TYPOGRAPHY.body1,
+    textAlign: 'left',
+    flex: 1,
+  },
+  fieldError: {
+    ...TYPOGRAPHY.caption,
+    marginTop: SPACING.xs,
+  },
+  inputIcon: {
+    fontSize: 16,
+    marginRight: SPACING.xs,
+  },
 });
