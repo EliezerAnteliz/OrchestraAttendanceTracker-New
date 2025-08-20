@@ -272,7 +272,7 @@ export default function UserRegistrationScreen() {
               }]}> 
                 <ActivityIndicator size="small" color={theme.colors.primary} />
                 <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}> 
-                  Cargando sedes...
+                  Cargando organizaciones...
                 </Text>
               </View>
             ) : (
@@ -331,11 +331,11 @@ export default function UserRegistrationScreen() {
 
           {/* Program Selector */}
           <View style={styles.organizationContainer}>
-            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Sede/Programa</Text>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Sede</Text>
             {programsLoading ? (
               <View style={[styles.organizationSelector, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}> 
                 <ActivityIndicator size="small" color={theme.colors.primary} />
-                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}>Cargando programas...</Text>
+                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}>Cargando sedes...</Text>
               </View>
             ) : (
               <Menu
@@ -366,18 +366,18 @@ export default function UserRegistrationScreen() {
                   />
                 ))}
                 {selectedOrganization && programs.length === 0 && (
-                  <Menu.Item title="No hay programas activos" disabled />
+                  <Menu.Item title="No hay sedes activas" disabled />
                 )}
               </Menu>
             )}
             {error && !selectedProgram && selectedOrganization && (
-              <Text style={[styles.fieldError, { color: theme.colors.error }]}>Selecciona un programa</Text>
+              <Text style={[styles.fieldError, { color: theme.colors.error }]}>Selecciona una sede</Text>
             )}
           </View>
 
           {/* Role Selector */}
           <View style={styles.organizationContainer}>
-            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Rol</Text>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Nivel de Usuario</Text>
             <Menu
               visible={showRoleMenu}
               onDismiss={() => setShowRoleMenu(false)}
