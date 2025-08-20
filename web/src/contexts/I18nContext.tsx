@@ -319,6 +319,13 @@ const translations: Translations = {
   // Button translations
   bulk_upload_short: { es: "Carga Masiva", en: "Bulk Upload" },
   new_student_short: { es: "Nuevo Estudiante", en: "New Student" },
+  
+  // Role switching translations
+  viewing_as: { es: "Viendo como", en: "Viewing as" },
+  switch_view_as: { es: "Cambiar vista como", en: "Switch view as" },
+  your_role: { es: "tu rol", en: "your role" },
+  viewing: { es: "viendo", en: "viewing" },
+  reset_to_actual_role: { es: "Volver a mi rol", en: "Reset to my role" },
 };
 
 interface I18nContextValue {
