@@ -572,7 +572,7 @@ export default function StudentDetail() {
                   {isEditing ? (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('parent_name')}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('parent_name') || 'Nombre del padre/madre'}</label>
                         <input
                           type="text"
                           value={parent.full_name || ''}
@@ -582,23 +582,23 @@ export default function StudentDetail() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone') || 'Teléfono'}</label>
                           <input
                             type="tel"
                             value={parent.phone_number || ''}
                             onChange={(e) => handleParentInputChange(parent.id, 'phone_number', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
-                            placeholder="Número de teléfono"
+                            placeholder={t('phone_placeholder') || 'Número de teléfono'}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">{t('email') || 'Email'}</label>
                           <input
                             type="email"
                             value={parent.email || ''}
                             onChange={(e) => handleParentInputChange(parent.id, 'email', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
-                            placeholder="Correo electrónico"
+                            placeholder={t('email_placeholder') || 'Correo electrónico'}
                           />
                         </div>
                       </div>
@@ -614,7 +614,7 @@ export default function StudentDetail() {
                             <MdPhone className="text-blue-600" size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Teléfono</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">{t('phone') || 'Teléfono'}</p>
                             {parent.phone_number ? (
                               <p className="text-gray-900 font-medium truncate">{parent.phone_number}</p>
                             ) : (
@@ -627,7 +627,7 @@ export default function StudentDetail() {
                             <MdEmail className="text-green-600" size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Email</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">{t('email') || 'Email'}</p>
                             {parent.email ? (
                               <p className="text-gray-900 font-medium truncate">{parent.email}</p>
                             ) : (
