@@ -20,6 +20,10 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedOrganization, setSelectedOrganization] = useState('');
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [selectedProgram, setSelectedProgram] = useState('');
+  const [programs, setPrograms] = useState<any[]>([]);
+  const [loadingPrograms, setLoadingPrograms] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('viewer');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,6 +55,38 @@ export default function SignUpPage() {
     loadOrganizations();
   }, []);
 
+  // Cargar programas cuando cambia la organización
+  useEffect(() => {
+    const loadPrograms = async () => {
+      if (!selectedOrganization) {
+        setPrograms([]);
+        setSelectedProgram('');
+        return;
+      }
+
+      try {
+        setLoadingPrograms(true);
+        const { data, error } = await supabase
+          .from('programs')
+          .select('id, name, type')
+          .eq('organization_id', selectedOrganization)
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+        setPrograms(data || []);
+        setSelectedProgram(''); // Reset selection
+      } catch (err) {
+        console.error('Error loading programs:', err);
+        setError('Error al cargar las sedes disponibles');
+      } finally {
+        setLoadingPrograms(false);
+      }
+    };
+
+    loadPrograms();
+  }, [selectedOrganization]);
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -65,7 +101,14 @@ export default function SignUpPage() {
 
     // Validar que se haya seleccionado una organización
     if (!selectedOrganization) {
-      setError('Por favor selecciona una sede/organización');
+      setError('Por favor selecciona una organización');
+      setLoading(false);
+      return;
+    }
+
+    // Validar que se haya seleccionado un programa/sede
+    if (!selectedProgram) {
+      setError('Por favor selecciona una sede');
       setLoading(false);
       return;
     }
@@ -78,6 +121,8 @@ export default function SignUpPage() {
         options: {
           data: {
             organization_id: selectedOrganization,
+            program_id: selectedProgram,
+            role: selectedRole,
             full_name: email.split('@')[0] // Usar parte del email como nombre temporal
           }
         }
@@ -95,9 +140,24 @@ export default function SignUpPage() {
             user_id: data.user.id,
             email: email,
             organization_id: selectedOrganization,
-            role: 'viewer', // Rol por defecto
+            role: selectedRole,
             full_name: email.split('@')[0]
           });
+
+        // Crear membresía del programa
+        if (selectedProgram) {
+          const { error: membershipError } = await supabase
+            .from('user_program_memberships')
+            .insert({
+              user_id: data.user.id,
+              program_id: selectedProgram,
+              role: selectedRole
+            });
+          
+          if (membershipError) {
+            console.error('Error creating program membership:', membershipError);
+          }
+        }
 
         if (profileError) {
           console.error('Error creating user profile:', profileError);
@@ -165,7 +225,7 @@ export default function SignUpPage() {
             ) : (
               <form onSubmit={handleSignUp} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
                     {t('email')}
                   </label>
                   <div className="relative">
@@ -185,8 +245,8 @@ export default function SignUpPage() {
                 </div>
                 
                 <div>
-                  <label htmlFor="organization" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Sede/Organización
+                  <label htmlFor="organization" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Organización
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -198,9 +258,9 @@ export default function SignUpPage() {
                       onChange={(e) => setSelectedOrganization(e.target.value)}
                       required
                       disabled={loadingOrgs}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
                     >
-                      <option value="">Selecciona tu sede...</option>
+                      <option value="">Selecciona tu organización...</option>
                       {organizations.map((org) => (
                         <option key={org.id} value={org.id}>
                           {org.name}
@@ -211,13 +271,66 @@ export default function SignUpPage() {
                   {loadingOrgs && (
                     <div className="mt-2 flex items-center space-x-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-gray-500">Cargando organizaciones disponibles...</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <label htmlFor="program" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Sede
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdBusiness className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      id="program"
+                      value={selectedProgram}
+                      onChange={(e) => setSelectedProgram(e.target.value)}
+                      required
+                      disabled={loadingPrograms || !selectedOrganization}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
+                    >
+                      <option value="">{selectedOrganization ? 'Selecciona una sede...' : 'Selecciona una organización primero'}</option>
+                      {programs.map((program) => (
+                        <option key={program.id} value={program.id}>
+                          {program.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {loadingPrograms && (
+                    <div className="mt-2 flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                       <span className="text-xs text-gray-500">Cargando sedes disponibles...</span>
                     </div>
                   )}
                 </div>
                 
                 <div>
-                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="role" className="block text-sm font-semibold text-gray-800 mb-2">
+                    Nivel de Usuario
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdBusiness className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      id="role"
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
+                    >
+                      <option value="viewer">Viewer</option>
+                      <option value="staff">Staff</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2">
                     {t('password')}
                   </label>
                   <div className="relative">
@@ -255,7 +368,7 @@ export default function SignUpPage() {
                 </div>
                 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-800 mb-2">
                     Confirmar Contraseña
                   </label>
                   <div className="relative">
@@ -295,9 +408,9 @@ export default function SignUpPage() {
                 
                 <button
                   type="submit"
-                  disabled={loading || !passwordStrength || !passwordsMatch || !selectedOrganization || loadingOrgs}
+                  disabled={loading || !passwordStrength || !passwordsMatch || !selectedOrganization || !selectedProgram || loadingOrgs || loadingPrograms}
                   className={`w-full py-3 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
-                    loading || !passwordStrength || !passwordsMatch || !selectedOrganization || loadingOrgs ? 'opacity-70 cursor-not-allowed transform-none' : ''
+                    loading || !passwordStrength || !passwordsMatch || !selectedOrganization || !selectedProgram || loadingOrgs || loadingPrograms ? 'opacity-70 cursor-not-allowed transform-none' : ''
                   }`}
                 >
                   {loading ? (
