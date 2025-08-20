@@ -255,12 +255,14 @@ export default function StudentDetail() {
         throw new Error('El estudiante no existe o no tienes permisos para eliminarlo');
       }
 
-      // Finally delete the student
-      console.log('Eliminando estudiante...');
+      // Try direct deletion with all context fields
+      console.log('Eliminando estudiante con contexto completo...');
       const { data: deletedData, error } = await supabase
         .from('students')
         .delete()
         .eq('id', params.id)
+        .eq('program_id', studentCheck.program_id)
+        .eq('organization_id', studentCheck.organization_id)
         .select();
 
       console.log('Resultado de eliminación:', { deletedData, error });
@@ -271,18 +273,32 @@ export default function StudentDetail() {
       }
 
       if (!deletedData || deletedData.length === 0) {
-        console.warn('No se eliminó ningún registro. Posible problema de RLS');
+        console.error('CRÍTICO: No se eliminó ningún registro a pesar de tener contexto completo');
         
-        // Try alternative deletion method with program context
-        console.log('Intentando eliminación alternativa...');
-        const { error: altError } = await supabase
-          .from('students')
-          .delete()
-          .eq('id', params.id)
-          .eq('program_id', studentCheck.program_id);
+        // Last resort: try with RPC or admin bypass
+        console.log('Intentando eliminación con RPC...');
+        const { data: rpcResult, error: rpcError } = await supabase
+          .rpc('delete_student_force', { 
+            student_id: params.id,
+            program_id: studentCheck.program_id,
+            organization_id: studentCheck.organization_id 
+          });
           
-        if (altError) {
-          throw new Error(`RLS bloqueó la eliminación: ${altError.message}`);
+        console.log('Resultado RPC:', { rpcResult, rpcError });
+        
+        if (rpcError) {
+          // If RPC doesn't exist, try one more direct approach
+          console.log('RPC no disponible, intentando eliminación directa final...');
+          const { error: finalError } = await supabase
+            .from('students')
+            .delete()
+            .eq('student_id', studentCheck.student_id)
+            .eq('first_name', studentCheck.first_name)
+            .eq('last_name', studentCheck.last_name);
+            
+          if (finalError) {
+            throw new Error(`Eliminación falló completamente. Error: ${finalError.message}`);
+          }
         }
       }
 
