@@ -132,16 +132,23 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
 
+      console.log('\n🚀 INICIANDO PROCESAMIENTO DE', jsonData.length, 'FILAS');
+      console.log('Datos del Excel:', jsonData);
+
       setProgress({ total: jsonData.length, processed: 0 });
       
       // Procesar cada fila
-      for (const row of jsonData) {
+      for (let i = 0; i < jsonData.length; i++) {
+        const row = jsonData[i];
+        console.log(`\n📋 PROCESANDO FILA ${i + 1}/${jsonData.length}:`, row);
+        
         try {
           await processStudentRow(row);
           setProgress(prev => ({ ...prev, processed: prev.processed + 1 }));
+          console.log(`✅ Fila ${i + 1} procesada exitosamente`);
         } catch (error: any) {
-          console.error('Error processing row:', error);
-          setErrorMessages(prev => [...prev, `Error en fila ${jsonData.indexOf(row) + 2}: ${error.message}`]);
+          console.error(`❌ Error en fila ${i + 1}:`, error);
+          setErrorMessages(prev => [...prev, `Error en fila ${i + 2}: ${error.message}`]);
           setResults(prev => ({ ...prev, errors: prev.errors + 1 }));
         }
       }
@@ -283,24 +290,34 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
   // Función para buscar candidatos similares con mejor precisión
   const findSimilarStudents = async (firstName: string, lastName: string) => {
+    console.log('=== INICIANDO BÚSQUEDA DE SIMILARES ===');
+    console.log('Buscando para:', firstName, lastName);
+    
     const { data: allStudents, error } = await supabase
       .from('students')
       .select('id, first_name, last_name, instrument, current_grade, age')
       .eq('program_id', activeProgram?.id);
 
-    if (error || !allStudents) return [];
+    if (error || !allStudents) {
+      console.log('Error o sin estudiantes:', error);
+      return [];
+    }
+
+    console.log('Total de estudiantes en BD:', allStudents.length);
 
     const candidates: DuplicateCandidate[] = [];
     const inputFullName = `${firstName} ${lastName}`;
     const inputParsed = parseFullName(inputFullName);
 
-    console.log('Buscando similitudes para:', inputFullName, 'Componentes:', inputParsed.parts);
+    console.log('Input parseado:', inputParsed);
 
     for (const student of allStudents) {
       const existingFullName = `${student.first_name} ${student.last_name}`;
       const existingParsed = parseFullName(existingFullName);
       
-      console.log('Comparando con:', existingFullName, 'Componentes:', existingParsed.parts);
+      console.log(`\n--- Comparando ---`);
+      console.log('Input:', inputFullName, '→', inputParsed.parts);
+      console.log('BD:', existingFullName, '→', existingParsed.parts);
       
       const similarity = calculateNameSimilarity(inputFullName, existingFullName);
       
@@ -316,22 +333,32 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
           inputParsed.lastName === existingParsed.lastName ||
           inputParsed.parts.some(part => existingParsed.parts.includes(part) && part.length > 2);
           
+        console.log('Coincidencia significativa:', hasSignificantMatch);
+        console.log('- Primer nombre igual:', inputParsed.firstName === existingParsed.firstName);
+        console.log('- Apellido igual:', inputParsed.lastName === existingParsed.lastName);
+          
         if (hasSignificantMatch) {
-          console.log('Candidato válido encontrado:', existingFullName, 'Similitud:', similarity);
+          console.log('✅ CANDIDATO VÁLIDO:', existingFullName, 'Similitud:', similarity);
           candidates.push({
             existingStudent: student,
             excelRow: { first_name: firstName, last_name: lastName },
             similarity
           });
         } else {
-          console.log('Candidato descartado por falta de coincidencia significativa:', existingFullName);
+          console.log('❌ Candidato descartado por falta de coincidencia significativa:', existingFullName);
         }
       } else if (similarity > 0) {
-        console.log('Similitud insuficiente:', existingFullName, 'Similitud:', similarity);
+        console.log('⚪ Similitud insuficiente:', existingFullName, 'Similitud:', similarity);
+      } else {
+        console.log('⚫ Sin similitud:', existingFullName);
       }
     }
 
+    console.log('\n=== RESUMEN ===');
     console.log('Total de candidatos encontrados:', candidates.length);
+    candidates.forEach((c, i) => {
+      console.log(`${i + 1}. ${c.existingStudent.first_name} ${c.existingStudent.last_name} (${Math.round(c.similarity * 100)}%)`);
+    });
     
     // Ordenar por similitud descendente y tomar solo los mejores
     return candidates
@@ -340,6 +367,8 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   };
 
   const processStudentRow = async (row: any, skipConfirmation = false) => {
+    console.log('\n🔍 PROCESANDO ESTUDIANTE:', row.first_name, row.last_name);
+    
     // Validar datos mínimos requeridos
     if (!row.first_name || !row.last_name) {
       throw new Error('Nombre y apellido son obligatorios');
@@ -362,9 +391,11 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       console.log('Datos preparados para procesamiento:', studentData);
 
       // Verificar si el estudiante ya existe (coincidencia exacta)
+      console.log('Buscando coincidencias exactas para:', studentData.first_name, studentData.last_name);
+      
       const { data: exactMatches, error: searchError } = await supabase
         .from('students')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, instrument, current_grade')
         .eq('first_name', studentData.first_name)
         .eq('last_name', studentData.last_name)
         .eq('program_id', activeProgram?.id);
@@ -372,6 +403,8 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       if (searchError) {
         throw new Error(`Error al buscar estudiante: ${searchError.message}`);
       }
+
+      console.log('Coincidencias exactas encontradas:', exactMatches?.length || 0, exactMatches);
 
       let studentId: string;
 
@@ -435,48 +468,55 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         setResults(prev => ({ ...prev, updated: prev.updated + 1 }));
       } 
       // Si no hay coincidencia exacta, buscar candidatos similares
-      else if (!skipConfirmation) {
-        const similarCandidates = await findSimilarStudents(studentData.first_name, studentData.last_name);
+      else {
+        console.log('No hay coincidencias exactas, buscando similares...');
         
-        if (similarCandidates.length > 0) {
-          // Mostrar diálogo de confirmación para el primer candidato más similar
-          const bestCandidate = similarCandidates[0];
+        if (!skipConfirmation) {
+          const similarCandidates = await findSimilarStudents(studentData.first_name, studentData.last_name);
           
-          return new Promise((resolve, reject) => {
-            setConfirmationDialog({
-              isOpen: true,
-              candidate: {
-                ...bestCandidate,
-                excelRow: row
-              },
-              onConfirm: async (action: 'update' | 'create') => {
-                setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
-                try {
-                  if (action === 'update') {
-                    // Actualizar el estudiante existente
-                    const result = await updateExistingStudent(bestCandidate.existingStudent.id, studentData, row);
-                    resolve(result);
-                  } else {
-                    // Crear nuevo estudiante
-                    const result = await createNewStudent(studentData, row);
-                    resolve(result);
+          if (similarCandidates.length > 0) {
+            console.log('Candidatos similares encontrados:', similarCandidates.length);
+            // Mostrar diálogo de confirmación para el primer candidato más similar
+            const bestCandidate = similarCandidates[0];
+            
+            return new Promise((resolve, reject) => {
+              setConfirmationDialog({
+                isOpen: true,
+                candidate: {
+                  ...bestCandidate,
+                  excelRow: row
+                },
+                onConfirm: async (action: 'update' | 'create') => {
+                  setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
+                  try {
+                    if (action === 'update') {
+                      // Actualizar el estudiante existente
+                      const result = await updateExistingStudent(bestCandidate.existingStudent.id, studentData, row);
+                      resolve(result);
+                    } else {
+                      // Crear nuevo estudiante
+                      const result = await createNewStudent(studentData, row);
+                      resolve(result);
+                    }
+                  } catch (error) {
+                    reject(error);
                   }
-                } catch (error) {
-                  reject(error);
+                },
+                onCancel: () => {
+                  setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
+                  reject(new Error('Operación cancelada por el usuario'));
                 }
-              },
-              onCancel: () => {
-                setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
-                reject(new Error('Operación cancelada por el usuario'));
-              }
+              });
             });
-          });
+          } else {
+            console.log('No se encontraron candidatos similares');
+          }
         }
+        
+        // Si no hay candidatos similares o se saltó la confirmación, crear nuevo estudiante
+        console.log('Creando nuevo estudiante...');
+        studentId = await createNewStudent(studentData, row);
       }
-      
-      // Si no hay candidatos similares o se saltó la confirmación, crear nuevo estudiante
-      console.log('Estudiante no encontrado, insertando nuevo');
-      studentId = await createNewStudent(studentData, row);
 
       // Procesar datos de padres si existen
       if (row.parent_first_name && row.parent_last_name) {
