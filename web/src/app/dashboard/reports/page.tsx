@@ -1376,7 +1376,7 @@ export default function ReportsPage() {
               </div>
               {/* Tendencia semanal: últimas 4 semanas */}
               {granularity === 'weekly' && weeklyTrend.length > 0 && (
-                <div className="mt-8 sm:mt-6">
+                <div className="mt-12 sm:mt-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-700">{t('weekly_trend_title')}</h3>
                     <span className={`${trendDirection === 'up' ? 'text-green-600' : trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'} text-sm font-medium`}>
