@@ -1299,10 +1299,11 @@ export default function AttendancePage() {
                     filteredStudents.map((student) => (
                       <tr 
                         key={student.id} 
-                        className={`hover:bg-gray-50 ${student.selected ? 'bg-blue-50' : ''}`}
+                        className={`${attendanceMode ? 'cursor-pointer' : ''} hover:bg-gray-50 ${student.selected ? 'bg-blue-50' : ''}`}
+                        onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                       >
                         {attendanceMode && (
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <td className="px-6 py-4 whitespace-nowrap text-center" onClick={(e) => e.stopPropagation()}>
                             <input
                               type="checkbox"
                               checked={student.selected || false}
@@ -1360,7 +1361,11 @@ export default function AttendancePage() {
             <div className="md:hidden space-y-3">
               {filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
-                  <div key={student.id} className={`bg-white p-4 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'}`}>
+                  <div 
+                    key={student.id} 
+                    className={`bg-white p-4 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
+                    onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
+                  >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-base">
@@ -1375,6 +1380,7 @@ export default function AttendancePage() {
                           type="checkbox"
                           checked={student.selected || false}
                           onChange={() => toggleStudentSelection(student.id)}
+                          onClick={(e) => e.stopPropagation()}
                           className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                       )}
