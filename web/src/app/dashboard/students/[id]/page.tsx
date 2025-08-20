@@ -278,7 +278,7 @@ export default function StudentDetail() {
         // Check current user's role and permissions
         console.log('Verificando rol y permisos del usuario...');
         const { data: userRole } = await supabase
-          .from('program_memberships')
+          .from('user_program_memberships')
           .select('role')
           .eq('user_id', user?.id)
           .eq('program_id', studentCheck.program_id)
@@ -306,31 +306,17 @@ export default function StudentDetail() {
           }
         }
         
-        // Try creating a database function for forced deletion
-        console.log('Intentando eliminación con función de base de datos...');
-        const { data: functionResult, error: functionError } = await supabase
-          .rpc('force_delete_student', { 
-            target_student_id: params.id 
-          });
+        // Try simple deletion without additional context
+        console.log('Intentando eliminación simple...');
+        const { data: simpleDeleteData, error: simpleDeleteError } = await supabase
+          .from('students')
+          .delete()
+          .eq('id', params.id);
           
-        console.log('Resultado función eliminación:', { functionResult, functionError });
+        console.log('Resultado eliminación simple:', { simpleDeleteData, simpleDeleteError });
         
-        if (!functionError && functionResult) {
-          console.log('Eliminación exitosa con función de base de datos');
-          return; // Exit early if successful
-        }
-        
-        // Try manual SQL execution (if user has sufficient privileges)
-        console.log('Intentando eliminación con SQL directo...');
-        const { data: sqlResult, error: sqlError } = await supabase
-          .rpc('execute_sql', {
-            sql_query: `DELETE FROM students WHERE id = '${params.id}' AND program_id = '${studentCheck.program_id}';`
-          });
-          
-        console.log('Resultado SQL directo:', { sqlResult, sqlError });
-        
-        if (!sqlError) {
-          console.log('Eliminación exitosa con SQL directo');
+        if (!simpleDeleteError && simpleDeleteData) {
+          console.log('Eliminación exitosa con método simple');
           return; // Exit early if successful
         }
         
