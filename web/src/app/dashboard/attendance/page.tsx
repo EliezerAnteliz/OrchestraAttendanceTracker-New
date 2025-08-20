@@ -1081,20 +1081,21 @@ export default function AttendancePage() {
 
   return (
     <div className="h-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-black">{t('attendance_title')}</h1>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative">
-            <DatePicker
-              selected={selectedDate}
-              onChange={handleDateChange}
-              dateFormat="dd/MM/yyyy"
-              className="border border-gray-300 rounded-md p-2.5 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] text-black font-medium shadow-sm w-full"
-              wrapperClassName="date-picker-wrapper w-44"
-              locale={lang === 'es' ? es : enUS}
-              showMonthYearPicker={false}
-              showMonthDropdown={false}
-              showYearDropdown={false}
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-black">{t('attendance_title')}</h1>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="relative">
+              <DatePicker
+                selected={selectedDate}
+                onChange={handleDateChange}
+                dateFormat="dd/MM/yyyy"
+                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] text-black font-medium shadow-sm w-full sm:w-44"
+                wrapperClassName="date-picker-wrapper w-full sm:w-44"
+                locale={lang === 'es' ? es : enUS}
+                showMonthYearPicker={false}
+                showMonthDropdown={false}
+                showYearDropdown={false}
               renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
                 <div className="flex justify-between items-center px-2 py-2">
                   <button
@@ -1122,22 +1123,23 @@ export default function AttendancePage() {
               )}
             />
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#0073ea]">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </span>
           </div>
-          
-          <button
-            onClick={toggleAttendanceMode}
-            className={`px-4 py-2 rounded-md flex items-center whitespace-nowrap ${
-              attendanceMode 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
-            }`}
-          >
-            {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
-          </button>
+            
+            <button
+              onClick={toggleAttendanceMode}
+              className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium w-full sm:w-auto ${
+                attendanceMode 
+                  ? 'bg-red-500 hover:bg-red-600 text-white' 
+                  : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
+              }`}
+            >
+              {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1155,23 +1157,23 @@ export default function AttendancePage() {
       )}
       
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-          <div className="relative flex-grow">
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="relative">
             <input
               type="text"
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
               onChange={handleSearch}
-              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="w-full pl-10 pr-4 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
             />
-            <span className="absolute left-3 top-2.5 text-black font-bold">&#128269;</span>
+            <span className="absolute left-3 top-3 text-gray-400">🔍</span>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex flex-col sm:flex-row gap-2">
             <select
               value={selectedInstrument}
               onChange={(e) => handleInstrumentChange(e.target.value)}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
               aria-label={t('filter_by_instrument')}
             >
               <option value="all">{t('all_instruments')}</option>
@@ -1184,82 +1186,82 @@ export default function AttendancePage() {
           </div>
         </div>
         
-        <div className="text-sm text-black font-semibold mb-2">
+        <div className="text-sm text-gray-600 font-medium mb-3">
           {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
         </div>
         
         {attendanceMode && (
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-2 mb-2">
+          <div className="mb-4 space-y-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={selectAllStudents}
-                className="px-4 py-2 rounded-md flex items-center bg-blue-500 hover:bg-blue-600 text-white text-sm"
+                className="flex-1 sm:flex-none px-3 py-2 rounded-md flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium"
               >
                 <span className="mr-2">☑</span>
                 {t('select_all')}
               </button>
               <button
                 onClick={deselectAllStudents}
-                className="px-4 py-2 rounded-md flex items-center bg-gray-500 hover:bg-gray-600 text-white text-sm"
+                className="flex-1 sm:flex-none px-3 py-2 rounded-md flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium"
               >
                 <span className="mr-2">☐</span>
                 {t('deselect_all')}
               </button>
             </div>
             
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 onClick={() => markAttendance('A')}
                 disabled={selectedStudentCount === 0}
-                className={`px-4 py-2 rounded-md flex items-center ${
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-green-500 hover:bg-green-600 text-white'
-                    : 'bg-gray-300 text-black cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                <span className="mr-2">✓</span>
+                <span className="mr-1">✓</span>
                 {t('mark_present')}
               </button>
               <button
                 onClick={() => markAttendance('EA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-4 py-2 rounded-md flex items-center ${
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                    : 'bg-gray-300 text-black cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                <span className="mr-2">!</span>
+                <span className="mr-1">!</span>
                 {t('mark_excused_absence')}
               </button>
               <button
                 onClick={() => markAttendance('UA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-4 py-2 rounded-md flex items-center ${
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-gray-300 text-black cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                <span className="mr-2">✗</span>
+                <span className="mr-1">✗</span>
                 {t('mark_unexcused_absence')}
               </button>
               
-              {/* Botón para limpiar asistencia */}
               <button
                 onClick={clearAttendanceForDate}
                 disabled={selectedStudentCount === 0 || isLoading}
-                className={`px-4 py-2 rounded-md flex items-center ${
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
                   selectedStudentCount > 0 && !isLoading
                     ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                    : 'bg-gray-300 text-black cursor-not-allowed'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
                 title={selectedStudentCount > 0 ? `Limpiar asistencia de ${selectedStudentCount} estudiante(s) seleccionado(s)` : 'Selecciona estudiantes para limpiar su asistencia'}
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                {t('clear_attendance')}
+                <span className="hidden sm:inline">{t('clear_attendance')}</span>
+                <span className="sm:hidden">Limpiar</span>
               </button>
             </div>
           </div>
@@ -1351,51 +1353,52 @@ export default function AttendancePage() {
             </div>
             
             {/* Vista de tarjetas para móviles */}
-            <div className="md:hidden space-y-4">
+            <div className="md:hidden space-y-3">
               {filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
-                  <div key={student.id} className={`bg-gray-50 p-4 rounded-lg border border-gray-200 ${student.selected ? 'border-blue-400 bg-blue-50' : ''}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-medium text-gray-900">
+                  <div key={student.id} className={`bg-white p-4 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 text-base">
                           {student.first_name} {student.last_name}
                         </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {t('grade')}: {student.current_grade || t('not_specified')}
+                        </p>
                       </div>
                       {attendanceMode && (
                         <input
                           type="checkbox"
                           checked={student.selected || false}
                           onChange={() => toggleStudentSelection(student.id)}
-                          className="h-5 w-5"
+                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                       )}
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
-                      <div>
-                        <span className="text-black">{t('instrument_label')}:</span>
-                        <p className="font-medium">{student.instrument || t('not_specified')}</p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">{t('instrument_label')}:</span>
+                        <span className="font-semibold text-gray-900">{student.instrument || t('not_specified')}</span>
                       </div>
-                      <div>
-                        <span className="text-black">{t('status')}:</span>
-                        <p>
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {student.is_active ? t('active') : t('inactive')}
-                          </span>
-                        </p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 font-medium">{t('status')}:</span>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {student.is_active ? t('active') : t('inactive')}
+                        </span>
                       </div>
-                      <div className="col-span-2">
-                        <span className="text-black">{t('attendance')}:</span>
-                        <div className="font-medium">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 font-medium">{t('attendance')}:</span>
+                        <div>
                           {student.attendance_status ? (
                             <AttendanceStatusIndicator
                               key={`${student.id}-${student.attendance_status || 'none'}`}
                               statusCode={student.attendance_status}
                             />
                           ) : (
-                            <span className="text-sm font-medium text-gray-900">{t('not_recorded')}</span>
+                            <span className="text-sm font-medium text-gray-500">{t('not_recorded')}</span>
                           )}
                         </div>
                       </div>
@@ -1403,8 +1406,9 @@ export default function AttendancePage() {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-black">
-                  {t('no_students_found')}
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-4xl mb-2">👥</div>
+                  <p className="font-medium">{t('no_students_found')}</p>
                 </div>
               )}
             </div>
