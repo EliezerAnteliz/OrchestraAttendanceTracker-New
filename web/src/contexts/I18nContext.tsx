@@ -326,6 +326,15 @@ const translations: Translations = {
   your_role: { es: "tu rol", en: "your role" },
   viewing: { es: "viendo", en: "viewing" },
   reset_to_actual_role: { es: "Volver a mi rol", en: "Reset to my role" },
+  
+  // Parent contact translations
+  parent_contact_info: { es: "Información de Contacto del Padre/Madre", en: "Parent Contact Information" },
+  parent_name: { es: "Nombre del Padre/Madre", en: "Parent Name" },
+  parent_phone: { es: "Teléfono del Padre/Madre", en: "Parent Phone" },
+  parent_email: { es: "Correo del Padre/Madre", en: "Parent Email" },
+  parent_name_placeholder: { es: "Ej: María González", en: "e.g: Maria Gonzalez" },
+  parent_phone_placeholder: { es: "Ej: +1 234 567 8900", en: "e.g: +1 234 567 8900" },
+  parent_email_placeholder: { es: "Ej: maria@email.com", en: "e.g: maria@email.com" },
 };
 
 interface I18nContextValue {
