@@ -374,16 +374,16 @@ export const getAttendanceByInstrument = async (
         ? record.students.instrument
         : 'No asignado';
       
-      if (!instrumentMap[instrument]) {
-        instrumentMap[instrument] = { present: 0, absent: 0, excused: 0 };
+      if (!instrumentMap[instrument as string]) {
+        instrumentMap[instrument as string] = { present: 0, absent: 0, excused: 0 };
       }
       
       // Clasificar según status_code
       const code = record.status_code ? String(record.status_code).toUpperCase() : '';
-      if (code === 'A') instrumentMap[instrument].present += 1;
-      else if (code === 'EA') instrumentMap[instrument].excused += 1;
-      else if (code === 'UA') instrumentMap[instrument].absent += 1;
-      else instrumentMap[instrument].absent += 1; // desconocido => ausencia
+      if (code === 'A') instrumentMap[instrument as string].present += 1;
+      else if (code === 'EA') instrumentMap[instrument as string].excused += 1;
+      else if (code === 'UA') instrumentMap[instrument as string].absent += 1;
+      else instrumentMap[instrument as string].absent += 1; // desconocido => ausencia
     });
 
     // Convertir a array y calcular totales
