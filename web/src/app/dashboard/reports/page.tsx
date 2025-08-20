@@ -1062,10 +1062,10 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-6 px-2 sm:px-0">
       {/* Selector de tipo de reporte */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg sm:text-xl font-medium text-gray-800 mb-4">{t('report_type_title')}</h2>
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+        <h2 className="text-base sm:text-xl font-medium text-gray-800 mb-3 sm:mb-4">{t('report_type_title')}</h2>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-4 sm:gap-0">
           <button
             onClick={() => {
@@ -1099,9 +1099,9 @@ export default function ReportsPage() {
       </div>
 
       {/* Información del período */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex flex-col gap-4 mb-4">
-          <h2 className="text-lg sm:text-xl font-medium text-gray-800 flex items-center">
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+        <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <h2 className="text-base sm:text-xl font-medium text-gray-800 flex items-center">
             <MdCalendarMonth className="mr-2" /> {t('period')} {granularity === 'monthly' ? t('monthly') : granularity === 'weekly' ? t('weekly') : t('annual')}
           </h2>
           
@@ -1134,7 +1134,7 @@ export default function ReportsPage() {
           </div>
           
           {/* Controles de período */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:gap-3">
 
             {granularity === 'monthly' ? (
               <div className="flex flex-col gap-2">
@@ -1161,7 +1161,7 @@ export default function ReportsPage() {
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
                 />
               </div>
             ) : granularity === 'weekly' ? (
@@ -1189,7 +1189,7 @@ export default function ReportsPage() {
                     setReportData(null);
                   }}
                   ariaLabelledBy="weekPicker"
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
                 />
               </div>
             ) : (
@@ -1200,7 +1200,7 @@ export default function ReportsPage() {
                   value={academicYear}
                   onChange={(e) => { setAcademicYear(parseInt(e.target.value, 10)); setReportData(null); }}
                   aria-label={t('academic_year')}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
                 >
                   {Array.from({ length: 7 }).map((_, idx) => {
                     const y = defaultAcademicYear - 3 + idx;
@@ -1220,7 +1220,7 @@ export default function ReportsPage() {
                   id="instrumentFilter"
                   value={instrumentFilter}
                   onChange={(e) => { setInstrumentFilter(e.target.value); setReportData(null); }}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
                 >
                   <option value="all">{t('all')}</option>
                   {instruments.map(inst => (
@@ -1244,7 +1244,7 @@ export default function ReportsPage() {
       {/* Selección de estudiante (solo para reporte individual) */}
       {reportType === 'individual' && (
         <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-lg sm:text-xl font-medium text-gray-800 mb-4">{t('selected_student')}</h2>
+          <h2 className="text-base sm:text-xl font-medium text-gray-800 mb-3 sm:mb-4">{t('selected_student')}</h2>
           {selectedStudent ? (
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <div className="flex-1">
@@ -1261,7 +1261,7 @@ export default function ReportsPage() {
           ) : (
             <button
               onClick={() => setStudentModalVisible(true)}
-              className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
             >
               {t('select_student_title')}
             </button>
@@ -1307,7 +1307,7 @@ export default function ReportsPage() {
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="px-4 py-2.5 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium w-full sm:w-auto"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-blue-600 transition-colors" flex items-center justify-center text-sm font-medium w-full sm:w-auto"
             >
               <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
@@ -1345,9 +1345,9 @@ export default function ReportsPage() {
             </div>
             
             {/* Gráfico */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-                <h3 className="font-medium text-gray-700 text-lg">{t('attendance_distribution')}</h3>
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <h3 className="font-medium text-gray-700 text-base sm:text-lg">{t('attendance_distribution')}</h3>
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
                   <button 
                     onClick={() => setChartType('pie')}
