@@ -1426,7 +1426,7 @@ export default function ReportsPage() {
               )}
               {/* Desglose mensual apilado (modo anual) - compacto */}
               {granularity === 'annual' && annualBreakdown.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-20 sm:mt-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-gray-700">{t('monthly_breakdown_title')}</h3>
                     <div className="hidden sm:flex items-center gap-3 text-xs text-gray-700">
