@@ -90,11 +90,19 @@ export function useUserRole() {
       } else {
         setViewingAsRole(role);
       }
+      // Refrescar la página para aplicar cambios inmediatamente
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
     }
   };
   
   const resetToActualRole = () => {
     setViewingAsRole(null);
+    // Refrescar la página para aplicar cambios inmediatamente
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
   };
 
   return {
