@@ -46,7 +46,7 @@ export default function SignUpPage() {
         setOrganizations(data || []);
       } catch (err) {
         console.error('Error loading organizations:', err);
-        setError('Error al cargar las organizaciones disponibles');
+        setError(t('error_loading_organizations'));
       } finally {
         setLoadingOrgs(false);
       }
@@ -78,7 +78,7 @@ export default function SignUpPage() {
         setSelectedProgram(''); // Reset selection
       } catch (err) {
         console.error('Error loading programs:', err);
-        setError('Error al cargar las sedes disponibles');
+        setError(t('error_loading_sedes'));
       } finally {
         setLoadingPrograms(false);
       }
@@ -94,21 +94,21 @@ export default function SignUpPage() {
     
     // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError(t('passwords_dont_match'));
       setLoading(false);
       return;
     }
 
     // Validar que se haya seleccionado una organización
     if (!selectedOrganization) {
-      setError('Por favor selecciona una organización');
+      setError(t('please_select_organization'));
       setLoading(false);
       return;
     }
 
     // Validar que se haya seleccionado un programa/sede
     if (!selectedProgram) {
-      setError('Por favor selecciona una sede');
+      setError(t('please_select_sede'));
       setLoading(false);
       return;
     }
@@ -170,7 +170,7 @@ export default function SignUpPage() {
         }, 3000);
       }
     } catch (err: any) {
-      setError(err.message || 'Error al crear la cuenta');
+      setError(err.message || t('error_creating_account'));
     } finally {
       setLoading(false);
     }
@@ -200,7 +200,7 @@ export default function SignUpPage() {
                 <MdMusicNote size={32} className="text-white" />
               </div>
               <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('create_account')}</h2>
-              <p className="text-gray-600">Únete a la comunidad musical</p>
+              <p className="text-gray-600">{t('join_musical_community')}</p>
             </div>
             
             {error && (
@@ -214,12 +214,12 @@ export default function SignUpPage() {
               <div className="text-center py-8">
                 <div className="bg-green-100 p-6 rounded-2xl mb-6">
                   <MdCheckCircle size={48} className="text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-green-800 mb-2">¡Cuenta creada exitosamente!</h3>
-                  <p className="text-green-700">Serás redirigido a la página de inicio de sesión en unos momentos.</p>
+                  <h3 className="text-xl font-bold text-green-800 mb-2">{t('account_created_successfully')}</h3>
+                  <p className="text-green-700">{t('redirecting_to_login')}</p>
                 </div>
                 <div className="flex items-center justify-center space-x-2 text-gray-600">
                   <div className="w-4 h-4 border-2 border-[#0073ea] border-t-transparent rounded-full animate-spin"></div>
-                  <span>Redirigiendo...</span>
+                  <span>{t('redirecting')}</span>
                 </div>
               </div>
             ) : (
@@ -238,15 +238,15 @@ export default function SignUpPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
-                      placeholder="tu@email.com"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-gray-800"
+                      placeholder={t('email_placeholder')}
                     />
                   </div>
                 </div>
                 
                 <div>
                   <label htmlFor="organization" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Organización
+                    {t('organization')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -260,7 +260,7 @@ export default function SignUpPage() {
                       disabled={loadingOrgs}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
                     >
-                      <option value="">Selecciona tu organización...</option>
+                      <option value="">{t('select_organization')}</option>
                       {organizations.map((org) => (
                         <option key={org.id} value={org.id}>
                           {org.name}
@@ -271,14 +271,14 @@ export default function SignUpPage() {
                   {loadingOrgs && (
                     <div className="mt-2 flex items-center space-x-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-gray-500">Cargando organizaciones disponibles...</span>
+                      <span className="text-xs text-gray-500">{t('loading_organizations')}</span>
                     </div>
                   )}
                 </div>
                 
                 <div>
                   <label htmlFor="program" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Sede
+                    {t('sede')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -292,7 +292,7 @@ export default function SignUpPage() {
                       disabled={loadingPrograms || !selectedOrganization}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
                     >
-                      <option value="">{selectedOrganization ? 'Selecciona una sede...' : 'Selecciona una organización primero'}</option>
+                      <option value="">{selectedOrganization ? t('select_sede') : t('select_organization_first')}</option>
                       {programs.map((program) => (
                         <option key={program.id} value={program.id}>
                           {program.name}
@@ -303,14 +303,14 @@ export default function SignUpPage() {
                   {loadingPrograms && (
                     <div className="mt-2 flex items-center space-x-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-gray-500">Cargando sedes disponibles...</span>
+                      <span className="text-xs text-gray-500">{t('loading_sedes')}</span>
                     </div>
                   )}
                 </div>
                 
                 <div>
                   <label htmlFor="role" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Nivel de Usuario
+                    {t('user_level')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -323,8 +323,8 @@ export default function SignUpPage() {
                       required
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-gray-800"
                     >
-                      <option value="viewer">Viewer</option>
-                      <option value="staff">Staff</option>
+                      <option value="viewer">{t('viewer')}</option>
+                      <option value="staff">{t('staff')}</option>
                     </select>
                   </div>
                 </div>
@@ -343,7 +343,7 @@ export default function SignUpPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-gray-800"
                       placeholder="••••••••"
                       minLength={6}
                     />
@@ -362,14 +362,14 @@ export default function SignUpPage() {
                   <div className="mt-2 flex items-center space-x-2">
                     <div className={`w-2 h-2 rounded-full ${passwordStrength ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span className={`text-xs ${passwordStrength ? 'text-green-600' : 'text-gray-500'}`}>
-                      Mínimo 6 caracteres
+                      {t('minimum_6_characters')}
                     </span>
                   </div>
                 </div>
                 
                 <div>
                   <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-800 mb-2">
-                    Confirmar Contraseña
+                    {t('confirm_password')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -381,7 +381,7 @@ export default function SignUpPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200"
+                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-gray-800"
                       placeholder="••••••••"
                     />
                     <button
@@ -400,7 +400,7 @@ export default function SignUpPage() {
                     <div className="mt-2 flex items-center space-x-2">
                       <div className={`w-2 h-2 rounded-full ${passwordsMatch ? 'bg-green-500' : 'bg-red-500'}`}></div>
                       <span className={`text-xs ${passwordsMatch ? 'text-green-600' : 'text-red-600'}`}>
-                        {passwordsMatch ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden'}
+                        {passwordsMatch ? t('passwords_match') : t('passwords_dont_match')}
                       </span>
                     </div>
                   )}
