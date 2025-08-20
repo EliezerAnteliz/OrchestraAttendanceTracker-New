@@ -204,10 +204,13 @@ export default function StudentDetail() {
       
       // First delete student-parent relationships
       console.log('Eliminando relaciones estudiante-padre...');
-      const { error: spError } = await supabase
+      const { data: deletedRelations, error: spError } = await supabase
         .from('student_parents')
         .delete()
-        .eq('student_id', params.id);
+        .eq('student_id', params.id)
+        .select();
+      
+      console.log('Relaciones eliminadas:', deletedRelations);
       
       if (spError) {
         console.error('Error eliminando relaciones:', spError);
@@ -216,10 +219,13 @@ export default function StudentDetail() {
 
       // Then delete attendance records
       console.log('Eliminando registros de asistencia...');
-      const { error: attError } = await supabase
+      const { data: deletedAttendance, error: attError } = await supabase
         .from('attendance')
         .delete()
-        .eq('student_id', params.id);
+        .eq('student_id', params.id)
+        .select();
+      
+      console.log('Registros de asistencia eliminados:', deletedAttendance);
       
       if (attError) {
         console.error('Error eliminando asistencia:', attError);
@@ -231,17 +237,25 @@ export default function StudentDetail() {
 
       // Finally delete the student
       console.log('Eliminando estudiante...');
-      const { error } = await supabase
+      const { data: deletedData, error } = await supabase
         .from('students')
         .delete()
-        .eq('id', params.id);
+        .eq('id', params.id)
+        .select();
+
+      console.log('Resultado de eliminación:', { deletedData, error });
 
       if (error) {
         console.error('Error eliminando estudiante:', error);
         throw error;
       }
 
-      console.log('Estudiante eliminado exitosamente');
+      if (!deletedData || deletedData.length === 0) {
+        console.warn('No se eliminó ningún registro. Posible problema de RLS o ID incorrecto');
+        throw new Error('No se pudo eliminar el estudiante. Verifica los permisos.');
+      }
+
+      console.log('Estudiante eliminado exitosamente:', deletedData);
       setDeleteConfirm(false);
       router.push('/dashboard/students');
     } catch (err) {
