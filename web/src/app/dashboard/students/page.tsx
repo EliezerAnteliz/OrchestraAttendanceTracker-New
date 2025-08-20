@@ -7,6 +7,7 @@ import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContac
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 type Student = {
   id: string;
@@ -22,6 +23,7 @@ type Student = {
 export default function StudentsPage() {
   const { t } = useI18n();
   const { activeProgram, loading: programLoading } = useProgram();
+  const { canBulkUpload, canEditStudents, loading: roleLoading } = useUserRole();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,15 +139,19 @@ export default function StudentsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-black">{t('students_title')}</h1>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button 
-            onClick={() => setShowUploadModal(true)} 
-            className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center"
-          >
-            <MdUpload className="mr-1" size={16} /> {t('bulk_upload_short')}
-          </button>
-          <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center">
-            <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
-          </Link>
+          {canBulkUpload && (
+            <button 
+              onClick={() => setShowUploadModal(true)} 
+              className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center"
+            >
+              <MdUpload className="mr-1" size={16} /> {t('bulk_upload_short')}
+            </button>
+          )}
+          {canEditStudents && (
+            <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center">
+              <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
+            </Link>
+          )}
         </div>
       </div>
 
