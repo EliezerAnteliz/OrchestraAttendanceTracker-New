@@ -263,7 +263,7 @@ export default function UserRegistrationScreen() {
           {/* Organization Selector */}
           <View style={styles.organizationContainer}>
             <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}> 
-              Sede/Organización
+              Organización
             </Text>
             {organizationsLoading ? (
               <View style={[styles.organizationSelector, { 
@@ -295,7 +295,7 @@ export default function UserRegistrationScreen() {
                       <Text style={styles.inputIcon}>🏢</Text>
                     )}
                   >
-                    {selectedOrganization ? selectedOrganization.name : 'Selecciona tu sede...'}
+                    {selectedOrganization ? selectedOrganization.name : 'Selecciona tu organización...'}
                   </Button>
                 }
               >
@@ -319,14 +319,19 @@ export default function UserRegistrationScreen() {
             )}
             {error && !selectedOrganization && (
               <Text style={[styles.fieldError, { color: theme.colors.error }]}> 
-                Selecciona una sede
+                Selecciona una organización
+              </Text>
+            )}
+            {!organizationsLoading && organizations.length === 0 && (
+              <Text style={[styles.fieldError, { color: theme.colors.onSurfaceVariant }]}> 
+                No hay organizaciones activas. Contacta al administrador.
               </Text>
             )}
           </View>
 
           {/* Program Selector */}
           <View style={styles.organizationContainer}>
-            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Programa</Text>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Sede/Programa</Text>
             {programsLoading ? (
               <View style={[styles.organizationSelector, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}> 
                 <ActivityIndicator size="small" color={theme.colors.primary} />
@@ -346,7 +351,7 @@ export default function UserRegistrationScreen() {
                     icon={() => (<Text style={styles.inputIcon}>🎼</Text>)}
                     disabled={!selectedOrganization}
                   >
-                    {selectedProgram ? selectedProgram.name : (selectedOrganization ? 'Selecciona un programa...' : 'Selecciona una sede primero')}
+                    {selectedProgram ? selectedProgram.name : (selectedOrganization ? 'Selecciona una sede...' : 'Selecciona una organización primero')}
                   </Button>
                 }
               >
