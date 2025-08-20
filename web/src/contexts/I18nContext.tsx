@@ -250,7 +250,6 @@ const translations: Translations = {
   mark_present: { es: "Marcar Presente", en: "Mark Present" },
   mark_excused_absence: { es: "Marcar Falta Justificada", en: "Mark Excused Absence" },
   mark_unexcused_absence: { es: "Marcar Falta Injustificada", en: "Mark Unexcused Absence" },
-  not_specified: { es: "No especificado", en: "Not specified" },
   not_recorded: { es: "No registrado", en: "Not recorded" },
   prev_month: { es: "Mes anterior", en: "Previous month" },
   next_month: { es: "Mes siguiente", en: "Next month" },
@@ -316,6 +315,10 @@ const translations: Translations = {
   clear_attendance_confirm: { es: "¿Estás seguro de que quieres limpiar toda la asistencia del {{date}}? Esta acción no se puede deshacer.", en: "Are you sure you want to clear all attendance for {{date}}? This action cannot be undone." },
   attendance_cleared_success: { es: "Asistencia limpiada exitosamente para {{date}}", en: "Attendance cleared successfully for {{date}}" },
   clear_attendance_error: { es: "Error al limpiar la asistencia: {{error}}", en: "Error clearing attendance: {{error}}" },
+  
+  // Button translations
+  bulk_upload_short: { es: "Carga Masiva", en: "Bulk Upload" },
+  new_student_short: { es: "Nuevo Estudiante", en: "New Student" },
 };
 
 interface I18nContextValue {
