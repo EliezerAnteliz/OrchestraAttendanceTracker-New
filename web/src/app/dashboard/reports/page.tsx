@@ -1062,18 +1062,18 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Selector de tipo de reporte */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-lg font-medium text-gray-800 mb-4">{t('report_type_title')}</h2>
-        <div className="flex space-x-4">
+        <h2 className="text-lg sm:text-xl font-medium text-gray-800 mb-4">{t('report_type_title')}</h2>
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-4 sm:gap-0">
           <button
             onClick={() => {
               setReportType('group');
               setSelectedStudent(null);
               setReportData(null);
             }}
-            className={`flex items-center px-4 py-2 rounded-md ${
+            className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
               reportType === 'group'
                 ? 'bg-[#0073ea] text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1087,7 +1087,7 @@ export default function ReportsPage() {
               setReportData(null);
               setStudentModalVisible(true);
             }}
-            className={`flex items-center px-4 py-2 rounded-md ${
+            className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
               reportType === 'individual'
                 ? 'bg-[#0073ea] text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1100,38 +1100,47 @@ export default function ReportsPage() {
 
       {/* Información del período */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-medium text-gray-800 flex items-center">
+        <div className="flex flex-col gap-4 mb-4">
+          <h2 className="text-lg sm:text-xl font-medium text-gray-800 flex items-center">
             <MdCalendarMonth className="mr-2" /> {t('period')} {granularity === 'monthly' ? t('monthly') : granularity === 'weekly' ? t('weekly') : t('annual')}
           </h2>
-          <div className="flex items-center gap-4">
-            {/* Toggle granularidad */}
-            <div className="flex items-center bg-gray-100 rounded-md overflow-hidden">
-              <button
-                className={`px-3 py-1 text-sm ${granularity === 'monthly' ? 'bg-[#0073ea] text-white' : 'text-gray-700'}`}
-                onClick={() => { setGranularity('monthly'); setReportData(null); }}
-              >
-                {t('monthly')}
-              </button>
-              <button
-                className={`px-3 py-1 text-sm ${granularity === 'weekly' ? 'bg-[#0073ea] text-white' : 'text-gray-700'}`}
-                onClick={() => { setGranularity('weekly'); setReportData(null); }}
-              >
-                {t('weekly')}
-              </button>
-              <button
-                className={`px-3 py-1 text-sm ${granularity === 'annual' ? 'bg-[#0073ea] text-white' : 'text-gray-700'}`}
-                onClick={() => { setGranularity('annual'); setReportData(null); }}
-              >
-                {t('annual')}
-              </button>
-            </div>
+          
+          {/* Toggle granularidad - Mobile first */}
+          <div className="grid grid-cols-3 gap-1 bg-gray-100 rounded-md overflow-hidden p-1">
+            <button
+              className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
+                granularity === 'monthly' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={() => { setGranularity('monthly'); setReportData(null); }}
+            >
+              {t('monthly')}
+            </button>
+            <button
+              className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
+                granularity === 'weekly' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={() => { setGranularity('weekly'); setReportData(null); }}
+            >
+              {t('weekly')}
+            </button>
+            <button
+              className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
+                granularity === 'annual' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={() => { setGranularity('annual'); setReportData(null); }}
+            >
+              {t('annual')}
+            </button>
+          </div>
+          
+          {/* Controles de período */}
+          <div className="flex flex-col gap-3">
 
             {granularity === 'monthly' ? (
-              <>
+              <div className="flex flex-col gap-2">
                 <label
                   htmlFor="monthPicker"
-                  className="text-sm text-gray-700 cursor-pointer select-none"
+                  className="text-sm font-medium text-gray-700 cursor-pointer select-none"
                 >
                   {t('month')}
                 </label>
@@ -1152,16 +1161,15 @@ export default function ReportsPage() {
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
-                  className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
                 />
-              </>
+              </div>
             ) : granularity === 'weekly' ? (
-              <>
-                <label htmlFor="weekPicker" className="text-sm text-gray-700">{t('week')}</label>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="weekPicker" className="text-sm font-medium text-gray-700">{t('week')}</label>
                 <DatePicker
                   id="weekPicker"
                   selected={(() => {
-                    // Tomar lunes de la semana ISO como fecha representativa
                     const { firstDay } = getISOWeekRange(customWeek);
                     return firstDay;
                   })()}
@@ -1181,18 +1189,18 @@ export default function ReportsPage() {
                     setReportData(null);
                   }}
                   ariaLabelledBy="weekPicker"
-                  className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
                 />
-              </>
+              </div>
             ) : (
-              <>
-                <label htmlFor="academicYear" className="text-sm text-gray-700">{t('academic_year')}</label>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="academicYear" className="text-sm font-medium text-gray-700">{t('academic_year')}</label>
                 <select
                   id="academicYear"
                   value={academicYear}
                   onChange={(e) => { setAcademicYear(parseInt(e.target.value, 10)); setReportData(null); }}
                   aria-label={t('academic_year')}
-                  className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
                 >
                   {Array.from({ length: 7 }).map((_, idx) => {
                     const y = defaultAcademicYear - 3 + idx;
@@ -1201,18 +1209,18 @@ export default function ReportsPage() {
                     );
                   })}
                 </select>
-              </>
+              </div>
             )}
 
             {/* Filtro por instrumento (solo para reporte grupal) */}
             {reportType === 'group' && (
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-700" htmlFor="instrumentFilter">{t('instrument_label')}</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700" htmlFor="instrumentFilter">{t('instrument_label')}</label>
                 <select
                   id="instrumentFilter"
                   value={instrumentFilter}
                   onChange={(e) => { setInstrumentFilter(e.target.value); setReportData(null); }}
-                  className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
                 >
                   <option value="all">{t('all')}</option>
                   {instruments.map(inst => (
@@ -1236,16 +1244,16 @@ export default function ReportsPage() {
       {/* Selección de estudiante (solo para reporte individual) */}
       {reportType === 'individual' && (
         <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-lg font-medium text-gray-800 mb-4">{t('selected_student')}</h2>
+          <h2 className="text-lg sm:text-xl font-medium text-gray-800 mb-4">{t('selected_student')}</h2>
           {selectedStudent ? (
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-base font-normal text-gray-800 leading-snug">{selectedStudent.name}</p>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+              <div className="flex-1">
+                <p className="text-base font-semibold text-gray-800 leading-snug">{selectedStudent.name}</p>
                 <p className="text-sm text-gray-600">{selectedStudent.instrument}</p>
               </div>
               <button
                 onClick={() => setStudentModalVisible(true)}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium w-full sm:w-auto"
               >
                 {t('change')}
               </button>
@@ -1253,7 +1261,7 @@ export default function ReportsPage() {
           ) : (
             <button
               onClick={() => setStudentModalVisible(true)}
-              className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+              className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium"
             >
               {t('select_student_title')}
             </button>
@@ -1262,14 +1270,14 @@ export default function ReportsPage() {
       )}
 
       {/* Botón para generar reporte */}
-      <div className="flex justify-center">
+      <div className="flex justify-center px-4">
         <button
           onClick={handleGenerateReport}
           disabled={generating || (reportType === 'individual' && !selectedStudent)}
-          className={`px-6 py-3 rounded-md flex items-center ${
+          className={`w-full sm:w-auto px-6 py-3 rounded-md flex items-center justify-center font-medium ${
             generating || (reportType === 'individual' && !selectedStudent)
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-[#0073ea] text-white hover:bg-[#0060c0]'
+              : 'bg-[#0073ea] text-white hover:bg-[#0060c0] shadow-sm'
           }`}
         >
           {generating ? (
@@ -1291,71 +1299,75 @@ export default function ReportsPage() {
       {/* Resultados del reporte */}
       {reportData && (
         <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-gray-800">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <h2 className="text-lg sm:text-xl font-medium text-gray-800">
               {reportType === 'individual' && selectedStudent
                 ? t('report_for_name', { name: selectedStudent.name })
                 : t('group_report_title')}
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="px-3 py-1 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center text-sm"
+              className="px-4 py-2.5 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium w-full sm:w-auto"
             >
-              <MdDownload className="mr-1" /> {t('export_csv')}
+              <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
             {/* Estadísticas */}
             <div className="space-y-4">
-              <h3 className="font-medium text-gray-700">{t('statistics')}</h3>
+              <h3 className="font-medium text-gray-700 text-lg">{t('statistics')}</h3>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-green-50 p-4 rounded-md">
-                  <p className="text-sm text-gray-600">{t('attendance_label')}</p>
-                  <p className="text-2xl font-bold text-green-700">{reportData.total_attendance}</p>
-                  <p className="text-sm text-gray-500">{reportData.attendance_percentage.toFixed(1)}%</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-green-50 p-3 sm:p-4 rounded-md border border-green-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('attendance_label')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-700">{reportData.total_attendance}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{reportData.attendance_percentage.toFixed(1)}%</p>
                 </div>
                 
-                <div className="bg-yellow-50 p-4 rounded-md">
-                  <p className="text-sm text-gray-600">{t('excused_absences_short')}</p>
-                  <p className="text-2xl font-bold text-yellow-700">{reportData.total_excused_absences}</p>
-                  <p className="text-sm text-gray-500">{reportData.excused_percentage.toFixed(1)}%</p>
+                <div className="bg-yellow-50 p-3 sm:p-4 rounded-md border border-yellow-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('excused_absences_short')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-700">{reportData.total_excused_absences}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{reportData.excused_percentage.toFixed(1)}%</p>
                 </div>
                 
-                <div className="bg-red-50 p-4 rounded-md">
-                  <p className="text-sm text-gray-600">{t('unexcused_absences_short')}</p>
-                  <p className="text-2xl font-bold text-red-700">{reportData.total_unexcused_absences}</p>
-                  <p className="text-sm text-gray-500">{reportData.unexcused_percentage.toFixed(1)}%</p>
+                <div className="bg-red-50 p-3 sm:p-4 rounded-md border border-red-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('unexcused_absences_short')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-700">{reportData.total_unexcused_absences}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">{reportData.unexcused_percentage.toFixed(1)}%</p>
                 </div>
                 
-                <div className="bg-blue-50 p-4 rounded-md">
-                  <p className="text-sm text-gray-600">{t('total_records')}</p>
-                  <p className="text-2xl font-bold text-blue-700">{reportData.total}</p>
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-md border border-blue-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('total_records')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-blue-700">{reportData.total}</p>
                 </div>
               </div>
             </div>
             
             {/* Gráfico */}
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-medium text-gray-700">{t('attendance_distribution')}</h3>
-                <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <h3 className="font-medium text-gray-700 text-lg">{t('attendance_distribution')}</h3>
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
                   <button 
                     onClick={() => setChartType('pie')}
-                    className={`px-3 py-1 text-xs rounded-md transition-colors ${chartType === 'pie' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      chartType === 'pie' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
                   >
                     {t('pie')}
                   </button>
                   <button 
                     onClick={() => setChartType('bar')}
-                    className={`px-3 py-1 text-xs rounded-md transition-colors ${chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
                   >
                     {t('bars')}
                   </button>
                 </div>
               </div>
-              <div className="h-[350px] w-full">
+              <div className="h-[300px] sm:h-[350px] w-full">
                 {chartType === 'pie' ? (
                   <PieChart data={reportData} />
                 ) : (
