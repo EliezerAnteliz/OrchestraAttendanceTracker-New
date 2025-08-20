@@ -13,6 +13,27 @@ export function useUserRole() {
   // El rol efectivo es el que está viendo actualmente o su rol real
   const userRole = viewingAsRole || actualUserRole;
 
+  // Cargar rol persistido al inicializar
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRole = localStorage.getItem('admin_viewing_as_role');
+      if (savedRole && (savedRole === 'admin' || savedRole === 'staff' || savedRole === 'viewer')) {
+        setViewingAsRole(savedRole as UserRole);
+      }
+    }
+  }, []);
+
+  // Guardar cambios de rol en localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (viewingAsRole) {
+        localStorage.setItem('admin_viewing_as_role', viewingAsRole);
+      } else {
+        localStorage.removeItem('admin_viewing_as_role');
+      }
+    }
+  }, [viewingAsRole]);
+
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!activeProgram?.id) {
@@ -63,7 +84,12 @@ export function useUserRole() {
   // Funciones para cambiar la vista (solo para admins)
   const switchToRole = (role: UserRole) => {
     if (actualUserRole === 'admin') {
-      setViewingAsRole(role);
+      if (role === actualUserRole) {
+        // Si selecciona su rol actual, resetear la vista
+        setViewingAsRole(null);
+      } else {
+        setViewingAsRole(role);
+      }
     }
   };
   
