@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Define types for our data structures
 type Student = {
@@ -43,6 +44,7 @@ type AttendanceRecord = {
 export default function AttendancePage() {
   const { t, lang } = useI18n();
   const { activeProgram } = useProgram();
+  const { canEditStudents } = useUserRole();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -1129,16 +1131,18 @@ export default function AttendancePage() {
             </span>
           </div>
             
-            <button
-              onClick={toggleAttendanceMode}
-              className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium w-full sm:w-auto ${
-                attendanceMode 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
-              }`}
-            >
-              {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
-            </button>
+            {canEditStudents && (
+              <button
+                onClick={toggleAttendanceMode}
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium w-full sm:w-auto ${
+                  attendanceMode 
+                    ? 'bg-red-500 hover:bg-red-600 text-white' 
+                    : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
+                }`}
+              >
+                {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
+              </button>
+            )}
           </div>
         </div>
       </div>
