@@ -224,68 +224,72 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     const parsed1 = parseFullName(name1);
     const parsed2 = parseFullName(name2);
     
+    console.log('Calculando similitud entre:');
+    console.log('- Nombre 1:', name1, '→', parsed1.parts);
+    console.log('- Nombre 2:', name2, '→', parsed2.parts);
+    
     // Coincidencia exacta
     if (parsed1.original === parsed2.original) return 1.0;
     
-    // Verificar coincidencias exactas por componentes
-    let exactMatches = 0;
-    let totalComponents = Math.max(parsed1.parts.length, parsed2.parts.length);
-    
-    // Verificar si el primer nombre coincide exactamente
-    const firstNameMatch = parsed1.firstName === parsed2.firstName && parsed1.firstName.length > 0;
-    
-    // Verificar si el apellido principal coincide exactamente
-    const lastNameMatch = parsed1.lastName === parsed2.lastName && parsed1.lastName.length > 0;
-    
-    // Si no hay coincidencia en nombre Y apellido principales, es muy improbable que sea la misma persona
-    if (!firstNameMatch && !lastNameMatch) {
-      // Verificar si algún componente del nombre coincide con algún componente del otro
-      let hasAnyMatch = false;
-      for (const part1 of parsed1.parts) {
-        for (const part2 of parsed2.parts) {
-          if (part1 === part2 && part1.length > 2) { // Solo considerar coincidencias de más de 2 caracteres
-            hasAnyMatch = true;
-            break;
-          }
-        }
-        if (hasAnyMatch) break;
-      }
-      
-      // Si no hay ninguna coincidencia de componentes significativos, retornar baja similitud
-      if (!hasAnyMatch) {
-        return 0.0;
-      }
-    }
-    
     // Contar coincidencias exactas de componentes
+    let exactMatches = 0;
+    const matchedParts = [];
+    
     for (const part1 of parsed1.parts) {
       if (parsed2.parts.includes(part1) && part1.length > 1) {
         exactMatches++;
+        matchedParts.push(part1);
       }
     }
     
-    // Calcular similitud basada en coincidencias exactas
-    const componentSimilarity = exactMatches / totalComponents;
+    console.log('- Componentes que coinciden:', matchedParts);
+    console.log('- Total de coincidencias:', exactMatches);
     
-    // Bonus por coincidencia de primer nombre y apellido
-    let bonus = 0;
-    if (firstNameMatch) bonus += 0.3;
-    if (lastNameMatch) bonus += 0.3;
-    
-    // Verificar si uno es subconjunto del otro (nombres completos vs nombres parciales)
-    const isSubset1 = parsed1.parts.every(part => parsed2.parts.includes(part));
-    const isSubset2 = parsed2.parts.every(part => parsed1.parts.includes(part));
-    
-    if (isSubset1 || isSubset2) {
-      const subsetSimilarity = Math.min(parsed1.parts.length, parsed2.parts.length) / Math.max(parsed1.parts.length, parsed2.parts.length);
-      return Math.min(0.95, componentSimilarity + bonus + (subsetSimilarity * 0.2));
+    // Si no hay al menos 2 componentes que coinciden, no es candidato
+    if (exactMatches < 2) {
+      console.log('❌ Menos de 2 componentes coinciden');
+      return 0.0;
     }
     
-    // Similitud final
-    const finalSimilarity = Math.min(0.9, componentSimilarity + bonus);
+    // Verificar patrones específicos de coincidencia
+    const firstNameMatch = parsed1.firstName === parsed2.firstName && parsed1.firstName.length > 1;
+    const lastNameMatch = parsed1.lastName === parsed2.lastName && parsed1.lastName.length > 1;
     
-    // Solo considerar como candidato si la similitud es significativa
-    return finalSimilarity >= 0.6 ? finalSimilarity : 0.0;
+    console.log('- Primer nombre coincide:', firstNameMatch, `(${parsed1.firstName} vs ${parsed2.firstName})`);
+    console.log('- Último apellido coincide:', lastNameMatch, `(${parsed1.lastName} vs ${parsed2.lastName})`);
+    
+    // Caso 1: Coincidencia de primer nombre + algún apellido
+    if (firstNameMatch && matchedParts.some(part => part !== parsed1.firstName)) {
+      console.log('✅ Patrón detectado: Primer nombre + apellido coinciden');
+      
+      // Verificar si uno es subconjunto del otro
+      const isSubset1 = parsed1.parts.every(part => parsed2.parts.includes(part));
+      const isSubset2 = parsed2.parts.every(part => parsed1.parts.includes(part));
+      
+      if (isSubset1 || isSubset2) {
+        // Caso como "Jesus Delgado" vs "Jesus Anthony Delgado" - alta similitud
+        console.log('🔥 Subconjunto detectado - alta similitud');
+        return 0.9;
+      } else {
+        // Caso como "Ian Ramirez" vs "Ian Daniel Rivera-Ramirez" - similitud media para confirmación
+        console.log('⚠️ Coincidencia parcial - requiere confirmación');
+        return 0.75;
+      }
+    }
+    
+    // Caso 2: Solo coincidencias de apellidos sin primer nombre
+    if (!firstNameMatch && exactMatches >= 2) {
+      console.log('⚪ Solo apellidos coinciden');
+      return 0.6;
+    }
+    
+    // Otros casos
+    const totalComponents = Math.max(parsed1.parts.length, parsed2.parts.length);
+    const componentSimilarity = exactMatches / totalComponents;
+    
+    console.log('- Similitud por componentes:', componentSimilarity);
+    
+    return componentSimilarity >= 0.5 ? componentSimilarity : 0.0;
   };
 
   // Función para buscar candidatos similares con mejor precisión
@@ -323,30 +327,14 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       
       console.log('Similitud calculada:', similarity);
       
-      // Considerar como candidato si:
-      // 1. La similitud es >= 0.7 pero < 1.0 (no exacta)
-      // 2. Y hay al menos una coincidencia significativa de nombre o apellido
-      if (similarity >= 0.7 && similarity < 1.0) {
-        // Verificación adicional: debe haber al menos coincidencia en primer nombre O apellido principal
-        const hasSignificantMatch = 
-          inputParsed.firstName === existingParsed.firstName ||
-          inputParsed.lastName === existingParsed.lastName ||
-          inputParsed.parts.some(part => existingParsed.parts.includes(part) && part.length > 2);
-          
-        console.log('Coincidencia significativa:', hasSignificantMatch);
-        console.log('- Primer nombre igual:', inputParsed.firstName === existingParsed.firstName);
-        console.log('- Apellido igual:', inputParsed.lastName === existingParsed.lastName);
-          
-        if (hasSignificantMatch) {
-          console.log('✅ CANDIDATO VÁLIDO:', existingFullName, 'Similitud:', similarity);
-          candidates.push({
-            existingStudent: student,
-            excelRow: { first_name: firstName, last_name: lastName },
-            similarity
-          });
-        } else {
-          console.log('❌ Candidato descartado por falta de coincidencia significativa:', existingFullName);
-        }
+      // Considerar como candidato si hay similitud > 0.6 pero < 1.0 (no exacta)
+      if (similarity >= 0.6 && similarity < 1.0) {
+        console.log('✅ CANDIDATO VÁLIDO:', existingFullName, 'Similitud:', similarity);
+        candidates.push({
+          existingStudent: student,
+          excelRow: { first_name: firstName, last_name: lastName },
+          similarity
+        });
       } else if (similarity > 0) {
         console.log('⚪ Similitud insuficiente:', existingFullName, 'Similitud:', similarity);
       } else {
@@ -363,7 +351,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     // Ordenar por similitud descendente y tomar solo los mejores
     return candidates
       .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 3); // Máximo 3 candidatos para evitar confusión
+      .slice(0, 5); // Máximo 5 candidatos para mostrar más opciones
   };
 
   const processStudentRow = async (row: any, skipConfirmation = false) => {
