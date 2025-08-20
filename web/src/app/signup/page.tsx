@@ -1,23 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useI18n } from '@/contexts/I18nContext';
-import { MdMusicNote, MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdCheckCircle } from 'react-icons/md';
+import { MdMusicNote, MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdCheckCircle, MdBusiness } from 'react-icons/md';
+
+type Organization = {
+  id: string;
+  name: string;
+  contact_email?: string;
+};
 
 export default function SignUpPage() {
   const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedOrganization, setSelectedOrganization] = useState('');
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingOrgs, setLoadingOrgs] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+
+  // Cargar organizaciones disponibles
+  useEffect(() => {
+    const loadOrganizations = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('id, name, contact_email')
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+        setOrganizations(data || []);
+      } catch (err) {
+        console.error('Error loading organizations:', err);
+        setError('Error al cargar las organizaciones disponibles');
+      } finally {
+        setLoadingOrgs(false);
+      }
+    };
+
+    loadOrganizations();
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,10 +63,24 @@ export default function SignUpPage() {
       return;
     }
 
+    // Validar que se haya seleccionado una organización
+    if (!selectedOrganization) {
+      setError('Por favor selecciona una sede/organización');
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Crear el usuario
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            organization_id: selectedOrganization,
+            full_name: email.split('@')[0] // Usar parte del email como nombre temporal
+          }
+        }
       });
 
       if (error) {
@@ -42,8 +88,23 @@ export default function SignUpPage() {
       }
 
       if (data?.user) {
+        // Crear el perfil del usuario en la tabla user_profiles
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: data.user.id,
+            email: email,
+            organization_id: selectedOrganization,
+            role: 'viewer', // Rol por defecto
+            full_name: email.split('@')[0]
+          });
+
+        if (profileError) {
+          console.error('Error creating user profile:', profileError);
+          // No lanzamos error aquí para no bloquear el registro
+        }
+
         setSuccess(true);
-        // Opcionalmente, redirigir después de un tiempo
         setTimeout(() => {
           router.push('/login');
         }, 3000);
@@ -121,6 +182,38 @@ export default function SignUpPage() {
                       placeholder="tu@email.com"
                     />
                   </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="organization" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Sede/Organización
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MdBusiness className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      id="organization"
+                      value={selectedOrganization}
+                      onChange={(e) => setSelectedOrganization(e.target.value)}
+                      required
+                      disabled={loadingOrgs}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white"
+                    >
+                      <option value="">Selecciona tu sede...</option>
+                      {organizations.map((org) => (
+                        <option key={org.id} value={org.id}>
+                          {org.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {loadingOrgs && (
+                    <div className="mt-2 flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-gray-500">Cargando sedes disponibles...</span>
+                    </div>
+                  )}
                 </div>
                 
                 <div>
@@ -202,9 +295,9 @@ export default function SignUpPage() {
                 
                 <button
                   type="submit"
-                  disabled={loading || !passwordStrength || !passwordsMatch}
+                  disabled={loading || !passwordStrength || !passwordsMatch || !selectedOrganization || loadingOrgs}
                   className={`w-full py-3 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
-                    loading || !passwordStrength || !passwordsMatch ? 'opacity-70 cursor-not-allowed transform-none' : ''
+                    loading || !passwordStrength || !passwordsMatch || !selectedOrganization || loadingOrgs ? 'opacity-70 cursor-not-allowed transform-none' : ''
                   }`}
                 >
                   {loading ? (
