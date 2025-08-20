@@ -67,7 +67,7 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({ data, type, loading =
               <tr key={index} className="hover:bg-gray-50">
                 <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
                   {type === 'date' 
-                    ? new Date(item.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                    ? new Date((item as AttendanceData).date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })
                     : (item as AttendanceByInstrument).instrument}
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
