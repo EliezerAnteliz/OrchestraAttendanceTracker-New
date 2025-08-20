@@ -7,8 +7,6 @@ import { StyledInput, StyledCard } from '../components';
 import { useAppTheme, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../theme';
 
 export default function UserRegistrationScreen() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,6 +19,12 @@ export default function UserRegistrationScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [programs, setPrograms] = useState([]);
+  const [programsLoading, setProgramsLoading] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showProgramMenu, setShowProgramMenu] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('viewer');
+  const [showRoleMenu, setShowRoleMenu] = useState(false);
   const { theme } = useAppTheme();
 
   // Load organizations on component mount
@@ -59,15 +63,49 @@ export default function UserRegistrationScreen() {
     }
   };
 
+  // Load programs when organization changes
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      if (!selectedOrganization) {
+        setPrograms([]);
+        setSelectedProgram(null);
+        return;
+      }
+      try {
+        setProgramsLoading(true);
+        const { data, error } = await supabase
+          .from('programs')
+          .select('id, name')
+          .eq('organization_id', selectedOrganization.id)
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) {
+          console.error('Error loading programs:', error);
+          Alert.alert('Error', 'No se pudieron cargar los programas');
+          return;
+        }
+        setPrograms(data || []);
+        setSelectedProgram(null);
+      } catch (err) {
+        console.error('Error loading programs:', err);
+        Alert.alert('Error', 'No se pudieron cargar los programas');
+      } finally {
+        setProgramsLoading(false);
+      }
+    };
+    fetchPrograms();
+  }, [selectedOrganization]);
+
   const validateForm = () => {
-    if (!firstName.trim()) return 'El nombre es requerido';
-    if (!lastName.trim()) return 'El apellido es requerido';
     if (!email.trim()) return 'El email es requerido';
     if (!password) return 'La contraseña es requerida';
     if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
     if (!confirmPassword) return 'Confirma tu contraseña';
     if (password !== confirmPassword) return 'Las contraseñas no coinciden';
     if (!selectedOrganization) return 'Selecciona una organización';
+    if (!selectedProgram) return 'Selecciona un programa';
+    if (!selectedRole) return 'Selecciona un rol';
     
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,11 +136,11 @@ export default function UserRegistrationScreen() {
         password: password,
         options: {
           data: {
-            first_name: firstName.trim(),
-            last_name: lastName.trim(),
-            full_name: `${firstName.trim()} ${lastName.trim()}`,
             organization_id: selectedOrganization.id,
-            organization_name: selectedOrganization.name
+            organization_name: selectedOrganization.name,
+            program_id: selectedProgram.id,
+            program_name: selectedProgram.name,
+            role: selectedRole
           }
         }
       });
@@ -121,9 +159,8 @@ export default function UserRegistrationScreen() {
           .insert({
             user_id: data.user.id,
             email: email.trim().toLowerCase(),
-            full_name: `${firstName.trim()} ${lastName.trim()}`,
             organization_id: selectedOrganization.id,
-            role: 'viewer',
+            role: selectedRole,
             is_active: true
           });
 
@@ -137,15 +174,29 @@ export default function UserRegistrationScreen() {
           console.log('User profile created successfully');
         }
 
+        // Create program membership
+        if (selectedProgram?.id) {
+          const { error: membershipError } = await supabase
+            .from('user_program_memberships')
+            .insert({
+              user_id: data.user.id,
+              program_id: selectedProgram.id,
+              role: selectedRole,
+            });
+          if (membershipError && membershipError.code !== '23505') {
+            console.error('Error creating program membership:', membershipError);
+          }
+        }
+
         setSuccess(true);
         
         // Clear form
-        setFirstName('');
-        setLastName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         setSelectedOrganization(null);
+        setSelectedProgram(null);
+        setSelectedRole('viewer');
         
         // Show success message and redirect after delay
         setTimeout(() => {
@@ -176,7 +227,7 @@ export default function UserRegistrationScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.colors.background }]}>
+    <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.colors.background }]}> 
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary }]}>
@@ -190,8 +241,8 @@ export default function UserRegistrationScreen() {
         
         <StyledCard style={styles.card} elevation={2}>
           {success && (
-            <View style={[styles.successContainer, { backgroundColor: theme.colors.primaryContainer }]}>
-              <Text style={[styles.successText, { color: theme.colors.onPrimaryContainer }]}>
+            <View style={[styles.successContainer, { backgroundColor: theme.colors.primaryContainer }]}> 
+              <Text style={[styles.successText, { color: theme.colors.onPrimaryContainer }]}> 
                 ¡Registro exitoso! Redirigiendo al inicio de sesión...
               </Text>
             </View>
@@ -211,16 +262,16 @@ export default function UserRegistrationScreen() {
 
           {/* Organization Selector */}
           <View style={styles.organizationContainer}>
-            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}> 
               Sede/Organización
             </Text>
             {organizationsLoading ? (
               <View style={[styles.organizationSelector, { 
                 borderColor: theme.colors.outline,
                 backgroundColor: theme.colors.surface 
-              }]}>
+              }]}> 
                 <ActivityIndicator size="small" color={theme.colors.primary} />
-                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}>
+                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}> 
                   Cargando sedes...
                 </Text>
               </View>
@@ -267,10 +318,80 @@ export default function UserRegistrationScreen() {
               </Menu>
             )}
             {error && !selectedOrganization && (
-              <Text style={[styles.fieldError, { color: theme.colors.error }]}>
+              <Text style={[styles.fieldError, { color: theme.colors.error }]}> 
                 Selecciona una sede
               </Text>
             )}
+          </View>
+
+          {/* Program Selector */}
+          <View style={styles.organizationContainer}>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Programa</Text>
+            {programsLoading ? (
+              <View style={[styles.organizationSelector, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}> 
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={[styles.organizationText, { color: theme.colors.onSurfaceVariant }]}>Cargando programas...</Text>
+              </View>
+            ) : (
+              <Menu
+                visible={showProgramMenu}
+                onDismiss={() => setShowProgramMenu(false)}
+                anchor={
+                  <Button
+                    mode="outlined"
+                    onPress={() => setShowProgramMenu(true)}
+                    style={[styles.organizationSelector, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}
+                    contentStyle={styles.organizationSelectorContent}
+                    labelStyle={[styles.organizationText, { color: selectedProgram ? theme.colors.onSurface : theme.colors.onSurfaceVariant }]}
+                    icon={() => (<Text style={styles.inputIcon}>🎼</Text>)}
+                    disabled={!selectedOrganization}
+                  >
+                    {selectedProgram ? selectedProgram.name : (selectedOrganization ? 'Selecciona un programa...' : 'Selecciona una sede primero')}
+                  </Button>
+                }
+              >
+                {programs.map((p) => (
+                  <Menu.Item
+                    key={p.id}
+                    onPress={() => {
+                      setSelectedProgram(p);
+                      setShowProgramMenu(false);
+                    }}
+                    title={p.name}
+                  />
+                ))}
+                {selectedOrganization && programs.length === 0 && (
+                  <Menu.Item title="No hay programas activos" disabled />
+                )}
+              </Menu>
+            )}
+            {error && !selectedProgram && selectedOrganization && (
+              <Text style={[styles.fieldError, { color: theme.colors.error }]}>Selecciona un programa</Text>
+            )}
+          </View>
+
+          {/* Role Selector */}
+          <View style={styles.organizationContainer}>
+            <Text style={[styles.organizationLabel, { color: theme.colors.onSurface }]}>Rol</Text>
+            <Menu
+              visible={showRoleMenu}
+              onDismiss={() => setShowRoleMenu(false)}
+              anchor={
+                <Button
+                  mode="outlined"
+                  onPress={() => setShowRoleMenu(true)}
+                  style={[styles.organizationSelector, { borderColor: theme.colors.outline, backgroundColor: theme.colors.surface }]}
+                  contentStyle={styles.organizationSelectorContent}
+                  labelStyle={[styles.organizationText, { color: theme.colors.onSurface }]}
+                  icon={() => (<Text style={styles.inputIcon}>👤</Text>)}
+                >
+                  {selectedRole === 'staff' ? 'Staff' : 'Viewer'}
+                </Button>
+              }
+            >
+              <Menu.Item title="Viewer" onPress={() => { setSelectedRole('viewer'); setShowRoleMenu(false); }} />
+              <Menu.Item title="Staff" onPress={() => { setSelectedRole('staff'); setShowRoleMenu(false); }} />
+            </Menu>
           </View>
 
           <StyledInput
@@ -321,7 +442,7 @@ export default function UserRegistrationScreen() {
             mode="contained"
             onPress={handleSignUp}
             loading={loading}
-            disabled={loading || organizationsLoading}
+            disabled={loading || organizationsLoading || programsLoading}
             style={styles.button}
           >
             Create Account
