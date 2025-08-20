@@ -1383,22 +1383,22 @@ export default function ReportsPage() {
                       {trendDirection === 'up' ? `▲ ${t('trend_up')}` : trendDirection === 'down' ? `▼ ${t('trend_down')}` : `▬ ${t('trend_flat')}`}
                     </span>
                   </div>
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     {weeklyTrend.map((w) => {
                     const isCurrent = w.week === customWeek;
                     return (
-                      <div key={w.week} className={`p-3 rounded-md border flex flex-col items-center ${isCurrent ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200'}`}>
-                        <div className="w-full h-24 flex items-end">
+                      <div key={w.week} className={`p-2 sm:p-3 rounded-md border flex flex-col items-center ${isCurrent ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200'}`}>
+                        <div className="w-full h-20 sm:h-24 flex items-end">
                           <div
                             className={`w-full rounded-t-md ${isCurrent ? 'bg-indigo-600 ring-2 ring-indigo-300' : 'bg-blue-500'}`}
                             style={{ height: `${Math.max(4, Math.min(100, Math.round(w.percentage)))}%` }}
                             title={`${w.percentage.toFixed(1)}%`}
                           />
                         </div>
-                        <div className="mt-2 text-sm text-gray-800 font-medium">{Math.round(w.percentage)}%</div>
-                        <div className="text-xs text-gray-600 text-center">{w.label}</div>
+                        <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-800 font-medium">{Math.round(w.percentage)}%</div>
+                        <div className="text-[10px] sm:text-xs text-gray-600 text-center leading-tight">{w.label}</div>
                         {isCurrent && (
-                          <span className="mt-1 text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-medium">Actual</span>
+                          <span className="mt-1 text-[8px] sm:text-[10px] px-1 sm:px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-medium">Actual</span>
                         )}
                       </div>
                     );
