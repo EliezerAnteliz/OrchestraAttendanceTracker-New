@@ -238,11 +238,12 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         // Generar un student_id único basado en el nombre y apellido
         const generatedStudentId = `S${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
         
-        // Añadir student_id y program_id a los datos del estudiante
+        // Añadir student_id, program_id y organization_id a los datos del estudiante
         const studentDataWithId = {
           ...studentData,
           student_id: row.student_id ? row.student_id.trim() : generatedStudentId,
-          program_id: activeProgram?.id // Usar el programa activo actual
+          program_id: activeProgram?.id, // Usar el programa activo actual
+          organization_id: activeProgram?.organization_id // Usar la organización del programa activo
         };
         
         console.log('Intentando insertar estudiante con datos:', JSON.stringify(studentDataWithId));
@@ -299,7 +300,8 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         phone_number: row.parent_phone_number ? row.parent_phone_number.toString().trim() : null,
         email: row.parent_email ? row.parent_email.trim() : null,
         preferred_contact_method: row.parent_preferred_contact_method ? row.parent_preferred_contact_method.trim() : 'phone',
-        program_id: activeProgram?.id // Usar el programa activo actual
+        program_id: activeProgram?.id, // Usar el programa activo actual
+        organization_id: activeProgram?.organization_id // Usar la organización del programa activo
       };
       
       console.log('Procesando datos de padre/madre:', parentData);
