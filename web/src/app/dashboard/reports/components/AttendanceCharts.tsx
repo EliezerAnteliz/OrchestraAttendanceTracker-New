@@ -2,29 +2,7 @@ import React from 'react';
 import LoadingIndicator from './LoadingIndicator';
 import ErrorDisplay from './ErrorDisplay';
 import NoDataDisplay from './NoDataDisplay';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-} from 'chart.js';
-import { Bar, Pie } from 'react-chartjs-2';
 import { AttendanceByInstrument, WeeklyStats } from '../services/reportService';
-
-// Registrar componentes de ChartJS
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
 
 interface PieChartProps {
   present: number;
@@ -47,64 +25,75 @@ interface InstrumentChartProps {
 }
 
 export const AttendancePieChart: React.FC<PieChartProps> = ({ present, excused, unexcused, loading = false, error = null }) => {
-  const data = {
-    labels: ['Asistencias', 'Faltas Justificadas', 'Faltas Injustificadas'],
-    datasets: [
-      {
-        data: [present, excused, unexcused],
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.8)',
-          'rgba(255, 206, 86, 0.8)',
-          'rgba(255, 99, 132, 0.8)',
-        ],
-        borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(255, 99, 132, 1)',
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          boxWidth: 12,
-          padding: 15,
-          font: {
-            size: 12,
-          },
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context: any) {
-            const total = present + excused + unexcused;
-            const value = context.raw;
-            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
-            return `${context.label}: ${value} (${percentage}%)`;
-          }
-        }
-      }
-    },
-  };
+  const total = present + excused + unexcused;
+  const presentPercentage = total > 0 ? (present / total) * 100 : 0;
+  const excusedPercentage = total > 0 ? (excused / total) * 100 : 0;
+  const unexcusedPercentage = total > 0 ? (unexcused / total) * 100 : 0;
 
   return (
     <div className="bg-white border border-gray-300 rounded-sm p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-4">Distribución de Asistencia</h3>
-      <div className="h-64">
+      <div className="h-64 flex items-center justify-center">
         {loading ? (
           <LoadingIndicator size="small" message="Cargando datos..." />
         ) : error ? (
           <ErrorDisplay message={error} severity="error" />
-        ) : present === 0 && excused === 0 && unexcused === 0 ? (
+        ) : total === 0 ? (
           <NoDataDisplay message="No hay datos de asistencia disponibles" />
         ) : (
-          <Pie data={data} options={options} />
+          <div className="flex flex-col items-center">
+            <div className="relative w-48 h-48 mb-4">
+              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="transparent"
+                  stroke="#3b82f6"
+                  strokeWidth="20"
+                  strokeDasharray={`${presentPercentage} ${100 - presentPercentage}`}
+                  strokeDashoffset="0"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="transparent"
+                  stroke="#fbbf24"
+                  strokeWidth="20"
+                  strokeDasharray={`${excusedPercentage} ${100 - excusedPercentage}`}
+                  strokeDashoffset={`${-presentPercentage}`}
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="transparent"
+                  stroke="#ef4444"
+                  strokeWidth="20"
+                  strokeDasharray={`${unexcusedPercentage} ${100 - unexcusedPercentage}`}
+                  strokeDashoffset={`${-(presentPercentage + excusedPercentage)}`}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold text-gray-700">{total}</span>
+              </div>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-blue-500 mr-2 rounded"></div>
+                <span>Asistencias: {present} ({presentPercentage.toFixed(1)}%)</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-yellow-400 mr-2 rounded"></div>
+                <span>Faltas Justificadas: {excused} ({excusedPercentage.toFixed(1)}%)</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-red-500 mr-2 rounded"></div>
+                <span>Faltas Injustificadas: {unexcused} ({unexcusedPercentage.toFixed(1)}%)</span>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -112,53 +101,13 @@ export const AttendancePieChart: React.FC<PieChartProps> = ({ present, excused, 
 };
 
 export const WeeklyBarChart: React.FC<BarChartProps> = ({ weeklyData, loading = false, error = null }) => {
-  const labels = weeklyData.map(week => week.weekLabel);
-  
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Asistencias',
-        data: weeklyData.map(week => week.total_attendance),
-        backgroundColor: 'rgba(54, 162, 235, 0.8)',
-      },
-      {
-        label: 'Faltas Justificadas',
-        data: weeklyData.map(week => week.total_excused_absences),
-        backgroundColor: 'rgba(255, 206, 86, 0.8)',
-      },
-      {
-        label: 'Faltas Injustificadas',
-        data: weeklyData.map(week => week.total_unexcused_absences),
-        backgroundColor: 'rgba(255, 99, 132, 0.8)',
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    scales: {
-      x: {
-        stacked: false,
-      },
-      y: {
-        stacked: false,
-        beginAtZero: true,
-      },
-    },
-    plugins: {
-      legend: {
-        position: 'bottom' as const,
-        labels: {
-          boxWidth: 12,
-          padding: 15,
-          font: {
-            size: 12,
-          },
-        },
-      },
-    },
-  };
+  const maxValue = Math.max(
+    ...weeklyData.flatMap(week => [
+      week.total_attendance,
+      week.total_excused_absences,
+      week.total_unexcused_absences
+    ])
+  );
 
   return (
     <div className="bg-white border border-gray-300 rounded-sm p-4">
@@ -171,7 +120,53 @@ export const WeeklyBarChart: React.FC<BarChartProps> = ({ weeklyData, loading = 
         ) : !weeklyData || weeklyData.length === 0 ? (
           <NoDataDisplay message="No hay datos semanales disponibles" />
         ) : (
-          <Bar data={data} options={options} />
+          <div className="h-full flex flex-col">
+            <div className="flex-1 flex items-end justify-around space-x-2 mb-4">
+              {weeklyData.map((week, index) => {
+                const total = week.total_attendance + week.total_excused_absences + week.total_unexcused_absences;
+                const attendanceHeight = maxValue > 0 ? (week.total_attendance / maxValue) * 180 : 0;
+                const excusedHeight = maxValue > 0 ? (week.total_excused_absences / maxValue) * 180 : 0;
+                const unexcusedHeight = maxValue > 0 ? (week.total_unexcused_absences / maxValue) * 180 : 0;
+                
+                return (
+                  <div key={index} className="flex flex-col items-center space-y-1">
+                    <div className="flex space-x-1">
+                      <div
+                        className="w-6 bg-blue-500 rounded-t"
+                        style={{ height: `${attendanceHeight}px` }}
+                        title={`Asistencias: ${week.total_attendance}`}
+                      ></div>
+                      <div
+                        className="w-6 bg-yellow-400 rounded-t"
+                        style={{ height: `${excusedHeight}px` }}
+                        title={`Faltas Justificadas: ${week.total_excused_absences}`}
+                      ></div>
+                      <div
+                        className="w-6 bg-red-500 rounded-t"
+                        style={{ height: `${unexcusedHeight}px` }}
+                        title={`Faltas Injustificadas: ${week.total_unexcused_absences}`}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-gray-600 text-center">{week.weekLabel}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex justify-center space-x-4 text-xs">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 mr-1 rounded"></div>
+                <span>Asistencias</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-yellow-400 mr-1 rounded"></div>
+                <span>Faltas Justificadas</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-red-500 mr-1 rounded"></div>
+                <span>Faltas Injustificadas</span>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -183,54 +178,6 @@ export const InstrumentBarChart: React.FC<InstrumentChartProps> = ({ instrumentD
   const topInstruments = [...instrumentData]
     .sort((a, b) => b.attendanceRate - a.attendanceRate)
     .slice(0, 5);
-  
-  const labels = topInstruments.map(item => item.instrument);
-  
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Tasa de Asistencia (%)',
-        data: topInstruments.map(item => item.attendanceRate.toFixed(1)),
-        backgroundColor: 'rgba(54, 162, 235, 0.8)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    indexAxis: 'y' as const,
-    responsive: true,
-    scales: {
-      x: {
-        beginAtZero: true,
-        max: 100,
-        ticks: {
-          callback: function(value: any) {
-            return value + '%';
-          }
-        }
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context: any) {
-            const instrument = topInstruments[context.dataIndex];
-            return [
-              `Tasa de Asistencia: ${instrument.attendanceRate.toFixed(1)}%`,
-              `Asistencias: ${instrument.present}`,
-              `Total de registros: ${instrument.total}`
-            ];
-          }
-        }
-      }
-    },
-  };
 
   return (
     <div className="bg-white border border-gray-300 rounded-sm p-4">
@@ -243,7 +190,33 @@ export const InstrumentBarChart: React.FC<InstrumentChartProps> = ({ instrumentD
         ) : !instrumentData || instrumentData.length === 0 ? (
           <NoDataDisplay message="No hay datos por instrumento disponibles" />
         ) : (
-          <Bar data={data} options={options} />
+          <div className="h-full flex flex-col justify-between">
+            <div className="space-y-3">
+              {topInstruments.map((instrument, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-24 text-sm text-gray-600 truncate mr-3">
+                    {instrument.instrument}
+                  </div>
+                  <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+                    <div
+                      className="bg-blue-500 h-6 rounded-full flex items-center justify-end pr-2"
+                      style={{ width: `${instrument.attendanceRate}%` }}
+                    >
+                      <span className="text-white text-xs font-medium">
+                        {instrument.attendanceRate.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-3 text-xs text-gray-500">
+                    {instrument.present}/{instrument.total}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500 text-center mt-4">
+              Mostrando los 5 instrumentos con mayor tasa de asistencia
+            </div>
+          </div>
         )}
       </div>
     </div>
