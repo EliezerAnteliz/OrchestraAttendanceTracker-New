@@ -8,6 +8,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { MdArrowBack, MdEdit, MdDelete, MdSave, MdCancel, MdPerson, MdPhone, MdSchool, MdMusicNote, MdEmail, MdAdd } from 'react-icons/md';
 import { theme } from '@/styles/theme';
 import { useProgram } from '@/contexts/ProgramContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface Student {
   id: string;
@@ -41,6 +42,7 @@ export default function StudentDetail() {
   const router = useRouter();
   const { t } = useI18n();
   const { activeProgram } = useProgram();
+  const { canEditStudents } = useUserRole();
   const [student, setStudent] = useState<Student | null>(null);
   const [parents, setParents] = useState<Parent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -317,21 +319,25 @@ export default function StudentDetail() {
         <div className="flex gap-2 w-full sm:w-auto">
           {!isEditing ? (
             <>
-              <button
-                onClick={() => {
-                  setIsEditing(true);
-                  setEditedParents([...parents]);
-                }}
-                className="flex-1 sm:flex-none px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
-              >
-                <MdEdit className="mr-2" size={16} /> {t('edit')}
-              </button>
-              <button
-                onClick={() => setDeleteConfirm(true)}
-                className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm font-medium"
-              >
-                <MdDelete className="mr-2" size={16} /> {t('delete')}
-              </button>
+              {canEditStudents && (
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditedParents([...parents]);
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
+                >
+                  <MdEdit className="mr-2" size={16} /> {t('edit')}
+                </button>
+              )}
+              {canEditStudents && (
+                <button
+                  onClick={() => setDeleteConfirm(true)}
+                  className="flex-1 sm:flex-none px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm font-medium"
+                >
+                  <MdDelete className="mr-2" size={16} /> {t('delete')}
+                </button>
+              )}
             </>
           ) : (
             <>
