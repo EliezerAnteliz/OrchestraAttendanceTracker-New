@@ -226,15 +226,8 @@ export default function StudentDetail() {
         throw attError;
       }
 
-      // Delete parents that are no longer linked to any student
-      console.log('Eliminando padres huérfanos...');
-      const { error: orphanParentsError } = await supabase
-        .rpc('delete_orphan_parents');
-      
-      if (orphanParentsError) {
-        console.warn('Warning eliminando padres huérfanos:', orphanParentsError);
-        // No lanzamos error aquí porque no es crítico
-      }
+      // Note: Orphan parents cleanup would require a custom database function
+      // For now, we'll leave parent records as they might be needed for other students
 
       // Finally delete the student
       console.log('Eliminando estudiante...');
