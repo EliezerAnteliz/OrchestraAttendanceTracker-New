@@ -47,6 +47,7 @@ export default function StudentDetail() {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedStudent, setEditedStudent] = useState<Student | null>(null);
+  const [editedParents, setEditedParents] = useState<Parent[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
@@ -117,11 +118,13 @@ export default function StudentDetail() {
             );
             
             setParents(sortedParents);
+            setEditedParents(sortedParents);
             
             console.log('Datos de padres obtenidos:', sortedParents);
           } else {
             console.log('No se encontraron padres asociados a este estudiante');
             setParents([]);
+            setEditedParents([]);
           }
         } catch (err) {
           console.error('Error al obtener datos de padres:', err);
@@ -145,7 +148,9 @@ export default function StudentDetail() {
 
     try {
       setLoading(true);
-      const { error } = await supabase
+      
+      // Update student data
+      const { error: studentError } = await supabase
         .from('students')
         .update({
           first_name: editedStudent.first_name,
@@ -159,13 +164,32 @@ export default function StudentDetail() {
         })
         .eq('id', params.id);
 
-      if (error) throw error;
+      if (studentError) throw studentError;
+
+      // Update parents data
+      for (const parent of editedParents) {
+        const { error: parentError } = await supabase
+          .from('parents')
+          .update({
+            full_name: parent.full_name,
+            phone_number: parent.phone_number,
+            email: parent.email,
+            preferred_contact_method: parent.preferred_contact_method
+          })
+          .eq('id', parent.id);
+
+        if (parentError) {
+          console.error('Error updating parent:', parentError);
+          throw parentError;
+        }
+      }
 
       setStudent(editedStudent);
+      setParents(editedParents);
       setIsEditing(false);
     } catch (err) {
-      console.error('Error updating student:', err);
-      setError(err instanceof Error ? err.message : 'Error al actualizar estudiante');
+      console.error('Error updating data:', err);
+      setError(err instanceof Error ? err.message : 'Error al actualizar datos');
     } finally {
       setLoading(false);
     }
@@ -218,6 +242,16 @@ export default function StudentDetail() {
         ? (e.target as HTMLInputElement).checked 
         : value
     });
+  };
+
+  const handleParentInputChange = (parentId: string, field: string, value: string) => {
+    setEditedParents(prev => 
+      prev.map(parent => 
+        parent.id === parentId 
+          ? { ...parent, [field]: value }
+          : parent
+      )
+    );
   };
 
   if (loading && !student) {
@@ -284,7 +318,10 @@ export default function StudentDetail() {
           {!isEditing ? (
             <>
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditedParents([...parents]);
+                }}
                 className="flex-1 sm:flex-none px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
               >
                 <MdEdit className="mr-2" size={16} /> {t('edit')}
@@ -311,6 +348,7 @@ export default function StudentDetail() {
                 onClick={() => {
                   setIsEditing(false);
                   setEditedStudent(student);
+                  setEditedParents(parents);
                 }}
                 className="flex-1 sm:flex-none px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center text-sm font-medium"
               >
@@ -527,41 +565,79 @@ export default function StudentDetail() {
         </div>
         <div className="p-6">
           
-          {parents.length > 0 ? (
+          {(isEditing ? editedParents : parents).length > 0 ? (
             <div className="space-y-4">
-              {parents.map((parent, index) => (
+              {(isEditing ? editedParents : parents).map((parent, index) => (
                 <div key={parent.id} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                  <h3 className="font-semibold text-lg text-gray-900 mb-3">
-                    {parent.full_name}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
-                      <div className="p-2 bg-blue-100 rounded-lg mr-3">
-                        <MdPhone className="text-blue-600" size={16} />
+                  {isEditing ? (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('parent_name')}</label>
+                        <input
+                          type="text"
+                          value={parent.full_name || ''}
+                          onChange={(e) => handleParentInputChange(parent.id, 'full_name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                        />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Teléfono</p>
-                        {parent.phone_number ? (
-                          <p className="text-gray-900 font-medium truncate">{parent.phone_number}</p>
-                        ) : (
-                          <p className="text-gray-400 italic text-sm">{t('phone_not_registered')}</p>
-                        )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                          <input
+                            type="tel"
+                            value={parent.phone_number || ''}
+                            onChange={(e) => handleParentInputChange(parent.id, 'phone_number', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                            placeholder="Número de teléfono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                          <input
+                            type="email"
+                            value={parent.email || ''}
+                            onChange={(e) => handleParentInputChange(parent.id, 'email', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                            placeholder="Correo electrónico"
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
-                      <div className="p-2 bg-green-100 rounded-lg mr-3">
-                        <MdEmail className="text-green-600" size={16} />
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-lg text-gray-900 mb-3">
+                        {parent.full_name}
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                            <MdPhone className="text-blue-600" size={16} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Teléfono</p>
+                            {parent.phone_number ? (
+                              <p className="text-gray-900 font-medium truncate">{parent.phone_number}</p>
+                            ) : (
+                              <p className="text-gray-400 italic text-sm">{t('phone_not_registered')}</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
+                          <div className="p-2 bg-green-100 rounded-lg mr-3">
+                            <MdEmail className="text-green-600" size={16} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Email</p>
+                            {parent.email ? (
+                              <p className="text-gray-900 font-medium truncate">{parent.email}</p>
+                            ) : (
+                              <p className="text-gray-400 italic text-sm">{t('email_not_registered')}</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Email</p>
-                        {parent.email ? (
-                          <p className="text-gray-900 font-medium truncate">{parent.email}</p>
-                        ) : (
-                          <p className="text-gray-400 italic text-sm">{t('email_not_registered')}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
