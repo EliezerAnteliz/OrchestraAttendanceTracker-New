@@ -194,45 +194,94 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     setErrorMessages([]);
   };
 
-  // Función para calcular similitud entre nombres
-  const calculateNameSimilarity = (name1: string, name2: string): number => {
-    const normalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' ');
-    const n1 = normalize(name1);
-    const n2 = normalize(name2);
+  // Función para normalizar y dividir nombres
+  const parseFullName = (fullName: string) => {
+    const normalized = fullName.toLowerCase().trim().replace(/\s+/g, ' ');
+    const parts = normalized.split(' ').filter(part => part.length > 0);
     
-    if (n1 === n2) return 1.0;
-    
-    // Verificar si uno contiene al otro
-    if (n1.includes(n2) || n2.includes(n1)) {
-      return Math.max(n2.length / n1.length, n1.length / n2.length) * 0.8;
-    }
-    
-    // Algoritmo de distancia de Levenshtein simplificado
-    const matrix = [];
-    for (let i = 0; i <= n2.length; i++) {
-      matrix[i] = [i];
-    }
-    for (let j = 0; j <= n1.length; j++) {
-      matrix[0][j] = j;
-    }
-    for (let i = 1; i <= n2.length; i++) {
-      for (let j = 1; j <= n1.length; j++) {
-        if (n2.charAt(i - 1) === n1.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-    const distance = matrix[n2.length][n1.length];
-    return 1 - distance / Math.max(n1.length, n2.length);
+    return {
+      original: normalized,
+      parts: parts,
+      firstNames: parts.slice(0, -1), // Todos excepto el último (asumiendo que el último es apellido)
+      lastNames: parts.slice(-1), // Solo el último
+      // Si hay más de 2 partes, asumir formato: nombre1 nombre2 apellido1 apellido2
+      firstName: parts[0] || '',
+      lastName: parts[parts.length - 1] || '',
+      fullFirstNames: parts.length > 2 ? parts.slice(0, Math.ceil(parts.length / 2)) : [parts[0] || ''],
+      fullLastNames: parts.length > 2 ? parts.slice(Math.ceil(parts.length / 2)) : [parts[parts.length - 1] || '']
+    };
   };
 
-  // Función para buscar candidatos similares
+  // Función mejorada para calcular similitud entre nombres
+  const calculateNameSimilarity = (name1: string, name2: string): number => {
+    const parsed1 = parseFullName(name1);
+    const parsed2 = parseFullName(name2);
+    
+    // Coincidencia exacta
+    if (parsed1.original === parsed2.original) return 1.0;
+    
+    // Verificar coincidencias exactas por componentes
+    let exactMatches = 0;
+    let totalComponents = Math.max(parsed1.parts.length, parsed2.parts.length);
+    
+    // Verificar si el primer nombre coincide exactamente
+    const firstNameMatch = parsed1.firstName === parsed2.firstName && parsed1.firstName.length > 0;
+    
+    // Verificar si el apellido principal coincide exactamente
+    const lastNameMatch = parsed1.lastName === parsed2.lastName && parsed1.lastName.length > 0;
+    
+    // Si no hay coincidencia en nombre Y apellido principales, es muy improbable que sea la misma persona
+    if (!firstNameMatch && !lastNameMatch) {
+      // Verificar si algún componente del nombre coincide con algún componente del otro
+      let hasAnyMatch = false;
+      for (const part1 of parsed1.parts) {
+        for (const part2 of parsed2.parts) {
+          if (part1 === part2 && part1.length > 2) { // Solo considerar coincidencias de más de 2 caracteres
+            hasAnyMatch = true;
+            break;
+          }
+        }
+        if (hasAnyMatch) break;
+      }
+      
+      // Si no hay ninguna coincidencia de componentes significativos, retornar baja similitud
+      if (!hasAnyMatch) {
+        return 0.0;
+      }
+    }
+    
+    // Contar coincidencias exactas de componentes
+    for (const part1 of parsed1.parts) {
+      if (parsed2.parts.includes(part1) && part1.length > 1) {
+        exactMatches++;
+      }
+    }
+    
+    // Calcular similitud basada en coincidencias exactas
+    const componentSimilarity = exactMatches / totalComponents;
+    
+    // Bonus por coincidencia de primer nombre y apellido
+    let bonus = 0;
+    if (firstNameMatch) bonus += 0.3;
+    if (lastNameMatch) bonus += 0.3;
+    
+    // Verificar si uno es subconjunto del otro (nombres completos vs nombres parciales)
+    const isSubset1 = parsed1.parts.every(part => parsed2.parts.includes(part));
+    const isSubset2 = parsed2.parts.every(part => parsed1.parts.includes(part));
+    
+    if (isSubset1 || isSubset2) {
+      const subsetSimilarity = Math.min(parsed1.parts.length, parsed2.parts.length) / Math.max(parsed1.parts.length, parsed2.parts.length);
+      return Math.min(0.95, componentSimilarity + bonus + (subsetSimilarity * 0.2));
+    }
+    
+    // Similitud final
+    const finalSimilarity = Math.min(0.9, componentSimilarity + bonus);
+    
+    // Solo considerar como candidato si la similitud es significativa
+    return finalSimilarity >= 0.6 ? finalSimilarity : 0.0;
+  };
+
+  // Función para buscar candidatos similares con mejor precisión
   const findSimilarStudents = async (firstName: string, lastName: string) => {
     const { data: allStudents, error } = await supabase
       .from('students')
@@ -243,23 +292,51 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
     const candidates: DuplicateCandidate[] = [];
     const inputFullName = `${firstName} ${lastName}`;
+    const inputParsed = parseFullName(inputFullName);
+
+    console.log('Buscando similitudes para:', inputFullName, 'Componentes:', inputParsed.parts);
 
     for (const student of allStudents) {
       const existingFullName = `${student.first_name} ${student.last_name}`;
+      const existingParsed = parseFullName(existingFullName);
+      
+      console.log('Comparando con:', existingFullName, 'Componentes:', existingParsed.parts);
+      
       const similarity = calculateNameSimilarity(inputFullName, existingFullName);
       
-      // Considerar como candidato si la similitud es >= 0.6 pero < 1.0 (no exacta)
-      if (similarity >= 0.6 && similarity < 1.0) {
-        candidates.push({
-          existingStudent: student,
-          excelRow: { first_name: firstName, last_name: lastName },
-          similarity
-        });
+      console.log('Similitud calculada:', similarity);
+      
+      // Considerar como candidato si:
+      // 1. La similitud es >= 0.7 pero < 1.0 (no exacta)
+      // 2. Y hay al menos una coincidencia significativa de nombre o apellido
+      if (similarity >= 0.7 && similarity < 1.0) {
+        // Verificación adicional: debe haber al menos coincidencia en primer nombre O apellido principal
+        const hasSignificantMatch = 
+          inputParsed.firstName === existingParsed.firstName ||
+          inputParsed.lastName === existingParsed.lastName ||
+          inputParsed.parts.some(part => existingParsed.parts.includes(part) && part.length > 2);
+          
+        if (hasSignificantMatch) {
+          console.log('Candidato válido encontrado:', existingFullName, 'Similitud:', similarity);
+          candidates.push({
+            existingStudent: student,
+            excelRow: { first_name: firstName, last_name: lastName },
+            similarity
+          });
+        } else {
+          console.log('Candidato descartado por falta de coincidencia significativa:', existingFullName);
+        }
+      } else if (similarity > 0) {
+        console.log('Similitud insuficiente:', existingFullName, 'Similitud:', similarity);
       }
     }
 
-    // Ordenar por similitud descendente
-    return candidates.sort((a, b) => b.similarity - a.similarity);
+    console.log('Total de candidatos encontrados:', candidates.length);
+    
+    // Ordenar por similitud descendente y tomar solo los mejores
+    return candidates
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 3); // Máximo 3 candidatos para evitar confusión
   };
 
   const processStudentRow = async (row: any, skipConfirmation = false) => {
@@ -881,27 +958,32 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   Encontramos un estudiante similar en la base de datos:
                 </p>
                 
-                {/* Comparación */}
+                {/* Comparación detallada */}
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700">En la base de datos:</span>
-                    <span className="text-sm text-gray-900 font-semibold">
-                      {confirmationDialog.candidate.existingStudent.first_name} {confirmationDialog.candidate.existingStudent.last_name}
-                    </span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Base de Datos</span>
+                      <div className="mt-1 p-2 bg-blue-100 rounded text-sm font-semibold text-blue-900">
+                        {confirmationDialog.candidate.existingStudent.first_name} {confirmationDialog.candidate.existingStudent.last_name}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Excel</span>
+                      <div className="mt-1 p-2 bg-green-100 rounded text-sm font-semibold text-green-900">
+                        {confirmationDialog.candidate.excelRow.first_name} {confirmationDialog.candidate.excelRow.last_name}
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700">En el Excel:</span>
-                    <span className="text-sm text-gray-900 font-semibold">
-                      {confirmationDialog.candidate.excelRow.first_name} {confirmationDialog.candidate.excelRow.last_name}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-gray-700">Similitud:</span>
-                    <span className="text-sm text-blue-600 font-semibold">
+                  <div className="text-center py-2 border-t border-gray-200">
+                    <span className="text-xs font-medium text-gray-700">Similitud Calculada:</span>
+                    <div className={`inline-block ml-2 px-2 py-1 rounded-full text-xs font-bold ${
+                      confirmationDialog.candidate.similarity >= 0.9 ? 'bg-red-100 text-red-800' :
+                      confirmationDialog.candidate.similarity >= 0.8 ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
                       {Math.round(confirmationDialog.candidate.similarity * 100)}%
-                    </span>
+                    </div>
                   </div>
                   
                   {/* Información adicional del estudiante existente */}
@@ -924,9 +1006,14 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   )}
                 </div>
                 
-                <p className="text-sm text-gray-600 text-center">
-                  ¿Qué deseas hacer?
-                </p>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800 text-center font-medium">
+                    ⚠️ ¿Es la misma persona?
+                  </p>
+                  <p className="text-xs text-yellow-700 text-center mt-1">
+                    Revisa cuidadosamente los nombres antes de decidir
+                  </p>
+                </div>
               </div>
               
               {/* Botones */}
