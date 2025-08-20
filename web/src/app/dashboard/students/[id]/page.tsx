@@ -200,36 +200,62 @@ export default function StudentDetail() {
   const handleDeleteStudent = async () => {
     try {
       setLoading(true);
+      console.log('Iniciando eliminación del estudiante:', params.id);
       
       // First delete student-parent relationships
+      console.log('Eliminando relaciones estudiante-padre...');
       const { error: spError } = await supabase
         .from('student_parents')
         .delete()
         .eq('student_id', params.id);
       
-      if (spError) throw spError;
+      if (spError) {
+        console.error('Error eliminando relaciones:', spError);
+        throw spError;
+      }
 
       // Then delete attendance records
+      console.log('Eliminando registros de asistencia...');
       const { error: attError } = await supabase
         .from('attendance')
         .delete()
         .eq('student_id', params.id);
       
-      if (attError) throw attError;
+      if (attError) {
+        console.error('Error eliminando asistencia:', attError);
+        throw attError;
+      }
+
+      // Delete parents that are no longer linked to any student
+      console.log('Eliminando padres huérfanos...');
+      const { error: orphanParentsError } = await supabase
+        .rpc('delete_orphan_parents');
+      
+      if (orphanParentsError) {
+        console.warn('Warning eliminando padres huérfanos:', orphanParentsError);
+        // No lanzamos error aquí porque no es crítico
+      }
 
       // Finally delete the student
+      console.log('Eliminando estudiante...');
       const { error } = await supabase
         .from('students')
         .delete()
         .eq('id', params.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error eliminando estudiante:', error);
+        throw error;
+      }
 
+      console.log('Estudiante eliminado exitosamente');
+      setDeleteConfirm(false);
       router.push('/dashboard/students');
     } catch (err) {
       console.error('Error deleting student:', err);
       setError(err instanceof Error ? err.message : 'Error al eliminar estudiante');
       setLoading(false);
+      setDeleteConfirm(false);
     }
   };
 
