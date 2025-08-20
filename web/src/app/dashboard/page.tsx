@@ -6,6 +6,7 @@ import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart,
          MdAssignmentTurnedIn, MdGroup, MdInsertChart } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
+import RoleSwitcher from '@/components/RoleSwitcher';
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -137,11 +138,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
-        <p className="text-gray-600 mt-1">
-          {t('dashboard_summary')}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
+          <p className="text-gray-600 mt-1">
+            {t('dashboard_summary')}
+          </p>
+        </div>
+        <RoleSwitcher />
       </div>
 
       {/* Tarjetas de estadísticas */}
