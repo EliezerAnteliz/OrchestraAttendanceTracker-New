@@ -10,6 +10,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { useI18n } from '@/contexts/I18nContext';
 import { ProgramProvider, useProgram } from '@/contexts/ProgramContext';
 import { supabase } from '@/lib/supabase';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const sidebarItems = [
   { key: 'menu_dashboard', href: '/dashboard', icon: <MdDashboard size={24} /> },
@@ -68,6 +69,7 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const { t } = useI18n();
+  const { isAdmin } = useUserRole();
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
 
   // Close sidebar when clicking a link on mobile
@@ -145,7 +147,7 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
               </li>
             );
           })}
-          {isOrgAdmin && (
+          {isOrgAdmin && isAdmin && (
             <li className="mb-1">
               <Link
                 href="/dashboard/admin/users"
