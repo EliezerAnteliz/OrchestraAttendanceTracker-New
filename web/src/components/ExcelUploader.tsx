@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { supabase } from '@/lib/supabase';
 import { FiDownload, FiUpload, FiAlertCircle, FiCheckCircle, FiFile, FiX, FiUsers } from 'react-icons/fi';
 import { useI18n } from '@/contexts/I18nContext';
+import { useProgram } from '@/contexts/ProgramContext';
 
 interface Student {
   student_id?: string; // Hacemos student_id opcional para que no se envíe en inserciones nuevas
@@ -37,6 +38,7 @@ interface ExcelUploaderProps {
 
 export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   const { t } = useI18n();
+  const { activeProgram } = useProgram();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState({ total: 0, processed: 0 });
@@ -236,12 +238,11 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         // Generar un student_id único basado en el nombre y apellido
         const generatedStudentId = `S${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
         
-        // Añadir student_id, organization_id y program_id a los datos del estudiante
+        // Añadir student_id y program_id a los datos del estudiante
         const studentDataWithId = {
           ...studentData,
           student_id: row.student_id ? row.student_id.trim() : generatedStudentId,
-          organization_id: 'a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4', // ID fijo de la organización
-          program_id: '9d7dc91c-7bbe-49cd-bc64-755467bf91da' // ID fijo del programa
+          program_id: activeProgram?.id // Usar el programa activo actual
         };
         
         console.log('Intentando insertar estudiante con datos:', JSON.stringify(studentDataWithId));
@@ -298,7 +299,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         phone_number: row.parent_phone_number ? row.parent_phone_number.toString().trim() : null,
         email: row.parent_email ? row.parent_email.trim() : null,
         preferred_contact_method: row.parent_preferred_contact_method ? row.parent_preferred_contact_method.trim() : 'phone',
-        organization_id: 'a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4' // ID fijo de la organización
+        program_id: activeProgram?.id // Usar el programa activo actual
       };
       
       console.log('Procesando datos de padre/madre:', parentData);
