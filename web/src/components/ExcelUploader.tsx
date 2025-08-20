@@ -202,12 +202,13 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
       console.log('Datos preparados para procesamiento:', studentData);
 
-      // Verificar si el estudiante ya existe (por nombre y apellido)
+      // Verificar si el estudiante ya existe (por nombre y apellido en el programa actual)
       const { data: existingStudents, error: searchError } = await supabase
         .from('students')
         .select('id, first_name, last_name')
         .eq('first_name', studentData.first_name)
-        .eq('last_name', studentData.last_name);
+        .eq('last_name', studentData.last_name)
+        .eq('program_id', activeProgram?.id);
 
       if (searchError) {
         throw new Error(`Error al buscar estudiante: ${searchError.message}`);
@@ -306,11 +307,12 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       
       console.log('Procesando datos de padre/madre:', parentData);
 
-      // Verificar si el padre/madre ya existe
+      // Verificar si el padre/madre ya existe (en el programa actual)
       const { data: existingParents, error: searchError } = await supabase
         .from('parents')
         .select('id')
-        .eq('full_name', parentData.full_name);
+        .eq('full_name', parentData.full_name)
+        .eq('program_id', activeProgram?.id);
 
       if (searchError) {
         throw new Error(`Error al buscar padre/madre: ${searchError.message}`);
@@ -371,7 +373,9 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
           student_id: studentId,
           parent_id: parentId,
           relationship: row.relationship_type || 'parent',
-          is_primary_contact: true // Asumimos que es contacto primario por defecto
+          is_primary_contact: true, // Asumimos que es contacto primario por defecto
+          program_id: activeProgram?.id,
+          organization_id: activeProgram?.organization_id
         };
 
         const { error: relationError } = await supabase
