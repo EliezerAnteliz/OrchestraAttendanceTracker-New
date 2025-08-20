@@ -16,6 +16,10 @@ interface NewStudent {
   instrument_size: string;
   position: string;
   is_active: boolean;
+  // Campos de contacto del padre/madre
+  parent_name?: string;
+  parent_phone?: string;
+  parent_email?: string;
 }
 
 export default function NewStudent() {
@@ -30,7 +34,10 @@ export default function NewStudent() {
     instrument: '',
     instrument_size: '',
     position: '',
-    is_active: true
+    is_active: true,
+    parent_name: '',
+    parent_phone: '',
+    parent_email: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -74,6 +81,25 @@ export default function NewStudent() {
         .single();
 
       if (insertError) throw insertError;
+
+      // Insert parent contact information if provided
+      if (data && (student.parent_name || student.parent_phone || student.parent_email)) {
+        const { error: parentError } = await supabase
+          .from('parents')
+          .insert({
+            student_id: data.id,
+            name: student.parent_name || null,
+            phone: student.parent_phone || null,
+            email: student.parent_email || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+
+        if (parentError) {
+          console.warn('Error creating parent contact:', parentError);
+          // Don't throw error here - student was created successfully
+        }
+      }
       
       // Redirect to the student detail page
       router.push(`/dashboard/students/${data.id}`);
@@ -175,6 +201,51 @@ export default function NewStudent() {
                       />
                       <span className="ml-3 text-[#323338] font-medium">{t('active')}</span>
                     </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Parent Contact Information */}
+              <div>
+                <h2 className="text-lg font-semibold mb-6 flex items-center text-[#323338]">
+                  <MdPerson className="mr-2 text-[#0086c0]" /> {t('parent_contact_info')}
+                </h2>
+                
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#323338] mb-2">{t('parent_name')}</label>
+                    <input
+                      type="text"
+                      name="parent_name"
+                      value={student.parent_name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8]"
+                      placeholder={t('parent_name_placeholder')}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-[#323338] mb-2">{t('parent_phone')}</label>
+                    <input
+                      type="tel"
+                      name="parent_phone"
+                      value={student.parent_phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8]"
+                      placeholder={t('parent_phone_placeholder')}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-[#323338] mb-2">{t('parent_email')}</label>
+                    <input
+                      type="email"
+                      name="parent_email"
+                      value={student.parent_email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8]"
+                      placeholder={t('parent_email_placeholder')}
+                    />
                   </div>
                 </div>
               </div>
