@@ -448,8 +448,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
           parent_id: parentId,
           relationship: row.relationship_type || 'parent',
           is_primary_contact: true, // Asumimos que es contacto primario por defecto
-          program_id: activeProgram?.id,
-          organization_id: activeProgram?.organization_id
+          program_id: activeProgram?.id
         };
 
         const { error: relationError } = await supabase
