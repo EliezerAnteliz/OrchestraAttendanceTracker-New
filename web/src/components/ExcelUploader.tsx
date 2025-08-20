@@ -36,6 +36,19 @@ interface ExcelUploaderProps {
   onComplete: (results: { added: number; updated: number; errors: number }) => void;
 }
 
+interface DuplicateCandidate {
+  existingStudent: any;
+  excelRow: any;
+  similarity: number;
+}
+
+interface ConfirmationDialog {
+  isOpen: boolean;
+  candidate: DuplicateCandidate | null;
+  onConfirm: (action: 'update' | 'create') => void;
+  onCancel: () => void;
+}
+
 export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   const { t } = useI18n();
   const { activeProgram } = useProgram();
@@ -46,6 +59,14 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [tableStructure, setTableStructure] = useState<any>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [confirmationDialog, setConfirmationDialog] = useState<ConfirmationDialog>({
+    isOpen: false,
+    candidate: null,
+    onConfirm: () => {},
+    onCancel: () => {}
+  });
+  const [pendingRows, setPendingRows] = useState<any[]>([]);
+  const [currentRowIndex, setCurrentRowIndex] = useState(0);
 
   // Obtener la estructura de la tabla students al cargar el componente
   useEffect(() => {
@@ -173,7 +194,75 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     setErrorMessages([]);
   };
 
-  const processStudentRow = async (row: any) => {
+  // Función para calcular similitud entre nombres
+  const calculateNameSimilarity = (name1: string, name2: string): number => {
+    const normalize = (str: string) => str.toLowerCase().trim().replace(/\s+/g, ' ');
+    const n1 = normalize(name1);
+    const n2 = normalize(name2);
+    
+    if (n1 === n2) return 1.0;
+    
+    // Verificar si uno contiene al otro
+    if (n1.includes(n2) || n2.includes(n1)) {
+      return Math.max(n2.length / n1.length, n1.length / n2.length) * 0.8;
+    }
+    
+    // Algoritmo de distancia de Levenshtein simplificado
+    const matrix = [];
+    for (let i = 0; i <= n2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= n1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= n2.length; i++) {
+      for (let j = 1; j <= n1.length; j++) {
+        if (n2.charAt(i - 1) === n1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    const distance = matrix[n2.length][n1.length];
+    return 1 - distance / Math.max(n1.length, n2.length);
+  };
+
+  // Función para buscar candidatos similares
+  const findSimilarStudents = async (firstName: string, lastName: string) => {
+    const { data: allStudents, error } = await supabase
+      .from('students')
+      .select('id, first_name, last_name, instrument, current_grade, age')
+      .eq('program_id', activeProgram?.id);
+
+    if (error || !allStudents) return [];
+
+    const candidates: DuplicateCandidate[] = [];
+    const inputFullName = `${firstName} ${lastName}`;
+
+    for (const student of allStudents) {
+      const existingFullName = `${student.first_name} ${student.last_name}`;
+      const similarity = calculateNameSimilarity(inputFullName, existingFullName);
+      
+      // Considerar como candidato si la similitud es >= 0.6 pero < 1.0 (no exacta)
+      if (similarity >= 0.6 && similarity < 1.0) {
+        candidates.push({
+          existingStudent: student,
+          excelRow: { first_name: firstName, last_name: lastName },
+          similarity
+        });
+      }
+    }
+
+    // Ordenar por similitud descendente
+    return candidates.sort((a, b) => b.similarity - a.similarity);
+  };
+
+  const processStudentRow = async (row: any, skipConfirmation = false) => {
     // Validar datos mínimos requeridos
     if (!row.first_name || !row.last_name) {
       throw new Error('Nombre y apellido son obligatorios');
@@ -193,17 +282,10 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         is_active: row.active !== undefined ? Boolean(row.active) : true
       };
       
-      // Log para depuración del tamaño del instrumento
-      if (row.instrument_size) {
-        console.log('Valor original de instrument_size:', row.instrument_size);
-        console.log('Tipo de dato de instrument_size:', typeof row.instrument_size);
-        console.log('Valor procesado de instrument_size:', String(row.instrument_size).trim());
-      }
-
       console.log('Datos preparados para procesamiento:', studentData);
 
-      // Verificar si el estudiante ya existe (por nombre y apellido en el programa actual)
-      const { data: existingStudents, error: searchError } = await supabase
+      // Verificar si el estudiante ya existe (coincidencia exacta)
+      const { data: exactMatches, error: searchError } = await supabase
         .from('students')
         .select('id, first_name, last_name')
         .eq('first_name', studentData.first_name)
@@ -216,9 +298,9 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
       let studentId: string;
 
-      // Si el estudiante existe, actualizarlo solo con campos no vacíos
-      if (existingStudents && existingStudents.length > 0) {
-        studentId = existingStudents[0].id;
+      // Si hay coincidencia exacta, actualizar
+      if (exactMatches && exactMatches.length > 0) {
+        studentId = exactMatches[0].id;
         console.log('Estudiante encontrado, actualizando ID:', studentId);
         
         // Obtener datos actuales del estudiante
@@ -275,56 +357,49 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
         setResults(prev => ({ ...prev, updated: prev.updated + 1 }));
       } 
-      // Si no existe, crear nuevo estudiante
-      else {
-        console.log('Estudiante no encontrado, insertando nuevo');
+      // Si no hay coincidencia exacta, buscar candidatos similares
+      else if (!skipConfirmation) {
+        const similarCandidates = await findSimilarStudents(studentData.first_name, studentData.last_name);
         
-        // Generar un student_id único basado en el nombre y apellido
-        const generatedStudentId = `S${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-        
-        // Añadir student_id, program_id y organization_id a los datos del estudiante
-        const studentDataWithId = {
-          ...studentData,
-          student_id: row.student_id ? row.student_id.trim() : generatedStudentId,
-          program_id: activeProgram?.id, // Usar el programa activo actual
-          organization_id: activeProgram?.organization_id // Usar la organización del programa activo
-        };
-        
-        console.log('Intentando insertar estudiante con datos:', JSON.stringify(studentDataWithId));
-        
-        try {
-          const { data: newStudent, error: insertError } = await supabase
-            .from('students')
-            .insert([studentDataWithId])
-            .select('id, student_id')
-            .single();
-
-          if (insertError) {
-            console.error('Error detallado al insertar:', insertError);
-            console.error('Código:', insertError.code);
-            console.error('Mensaje:', insertError.message);
-            console.error('Detalles:', insertError.details);
-            console.error('Pista:', insertError.hint);
-            throw new Error(`Error al insertar estudiante: ${insertError.code} - ${insertError.message} - ${insertError.details || 'Sin detalles'} - ${insertError.hint || 'Sin pista'}`);
-          }
+        if (similarCandidates.length > 0) {
+          // Mostrar diálogo de confirmación para el primer candidato más similar
+          const bestCandidate = similarCandidates[0];
           
-          if (!newStudent) {
-            console.error('No se recibió respuesta de datos al insertar');
-            throw new Error('No se recibió respuesta de datos al insertar estudiante');
-          }
-          
-          studentId = newStudent.id;
-          console.log('Estudiante insertado con ID:', studentId);
-          setResults(prev => ({ ...prev, added: prev.added + 1 }));
-        } catch (error) {
-          console.error('Error en la inserción:', error);
-          if (error instanceof Error) {
-            throw error;
-          } else {
-            throw new Error(`Error desconocido al insertar estudiante: ${JSON.stringify(error)}`);
-          }
+          return new Promise((resolve, reject) => {
+            setConfirmationDialog({
+              isOpen: true,
+              candidate: {
+                ...bestCandidate,
+                excelRow: row
+              },
+              onConfirm: async (action: 'update' | 'create') => {
+                setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
+                try {
+                  if (action === 'update') {
+                    // Actualizar el estudiante existente
+                    const result = await updateExistingStudent(bestCandidate.existingStudent.id, studentData, row);
+                    resolve(result);
+                  } else {
+                    // Crear nuevo estudiante
+                    const result = await createNewStudent(studentData, row);
+                    resolve(result);
+                  }
+                } catch (error) {
+                  reject(error);
+                }
+              },
+              onCancel: () => {
+                setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
+                reject(new Error('Operación cancelada por el usuario'));
+              }
+            });
+          });
         }
       }
+      
+      // Si no hay candidatos similares o se saltó la confirmación, crear nuevo estudiante
+      console.log('Estudiante no encontrado, insertando nuevo');
+      studentId = await createNewStudent(studentData, row);
 
       // Procesar datos de padres si existen
       if (row.parent_first_name && row.parent_last_name) {
@@ -334,6 +409,114 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       console.error('Error procesando estudiante:', error);
       throw error;
     }
+  };
+
+  // Función auxiliar para actualizar estudiante existente
+  const updateExistingStudent = async (studentId: string, studentData: any, row: any) => {
+    console.log('Actualizando estudiante existente ID:', studentId);
+    
+    // Obtener datos actuales del estudiante
+    const { data: currentStudent, error: fetchError } = await supabase
+      .from('students')
+      .select('*')
+      .eq('id', studentId)
+      .single();
+
+    if (fetchError) {
+      throw new Error(`Error al obtener datos actuales del estudiante: ${fetchError.message}`);
+    }
+
+    // Crear objeto de actualización solo con campos que no están vacíos en el Excel
+    const updateData: any = {};
+    
+    // Solo actualizar campos que tienen valores en el Excel
+    if (studentData.first_name && studentData.first_name.trim()) {
+      updateData.first_name = studentData.first_name;
+    }
+    if (studentData.last_name && studentData.last_name.trim()) {
+      updateData.last_name = studentData.last_name;
+    }
+    if (studentData.instrument && studentData.instrument.trim()) {
+      updateData.instrument = studentData.instrument;
+    }
+    if (studentData.instrument_size && studentData.instrument_size.trim()) {
+      updateData.instrument_size = studentData.instrument_size;
+    }
+    if (studentData.current_grade && studentData.current_grade.trim()) {
+      updateData.current_grade = studentData.current_grade;
+    }
+    if (studentData.age !== null && studentData.age !== undefined) {
+      updateData.age = studentData.age;
+    }
+    if (studentData.orchestra_position && studentData.orchestra_position.trim()) {
+      updateData.orchestra_position = studentData.orchestra_position;
+    }
+    if (studentData.is_active !== undefined) {
+      updateData.is_active = studentData.is_active;
+    }
+
+    // Solo actualizar si hay campos para actualizar
+    if (Object.keys(updateData).length > 0) {
+      const { error: updateError } = await supabase
+        .from('students')
+        .update(updateData)
+        .eq('id', studentId);
+
+      if (updateError) {
+        throw new Error(`Error al actualizar estudiante: ${updateError.message}`);
+      }
+    }
+
+    setResults(prev => ({ ...prev, updated: prev.updated + 1 }));
+    
+    // Procesar datos de padres si existen
+    if (row.parent_first_name && row.parent_last_name) {
+      await processParentData(row, studentId);
+    }
+    
+    return studentId;
+  };
+
+  // Función auxiliar para crear nuevo estudiante
+  const createNewStudent = async (studentData: any, row: any) => {
+    // Generar un student_id único basado en el nombre y apellido
+    const generatedStudentId = `S${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    
+    // Añadir student_id, program_id y organization_id a los datos del estudiante
+    const studentDataWithId = {
+      ...studentData,
+      student_id: row.student_id ? row.student_id.trim() : generatedStudentId,
+      program_id: activeProgram?.id,
+      organization_id: activeProgram?.organization_id
+    };
+    
+    console.log('Intentando insertar estudiante con datos:', JSON.stringify(studentDataWithId));
+    
+    const { data: newStudent, error: insertError } = await supabase
+      .from('students')
+      .insert([studentDataWithId])
+      .select('id, student_id')
+      .single();
+
+    if (insertError) {
+      console.error('Error detallado al insertar:', insertError);
+      throw new Error(`Error al insertar estudiante: ${insertError.code} - ${insertError.message}`);
+    }
+    
+    if (!newStudent) {
+      throw new Error('No se recibió respuesta de datos al insertar estudiante');
+    }
+    
+    const studentId = newStudent.id;
+    console.log('Estudiante insertado con ID:', studentId);
+    setResults(prev => ({ ...prev, added: prev.added + 1 }));
+    
+    // Procesar datos de padres si existen
+    if (row.parent_first_name && row.parent_last_name) {
+      await processParentData(row, studentId);
+    }
+    
+    return studentId;
   };
 
   const processParentData = async (row: any, studentId: string) => {
@@ -676,6 +859,101 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
           </div>
         </div>
       </div>
+
+      {/* Diálogo de Confirmación de Duplicados */}
+      {confirmationDialog.isOpen && confirmationDialog.candidate && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div className="p-6">
+              {/* Icono de advertencia */}
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full mb-4">
+                <FiAlertCircle className="w-6 h-6 text-yellow-600" />
+              </div>
+              
+              {/* Título */}
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">
+                Posible Estudiante Duplicado Detectado
+              </h3>
+              
+              {/* Contenido */}
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 text-center">
+                  Encontramos un estudiante similar en la base de datos:
+                </p>
+                
+                {/* Comparación */}
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">En la base de datos:</span>
+                    <span className="text-sm text-gray-900 font-semibold">
+                      {confirmationDialog.candidate.existingStudent.first_name} {confirmationDialog.candidate.existingStudent.last_name}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">En el Excel:</span>
+                    <span className="text-sm text-gray-900 font-semibold">
+                      {confirmationDialog.candidate.excelRow.first_name} {confirmationDialog.candidate.excelRow.last_name}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">Similitud:</span>
+                    <span className="text-sm text-blue-600 font-semibold">
+                      {Math.round(confirmationDialog.candidate.similarity * 100)}%
+                    </span>
+                  </div>
+                  
+                  {/* Información adicional del estudiante existente */}
+                  {confirmationDialog.candidate.existingStudent.instrument && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">Instrumento:</span>
+                      <span className="text-sm text-gray-900">
+                        {confirmationDialog.candidate.existingStudent.instrument}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {confirmationDialog.candidate.existingStudent.current_grade && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">Grado:</span>
+                      <span className="text-sm text-gray-900">
+                        {confirmationDialog.candidate.existingStudent.current_grade}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                <p className="text-sm text-gray-600 text-center">
+                  ¿Qué deseas hacer?
+                </p>
+              </div>
+              
+              {/* Botones */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <button
+                  onClick={() => confirmationDialog.onConfirm('update')}
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium transition-colors"
+                >
+                  Actualizar Existente
+                </button>
+                <button
+                  onClick={() => confirmationDialog.onConfirm('create')}
+                  className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 font-medium transition-colors"
+                >
+                  Crear Nuevo
+                </button>
+                <button
+                  onClick={confirmationDialog.onCancel}
+                  className="flex-1 px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-medium transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
