@@ -216,18 +216,61 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
       let studentId: string;
 
-      // Si el estudiante existe, actualizarlo
+      // Si el estudiante existe, actualizarlo solo con campos no vacíos
       if (existingStudents && existingStudents.length > 0) {
         studentId = existingStudents[0].id;
         console.log('Estudiante encontrado, actualizando ID:', studentId);
         
-        const { error: updateError } = await supabase
+        // Obtener datos actuales del estudiante
+        const { data: currentStudent, error: fetchError } = await supabase
           .from('students')
-          .update(studentData)
-          .eq('id', studentId);
+          .select('*')
+          .eq('id', studentId)
+          .single();
 
-        if (updateError) {
-          throw new Error(`Error al actualizar estudiante: ${updateError.message}`);
+        if (fetchError) {
+          throw new Error(`Error al obtener datos actuales del estudiante: ${fetchError.message}`);
+        }
+
+        // Crear objeto de actualización solo con campos que no están vacíos en el Excel
+        const updateData: any = {};
+        
+        // Solo actualizar campos que tienen valores en el Excel
+        if (studentData.first_name && studentData.first_name.trim()) {
+          updateData.first_name = studentData.first_name;
+        }
+        if (studentData.last_name && studentData.last_name.trim()) {
+          updateData.last_name = studentData.last_name;
+        }
+        if (studentData.instrument && studentData.instrument.trim()) {
+          updateData.instrument = studentData.instrument;
+        }
+        if (studentData.instrument_size && studentData.instrument_size.trim()) {
+          updateData.instrument_size = studentData.instrument_size;
+        }
+        if (studentData.current_grade && studentData.current_grade.trim()) {
+          updateData.current_grade = studentData.current_grade;
+        }
+        if (studentData.age !== null && studentData.age !== undefined) {
+          updateData.age = studentData.age;
+        }
+        if (studentData.orchestra_position && studentData.orchestra_position.trim()) {
+          updateData.orchestra_position = studentData.orchestra_position;
+        }
+        if (studentData.is_active !== undefined) {
+          updateData.is_active = studentData.is_active;
+        }
+
+        // Solo actualizar si hay campos para actualizar
+        if (Object.keys(updateData).length > 0) {
+          const { error: updateError } = await supabase
+            .from('students')
+            .update(updateData)
+            .eq('id', studentId);
+
+          if (updateError) {
+            throw new Error(`Error al actualizar estudiante: ${updateError.message}`);
+          }
         }
 
         setResults(prev => ({ ...prev, updated: prev.updated + 1 }));
@@ -320,18 +363,49 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
       let parentId: string;
 
-      // Si el padre/madre existe, actualizarlo
+      // Si el padre/madre existe, actualizarlo solo con campos no vacíos
       if (existingParents && existingParents.length > 0) {
         parentId = existingParents[0].id;
         console.log('Padre/madre encontrado, actualizando ID:', parentId);
         
-        const { error: updateError } = await supabase
+        // Obtener datos actuales del padre/madre
+        const { data: currentParent, error: fetchError } = await supabase
           .from('parents')
-          .update(parentData)
-          .eq('id', parentId);
-          
-        if (updateError) {
-          throw new Error(`Error al actualizar padre/madre: ${updateError.message}`);
+          .select('*')
+          .eq('id', parentId)
+          .single();
+
+        if (fetchError) {
+          throw new Error(`Error al obtener datos actuales del padre/madre: ${fetchError.message}`);
+        }
+
+        // Crear objeto de actualización solo con campos que no están vacíos en el Excel
+        const updateParentData: any = {};
+        
+        // Solo actualizar campos que tienen valores en el Excel
+        if (parentData.full_name && parentData.full_name.trim()) {
+          updateParentData.full_name = parentData.full_name;
+        }
+        if (parentData.phone_number && parentData.phone_number.trim()) {
+          updateParentData.phone_number = parentData.phone_number;
+        }
+        if (parentData.email && parentData.email.trim()) {
+          updateParentData.email = parentData.email;
+        }
+        if (parentData.preferred_contact_method && parentData.preferred_contact_method.trim()) {
+          updateParentData.preferred_contact_method = parentData.preferred_contact_method;
+        }
+
+        // Solo actualizar si hay campos para actualizar
+        if (Object.keys(updateParentData).length > 0) {
+          const { error: updateError } = await supabase
+            .from('parents')
+            .update(updateParentData)
+            .eq('id', parentId);
+            
+          if (updateError) {
+            throw new Error(`Error al actualizar padre/madre: ${updateError.message}`);
+          }
         }
       } 
       // Si no existe, crear nuevo padre/madre
