@@ -161,7 +161,7 @@ export default function AdminUsersPage() {
       const { error } = await supabase
         .from('user_profiles')
         .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('id', userId);
+        .eq('user_id', userId);
       
       if (error) throw error;
       
@@ -182,7 +182,7 @@ export default function AdminUsersPage() {
       const { error } = await supabase
         .from('user_profiles')
         .update({ is_active: !currentStatus, updated_at: new Date().toISOString() })
-        .eq('id', userId);
+        .eq('user_id', userId);
       
       if (error) throw error;
       
