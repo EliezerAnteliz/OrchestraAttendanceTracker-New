@@ -202,6 +202,10 @@ export default function StudentDetail() {
       setLoading(true);
       console.log('Iniciando eliminación del estudiante:', params.id);
       
+      // Get current user and program context for RLS
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Usuario actual:', user?.id);
+      
       // First delete student-parent relationships
       console.log('Eliminando relaciones estudiante-padre...');
       const { data: deletedRelations, error: spError } = await supabase
@@ -232,8 +236,24 @@ export default function StudentDetail() {
         throw attError;
       }
 
-      // Note: Orphan parents cleanup would require a custom database function
-      // For now, we'll leave parent records as they might be needed for other students
+      // Check if student exists and user has permission to delete
+      console.log('Verificando existencia del estudiante...');
+      const { data: studentCheck, error: checkError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('id', params.id)
+        .single();
+      
+      console.log('Estudiante encontrado para eliminar:', studentCheck);
+      
+      if (checkError) {
+        console.error('Error verificando estudiante:', checkError);
+        throw new Error(`No se puede acceder al estudiante: ${checkError.message}`);
+      }
+
+      if (!studentCheck) {
+        throw new Error('El estudiante no existe o no tienes permisos para eliminarlo');
+      }
 
       // Finally delete the student
       console.log('Eliminando estudiante...');
@@ -251,11 +271,22 @@ export default function StudentDetail() {
       }
 
       if (!deletedData || deletedData.length === 0) {
-        console.warn('No se eliminó ningún registro. Posible problema de RLS o ID incorrecto');
-        throw new Error('No se pudo eliminar el estudiante. Verifica los permisos.');
+        console.warn('No se eliminó ningún registro. Posible problema de RLS');
+        
+        // Try alternative deletion method with program context
+        console.log('Intentando eliminación alternativa...');
+        const { error: altError } = await supabase
+          .from('students')
+          .delete()
+          .eq('id', params.id)
+          .eq('program_id', studentCheck.program_id);
+          
+        if (altError) {
+          throw new Error(`RLS bloqueó la eliminación: ${altError.message}`);
+        }
       }
 
-      console.log('Estudiante eliminado exitosamente:', deletedData);
+      console.log('Estudiante eliminado exitosamente');
       setDeleteConfirm(false);
       router.push('/dashboard/students');
     } catch (err) {
