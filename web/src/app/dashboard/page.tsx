@@ -138,14 +138,18 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
-          <p className="text-gray-600 mt-1">
-            {t('dashboard_summary')}
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
+            <p className="text-gray-600 mt-1">
+              {t('dashboard_summary')}
+            </p>
+          </div>
+          <div className="sm:ml-4">
+            <RoleSwitcher />
+          </div>
         </div>
-        <RoleSwitcher />
       </div>
 
       {/* Tarjetas de estadísticas */}
