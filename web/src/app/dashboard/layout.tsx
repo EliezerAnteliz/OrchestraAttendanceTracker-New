@@ -199,7 +199,7 @@ function DashboardContent({ children }: { children: ReactNode }) {
       {/* Overlay for mobile when sidebar is open */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" 
+          className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm z-20 md:hidden" 
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
