@@ -9,13 +9,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-3 sm:p-4 shadow-lg">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-base sm:text-2xl font-bold truncate">{t("app_title")}</h1>
+      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-2 sm:p-4 shadow-lg">
+        <div className="container mx-auto flex justify-between items-center gap-2">
+          <div className="flex items-center min-w-0 flex-1">
+            <h1 className="text-sm sm:text-2xl font-bold truncate">{t("app_title")}</h1>
           </div>
           <div className="flex-shrink-0">
-            <Link href="/login" className="px-2 py-1 sm:px-6 sm:py-2 bg-white/10 backdrop-blur-sm text-white rounded-md sm:rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 text-xs sm:text-base whitespace-nowrap">
+            <Link href="/login" className="px-1.5 py-0.5 sm:px-6 sm:py-2 bg-white/10 backdrop-blur-sm text-white rounded sm:rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 text-xs sm:text-base whitespace-nowrap">
               {t("login")}
             </Link>
           </div>
