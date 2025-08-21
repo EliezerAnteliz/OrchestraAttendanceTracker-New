@@ -39,11 +39,11 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/dashboard" 
-                  className="px-8 py-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold">
+                  className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold text-sm sm:text-base">
                   {t("access_dashboard")}
                 </Link>
                 <Link href="/signup" 
-                  className="px-8 py-4 bg-white text-[#0073ea] rounded-xl border-2 border-[#0073ea] hover:bg-[#0073ea] hover:text-white transition-all duration-300 text-center font-semibold">
+                  className="px-6 py-3 sm:px-8 sm:py-4 bg-white text-[#0073ea] rounded-xl border-2 border-[#0073ea] hover:bg-[#0073ea] hover:text-white transition-all duration-300 text-center font-semibold text-sm sm:text-base">
                   {t("start_free")}
                 </Link>
               </div>
