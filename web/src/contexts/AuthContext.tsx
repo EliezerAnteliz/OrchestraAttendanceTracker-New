@@ -33,6 +33,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw error;
         }
         
+        if (data.session?.user) {
+          // Verificar si el usuario está activo en user_profiles
+          const { data: userProfile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('is_active')
+            .eq('user_id', data.session.user.id)
+            .single();
+
+          if (profileError || !userProfile?.is_active) {
+            // Si no se encuentra el perfil o el usuario está inactivo, cerrar sesión
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            if (pathname.startsWith('/dashboard')) {
+              router.push('/login');
+            }
+            return;
+          }
+        }
+
         setSession(data.session);
         setUser(data.session?.user || null);
       } catch (error) {
