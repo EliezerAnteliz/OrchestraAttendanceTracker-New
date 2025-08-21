@@ -46,6 +46,7 @@ const translations: Translations = {
   access_247_desc: { es: "Disponible desde cualquier dispositivo", en: "Available from any device" },
   back_to_home: { es: "Volver al inicio", en: "Back to home" },
   access_account_continue: { es: "Accede a tu cuenta para continuar", en: "Access your account to continue" },
+  view_details: { es: "Ver Detalles", en: "View Details" },
   footer_copyright: { es: " Eliezer Anteliz", en: " Eliezer Anteliz" },
 
   // Auth
