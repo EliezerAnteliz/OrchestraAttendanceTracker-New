@@ -12,10 +12,10 @@ export default function Home() {
       <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <h1 className="text-2xl font-bold">{t("app_title")}</h1>
+            <h1 className="text-lg sm:text-2xl font-bold">{t("app_title")}</h1>
           </div>
-          <div className="space-x-4">
-            <Link href="/login" className="px-6 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20">
+          <div className="space-x-2 sm:space-x-4">
+            <Link href="/login" className="px-3 py-1.5 sm:px-6 sm:py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 text-sm sm:text-base">
               {t("login")}
             </Link>
           </div>
