@@ -45,7 +45,8 @@ const translations: Translations = {
   access_247: { es: "Acceso 24/7", en: "24/7 Access" },
   access_247_desc: { es: "Disponible desde cualquier dispositivo", en: "Available from any device" },
   back_to_home: { es: "Volver al inicio", en: "Back to home" },
-  footer_copyright: { es: "© {year} Eliezer Anteliz", en: "© {year} Eliezer Anteliz" },
+  access_account_continue: { es: "Accede a tu cuenta para continuar", en: "Access your account to continue" },
+  footer_copyright: { es: " Eliezer Anteliz", en: " Eliezer Anteliz" },
 
   // Auth
   email: { es: "Correo Electrónico", en: "Email" },
@@ -82,7 +83,7 @@ const translations: Translations = {
   redirecting: { es: "Redirigiendo...", en: "Redirecting..." },
   please_select_organization: { es: "Por favor selecciona una organización", en: "Please select an organization" },
   please_select_sede: { es: "Por favor selecciona una sede", en: "Please select a site" },
-  error_loading_organizations: { es: "Error al cargar las organizaciones disponibles", en: "Error loading available organizations" },
+  error_loading_organizations_signup: { es: "Error al cargar las organizaciones disponibles", en: "Error loading available organizations" },
   error_loading_sedes: { es: "Error al cargar las sedes disponibles", en: "Error loading available sites" },
   error_creating_account: { es: "Error al crear la cuenta", en: "Error creating account" },
 
@@ -263,7 +264,7 @@ const translations: Translations = {
   no_members: { es: "Sin miembros.", en: "No members." },
   since: { es: "Desde", en: "Since" },
   revoke: { es: "Revocar", en: "Revoke" },
-  email_placeholder: { es: "usuario@dominio.com", en: "user@domain.com" },
+  admin_email_placeholder: { es: "usuario@dominio.com", en: "user@domain.com" },
   
   // Attendance page
   attendance_title: { es: "Asistencia", en: "Attendance" },
@@ -361,6 +362,111 @@ const translations: Translations = {
   parent_name_placeholder: { es: "Ej: María González", en: "e.g: Maria Gonzalez" },
   parent_phone_placeholder: { es: "Ej: +1 234 567 8900", en: "e.g: +1 234 567 8900" },
   parent_email_placeholder: { es: "Ej: maria@email.com", en: "e.g: maria@email.com" },
+  
+  // User edit modal translations
+  edit_user: { es: "Editar Usuario", en: "Edit User" },
+  update_user_info_permissions: { es: "Actualiza información y permisos", en: "Update information and permissions" },
+  personal_info_section: { es: "Información Personal", en: "Personal Information" },
+  full_name_label: { es: "Nombre Completo", en: "Full Name" },
+  full_name_placeholder: { es: "Nombre completo del usuario", en: "User's full name" },
+  email_address_label: { es: "Correo Electrónico", en: "Email Address" },
+  email_placeholder_user: { es: "usuario@dominio.com", en: "user@domain.com" },
+  permissions_access_section: { es: "Permisos y Acceso", en: "Permissions and Access" },
+  user_role_label: { es: "Rol del Usuario", en: "User Role" },
+  administrator: { es: "Administrador", en: "Administrator" },
+  staff_member: { es: "Personal", en: "Staff" },
+  viewer_role: { es: "Visualizador", en: "Viewer" },
+  assigned_sites_programs: { es: "Sedes/Programas Asignados", en: "Assigned Sites/Programs" },
+  sites_selection_help: { es: "💡 Selecciona las sedes donde el usuario puede trabajar. Los profesores pueden estar asignados a múltiples sedes.", en: "💡 Select the sites where the user can work. Teachers can be assigned to multiple sites." },
+  orchestra_site: { es: "Sede de la orquesta", en: "Orchestra site" },
+  save_changes: { es: "Guardar Cambios", en: "Save Changes" },
+  saving_changes: { es: "Guardando...", en: "Saving..." },
+  
+  // Admin Users Page translations
+  admin_users_title: { es: "Gestión de Usuarios", en: "User Management" },
+  admin_users_subtitle: { es: "Administra usuarios y sus roles en los programas", en: "Manage users and their roles in programs" },
+  add_new_user: { es: "Agregar Nuevo Usuario", en: "Add New User" },
+  registered_users: { es: "Usuarios Registrados", en: "Registered Users" },
+  manage_all_users: { es: "Gestiona todos los usuarios de la organización", en: "Manage all users in the organization" },
+  users_count: { es: "usuarios", en: "users" },
+  no_programs_available: { es: "No hay programas disponibles", en: "No programs available" },
+  contact_admin_programs: { es: "Contacta al administrador para configurar los programas.", en: "Contact the administrator to configure programs." },
+  
+  // Create User Modal translations
+  create_new_user: { es: "Crear Nuevo Usuario", en: "Create New User" },
+  grant_system_access: { es: "Conceder acceso al sistema", en: "Grant system access" },
+  user_information: { es: "Información del Usuario", en: "User Information" },
+  user_full_name: { es: "Nombre Completo", en: "Full Name" },
+  user_full_name_placeholder: { es: "Nombre completo del usuario", en: "User's full name" },
+  user_email_address: { es: "Correo Electrónico", en: "Email Address" },
+  user_email_placeholder: { es: "usuario@dominio.com", en: "user@domain.com" },
+  organization_assignment: { es: "Asignación de Organización", en: "Organization Assignment" },
+  select_organization_label: { es: "Seleccionar Organización", en: "Select Organization" },
+  select_organization_placeholder: { es: "Selecciona una organización...", en: "Select an organization..." },
+  loading_organizations_text: { es: "Cargando organizaciones...", en: "Loading organizations..." },
+  program_access: { es: "Acceso a Programas", en: "Program Access" },
+  select_programs_label: { es: "Seleccionar Programas", en: "Select Programs" },
+  select_programs_help: { es: "Selecciona los programas donde el usuario puede trabajar", en: "Select the programs where the user can work" },
+  no_programs_organization: { es: "No hay programas disponibles para esta organización", en: "No programs available for this organization" },
+  user_role_assignment: { es: "Asignación de Rol", en: "Role Assignment" },
+  select_user_role: { es: "Seleccionar Rol", en: "Select Role" },
+  admin_role_desc: { es: "Acceso completo al sistema", en: "Full system access" },
+  staff_role_desc: { es: "Acceso a funciones de personal", en: "Staff functions access" },
+  viewer_role_desc: { es: "Solo lectura", en: "Read-only access" },
+  create_user_button: { es: "Crear Usuario", en: "Create User" },
+  creating_user: { es: "Creando usuario...", en: "Creating user..." },
+  
+  // User management table translations
+  name_column: { es: "Nombre", en: "Name" },
+  email_column: { es: "Email", en: "Email" },
+  organization_column: { es: "Organización", en: "Organization" },
+  program_site_column: { es: "Programa / Sede", en: "Program / Site" },
+  role_column: { es: "Rol", en: "Role" },
+  status_column: { es: "Estado", en: "Status" },
+  registration_date_column: { es: "Fecha de Registro", en: "Registration Date" },
+  actions_column: { es: "Acciones", en: "Actions" },
+  no_program: { es: "Sin programas", en: "No programs" },
+  admin_role: { es: "Admin", en: "Admin" },
+  staff_role: { es: "Staff", en: "Staff" },
+  viewer_role_short: { es: "Viewer", en: "Viewer" },
+  active_status: { es: "Activo", en: "Active" },
+  inactive_status: { es: "Inactivo", en: "Inactive" },
+  edit_tooltip: { es: "Editar usuario", en: "Edit user" },
+  toggle_status_tooltip: { es: "Cambiar estado", en: "Toggle status" },
+  activate_user: { es: "Activar usuario", en: "Activate user" },
+  deactivate_user: { es: "Desactivar usuario", en: "Deactivate user" },
+  delete_tooltip: { es: "Eliminar usuario", en: "Delete user" },
+  
+  // Delete confirmation modal translations
+  confirm_deletion: { es: "Confirmar Eliminación", en: "Confirm Deletion" },
+  delete_user_warning: { es: "¿Estás seguro de que deseas eliminar este usuario?", en: "Are you sure you want to delete this user?" },
+  delete_user_confirmation: { es: "¿Estás seguro de que deseas eliminar completamente al usuario <strong>{email}</strong>? Esta acción no se puede deshacer y eliminará todos los datos asociados.", en: "Are you sure you want to completely delete the user <strong>{email}</strong>? This action cannot be undone and will delete all associated data." },
+  delete_user_description: { es: "Esta acción eliminará permanentemente al usuario y todos sus datos asociados. No se puede deshacer.", en: "This action will permanently delete the user and all associated data. This cannot be undone." },
+  delete_user_button: { es: "Eliminar Usuario", en: "Delete User" },
+  deleting: { es: "Eliminando...", en: "Deleting..." },
+  
+  // Success and error messages
+  user_created_success: { es: "Usuario creado exitosamente", en: "User created successfully" },
+  user_updated_success: { es: "Usuario actualizado exitosamente", en: "User updated successfully" },
+  user_deleted_success: { es: "Usuario eliminado exitosamente", en: "User deleted successfully" },
+  user_status_updated: { es: "Estado del usuario actualizado", en: "User status updated" },
+  error_creating_user: { es: "Error al crear el usuario", en: "Error creating user" },
+  error_updating_user: { es: "Error al actualizar el usuario", en: "Error updating user" },
+  error_deleting_user: { es: "Error al eliminar el usuario", en: "Error deleting user" },
+  error_loading_users: { es: "Error al cargar los usuarios", en: "Error loading users" },
+  error_loading_organizations: { es: "Error al cargar las organizaciones", en: "Error loading organizations" },
+  user_exists_error: { es: "Ya existe un usuario con este correo electrónico", en: "A user with this email already exists" },
+  
+  // Form validation messages
+  field_required: { es: "Este campo es obligatorio", en: "This field is required" },
+  invalid_email: { es: "Correo electrónico inválido", en: "Invalid email address" },
+  select_organization_required: { es: "Selecciona una organización", en: "Select an organization" },
+  select_program_required: { es: "Selecciona al menos un programa", en: "Select at least one program" },
+  select_role_required: { es: "Selecciona un rol", en: "Select a role" },
+  
+  // User status validation messages  
+  user_account_inactive: { es: "Tu cuenta está inactiva. Contacta al administrador para reactivarla.", en: "Your account is inactive. Contact the administrator to reactivate it." },
+  user_profile_not_found: { es: "No se encontró el perfil de usuario. Contacta al administrador.", en: "User profile not found. Contact the administrator." },
 };
 
 interface I18nContextValue {
