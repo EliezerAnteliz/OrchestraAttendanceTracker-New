@@ -96,7 +96,7 @@ export default function LoginPage() {
                   {t('email')}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                     <MdEmail className="h-4 w-4 text-gray-400" />
                   </div>
                   <input
@@ -105,7 +105,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm"
+                    className="w-full pl-3 md:pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
                   {t('password')}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                     <MdLock className="h-4 w-4 text-gray-400" />
                   </div>
                   <input
@@ -125,7 +125,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm"
+                    className="w-full pl-3 md:pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                     placeholder="••••••••"
                   />
                   <button
