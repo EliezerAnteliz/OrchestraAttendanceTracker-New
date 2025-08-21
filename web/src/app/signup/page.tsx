@@ -229,7 +229,7 @@ export default function SignUpPage() {
                     {t('email')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdEmail className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
@@ -238,7 +238,7 @@ export default function SignUpPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                       placeholder={t('email_placeholder')}
                     />
                   </div>
@@ -249,7 +249,7 @@ export default function SignUpPage() {
                     {t('organization')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdBusiness className="h-4 w-4 text-gray-400" />
                     </div>
                     <select
@@ -258,7 +258,7 @@ export default function SignUpPage() {
                       onChange={(e) => setSelectedOrganization(e.target.value)}
                       required
                       disabled={loadingOrgs}
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-900"
                     >
                       <option value="">{t('select_organization')}</option>
                       {organizations.map((org) => (
@@ -281,7 +281,7 @@ export default function SignUpPage() {
                     {t('sede')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdBusiness className="h-4 w-4 text-gray-400" />
                     </div>
                     <select
@@ -290,7 +290,7 @@ export default function SignUpPage() {
                       onChange={(e) => setSelectedProgram(e.target.value)}
                       required
                       disabled={loadingPrograms || !selectedOrganization}
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-900"
                     >
                       <option value="">{selectedOrganization ? t('select_sede') : t('select_organization_first')}</option>
                       {programs.map((program) => (
@@ -313,7 +313,7 @@ export default function SignUpPage() {
                     {t('user_level')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdBusiness className="h-4 w-4 text-gray-400" />
                     </div>
                     <select
@@ -321,7 +321,7 @@ export default function SignUpPage() {
                       value={selectedRole}
                       onChange={(e) => setSelectedRole(e.target.value)}
                       required
-                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 bg-white text-sm text-gray-900"
                     >
                       <option value="viewer">{t('viewer')}</option>
                       <option value="staff">{t('staff')}</option>
@@ -334,7 +334,7 @@ export default function SignUpPage() {
                     {t('password')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdLock className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
@@ -343,7 +343,7 @@ export default function SignUpPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                       placeholder="••••••••"
                       minLength={6}
                     />
@@ -372,7 +372,7 @@ export default function SignUpPage() {
                     {t('confirm_password')}
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                       <MdLock className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
@@ -381,7 +381,7 @@ export default function SignUpPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-800"
+                      className="w-full pl-3 md:pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                       placeholder="••••••••"
                     />
                     <button
