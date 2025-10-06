@@ -89,10 +89,10 @@ export default function NewStudent() {
         .insert({
           first_name: student.first_name,
           last_name: student.last_name,
-          grade: student.grade || null,
+          current_grade: student.grade || null,
           instrument: student.instrument || null,
           instrument_size: student.instrument_size || null,
-          position: student.position || null,
+          orchestra_position: student.position || null,
           is_active: student.is_active,
           program_id: activeProgram.id,
           organization_id: programData.organization_id,
