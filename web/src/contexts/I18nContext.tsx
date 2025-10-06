@@ -294,8 +294,12 @@ const translations: Translations = {
   personal_information: { es: "Información Personal", en: "Personal Information" },
   required_fields_error: { es: "Nombre y apellido son campos obligatorios", en: "First name and last name are required fields" },
   error_creating_student: { es: "Error al crear estudiante", en: "Error creating student" },
-  instrument_size_placeholder: { es: "Ej: 1/2, 3/4, 4/4", en: "Ex: 1/2, 3/4, 4/4" },
-  position_placeholder: { es: "Ej: Primera fila, Segunda fila", en: "Ex: First row, Second row" },
+  instrument_size_placeholder: { es: "1/2, 3/4, 4/4", en: "1/2, 3/4, 4/4" },
+  position_placeholder: { es: "Primera fila, Segunda fila", en: "First row, Second row" },
+  first_name_placeholder: { es: "Juan", en: "John" },
+  last_name_placeholder: { es: "Pérez", en: "Smith" },
+  grade_placeholder: { es: "5to grado", en: "5th grade" },
+  instrument_placeholder: { es: "Violín", en: "Violin" },
   saving: { es: "Guardando...", en: "Saving..." },
   complete_student_info: { es: "Complete la información del estudiante", en: "Complete the student information" },
 
@@ -360,9 +364,9 @@ const translations: Translations = {
   parent_name: { es: "Nombre del Padre/Madre", en: "Parent Name" },
   parent_phone: { es: "Teléfono del Padre/Madre", en: "Parent Phone" },
   parent_email: { es: "Correo del Padre/Madre", en: "Parent Email" },
-  parent_name_placeholder: { es: "Ej: María González", en: "e.g: Maria Gonzalez" },
-  parent_phone_placeholder: { es: "Ej: +1 234 567 8900", en: "e.g: +1 234 567 8900" },
-  parent_email_placeholder: { es: "Ej: maria@email.com", en: "e.g: maria@email.com" },
+  parent_name_placeholder: { es: "María González", en: "Maria Gonzalez" },
+  parent_phone_placeholder: { es: "+1 234 567 8900", en: "+1 234 567 8900" },
+  parent_email_placeholder: { es: "maria@email.com", en: "maria@email.com" },
   
   // User edit modal translations
   edit_user: { es: "Editar Usuario", en: "Edit User" },
