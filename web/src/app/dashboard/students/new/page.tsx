@@ -109,10 +109,11 @@ export default function NewStudent() {
         const { error: parentError } = await supabase
           .from('parents')
           .insert({
-            student_id: data.id,
-            name: student.parent_name || null,
-            phone: student.parent_phone || null,
+            full_name: student.parent_name || null,
+            phone_number: student.parent_phone || null,
             email: student.parent_email || null,
+            organization_id: programData.organization_id,
+            program_id: activeProgram.id,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
