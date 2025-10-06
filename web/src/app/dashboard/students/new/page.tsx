@@ -160,7 +160,7 @@ export default function NewStudent() {
                       value={student.first_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('first_name_placeholder')}
                     />
                   </div>
@@ -175,7 +175,7 @@ export default function NewStudent() {
                       value={student.last_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('last_name_placeholder')}
                     />
                   </div>
@@ -187,7 +187,7 @@ export default function NewStudent() {
                       name="grade"
                       value={student.grade}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('grade_placeholder')}
                     />
                   </div>
@@ -222,7 +222,7 @@ export default function NewStudent() {
                       name="parent_name"
                       value={student.parent_name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('parent_name_placeholder')}
                     />
                   </div>
@@ -234,7 +234,7 @@ export default function NewStudent() {
                       name="parent_phone"
                       value={student.parent_phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('parent_phone_placeholder')}
                     />
                   </div>
@@ -246,7 +246,7 @@ export default function NewStudent() {
                       name="parent_email"
                       value={student.parent_email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('parent_email_placeholder')}
                     />
                   </div>
@@ -267,7 +267,7 @@ export default function NewStudent() {
                       name="instrument"
                       value={student.instrument}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('instrument_placeholder')}
                     />
                   </div>
@@ -279,7 +279,7 @@ export default function NewStudent() {
                       name="instrument_size"
                       value={student.instrument_size}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('instrument_size_placeholder')}
                     />
                   </div>
@@ -291,7 +291,7 @@ export default function NewStudent() {
                       name="position"
                       value={student.position}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-[#323338]"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0086c0] focus:border-[#0086c0] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-500"
                       placeholder={t('position_placeholder')}
                     />
                   </div>
