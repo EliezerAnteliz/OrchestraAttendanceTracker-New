@@ -106,7 +106,8 @@ export default function NewStudent() {
 
       // Insert parent contact information if provided
       if (data && (student.parent_name || student.parent_phone || student.parent_email)) {
-        const { error: parentError } = await supabase
+        // First, create the parent
+        const { data: parentData, error: parentError } = await supabase
           .from('parents')
           .insert({
             full_name: student.parent_name || null,
@@ -116,11 +117,28 @@ export default function NewStudent() {
             program_id: activeProgram.id,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
-          });
+          })
+          .select()
+          .single();
 
         if (parentError) {
-          console.warn('Error creating parent contact:', parentError);
+          console.error('Error creating parent contact:', parentError);
           // Don't throw error here - student was created successfully
+        } else if (parentData) {
+          // Create the relationship in student_parents table
+          const { error: relationError } = await supabase
+            .from('student_parents')
+            .insert({
+              student_id: data.id,
+              parent_id: parentData.id,
+              program_id: activeProgram.id,
+              is_primary_contact: true,
+              created_at: new Date().toISOString()
+            });
+
+          if (relationError) {
+            console.error('Error creating student-parent relationship:', relationError);
+          }
         }
       }
       
