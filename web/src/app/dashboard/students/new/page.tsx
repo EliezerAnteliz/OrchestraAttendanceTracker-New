@@ -83,10 +83,15 @@ export default function NewStudent() {
         throw new Error('Error al obtener información del programa');
       }
       
+      // Generate a unique student_id in format S + random numbers
+      const randomNum = Math.floor(Math.random() * 10000);
+      const studentId = `S${randomNum}`;
+      
       // Insert new student
       const { data, error: insertError } = await supabase
         .from('students')
         .insert({
+          student_id: studentId,
           first_name: student.first_name,
           last_name: student.last_name,
           current_grade: student.grade || null,
