@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase';
 import { MdArrowBack, MdSave, MdCancel, MdPerson, MdMusicNote } from 'react-icons/md';
 import { theme } from '@/styles/theme';
 import { useI18n } from '@/contexts/I18nContext';
+import { useProgram } from '@/contexts/ProgramContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NewStudent {
   first_name: string;
@@ -25,6 +27,8 @@ interface NewStudent {
 export default function NewStudent() {
   const router = useRouter();
   const { t } = useI18n();
+  const { activeProgram } = useProgram();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [student, setStudent] = useState<NewStudent>({
@@ -62,6 +66,22 @@ export default function NewStudent() {
       if (!student.first_name || !student.last_name) {
         throw new Error(t('required_fields_error'));
       }
+
+      // Validate program is selected
+      if (!activeProgram?.id) {
+        throw new Error('No hay programa activo seleccionado');
+      }
+
+      // Get organization_id from active program
+      const { data: programData, error: programError } = await supabase
+        .from('programs')
+        .select('organization_id')
+        .eq('id', activeProgram.id)
+        .single();
+
+      if (programError || !programData) {
+        throw new Error('Error al obtener información del programa');
+      }
       
       // Insert new student
       const { data, error: insertError } = await supabase
@@ -74,6 +94,8 @@ export default function NewStudent() {
           instrument_size: student.instrument_size || null,
           position: student.position || null,
           is_active: student.is_active,
+          program_id: activeProgram.id,
+          organization_id: programData.organization_id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
