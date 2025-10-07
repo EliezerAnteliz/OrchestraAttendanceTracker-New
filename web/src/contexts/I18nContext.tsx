@@ -244,6 +244,21 @@ const translations: Translations = {
   unexcused_absences_short: { es: "F. Injustificadas", en: "Unexcused" },
   academic_year: { es: "Año académico", en: "Academic year" },
   
+  // Unexcused absences report
+  unexcused_absences_current_week: { es: "Faltas Injustificadas (Semana Actual)", en: "Unexcused Absences (Current Week)" },
+  loading_unexcused: { es: "Cargando...", en: "Loading..." },
+  no_unexcused_status_found: { es: "No se encontró el estado de \"Falta Injustificada\" en la base de datos", en: "\"Unexcused Absence\" status not found in database" },
+  no_students_with_unexcused: { es: "No hay estudiantes con 2 o más faltas injustificadas en la semana actual", en: "No students with 2 or more unexcused absences this week" },
+  unexcused_absences_title: { es: "Faltas Injustificadas - Semana Actual", en: "Unexcused Absences - Current Week" },
+  no_students_unexcused_this_week: { es: "No hay estudiantes con faltas injustificadas esta semana", en: "No students with unexcused absences this week" },
+  total_students_with_unexcused: { es: "Total de estudiantes con faltas injustificadas:", en: "Total students with unexcused absences:" },
+  student_info: { es: "Información del estudiante", en: "Student information" },
+  parent_contact_label: { es: "Contacto del Padre/Madre", en: "Parent/Guardian Contact" },
+  unexcused_count: { es: "Faltas injustificadas:", en: "Unexcused absences:" },
+  no_contact_info: { es: "No hay información de contacto registrada", en: "No contact information registered" },
+  close_button: { es: "Cerrar", en: "Close" },
+  error_fetching_unexcused: { es: "Error al obtener las faltas injustificadas", en: "Error fetching unexcused absences" },
+  
   // Admin page (users)
   admin_users_page_title: { es: "Admin · Usuarios", en: "Admin · Users" },
   admin_users_page_desc: {
