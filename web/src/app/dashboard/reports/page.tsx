@@ -721,18 +721,36 @@ export default function ReportsPage() {
       return;
     }
 
-    // Formatear las fechas
-    const formattedDates = studentItem.dates.map(date => {
+    // Formatear las fechas en español
+    const formattedDatesES = studentItem.dates.map(date => {
       const d = new Date(date);
-      return d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+      return d.toLocaleDateString('es-ES', { 
         day: '2-digit', 
         month: 'long', 
         year: 'numeric' 
       });
     }).join('\n');
 
-    // Obtener fecha actual
-    const currentDate = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+    // Formatear las fechas en inglés
+    const formattedDatesEN = studentItem.dates.map(date => {
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+    }).join('\n');
+
+    // Obtener fecha actual en español
+    const currentDateES = new Date().toLocaleDateString('es-ES', { 
+      day: '2-digit', 
+      month: 'long', 
+      year: 'numeric',
+      weekday: 'long'
+    });
+
+    // Obtener fecha actual en inglés
+    const currentDateEN = new Date().toLocaleDateString('en-US', { 
       day: '2-digit', 
       month: 'long', 
       year: 'numeric',
