@@ -622,7 +622,7 @@ export default function ReportsPage() {
       );
       
       if (!unexcusedStatus) {
-        alert('No se encontró el estado de "Falta Injustificada" en la base de datos');
+        alert(t('no_unexcused_status_found'));
         return;
       }
       
@@ -635,11 +635,13 @@ export default function ReportsPage() {
         }
       });
       
-      // Obtener información de estudiantes con faltas injustificadas
-      const studentIds = Array.from(unexcusedByStudent.keys());
+      // Filtrar solo estudiantes con 2 o más faltas injustificadas
+      const studentIds = Array.from(unexcusedByStudent.keys()).filter(
+        studentId => (unexcusedByStudent.get(studentId) || 0) >= 2
+      );
       
       if (studentIds.length === 0) {
-        alert('No hay estudiantes con faltas injustificadas en la semana actual');
+        alert(t('no_students_with_unexcused'));
         setLoadingUnexcused(false);
         return;
       }
@@ -697,7 +699,7 @@ export default function ReportsPage() {
       
     } catch (error) {
       console.error('Error fetching unexcused absences:', error);
-      alert('Error al obtener las faltas injustificadas');
+      alert(t('error_fetching_unexcused'));
     } finally {
       setLoadingUnexcused(false);
     }
@@ -1422,11 +1424,11 @@ export default function ReportsPage() {
             {loadingUnexcused ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                Cargando...
+                {t('loading_unexcused')}
               </>
             ) : (
               <>
-                <MdWarning className="mr-2" /> Faltas Injustificadas (Semana Actual)
+                <MdWarning className="mr-2" /> {t('unexcused_absences_current_week')}
               </>
             )}
           </button>
@@ -1636,7 +1638,7 @@ export default function ReportsPage() {
             <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
               <div className="flex items-center">
                 <MdWarning className="mr-2" size={24} />
-                <h2 className="text-xl font-bold">Faltas Injustificadas - Semana Actual</h2>
+                <h2 className="text-xl font-bold">{t('unexcused_absences_title')}</h2>
               </div>
               <button
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
@@ -1650,12 +1652,12 @@ export default function ReportsPage() {
             <div className="flex-1 overflow-y-auto p-6">
               {unexcusedStudents.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  No hay estudiantes con faltas injustificadas esta semana
+                  {t('no_students_unexcused_this_week')}
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="text-sm text-gray-600 mb-4">
-                    Total de estudiantes con faltas injustificadas: <span className="font-bold text-red-600">{unexcusedStudents.length}</span>
+                    {t('total_students_with_unexcused')} <span className="font-bold text-red-600">{unexcusedStudents.length}</span>
                   </div>
                   
                   {unexcusedStudents.map((item, index) => (
@@ -1672,8 +1674,8 @@ export default function ReportsPage() {
                             </h3>
                           </div>
                           <div className="text-sm text-gray-600 space-y-1">
-                            <p><span className="font-medium">Instrumento:</span> {item.student.instrument}</p>
-                            <p><span className="font-medium">Faltas injustificadas:</span> 
+                            <p><span className="font-medium">{t('instrument_label')}:</span> {item.student.instrument}</p>
+                            <p><span className="font-medium">{t('unexcused_count')}</span> 
                               <span className="ml-2 bg-red-600 text-white px-2 py-0.5 rounded font-bold">
                                 {item.absences}
                               </span>
@@ -1683,15 +1685,15 @@ export default function ReportsPage() {
 
                         {/* Información del padre/madre */}
                         <div className="bg-gray-50 rounded-lg p-3 sm:w-64">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Contacto del Padre/Madre</h4>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('parent_contact_label')}</h4>
                           {item.parentInfo ? (
                             <div className="text-sm text-gray-600 space-y-1">
-                              <p><span className="font-medium">Nombre:</span> {item.parentInfo.full_name || 'N/A'}</p>
-                              <p><span className="font-medium">Teléfono:</span> {item.parentInfo.phone_number || 'N/A'}</p>
-                              <p><span className="font-medium">Email:</span> {item.parentInfo.email || 'N/A'}</p>
+                              <p><span className="font-medium">{t('parent_name')}:</span> {item.parentInfo.full_name || 'N/A'}</p>
+                              <p><span className="font-medium">{t('parent_phone')}:</span> {item.parentInfo.phone_number || 'N/A'}</p>
+                              <p><span className="font-medium">{t('parent_email')}:</span> {item.parentInfo.email || 'N/A'}</p>
                             </div>
                           ) : (
-                            <p className="text-sm text-gray-500 italic">No hay información de contacto registrada</p>
+                            <p className="text-sm text-gray-500 italic">{t('no_contact_info')}</p>
                           )}
                         </div>
                       </div>
@@ -1707,7 +1709,7 @@ export default function ReportsPage() {
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
               >
-                Cerrar
+                {t('close_button')}
               </button>
             </div>
           </div>
