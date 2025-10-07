@@ -263,6 +263,11 @@ const translations: Translations = {
   error_sending_email: { es: "Error al enviar el email", en: "Error sending email" },
   no_parent_email: { es: "No hay email de contacto registrado", en: "No contact email registered" },
   sending_email: { es: "Enviando...", en: "Sending..." },
+  preview_email: { es: "Previsualizar Email", en: "Preview Email" },
+  email_preview: { es: "Previsualización del Email", en: "Email Preview" },
+  send_email: { es: "Enviar Email", en: "Send Email" },
+  email_to: { es: "Para:", en: "To:" },
+  email_subject: { es: "Asunto:", en: "Subject:" },
   
   // Admin page (users)
   admin_users_page_title: { es: "Admin · Usuarios", en: "Admin · Users" },
