@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '../../../lib/supabase';
-import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload, MdWarning, MdClose } from 'react-icons/md';
+import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload, MdWarning, MdClose, MdEmail } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -85,8 +85,9 @@ export default function ReportsPage() {
   const { isAdmin } = useUserRole();
   // Estados
   const [unexcusedAbsencesModalVisible, setUnexcusedAbsencesModalVisible] = useState(false);
-  const [unexcusedStudents, setUnexcusedStudents] = useState<Array<{student: Student, absences: number, parentInfo: any}>>([]);
+  const [unexcusedStudents, setUnexcusedStudents] = useState<Array<{student: Student, absences: number, parentInfo: any, dates: string[]}>>([]);
   const [loadingUnexcused, setLoadingUnexcused] = useState(false);
+  const [sendingEmailFor, setSendingEmailFor] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reportType, setReportType] = useState<'individual' | 'group'>('group');
@@ -627,17 +628,20 @@ export default function ReportsPage() {
       }
       
       // Filtrar solo faltas injustificadas y contar por estudiante
-      const unexcusedByStudent = new Map<string, number>();
+      const unexcusedByStudent = new Map<string, {count: number, dates: string[]}>();
       attendanceData?.forEach(record => {
         if (record.status_code === unexcusedStatus.code) {
-          const count = unexcusedByStudent.get(record.student_id) || 0;
-          unexcusedByStudent.set(record.student_id, count + 1);
+          const existing = unexcusedByStudent.get(record.student_id) || {count: 0, dates: []};
+          unexcusedByStudent.set(record.student_id, {
+            count: existing.count + 1,
+            dates: [...existing.dates, record.date]
+          });
         }
       });
       
       // Filtrar solo estudiantes con 2 o más faltas injustificadas
       const studentIds = Array.from(unexcusedByStudent.keys()).filter(
-        studentId => (unexcusedByStudent.get(studentId) || 0) >= 2
+        studentId => (unexcusedByStudent.get(studentId)?.count || 0) >= 2
       );
       
       if (studentIds.length === 0) {
@@ -677,6 +681,8 @@ export default function ReportsPage() {
             parentInfo = parentData;
           }
           
+          const studentData = unexcusedByStudent.get(student.id);
+          
           return {
             student: {
               id: student.id,
@@ -685,7 +691,8 @@ export default function ReportsPage() {
               last_name: student.last_name,
               instrument: student.instrument || 'N/A'
             },
-            absences: unexcusedByStudent.get(student.id) || 0,
+            absences: studentData?.count || 0,
+            dates: studentData?.dates || [],
             parentInfo
           };
         })
@@ -702,6 +709,84 @@ export default function ReportsPage() {
       alert(t('error_fetching_unexcused'));
     } finally {
       setLoadingUnexcused(false);
+    }
+  };
+
+  // Función para enviar email al padre
+  const handleSendEmailToParent = async (studentItem: typeof unexcusedStudents[0]) => {
+    if (!studentItem.parentInfo?.email) {
+      alert(t('no_parent_email'));
+      return;
+    }
+
+    setSendingEmailFor(studentItem.student.id);
+    
+    try {
+      // Formatear las fechas
+      const formattedDates = studentItem.dates.map(date => {
+        const d = new Date(date);
+        return d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+          day: '2-digit', 
+          month: 'long', 
+          year: 'numeric' 
+        });
+      }).join('\n');
+
+      // Obtener fecha actual
+      const currentDate = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric',
+        weekday: 'long'
+      });
+
+      // Construir el cuerpo del email según el idioma
+      const emailSubject = lang === 'es' 
+        ? `Reporte de Asistencia - ${studentItem.student.name}`
+        : `Attendance Report - ${studentItem.student.name}`;
+
+      const emailBody = lang === 'es'
+        ? `${currentDate}
+
+Estimado Padre/Tutor de ${studentItem.student.name},
+
+El propósito de este reporte de asistencia es para informarle que ${studentItem.student.name} fue marcado(a) unexcused en el Programa Ascend, el Martes, 07 de Octubre de 2025. La asistencia es importante para nosotros y unexcused causará que el/la estudiante pierda oportunidades significativas de instrucción y aprendizaje. Por favor llame a la Coordinadora de sede de Ascend, Alyssa Pequeño al 210 665 - 4449 o arequejo@theorchestra-sa.org para justificar esta ausencia.
+
+Atentamente,
+La Oficina de Asistencia
+Ascend
+
+Fecha          Descripción
+${formattedDates}     Unexcused`
+        : `${currentDate}
+
+Dear Parent/Guardian of ${studentItem.student.name},
+
+The purpose of this attendance report is to inform you that ${studentItem.student.name} was marked unexcused in the Ascend Program on Tuesday, October 07, 2025. Attendance is important to us and unexcused will cause the student to miss significant opportunities for instruction and learning. Please call the Ascend Site Coordinator, Alyssa Pequeño at 210 665 - 4449 or arequejo@theorchestra-sa.org to justify this absence.
+
+Sincerely,
+The Attendance Office
+Ascend
+
+Date          Description
+${formattedDates}     Unexcused`;
+
+      // Crear el mailto link
+      const mailtoLink = `mailto:${studentItem.parentInfo.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Abrir el cliente de email
+      window.location.href = mailtoLink;
+      
+      // Mostrar mensaje de éxito después de un breve delay
+      setTimeout(() => {
+        alert(t('email_sent_success'));
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert(t('error_sending_email'));
+    } finally {
+      setSendingEmailFor(null);
     }
   };
 
@@ -1687,11 +1772,34 @@ export default function ReportsPage() {
                         <div className="bg-gray-50 rounded-lg p-3 sm:w-64">
                           <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('parent_contact_label')}</h4>
                           {item.parentInfo ? (
-                            <div className="text-sm text-gray-600 space-y-1">
-                              <p><span className="font-medium">{t('parent_name')}:</span> {item.parentInfo.full_name || 'N/A'}</p>
-                              <p><span className="font-medium">{t('parent_phone')}:</span> {item.parentInfo.phone_number || 'N/A'}</p>
-                              <p><span className="font-medium">{t('parent_email')}:</span> {item.parentInfo.email || 'N/A'}</p>
-                            </div>
+                            <>
+                              <div className="text-sm text-gray-600 space-y-1 mb-3">
+                                <p><span className="font-medium">{t('parent_name')}:</span> {item.parentInfo.full_name || 'N/A'}</p>
+                                <p><span className="font-medium">{t('parent_phone')}:</span> {item.parentInfo.phone_number || 'N/A'}</p>
+                                <p><span className="font-medium">{t('parent_email')}:</span> {item.parentInfo.email || 'N/A'}</p>
+                              </div>
+                              
+                              {/* Botón para enviar email */}
+                              {item.parentInfo.email && (
+                                <button
+                                  onClick={() => handleSendEmailToParent(item)}
+                                  disabled={sendingEmailFor === item.student.id}
+                                  className="w-full px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {sendingEmailFor === item.student.id ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-2"></div>
+                                      {t('sending_email')}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <MdEmail className="mr-2" size={16} />
+                                      {t('send_email_to_parent')}
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </>
                           ) : (
                             <p className="text-sm text-gray-500 italic">{t('no_contact_info')}</p>
                           )}
