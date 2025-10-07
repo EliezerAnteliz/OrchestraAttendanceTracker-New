@@ -757,44 +757,49 @@ export default function ReportsPage() {
       weekday: 'long'
     });
 
-    // Construir el asunto y cuerpo del email BILINGÜE
+    // Construir el asunto y cuerpo del email BILINGÜE siguiendo formato de la imagen
     const emailSubject = `Reporte de Asistencia / Attendance Report - ${studentItem.student.name}`;
+
+    // Crear tabla de fechas
+    const dateTableES = studentItem.dates.map(d => {
+      const date = new Date(d);
+      return `${date.toLocaleDateString('es-ES', {day: '2-digit', month: 'long', year: 'numeric'})}     Unexcused`;
+    }).join('\n');
+
+    const dateTableEN = studentItem.dates.map(d => {
+      const date = new Date(d);
+      return `${date.toLocaleDateString('en-US', {day: '2-digit', month: 'long', year: 'numeric'})}     Unexcused`;
+    }).join('\n');
 
     const emailBody = `${currentDateES}
 
 ESPAÑOL:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Estimado Padre/Tutor de ${studentItem.student.name},
 
-El propósito de este reporte es informarle que ${studentItem.student.name} tiene ${studentItem.absences} falta(s) injustificada(s) en el Programa Ascend esta semana.
-
-Fechas de las faltas:
-${formattedDatesES}
-
-La asistencia es importante. Por favor contacte a la Coordinadora Alyssa Pequeño al 210-665-4449 o arequejo@theorchestra-sa.org para justificar estas ausencias.
+El propósito de este reporte de asistencia es para informarle que ${studentItem.student.name} fue marcado(a) unexcused de Ascend el ${formattedDatesES.split('\n')[0]}. La asistencia es importante para nosotros y unexcused causará que el/la estudiante pierda oportunidades significativas de instrucción y aprendizaje. Por favor llame a la Coordinadora de sede de Ascend, Alyssa Pequeño al 210 665 - 4449 o arequejo@theorchestra-sa.org para justificar esta ausencia.
 
 Atentamente,
 La Oficina de Asistencia
 Ascend
+
+Fecha          Descripción
+${dateTableES}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${currentDateEN}
 
 ENGLISH:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Dear Parent/Guardian of ${studentItem.student.name},
 
-The purpose of this report is to inform you that ${studentItem.student.name} has ${studentItem.absences} unexcused absence(s) in the Ascend Program this week.
-
-Absence dates:
-${formattedDatesEN}
-
-Attendance is important. Please contact Site Coordinator Alyssa Pequeño at 210-665-4449 or arequejo@theorchestra-sa.org to justify these absences.
+The purpose of this attendance report is to inform you that ${studentItem.student.name} was marked unexcused in the Ascend Program on ${formattedDatesEN.split('\n')[0]}. Attendance is important to us and unexcused will cause the student to miss significant opportunities for instruction and learning. Please call the Ascend Site Coordinator, Alyssa Pequeño at 210 665 - 4449 or arequejo@theorchestra-sa.org to justify this absence.
 
 Sincerely,
 The Attendance Office
-Ascend`;
+Ascend
+
+Date          Description
+${dateTableEN}`;
 
     // Guardar datos para previsualización (usar email de prueba)
     setEmailPreviewData({
