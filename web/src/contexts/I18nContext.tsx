@@ -258,6 +258,11 @@ const translations: Translations = {
   no_contact_info: { es: "No hay información de contacto registrada", en: "No contact information registered" },
   close_button: { es: "Cerrar", en: "Close" },
   error_fetching_unexcused: { es: "Error al obtener las faltas injustificadas", en: "Error fetching unexcused absences" },
+  send_email_to_parent: { es: "Enviar Email al Padre/Madre", en: "Send Email to Parent/Guardian" },
+  email_sent_success: { es: "Email enviado exitosamente", en: "Email sent successfully" },
+  error_sending_email: { es: "Error al enviar el email", en: "Error sending email" },
+  no_parent_email: { es: "No hay email de contacto registrado", en: "No contact email registered" },
+  sending_email: { es: "Enviando...", en: "Sending..." },
   
   // Admin page (users)
   admin_users_page_title: { es: "Admin · Usuarios", en: "Admin · Users" },
