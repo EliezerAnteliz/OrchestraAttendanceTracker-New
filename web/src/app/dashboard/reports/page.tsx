@@ -88,6 +88,8 @@ export default function ReportsPage() {
   const [unexcusedStudents, setUnexcusedStudents] = useState<Array<{student: Student, absences: number, parentInfo: any, dates: string[]}>>([]);
   const [loadingUnexcused, setLoadingUnexcused] = useState(false);
   const [sendingEmailFor, setSendingEmailFor] = useState<string | null>(null);
+  const [emailPreviewVisible, setEmailPreviewVisible] = useState(false);
+  const [emailPreviewData, setEmailPreviewData] = useState<{to: string, subject: string, body: string, studentItem: any} | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reportType, setReportType] = useState<'individual' | 'group'>('group');
@@ -712,41 +714,38 @@ export default function ReportsPage() {
     }
   };
 
-  // Función para enviar email al padre
-  const handleSendEmailToParent = async (studentItem: typeof unexcusedStudents[0]) => {
+  // Función para previsualizar email
+  const handlePreviewEmail = (studentItem: typeof unexcusedStudents[0]) => {
     if (!studentItem.parentInfo?.email) {
       alert(t('no_parent_email'));
       return;
     }
 
-    setSendingEmailFor(studentItem.student.id);
-    
-    try {
-      // Formatear las fechas
-      const formattedDates = studentItem.dates.map(date => {
-        const d = new Date(date);
-        return d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
-          day: '2-digit', 
-          month: 'long', 
-          year: 'numeric' 
-        });
-      }).join('\n');
-
-      // Obtener fecha actual
-      const currentDate = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+    // Formatear las fechas
+    const formattedDates = studentItem.dates.map(date => {
+      const d = new Date(date);
+      return d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
         day: '2-digit', 
         month: 'long', 
-        year: 'numeric',
-        weekday: 'long'
+        year: 'numeric' 
       });
+    }).join('\n');
 
-      // Construir el cuerpo del email según el idioma
-      const emailSubject = lang === 'es' 
-        ? `Reporte de Asistencia - ${studentItem.student.name}`
-        : `Attendance Report - ${studentItem.student.name}`;
+    // Obtener fecha actual
+    const currentDate = new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { 
+      day: '2-digit', 
+      month: 'long', 
+      year: 'numeric',
+      weekday: 'long'
+    });
 
-      const emailBody = lang === 'es'
-        ? `${currentDate}
+    // Construir el cuerpo del email según el idioma
+    const emailSubject = lang === 'es' 
+      ? `Reporte de Asistencia - ${studentItem.student.name}`
+      : `Attendance Report - ${studentItem.student.name}`;
+
+    const emailBody = lang === 'es'
+      ? `${currentDate}
 
 Estimado Padre/Tutor de ${studentItem.student.name},
 
@@ -758,7 +757,7 @@ Ascend
 
 Fecha          Descripción
 ${formattedDates}     Unexcused`
-        : `${currentDate}
+      : `${currentDate}
 
 Dear Parent/Guardian of ${studentItem.student.name},
 
@@ -771,11 +770,30 @@ Ascend
 Date          Description
 ${formattedDates}     Unexcused`;
 
+    // Guardar datos para previsualización
+    setEmailPreviewData({
+      to: studentItem.parentInfo.email,
+      subject: emailSubject,
+      body: emailBody,
+      studentItem
+    });
+    setEmailPreviewVisible(true);
+  };
+
+  // Función para enviar el email después de la previsualización
+  const handleConfirmSendEmail = () => {
+    if (!emailPreviewData) return;
+
+    try {
       // Crear el mailto link
-      const mailtoLink = `mailto:${studentItem.parentInfo.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+      const mailtoLink = `mailto:${emailPreviewData.to}?subject=${encodeURIComponent(emailPreviewData.subject)}&body=${encodeURIComponent(emailPreviewData.body)}`;
       
       // Abrir el cliente de email
       window.location.href = mailtoLink;
+      
+      // Cerrar modales
+      setEmailPreviewVisible(false);
+      setEmailPreviewData(null);
       
       // Mostrar mensaje de éxito después de un breve delay
       setTimeout(() => {
@@ -785,8 +803,6 @@ ${formattedDates}     Unexcused`;
     } catch (error) {
       console.error('Error sending email:', error);
       alert(t('error_sending_email'));
-    } finally {
-      setSendingEmailFor(null);
     }
   };
 
@@ -1715,6 +1731,74 @@ ${formattedDates}     Unexcused`;
         onSelect={handleSelectStudent}
       />
 
+      {/* Modal de previsualización de email */}
+      {emailPreviewVisible && emailPreviewData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-[#0073ea] text-white px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center">
+                <MdEmail className="mr-2" size={24} />
+                <h2 className="text-xl font-bold">{t('email_preview')}</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setEmailPreviewVisible(false);
+                  setEmailPreviewData(null);
+                }}
+                className="hover:bg-[#0060c0] rounded-full p-2 transition-colors"
+              >
+                <MdClose size={24} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-4">
+                {/* Email headers */}
+                <div className="border-b border-gray-200 pb-4 space-y-2">
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-700 min-w-[80px]">{t('email_to')}</span>
+                    <span className="text-gray-600">{emailPreviewData.to}</span>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="font-semibold text-gray-700 min-w-[80px]">{t('email_subject')}</span>
+                    <span className="text-gray-600">{emailPreviewData.subject}</span>
+                  </div>
+                </div>
+
+                {/* Email body */}
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800 leading-relaxed">
+                    {emailPreviewData.body}
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setEmailPreviewVisible(false);
+                  setEmailPreviewData(null);
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleConfirmSendEmail}
+                className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors font-medium flex items-center"
+              >
+                <MdEmail className="mr-2" size={18} />
+                {t('send_email')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de faltas injustificadas */}
       {unexcusedAbsencesModalVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1779,24 +1863,14 @@ ${formattedDates}     Unexcused`;
                                 <p><span className="font-medium">{t('parent_email')}:</span> {item.parentInfo.email || 'N/A'}</p>
                               </div>
                               
-                              {/* Botón para enviar email */}
+                              {/* Botón para previsualizar email */}
                               {item.parentInfo.email && (
                                 <button
-                                  onClick={() => handleSendEmailToParent(item)}
-                                  disabled={sendingEmailFor === item.student.id}
-                                  className="w-full px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                  onClick={() => handlePreviewEmail(item)}
+                                  className="w-full px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
                                 >
-                                  {sendingEmailFor === item.student.id ? (
-                                    <>
-                                      <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-2"></div>
-                                      {t('sending_email')}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <MdEmail className="mr-2" size={16} />
-                                      {t('send_email_to_parent')}
-                                    </>
-                                  )}
+                                  <MdEmail className="mr-2" size={16} />
+                                  {t('preview_email')}
                                 </button>
                               )}
                             </>
