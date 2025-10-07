@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '../../../lib/supabase';
-import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload } from 'react-icons/md';
+import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload, MdWarning, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es as esLocale, enUS } from 'date-fns/locale';
 import { useProgram } from '@/contexts/ProgramContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Registrar locales para react-datepicker (forzar que la semana empiece en lunes)
 const enMonday: typeof enUS = {
@@ -81,7 +82,11 @@ interface AttendanceStats {
 export default function ReportsPage() {
   const { t, lang } = useI18n();
   const { activeProgram } = useProgram();
+  const { isAdmin } = useUserRole();
   // Estados
+  const [unexcusedAbsencesModalVisible, setUnexcusedAbsencesModalVisible] = useState(false);
+  const [unexcusedStudents, setUnexcusedStudents] = useState<Array<{student: Student, absences: number, parentInfo: any}>>([]);
+  const [loadingUnexcused, setLoadingUnexcused] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reportType, setReportType] = useState<'individual' | 'group'>('group');
@@ -580,6 +585,121 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
       setGenerating(false);
+    }
+  };
+
+  // Función para obtener estudiantes con faltas injustificadas de la semana actual
+  const handleShowUnexcusedAbsences = async () => {
+    if (!activeProgram?.id) return;
+    
+    setLoadingUnexcused(true);
+    try {
+      // Obtener rango de la semana actual (lunes a domingo)
+      const now = new Date();
+      const { firstDay, lastDay } = getISOWeekRange(getISOWeekString(now));
+      
+      const startDate = firstDay.toISOString().split('T')[0];
+      const endDate = lastDay.toISOString().split('T')[0];
+      
+      // Obtener registros de asistencia de la semana actual
+      const { data: attendanceData, error: attendanceError } = await supabase
+        .from('attendance')
+        .select('*')
+        .eq('program_id', activeProgram.id)
+        .gte('date', startDate)
+        .lte('date', endDate);
+      
+      if (attendanceError) throw attendanceError;
+      
+      // Obtener códigos de estado
+      const { data: statusData } = await supabase
+        .from('attendance_status')
+        .select('*');
+      
+      // Encontrar el código para "Falta Injustificada"
+      const unexcusedStatus = statusData?.find(s => 
+        s.code === 'UA' || s.name?.toLowerCase().includes('injustificada') || s.name?.toLowerCase().includes('unexcused')
+      );
+      
+      if (!unexcusedStatus) {
+        alert('No se encontró el estado de "Falta Injustificada" en la base de datos');
+        return;
+      }
+      
+      // Filtrar solo faltas injustificadas y contar por estudiante
+      const unexcusedByStudent = new Map<string, number>();
+      attendanceData?.forEach(record => {
+        if (record.status_code === unexcusedStatus.code) {
+          const count = unexcusedByStudent.get(record.student_id) || 0;
+          unexcusedByStudent.set(record.student_id, count + 1);
+        }
+      });
+      
+      // Obtener información de estudiantes con faltas injustificadas
+      const studentIds = Array.from(unexcusedByStudent.keys());
+      
+      if (studentIds.length === 0) {
+        alert('No hay estudiantes con faltas injustificadas en la semana actual');
+        setLoadingUnexcused(false);
+        return;
+      }
+      
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select('*')
+        .in('id', studentIds);
+      
+      if (studentsError) throw studentsError;
+      
+      // Obtener información de padres para cada estudiante
+      const studentsWithParents = await Promise.all(
+        (studentsData || []).map(async (student) => {
+          // Obtener relaciones de padres
+          const { data: parentRelations } = await supabase
+            .from('student_parents')
+            .select('parent_id, is_primary_contact')
+            .eq('student_id', student.id);
+          
+          let parentInfo = null;
+          if (parentRelations && parentRelations.length > 0) {
+            // Priorizar contacto primario
+            const primaryRelation = parentRelations.find(r => r.is_primary_contact) || parentRelations[0];
+            
+            // Obtener datos del padre
+            const { data: parentData } = await supabase
+              .from('parents')
+              .select('*')
+              .eq('id', primaryRelation.parent_id)
+              .single();
+            
+            parentInfo = parentData;
+          }
+          
+          return {
+            student: {
+              id: student.id,
+              name: `${student.first_name} ${student.last_name}`,
+              first_name: student.first_name,
+              last_name: student.last_name,
+              instrument: student.instrument || 'N/A'
+            },
+            absences: unexcusedByStudent.get(student.id) || 0,
+            parentInfo
+          };
+        })
+      );
+      
+      // Ordenar por número de faltas (mayor a menor)
+      studentsWithParents.sort((a, b) => b.absences - a.absences);
+      
+      setUnexcusedStudents(studentsWithParents);
+      setUnexcusedAbsencesModalVisible(true);
+      
+    } catch (error) {
+      console.error('Error fetching unexcused absences:', error);
+      alert('Error al obtener las faltas injustificadas');
+    } finally {
+      setLoadingUnexcused(false);
     }
   };
 
@@ -1269,8 +1389,8 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* Botón para generar reporte */}
-      <div className="flex justify-center px-4">
+      {/* Botones de acción */}
+      <div className="flex flex-col sm:flex-row justify-center gap-3 px-4">
         <button
           onClick={handleGenerateReport}
           disabled={generating || (reportType === 'individual' && !selectedStudent)}
@@ -1291,6 +1411,26 @@ export default function ReportsPage() {
             </>
           )}
         </button>
+        
+        {/* Botón para ver faltas injustificadas (solo admin) */}
+        {isAdmin && (
+          <button
+            onClick={handleShowUnexcusedAbsences}
+            disabled={loadingUnexcused}
+            className="w-full sm:w-auto px-6 py-3 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm"
+          >
+            {loadingUnexcused ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                Cargando...
+              </>
+            ) : (
+              <>
+                <MdWarning className="mr-2" /> Faltas Injustificadas (Semana Actual)
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Error al generar reporte */}
@@ -1487,6 +1627,92 @@ export default function ReportsPage() {
         students={students}
         onSelect={handleSelectStudent}
       />
+
+      {/* Modal de faltas injustificadas */}
+      {unexcusedAbsencesModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center">
+                <MdWarning className="mr-2" size={24} />
+                <h2 className="text-xl font-bold">Faltas Injustificadas - Semana Actual</h2>
+              </div>
+              <button
+                onClick={() => setUnexcusedAbsencesModalVisible(false)}
+                className="hover:bg-red-700 rounded-full p-2 transition-colors"
+              >
+                <MdClose size={24} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {unexcusedStudents.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No hay estudiantes con faltas injustificadas esta semana
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-600 mb-4">
+                    Total de estudiantes con faltas injustificadas: <span className="font-bold text-red-600">{unexcusedStudents.length}</span>
+                  </div>
+                  
+                  {unexcusedStudents.map((item, index) => (
+                    <div key={item.student.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                        {/* Información del estudiante */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">
+                              #{index + 1}
+                            </span>
+                            <h3 className="text-lg font-semibold text-gray-800">
+                              {item.student.name}
+                            </h3>
+                          </div>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><span className="font-medium">Instrumento:</span> {item.student.instrument}</p>
+                            <p><span className="font-medium">Faltas injustificadas:</span> 
+                              <span className="ml-2 bg-red-600 text-white px-2 py-0.5 rounded font-bold">
+                                {item.absences}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Información del padre/madre */}
+                        <div className="bg-gray-50 rounded-lg p-3 sm:w-64">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Contacto del Padre/Madre</h4>
+                          {item.parentInfo ? (
+                            <div className="text-sm text-gray-600 space-y-1">
+                              <p><span className="font-medium">Nombre:</span> {item.parentInfo.full_name || 'N/A'}</p>
+                              <p><span className="font-medium">Teléfono:</span> {item.parentInfo.phone_number || 'N/A'}</p>
+                              <p><span className="font-medium">Email:</span> {item.parentInfo.email || 'N/A'}</p>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic">No hay información de contacto registrada</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+              <button
+                onClick={() => setUnexcusedAbsencesModalVisible(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
