@@ -770,9 +770,9 @@ Ascend
 Date          Description
 ${formattedDates}     Unexcused`;
 
-    // Guardar datos para previsualización
+    // Guardar datos para previsualización (usar email de prueba)
     setEmailPreviewData({
-      to: studentItem.parentInfo.email,
+      to: 'eliezeranteliz@gmail.com',
       subject: emailSubject,
       body: emailBody,
       studentItem
