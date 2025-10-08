@@ -1555,10 +1555,10 @@ ${dateTableEN}`;
         
         {/* Selector de fecha y botón para ver faltas injustificadas (solo admin) */}
         {isAdmin && (
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-end">
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">
-                {lang === 'es' ? 'Fecha a reportar:' : 'Date to report:'}
+              <label className="text-sm font-medium text-gray-800 mb-2">
+                {lang === 'es' ? 'Seleccione el día para ver las faltas injustificadas:' : 'Select the day to view unexcused absences:'}
               </label>
               <DatePicker
                 selected={selectedReportDate}
@@ -1566,14 +1566,15 @@ ${dateTableEN}`;
                 dateFormat="dd/MM/yyyy"
                 locale={lang === 'es' ? 'es-mon' : 'en-mon'}
                 maxDate={new Date()}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 font-medium w-full"
                 placeholderText={lang === 'es' ? 'Seleccionar fecha' : 'Select date'}
+                wrapperClassName="w-full sm:w-auto"
               />
             </div>
             <button
               onClick={handleShowUnexcusedAbsences}
               disabled={loadingUnexcused}
-              className="px-6 py-3 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm self-end"
+              className="px-6 py-2.5 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm whitespace-nowrap"
             >
               {loadingUnexcused ? (
                 <>
