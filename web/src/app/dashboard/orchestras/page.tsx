@@ -321,7 +321,7 @@ export default function OrchestrasPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                       placeholder={lang === 'es' ? 'Ej: Mozart, Beethoven' : 'Ex: Mozart, Beethoven'}
                       required
                     />
@@ -334,7 +334,7 @@ export default function OrchestrasPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                       rows={3}
                       placeholder={lang === 'es' ? 'Descripción opcional' : 'Optional description'}
                     />
