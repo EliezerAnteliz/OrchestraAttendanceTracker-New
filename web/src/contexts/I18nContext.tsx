@@ -93,6 +93,7 @@ const translations: Translations = {
   brand_subtitle: { es: "Attendance Tracker", en: "Attendance Tracker" },
   menu_dashboard: { es: "Dashboard", en: "Dashboard" },
   menu_students: { es: "Estudiantes", en: "Students" },
+  menu_orchestras: { es: "Orquestas", en: "Orchestras" },
   menu_attendance: { es: "Asistencia", en: "Attendance" },
   menu_reports: { es: "Reportes", en: "Reports" },
   sign_out: { es: "Cerrar sesión", en: "Sign out" },
