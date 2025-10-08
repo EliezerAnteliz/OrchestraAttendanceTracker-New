@@ -388,19 +388,29 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       
       console.log('Datos preparados para procesamiento:', studentData);
 
-      // Verificar si el estudiante ya existe (coincidencia exacta)
-      console.log('Buscando coincidencias exactas para:', studentData.first_name, studentData.last_name);
+      // Verificar si el estudiante ya existe (coincidencia con normalización)
+      console.log('Buscando coincidencias para:', studentData.first_name, studentData.last_name);
       
-      const { data: exactMatches, error: searchError } = await supabase
+      // Obtener todos los estudiantes del programa para comparar con normalización
+      const { data: allStudents, error: searchError } = await supabase
         .from('students')
         .select('id, first_name, last_name, instrument, current_grade')
-        .eq('first_name', studentData.first_name)
-        .eq('last_name', studentData.last_name)
         .eq('program_id', activeProgram?.id);
 
       if (searchError) {
         throw new Error(`Error al buscar estudiante: ${searchError.message}`);
       }
+
+      // Buscar coincidencia exacta usando normalización
+      const normalizedInputFirst = normalizeText(studentData.first_name);
+      const normalizedInputLast = normalizeText(studentData.last_name);
+      
+      const exactMatches = allStudents?.filter(s => {
+        const normalizedExistingFirst = normalizeText(s.first_name);
+        const normalizedExistingLast = normalizeText(s.last_name);
+        return normalizedExistingFirst === normalizedInputFirst && 
+               normalizedExistingLast === normalizedInputLast;
+      }) || [];
 
       console.log('Coincidencias exactas encontradas:', exactMatches?.length || 0, exactMatches);
 
