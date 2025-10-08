@@ -1566,7 +1566,7 @@ ${dateTableEN}`;
                 dateFormat="dd/MM/yyyy"
                 locale={lang === 'es' ? 'es-mon' : 'en-mon'}
                 maxDate={new Date()}
-                className="px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 font-medium w-full"
+                className="px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 font-medium w-full text-center"
                 placeholderText={lang === 'es' ? 'Seleccionar fecha' : 'Select date'}
                 wrapperClassName="w-full sm:w-auto"
               />
