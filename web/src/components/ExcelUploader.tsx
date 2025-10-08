@@ -201,9 +201,19 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     setErrorMessages([]);
   };
 
+  // Función para normalizar texto removiendo acentos y tildes
+  const normalizeText = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      .normalize('NFD') // Descomponer caracteres con acentos
+      .replace(/[\u0300-\u036f]/g, '') // Remover marcas diacríticas (acentos, tildes)
+      .replace(/\s+/g, ' '); // Normalizar espacios
+  };
+
   // Función para normalizar y dividir nombres
   const parseFullName = (fullName: string) => {
-    const normalized = fullName.toLowerCase().trim().replace(/\s+/g, ' ');
+    const normalized = normalizeText(fullName);
     const parts = normalized.split(' ').filter(part => part.length > 0);
     
     return {
@@ -630,7 +640,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       const parentData = {
         full_name: `${row.parent_first_name.trim()} ${row.parent_last_name.trim()}`,
         phone_number: row.parent_phone_number ? row.parent_phone_number.toString().trim() : null,
-        email: row.parent_email ? row.parent_email.trim() : null,
+        email: row.parent_email ? row.parent_email.trim().toLowerCase() : null,
         preferred_contact_method: row.parent_preferred_contact_method ? row.parent_preferred_contact_method.trim() : 'phone',
         program_id: activeProgram?.id, // Usar el programa activo actual
         organization_id: activeProgram?.organization_id // Usar la organización del programa activo
@@ -638,11 +648,10 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       
       console.log('Procesando datos de padre/madre:', parentData);
 
-      // Verificar si el padre/madre ya existe (en el programa actual)
-      const { data: existingParents, error: searchError } = await supabase
+      // Buscar padre/madre existente por múltiples criterios
+      const { data: allParents, error: searchError } = await supabase
         .from('parents')
-        .select('id')
-        .eq('full_name', parentData.full_name)
+        .select('id, full_name, email, phone_number')
         .eq('program_id', activeProgram?.id);
 
       if (searchError) {
@@ -650,10 +659,46 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       }
 
       let parentId: string;
+      let existingParent = null;
+
+      // Buscar coincidencia por email (más confiable)
+      if (parentData.email && allParents) {
+        existingParent = allParents.find(p => 
+          p.email && p.email.toLowerCase() === parentData.email?.toLowerCase()
+        );
+        if (existingParent) {
+          console.log('Padre/madre encontrado por email:', existingParent.email);
+        }
+      }
+
+      // Si no se encontró por email, buscar por teléfono
+      if (!existingParent && parentData.phone_number && allParents) {
+        const cleanPhone = parentData.phone_number.replace(/\D/g, ''); // Remover caracteres no numéricos
+        existingParent = allParents.find(p => {
+          if (!p.phone_number) return false;
+          const cleanExistingPhone = p.phone_number.replace(/\D/g, '');
+          return cleanExistingPhone === cleanPhone;
+        });
+        if (existingParent) {
+          console.log('Padre/madre encontrado por teléfono:', existingParent.phone_number);
+        }
+      }
+
+      // Si no se encontró por email ni teléfono, buscar por nombre normalizado
+      if (!existingParent && allParents) {
+        const normalizedInputName = normalizeText(parentData.full_name);
+        existingParent = allParents.find(p => {
+          const normalizedExistingName = normalizeText(p.full_name);
+          return normalizedExistingName === normalizedInputName;
+        });
+        if (existingParent) {
+          console.log('Padre/madre encontrado por nombre normalizado:', existingParent.full_name);
+        }
+      }
 
       // Si el padre/madre existe, actualizarlo solo con campos no vacíos
-      if (existingParents && existingParents.length > 0) {
-        parentId = existingParents[0].id;
+      if (existingParent) {
+        parentId = existingParent.id;
         console.log('Padre/madre encontrado, actualizando ID:', parentId);
         
         // Obtener datos actuales del padre/madre
