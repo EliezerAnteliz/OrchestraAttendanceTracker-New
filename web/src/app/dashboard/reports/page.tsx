@@ -633,6 +633,7 @@ export default function ReportsPage() {
       const unexcusedByStudent = new Map<string, {count: number, dates: string[]}>();
       attendanceData?.forEach(record => {
         if (record.status_code === unexcusedStatus.code) {
+          console.log('Fecha de inasistencia encontrada:', record.date, 'para estudiante:', record.student_id);
           const existing = unexcusedByStudent.get(record.student_id) || {count: 0, dates: []};
           unexcusedByStudent.set(record.student_id, {
             count: existing.count + 1,
