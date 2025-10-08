@@ -603,8 +603,11 @@ export default function ReportsPage() {
     
     setLoadingUnexcused(true);
     try {
-      // Usar la fecha seleccionada
-      const reportDate = selectedReportDate.toISOString().split('T')[0];
+      // Usar la fecha seleccionada (formato local para evitar problemas de zona horaria)
+      const year = selectedReportDate.getFullYear();
+      const month = String(selectedReportDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedReportDate.getDate()).padStart(2, '0');
+      const reportDate = `${year}-${month}-${day}`;
       
       // Obtener registros de asistencia de la fecha específica
       const { data: attendanceData, error: attendanceError } = await supabase
