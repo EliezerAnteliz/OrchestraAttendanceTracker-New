@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { MdAdd, MdEdit, MdDelete, MdMusicNote, MdSearch, MdPeople } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdMusicNote, MdSearch, MdPeople, MdPersonAdd, MdClose, MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -16,6 +16,15 @@ interface Orchestra {
   is_active: boolean;
   created_at: string;
   student_count?: number;
+}
+
+interface Student {
+  id: string;
+  first_name: string;
+  last_name: string;
+  instrument: string | null;
+  orchestra_id: string | null;
+  is_active: boolean;
 }
 
 export default function OrchestrasPage() {
@@ -33,6 +42,14 @@ export default function OrchestrasPage() {
     description: '',
     is_active: true
   });
+  
+  // Estados para asignar estudiantes
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assigningOrchestra, setAssigningOrchestra] = useState<Orchestra | null>(null);
+  const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
+  const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [assigningStudents, setAssigningStudents] = useState(false);
 
   useEffect(() => {
     if (activeProgram?.id) {
@@ -168,6 +185,97 @@ export default function OrchestrasPage() {
     }
   };
 
+  // Función para abrir modal de asignación de estudiantes
+  const handleAssignStudents = async (orchestra: Orchestra) => {
+    setAssigningOrchestra(orchestra);
+    setSelectedStudents(new Set());
+    setStudentSearchTerm('');
+    
+    try {
+      // Obtener estudiantes activos del programa que NO estén en ninguna orquesta
+      const { data: students, error } = await supabase
+        .from('students')
+        .select('id, first_name, last_name, instrument, orchestra_id, is_active')
+        .eq('program_id', activeProgram?.id)
+        .eq('is_active', true)
+        .is('orchestra_id', null)
+        .order('last_name', { ascending: true });
+
+      if (error) throw error;
+      
+      setAvailableStudents(students || []);
+      setShowAssignModal(true);
+    } catch (error: any) {
+      console.error('Error loading students:', error);
+      alert(error.message || (lang === 'es' ? 'Error al cargar estudiantes' : 'Error loading students'));
+    }
+  };
+
+  // Función para seleccionar/deseleccionar estudiante
+  const toggleStudentSelection = (studentId: string) => {
+    const newSelection = new Set(selectedStudents);
+    if (newSelection.has(studentId)) {
+      newSelection.delete(studentId);
+    } else {
+      newSelection.add(studentId);
+    }
+    setSelectedStudents(newSelection);
+  };
+
+  // Función para seleccionar todos los estudiantes filtrados
+  const toggleSelectAll = () => {
+    const filteredIds = filteredAvailableStudents.map(s => s.id);
+    if (selectedStudents.size === filteredIds.length && filteredIds.length > 0) {
+      setSelectedStudents(new Set());
+    } else {
+      setSelectedStudents(new Set(filteredIds));
+    }
+  };
+
+  // Función para asignar estudiantes a la orquesta
+  const handleConfirmAssignment = async () => {
+    if (selectedStudents.size === 0) {
+      alert(lang === 'es' ? 'Selecciona al menos un estudiante' : 'Select at least one student');
+      return;
+    }
+
+    if (!assigningOrchestra) return;
+
+    setAssigningStudents(true);
+    try {
+      // Actualizar todos los estudiantes seleccionados
+      const updates = Array.from(selectedStudents).map(studentId => 
+        supabase
+          .from('students')
+          .update({ orchestra_id: assigningOrchestra.id })
+          .eq('id', studentId)
+      );
+
+      await Promise.all(updates);
+
+      alert(lang === 'es' 
+        ? `${selectedStudents.size} estudiante(s) asignado(s) a ${assigningOrchestra.name} exitosamente`
+        : `${selectedStudents.size} student(s) assigned to ${assigningOrchestra.name} successfully`
+      );
+
+      setShowAssignModal(false);
+      setAssigningOrchestra(null);
+      setSelectedStudents(new Set());
+      fetchOrchestras();
+    } catch (error: any) {
+      console.error('Error assigning students:', error);
+      alert(error.message || (lang === 'es' ? 'Error al asignar estudiantes' : 'Error assigning students'));
+    } finally {
+      setAssigningStudents(false);
+    }
+  };
+
+  // Filtrar estudiantes disponibles
+  const filteredAvailableStudents = availableStudents.filter(s =>
+    `${s.first_name} ${s.last_name}`.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+    (s.instrument && s.instrument.toLowerCase().includes(studentSearchTerm.toLowerCase()))
+  );
+
   const filteredOrchestras = orchestras.filter(o =>
     o.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (o.description && o.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -288,12 +396,22 @@ export default function OrchestrasPage() {
                 <p className="text-gray-600 text-sm mb-4">{orchestra.description}</p>
               )}
 
-              <div className="flex items-center text-gray-700 bg-gray-50 rounded-md p-3">
+              <div className="flex items-center text-gray-700 bg-gray-50 rounded-md p-3 mb-3">
                 <MdPeople className="mr-2 text-blue-600" size={20} />
                 <span className="font-medium">
                   {orchestra.student_count || 0} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
                 </span>
               </div>
+
+              {isAdmin && (
+                <button
+                  onClick={() => handleAssignStudents(orchestra)}
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center font-medium"
+                >
+                  <MdPersonAdd className="mr-2" size={18} />
+                  {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -377,6 +495,156 @@ export default function OrchestrasPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Asignación de Estudiantes */}
+      {showAssignModal && assigningOrchestra && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                    <MdPersonAdd className="mr-2 text-green-600" size={24} />
+                    {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
+                    <span className="font-semibold">{assigningOrchestra.name}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    setAssigningOrchestra(null);
+                    setSelectedStudents(new Set());
+                  }}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <MdClose size={24} />
+                </button>
+              </div>
+            </div>
+
+            {/* Search and Select All */}
+            <div className="p-4 border-b border-gray-200 space-y-3">
+              <div className="relative">
+                <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder={lang === 'es' ? 'Buscar estudiante...' : 'Search student...'}
+                  value={studentSearchTerm}
+                  onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={toggleSelectAll}
+                  className="flex items-center text-sm text-green-600 hover:text-green-700 font-medium"
+                >
+                  {selectedStudents.size === filteredAvailableStudents.length && filteredAvailableStudents.length > 0 ? (
+                    <>
+                      <MdCheckBox className="mr-1" size={20} />
+                      {lang === 'es' ? 'Deseleccionar todos' : 'Deselect all'}
+                    </>
+                  ) : (
+                    <>
+                      <MdCheckBoxOutlineBlank className="mr-1" size={20} />
+                      {lang === 'es' ? 'Seleccionar todos' : 'Select all'}
+                    </>
+                  )}
+                </button>
+                <span className="text-sm text-gray-600">
+                  {selectedStudents.size} {lang === 'es' ? 'seleccionado(s)' : 'selected'}
+                </span>
+              </div>
+            </div>
+
+            {/* Students List */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {filteredAvailableStudents.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <MdPeople className="mx-auto mb-3 text-gray-400" size={48} />
+                  <p>
+                    {studentSearchTerm 
+                      ? (lang === 'es' ? 'No se encontraron estudiantes' : 'No students found')
+                      : (lang === 'es' ? 'No hay estudiantes disponibles sin orquesta' : 'No students available without orchestra')
+                    }
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredAvailableStudents.map((student) => (
+                    <div
+                      key={student.id}
+                      onClick={() => toggleStudentSelection(student.id)}
+                      className={`p-3 border-2 rounded-md cursor-pointer transition-all ${
+                        selectedStudents.has(student.id)
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 hover:border-green-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <div className="mr-3">
+                          {selectedStudents.has(student.id) ? (
+                            <MdCheckBox className="text-green-600" size={24} />
+                          ) : (
+                            <MdCheckBoxOutlineBlank className="text-gray-400" size={24} />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-800">
+                            {student.first_name} {student.last_name}
+                          </p>
+                          {student.instrument && (
+                            <p className="text-sm text-gray-600">{student.instrument}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    setAssigningOrchestra(null);
+                    setSelectedStudents(new Set());
+                  }}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                  disabled={assigningStudents}
+                >
+                  {lang === 'es' ? 'Cancelar' : 'Cancel'}
+                </button>
+                <button
+                  onClick={handleConfirmAssignment}
+                  disabled={assigningStudents || selectedStudents.size === 0}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+                >
+                  {assigningStudents ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                      {lang === 'es' ? 'Asignando...' : 'Assigning...'}
+                    </>
+                  ) : (
+                    <>
+                      <MdPersonAdd className="mr-2" size={18} />
+                      {lang === 'es' ? `Asignar ${selectedStudents.size} estudiante(s)` : `Assign ${selectedStudents.size} student(s)`}
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
