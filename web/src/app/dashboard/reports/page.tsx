@@ -722,9 +722,10 @@ export default function ReportsPage() {
       return;
     }
 
-    // Formatear las fechas en español
+    // Formatear las fechas en español (sin conversión de zona horaria)
     const formattedDatesES = studentItem.dates.map(date => {
-      const d = new Date(date);
+      // Agregar 'T00:00:00' para evitar problemas de zona horaria
+      const d = new Date(date + 'T00:00:00');
       return d.toLocaleDateString('es-ES', { 
         day: '2-digit', 
         month: 'long', 
@@ -732,9 +733,10 @@ export default function ReportsPage() {
       });
     }).join('\n');
 
-    // Formatear las fechas en inglés
+    // Formatear las fechas en inglés (sin conversión de zona horaria)
     const formattedDatesEN = studentItem.dates.map(date => {
-      const d = new Date(date);
+      // Agregar 'T00:00:00' para evitar problemas de zona horaria
+      const d = new Date(date + 'T00:00:00');
       return d.toLocaleDateString('en-US', { 
         day: '2-digit', 
         month: 'long', 
@@ -761,14 +763,14 @@ export default function ReportsPage() {
     // Construir el asunto y cuerpo del email BILINGÜE siguiendo formato de la imagen
     const emailSubject = `Reporte de Asistencia / Attendance Report - ${studentItem.student.name}`;
 
-    // Crear tabla de fechas
+    // Crear tabla de fechas (sin conversión de zona horaria)
     const dateTableES = studentItem.dates.map(d => {
-      const date = new Date(d);
+      const date = new Date(d + 'T00:00:00');
       return `${date.toLocaleDateString('es-ES', {day: '2-digit', month: 'long', year: 'numeric'})}     Unexcused`;
     }).join('\n');
 
     const dateTableEN = studentItem.dates.map(d => {
-      const date = new Date(d);
+      const date = new Date(d + 'T00:00:00');
       return `${date.toLocaleDateString('en-US', {day: '2-digit', month: 'long', year: 'numeric'})}     Unexcused`;
     }).join('\n');
 
