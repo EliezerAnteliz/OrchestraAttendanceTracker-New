@@ -90,6 +90,7 @@ export default function ReportsPage() {
   const [sendingEmailFor, setSendingEmailFor] = useState<string | null>(null);
   const [emailPreviewVisible, setEmailPreviewVisible] = useState(false);
   const [emailPreviewData, setEmailPreviewData] = useState<{to: string, subject: string, body: string, studentItem: any} | null>(null);
+  const [emailProvider, setEmailProvider] = useState<'gmail' | 'outlook'>('gmail');
   const [selectedReportDate, setSelectedReportDate] = useState<Date>(() => {
     // Por defecto, ayer
     const yesterday = new Date();
@@ -823,11 +824,18 @@ ${dateTableEN}`;
     if (!emailPreviewData) return;
 
     try {
-      // Crear el mailto link
-      const mailtoLink = `mailto:${emailPreviewData.to}?subject=${encodeURIComponent(emailPreviewData.subject)}&body=${encodeURIComponent(emailPreviewData.body)}`;
+      let emailUrl = '';
       
-      // Abrir el cliente de email
-      window.location.href = mailtoLink;
+      if (emailProvider === 'gmail') {
+        // Gmail web compose URL
+        emailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailPreviewData.to)}&su=${encodeURIComponent(emailPreviewData.subject)}&body=${encodeURIComponent(emailPreviewData.body)}`;
+      } else {
+        // Outlook web compose URL
+        emailUrl = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(emailPreviewData.to)}&subject=${encodeURIComponent(emailPreviewData.subject)}&body=${encodeURIComponent(emailPreviewData.body)}`;
+      }
+      
+      // Abrir en nueva pestaña
+      window.open(emailUrl, '_blank');
       
       // Cerrar modales
       setEmailPreviewVisible(false);
@@ -835,7 +843,7 @@ ${dateTableEN}`;
       
       // Mostrar mensaje de éxito después de un breve delay
       setTimeout(() => {
-        alert(t('email_sent_success'));
+        alert(lang === 'es' ? 'Email abierto en ' + (emailProvider === 'gmail' ? 'Gmail' : 'Outlook') : 'Email opened in ' + (emailProvider === 'gmail' ? 'Gmail' : 'Outlook'));
       }, 500);
       
     } catch (error) {
@@ -1832,23 +1840,61 @@ ${dateTableEN}`;
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
-              <button
-                onClick={() => {
-                  setEmailPreviewVisible(false);
-                  setEmailPreviewData(null);
-                }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={handleConfirmSendEmail}
-                className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors font-medium flex items-center"
-              >
-                <MdEmail className="mr-2" size={18} />
-                {t('send_email')}
-              </button>
+            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+              {/* Selector de proveedor de email */}
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  {lang === 'es' ? 'Enviar desde:' : 'Send from:'}
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEmailProvider('gmail')}
+                    className={`flex-1 px-4 py-2 rounded-md border-2 transition-all font-medium ${
+                      emailProvider === 'gmail'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg mr-2">📧</span>
+                      Gmail
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setEmailProvider('outlook')}
+                    className={`flex-1 px-4 py-2 rounded-md border-2 transition-all font-medium ${
+                      emailProvider === 'outlook'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg mr-2">📨</span>
+                      Outlook
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Botones de acción */}
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setEmailPreviewVisible(false);
+                    setEmailPreviewData(null);
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={handleConfirmSendEmail}
+                  className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors font-medium flex items-center"
+                >
+                  <MdEmail className="mr-2" size={18} />
+                  {t('send_email')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
