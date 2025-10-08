@@ -602,15 +602,68 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
     return studentId;
   };
 
+  // Función para generar un student_id único
+  const generateUniqueStudentId = async (): Promise<string> => {
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      // Generar ID con timestamp y random para mayor unicidad
+      const timestamp = Date.now().toString().slice(-6);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      const candidateId = `S${timestamp}${random}`;
+      
+      // Verificar si ya existe
+      const { data: existing } = await supabase
+        .from('students')
+        .select('id')
+        .eq('student_id', candidateId)
+        .eq('organization_id', activeProgram?.organization_id);
+      
+      if (!existing || existing.length === 0) {
+        console.log(`✅ student_id único generado: ${candidateId}`);
+        return candidateId;
+      }
+      
+      attempts++;
+      console.log(`⚠️ Intento ${attempts}: ${candidateId} ya existe, reintentando...`);
+    }
+    
+    // Si después de 10 intentos no se genera uno único, usar UUID
+    const uuid = crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
+    return `S${uuid}`;
+  };
+
   // Función auxiliar para crear nuevo estudiante
   const createNewStudent = async (studentData: any, row: any) => {
-    // Generar un student_id único basado en el nombre y apellido
-    const generatedStudentId = `S${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    let studentIdToUse: string;
+    
+    // Si viene student_id en el Excel, verificar que no exista
+    if (row.student_id && row.student_id.trim()) {
+      const providedStudentId = row.student_id.trim();
+      
+      // Verificar si ya existe este student_id en la organización
+      const { data: existingWithId } = await supabase
+        .from('students')
+        .select('id, student_id')
+        .eq('student_id', providedStudentId)
+        .eq('organization_id', activeProgram?.organization_id);
+      
+      if (existingWithId && existingWithId.length > 0) {
+        console.log(`⚠️ student_id ${providedStudentId} ya existe, generando uno nuevo`);
+        studentIdToUse = await generateUniqueStudentId();
+      } else {
+        studentIdToUse = providedStudentId;
+      }
+    } else {
+      // Generar un student_id único
+      studentIdToUse = await generateUniqueStudentId();
+    }
     
     // Añadir student_id, program_id y organization_id a los datos del estudiante
     const studentDataWithId = {
       ...studentData,
-      student_id: row.student_id ? row.student_id.trim() : generatedStudentId,
+      student_id: studentIdToUse,
       program_id: activeProgram?.id,
       organization_id: activeProgram?.organization_id
     };
