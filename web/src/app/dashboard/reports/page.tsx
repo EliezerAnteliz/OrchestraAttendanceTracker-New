@@ -90,6 +90,12 @@ export default function ReportsPage() {
   const [sendingEmailFor, setSendingEmailFor] = useState<string | null>(null);
   const [emailPreviewVisible, setEmailPreviewVisible] = useState(false);
   const [emailPreviewData, setEmailPreviewData] = useState<{to: string, subject: string, body: string, studentItem: any} | null>(null);
+  const [selectedReportDate, setSelectedReportDate] = useState<Date>(() => {
+    // Por defecto, ayer
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return yesterday;
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reportType, setReportType] = useState<'individual' | 'group'>('group');
@@ -591,26 +597,21 @@ export default function ReportsPage() {
     }
   };
 
-  // Función para obtener estudiantes con faltas injustificadas de la semana actual
+  // Función para obtener estudiantes con faltas injustificadas de una fecha específica
   const handleShowUnexcusedAbsences = async () => {
     if (!activeProgram?.id) return;
     
     setLoadingUnexcused(true);
     try {
-      // Obtener rango de la semana actual (lunes a domingo)
-      const now = new Date();
-      const { firstDay, lastDay } = getISOWeekRange(getISOWeekString(now));
+      // Usar la fecha seleccionada
+      const reportDate = selectedReportDate.toISOString().split('T')[0];
       
-      const startDate = firstDay.toISOString().split('T')[0];
-      const endDate = lastDay.toISOString().split('T')[0];
-      
-      // Obtener registros de asistencia de la semana actual
+      // Obtener registros de asistencia de la fecha específica
       const { data: attendanceData, error: attendanceError } = await supabase
         .from('attendance')
         .select('*')
         .eq('program_id', activeProgram.id)
-        .gte('date', startDate)
-        .lte('date', endDate);
+        .eq('date', reportDate);
       
       if (attendanceError) throw attendanceError;
       
@@ -629,26 +630,26 @@ export default function ReportsPage() {
         return;
       }
       
-      // Filtrar solo faltas injustificadas y contar por estudiante
+      // Filtrar solo faltas injustificadas de la fecha específica
       const unexcusedByStudent = new Map<string, {count: number, dates: string[]}>();
       attendanceData?.forEach(record => {
         if (record.status_code === unexcusedStatus.code) {
           console.log('Fecha de inasistencia encontrada:', record.date, 'para estudiante:', record.student_id);
-          const existing = unexcusedByStudent.get(record.student_id) || {count: 0, dates: []};
+          // Solo agregar esta fecha específica
           unexcusedByStudent.set(record.student_id, {
-            count: existing.count + 1,
-            dates: [...existing.dates, record.date]
+            count: 1,
+            dates: [record.date]
           });
         }
       });
       
-      // Filtrar solo estudiantes con 1 o más faltas injustificadas
-      const studentIds = Array.from(unexcusedByStudent.keys()).filter(
-        studentId => (unexcusedByStudent.get(studentId)?.count || 0) >= 1
-      );
+      // Obtener todos los estudiantes con faltas en esta fecha
+      const studentIds = Array.from(unexcusedByStudent.keys());
       
       if (studentIds.length === 0) {
-        alert(t('no_students_with_unexcused'));
+        alert(lang === 'es' 
+          ? `No hay estudiantes con faltas injustificadas el ${reportDate}` 
+          : `No students with unexcused absences on ${reportDate}`);
         setLoadingUnexcused(false);
         return;
       }
@@ -779,7 +780,7 @@ export default function ReportsPage() {
 ESPAÑOL:
 Estimado Padre/Tutor de ${studentItem.student.name},
 
-El propósito de este reporte de asistencia es para informarle que ${studentItem.student.name} fue marcado(a) unexcused de Ascend en ${studentItem.dates.length === 1 ? 'la siguiente fecha' : 'las siguientes fechas'}. La asistencia es importante para nosotros y unexcused causará que el/la estudiante pierda oportunidades significativas de instrucción y aprendizaje. Por favor llame a la Coordinadora de sede de Ascend, Alyssa Pequeño al 210 665 - 4449 o arequejo@theorchestra-sa.org para justificar ${studentItem.dates.length === 1 ? 'esta ausencia' : 'estas ausencias'}.
+El propósito de este reporte de asistencia es para informarle que ${studentItem.student.name} fue marcado(a) unexcused de Ascend el día ${formattedDatesES}. La asistencia es importante para nosotros y unexcused causará que el/la estudiante pierda oportunidades significativas de instrucción y aprendizaje. Por favor llame a la Coordinadora de sede de Ascend, Alyssa Pequeño al 210 665 - 4449 o arequejo@theorchestra-sa.org para justificar esta ausencia.
 
 Atentamente,
 La Oficina de Asistencia
@@ -795,7 +796,7 @@ ${currentDateEN}
 ENGLISH:
 Dear Parent/Guardian of ${studentItem.student.name},
 
-The purpose of this attendance report is to inform you that ${studentItem.student.name} was marked unexcused in the Ascend Program on ${studentItem.dates.length === 1 ? 'the following date' : 'the following dates'}. Attendance is important to us and unexcused will cause the student to miss significant opportunities for instruction and learning. Please call the Ascend Site Coordinator, Alyssa Pequeño at 210 665 - 4449 or arequejo@theorchestra-sa.org to justify ${studentItem.dates.length === 1 ? 'this absence' : 'these absences'}.
+The purpose of this attendance report is to inform you that ${studentItem.student.name} was marked unexcused in the Ascend Program on ${formattedDatesEN}. Attendance is important to us and unexcused will cause the student to miss significant opportunities for instruction and learning. Please call the Ascend Site Coordinator, Alyssa Pequeño at 210 665 - 4449 or arequejo@theorchestra-sa.org to justify this absence.
 
 Sincerely,
 The Attendance Office
@@ -1549,24 +1550,40 @@ ${dateTableEN}`;
           )}
         </button>
         
-        {/* Botón para ver faltas injustificadas (solo admin) */}
+        {/* Selector de fecha y botón para ver faltas injustificadas (solo admin) */}
         {isAdmin && (
-          <button
-            onClick={handleShowUnexcusedAbsences}
-            disabled={loadingUnexcused}
-            className="w-full sm:w-auto px-6 py-3 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm"
-          >
-            {loadingUnexcused ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                {t('loading_unexcused')}
-              </>
-            ) : (
-              <>
-                <MdWarning className="mr-2" /> {t('unexcused_absences_current_week')}
-              </>
-            )}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
+                {lang === 'es' ? 'Fecha a reportar:' : 'Date to report:'}
+              </label>
+              <DatePicker
+                selected={selectedReportDate}
+                onChange={(date: Date | null) => date && setSelectedReportDate(date)}
+                dateFormat="dd/MM/yyyy"
+                locale={lang === 'es' ? 'es-mon' : 'en-mon'}
+                maxDate={new Date()}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholderText={lang === 'es' ? 'Seleccionar fecha' : 'Select date'}
+              />
+            </div>
+            <button
+              onClick={handleShowUnexcusedAbsences}
+              disabled={loadingUnexcused}
+              className="px-6 py-3 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm self-end"
+            >
+              {loadingUnexcused ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  {t('loading_unexcused')}
+                </>
+              ) : (
+                <>
+                  <MdWarning className="mr-2" /> {lang === 'es' ? 'Ver Faltas del Día' : 'View Absences for Day'}
+                </>
+              )}
+            </button>
+          </div>
         )}
       </div>
 
@@ -1841,7 +1858,9 @@ ${dateTableEN}`;
             <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
               <div className="flex items-center">
                 <MdWarning className="mr-2" size={24} />
-                <h2 className="text-xl font-bold">{t('unexcused_absences_title')}</h2>
+                <h2 className="text-xl font-bold">
+                  {lang === 'es' ? 'Faltas Injustificadas' : 'Unexcused Absences'} - {selectedReportDate.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </h2>
               </div>
               <button
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
