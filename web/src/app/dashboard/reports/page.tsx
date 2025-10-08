@@ -804,9 +804,9 @@ Ascend
 Date          Description
 ${dateTableEN}`;
 
-    // Guardar datos para previsualización (usar email de prueba)
+    // Guardar datos para previsualización (usar email del padre/tutor)
     setEmailPreviewData({
-      to: 'eliezeranteliz@gmail.com',
+      to: studentItem.parentInfo.email,
       subject: emailSubject,
       body: emailBody,
       studentItem
