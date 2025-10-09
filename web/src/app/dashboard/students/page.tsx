@@ -137,7 +137,7 @@ export default function StudentsPage() {
         </div>
       )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('students_title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('students_title')}</h1>
         <div className="flex gap-2 w-full sm:w-auto">
           {canBulkUpload && (
             <button 
@@ -261,7 +261,7 @@ export default function StudentsPage() {
             filteredStudents.map((student) => (
               <div key={student.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-gray-900 text-base">
+                  <h3 className="font-semibold text-gray-800 text-base">
                     {student.first_name} {student.last_name}
                   </h3>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -305,7 +305,7 @@ export default function StudentsPage() {
         <div className="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-300">
             <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-800">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <MdUpload className="w-5 h-5 text-blue-600" />
                 </div>
