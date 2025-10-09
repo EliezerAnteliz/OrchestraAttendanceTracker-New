@@ -15,8 +15,8 @@ import { useUserRole } from '@/hooks/useUserRole';
 const sidebarItems = [
   { key: 'menu_dashboard', href: '/dashboard', icon: <MdDashboard size={24} /> },
   { key: 'menu_students', href: '/dashboard/students', icon: <MdPeople size={24} /> },
-  { key: 'menu_orchestras', href: '/dashboard/orchestras', icon: <MdMusicNote size={24} /> },
   { key: 'menu_attendance', href: '/dashboard/attendance', icon: <MdAssignment size={24} /> },
+  { key: 'menu_orchestras', href: '/dashboard/orchestras', icon: <MdMusicNote size={24} /> },
   { key: 'menu_reports', href: '/dashboard/reports', icon: <MdInsertChart size={24} /> },
 ];
 
