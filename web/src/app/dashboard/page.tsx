@@ -29,6 +29,7 @@ export default function DashboardPage() {
         if (!activeProgram?.id) {
           setStats({ totalStudents: 0, activeStudents: 0, attendanceToday: 0, attendanceRate: 0, totalOrchestras: 0 });
           setOrchestraStats([]);
+          setLoading(false);
           return;
         }
         
@@ -154,10 +155,47 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loading_data')}</p>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div className="flex-1">
+              <div className="h-8 bg-gray-200 rounded w-64 animate-pulse mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-96 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton para tarjetas de estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="bg-white rounded-lg shadow p-6 border border-gray-200">
+              <div className="flex items-center">
+                <div className="bg-gray-200 p-3 rounded-full mr-4 animate-pulse w-12 h-12"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-20 animate-pulse mb-2"></div>
+                  <div className="h-6 bg-gray-200 rounded w-12 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Skeleton para sección de orquestas */}
+        <div className="mt-8">
+          <div className="h-6 bg-gray-200 rounded w-64 animate-pulse mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow p-6 border border-gray-200">
+                <div className="flex items-center">
+                  <div className="bg-gray-200 p-3 rounded-full mr-4 animate-pulse w-12 h-12"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded w-12 animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
