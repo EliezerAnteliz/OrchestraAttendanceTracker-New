@@ -20,6 +20,7 @@ export default function DashboardPage() {
   });
   const [orchestraStats, setOrchestraStats] = useState<Array<{name: string, studentCount: number}>>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -147,15 +148,17 @@ export default function DashboardPage() {
         setError(msg);
       } finally {
         setLoading(false);
+        setInitialLoad(false);
       }
     }
     
     fetchDashboardData();
   }, [activeProgram?.id]);
 
-  if (loading) {
+  // Solo mostrar skeleton en la primera carga inicial
+  if (loading && initialLoad) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fadeIn">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="flex-1">
@@ -210,7 +213,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div className="flex-1">
