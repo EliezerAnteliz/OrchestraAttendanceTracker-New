@@ -398,8 +398,7 @@ export default function OrchestrasPage() {
     <div className="p-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center">
-          <MdMusicNote className="mr-2" size={28} />
+        <h1 className="text-2xl font-bold text-gray-800">
           {lang === 'es' ? 'Gestión de Orquestas' : 'Orchestra Management'}
         </h1>
         
@@ -466,8 +465,8 @@ export default function OrchestrasPage() {
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                    <MdMusicNote className="mr-2 text-blue-600" size={24} />
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                    <MdMusicNote className="mr-2 text-blue-600" size={20} />
                     {orchestra.name}
                   </h3>
                   {!orchestra.is_active && (
@@ -537,7 +536,7 @@ export default function OrchestrasPage() {
         <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
             <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 {editingOrchestra 
                   ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
                   : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
@@ -623,7 +622,7 @@ export default function OrchestrasPage() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
                     <MdPersonAdd className="mr-2 text-green-600" size={24} />
                     {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
                   </h2>
@@ -773,7 +772,7 @@ export default function OrchestrasPage() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
                     <MdMusicNote className="mr-2 text-blue-600" size={24} />
                     {viewingOrchestra.name}
                   </h2>
