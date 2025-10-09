@@ -9,7 +9,7 @@ import { useProgram } from '@/contexts/ProgramContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
 
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { activeProgram } = useProgram();
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -214,7 +214,7 @@ export default function DashboardPage() {
           color="bg-orange-500"
         />
         <StatCard 
-          title={t('lang') === 'es' ? 'Orquestas' : 'Orchestras'} 
+          title={lang === 'es' ? 'Orquestas' : 'Orchestras'} 
           value={stats.totalOrchestras} 
           icon={<MdMusicNote size={24} />}
           color="bg-indigo-500"
@@ -225,7 +225,7 @@ export default function DashboardPage() {
       {orchestraStats.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            {t('lang') === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
+            {lang === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {orchestraStats.map((orchestra, index) => (
