@@ -191,7 +191,7 @@ export default function NewStudent() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Personal Information */}
               <div>
-                <h2 className="text-lg font-semibold mb-6 flex items-center text-[#323338]">
+                <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
                   <MdPerson className="mr-2 text-[#0086c0]" /> {t('personal_information')}
                 </h2>
                 
@@ -256,7 +256,7 @@ export default function NewStudent() {
               
               {/* Parent Contact Information */}
               <div>
-                <h2 className="text-lg font-semibold mb-6 flex items-center text-[#323338]">
+                <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
                   <MdPerson className="mr-2 text-[#0086c0]" /> {t('parent_contact_info')}
                 </h2>
                 
@@ -301,7 +301,7 @@ export default function NewStudent() {
               
               {/* Orchestra Information */}
               <div>
-                <h2 className="text-lg font-semibold mb-6 flex items-center text-[#323338]">
+                <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
                   <MdMusicNote className="mr-2 text-[#0086c0]" /> {t('orchestra_info')}
                 </h2>
                 
