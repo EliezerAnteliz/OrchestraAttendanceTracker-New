@@ -290,7 +290,8 @@ export default function OrchestrasPage() {
         .select('id, first_name, last_name, instrument, orchestra_id, is_active')
         .eq('orchestra_id', orchestra.id)
         .eq('is_active', true)
-        .order('last_name', { ascending: true });
+        .order('last_name', { ascending: true })
+        .order('first_name', { ascending: true });
 
       if (error) throw error;
       
@@ -532,7 +533,7 @@ export default function OrchestrasPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
             <div className="p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -615,7 +616,7 @@ export default function OrchestrasPage() {
 
       {/* Modal de Asignación de Estudiantes */}
       {showAssignModal && assigningOrchestra && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
@@ -765,7 +766,7 @@ export default function OrchestrasPage() {
 
       {/* Modal para Ver Estudiantes de la Orquesta */}
       {showStudentsModal && viewingOrchestra && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
