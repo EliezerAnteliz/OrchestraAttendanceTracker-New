@@ -1,5 +1,6 @@
 "use client";
 
+// Página de Asistencia con filtrado por Orquesta - v1.0
 import React, { useState, useEffect } from 'react';
 import AttendanceStatusIndicator from '@/components/AttendanceStatusIndicator';
 import { supabase } from '../../../lib/supabase';
