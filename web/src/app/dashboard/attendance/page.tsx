@@ -18,6 +18,11 @@ type Student = {
   last_name: string;
   selected?: boolean;
   attendance_status?: string | null;
+  orchestra_id?: string | null;
+  orchestra?: {
+    id: string;
+    name: string;
+  } | null;
   [key: string]: any; // For other properties that might exist
 };
 
@@ -60,6 +65,8 @@ export default function AttendancePage() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [selectedInstrument, setSelectedInstrument] = useState<string>('all');
   const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
+  const [selectedOrchestra, setSelectedOrchestra] = useState<string>('all');
+  const [availableOrchestras, setAvailableOrchestras] = useState<Array<{id: string, name: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -289,10 +296,13 @@ export default function AttendancePage() {
           activeProgramId: activeProgram?.id
         });
         
-        // Cargar estudiantes activos
+        // Cargar estudiantes activos con información de orquesta
         const { data: studentsData, error: studentsError } = await supabase
           .from('students')
-          .select('*')
+          .select(`
+            *,
+            orchestra:orchestra_id(id, name)
+          `)
           .eq('is_active', true)
           .eq('program_id', activeProgram.id)
           .order('first_name', { ascending: true })
@@ -389,10 +399,20 @@ export default function AttendancePage() {
             .sort()
         ));
         
+        // Extraer orquestas únicas para el filtro
+        const orchestraMap = new Map<string, {id: string, name: string}>();
+        studentsWithAttendance.forEach(student => {
+          if (student.orchestra && student.orchestra.id) {
+            orchestraMap.set(student.orchestra.id, student.orchestra);
+          }
+        });
+        const orchestras = Array.from(orchestraMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        
         setStudents(studentsWithAttendance);
         setFilteredStudents(studentsWithAttendance);
         setAttendanceStatuses(statusesData || []);
         setAvailableInstruments(instruments as string[]);
+        setAvailableOrchestras(orchestras);
         
       } catch (error) {
         console.error('Error al cargar datos:', error);
@@ -453,21 +473,27 @@ export default function AttendancePage() {
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [activeProgram?.id, currentDate]);
   
-  // Función para filtrar estudiantes
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    applyFilters(term, selectedInstrument);
+  // Función para manejar el cambio de búsqueda
+  const handleSearchChange = (term: string) => {
+    const lowerTerm = term.toLowerCase();
+    setSearchTerm(lowerTerm);
+    applyFilters(lowerTerm, selectedInstrument, selectedOrchestra);
   };
   
   // Función para manejar el cambio de instrumento seleccionado
   const handleInstrumentChange = (instrument: string) => {
     setSelectedInstrument(instrument);
-    applyFilters(searchTerm, instrument);
+    applyFilters(searchTerm, instrument, selectedOrchestra);
+  };
+  
+  // Función para manejar el cambio de orquesta seleccionada
+  const handleOrchestraChange = (orchestra: string) => {
+    setSelectedOrchestra(orchestra);
+    applyFilters(searchTerm, selectedInstrument, orchestra);
   };
   
   // Función para aplicar todos los filtros
-  const applyFilters = (searchTerm: string, instrument: string) => {
+  const applyFilters = (searchTerm: string, instrument: string, orchestra: string) => {
     let filtered = students;
     
     // Filtrar por término de búsqueda
@@ -484,6 +510,17 @@ export default function AttendancePage() {
       filtered = filtered.filter(student => 
         student.instrument && student.instrument.toLowerCase() === instrument.toLowerCase()
       );
+    }
+    
+    // Filtrar por orquesta
+    if (orchestra !== 'all') {
+      if (orchestra === 'none') {
+        // Mostrar solo estudiantes sin orquesta
+        filtered = filtered.filter(student => !student.orchestra_id);
+      } else {
+        // Mostrar estudiantes de la orquesta seleccionada
+        filtered = filtered.filter(student => student.orchestra_id === orchestra);
+      }
     }
     
     setFilteredStudents(filtered);
@@ -1167,7 +1204,7 @@ export default function AttendancePage() {
               type="text"
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
             />
             <span className="absolute left-3 top-3 text-gray-400">🔍</span>
@@ -1184,6 +1221,21 @@ export default function AttendancePage() {
               {availableInstruments.map((instrument) => (
                 <option key={instrument} value={instrument}>
                   {instrument}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedOrchestra}
+              onChange={(e) => handleOrchestraChange(e.target.value)}
+              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
+            >
+              <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
+              <option value="none">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</option>
+              {availableOrchestras.map((orchestra) => (
+                <option key={orchestra.id} value={orchestra.id}>
+                  {orchestra.name}
                 </option>
               ))}
             </select>
@@ -1290,6 +1342,7 @@ export default function AttendancePage() {
                     )}
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('name')}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('instrument_label')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{lang === 'es' ? 'Orquesta' : 'Orchestra'}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('status')}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('attendance')}</th>
                   </tr>
@@ -1326,6 +1379,15 @@ export default function AttendancePage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{student.instrument || t('not_specified')}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {student.orchestra ? (
+                            <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              🎵 {student.orchestra.name}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-sm font-medium rounded-full ${
@@ -1390,6 +1452,16 @@ export default function AttendancePage() {
                       <div className="flex justify-between">
                         <span className="text-gray-600 font-medium">{t('instrument_label')}:</span>
                         <span className="font-semibold text-gray-900">{student.instrument || t('not_specified')}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600 font-medium">{lang === 'es' ? 'Orquesta:' : 'Orchestra:'}</span>
+                        {student.orchestra ? (
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            🎵 {student.orchestra.name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
+                        )}
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 font-medium">{t('status')}:</span>
