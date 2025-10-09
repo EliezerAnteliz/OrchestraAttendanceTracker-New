@@ -224,28 +224,22 @@ export default function DashboardPage() {
       {/* Sección de Orquestas */}
       {orchestraStats.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-            <MdMusicNote className="mr-2 text-indigo-600" size={24} />
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
             {t('lang') === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {orchestraStats.map((orchestra, index) => (
               <div 
                 key={index}
-                className="bg-white rounded-lg shadow p-5 border-l-4 border-indigo-500 hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg shadow p-6 border border-gray-200"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 text-lg flex items-center">
-                      <MdMusicNote className="mr-2 text-indigo-600" size={20} />
-                      {orchestra.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {t('lang') === 'es' ? 'Estudiantes activos' : 'Active students'}
-                    </p>
+                <div className="flex items-center">
+                  <div className="bg-indigo-500 p-3 rounded-full text-white mr-4">
+                    <MdMusicNote size={24} />
                   </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold text-indigo-600">{orchestra.studentCount}</p>
+                  <div>
+                    <p className="text-sm text-gray-500">{orchestra.name}</p>
+                    <p className="text-2xl font-bold text-gray-800">{orchestra.studentCount}</p>
                   </div>
                 </div>
               </div>
