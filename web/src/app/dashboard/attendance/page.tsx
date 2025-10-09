@@ -425,6 +425,13 @@ export default function AttendancePage() {
     fetchData();
   }, [currentDate, activeProgram?.id]);
 
+  // Reaplicar filtros cuando cambien los estudiantes (después de cambiar fecha)
+  useEffect(() => {
+    if (students.length > 0) {
+      applyFilters(searchTerm, selectedInstrument, selectedOrchestra);
+    }
+  }, [students]);
+
   // Suscripción en tiempo real a cambios en la tabla attendance para la fecha/programa actuales
   useEffect(() => {
     if (!activeProgram?.id || !currentDate) return;
@@ -1117,12 +1124,6 @@ export default function AttendancePage() {
     );
     
     setSelectedStudentCount(0);
-    
-    // Reaplicar filtros después de cargar los datos
-    // Usar setTimeout para asegurar que los estudiantes se hayan actualizado
-    setTimeout(() => {
-      applyFilters(searchTerm, selectedInstrument, selectedOrchestra);
-    }, 100);
   };
 
   return (
