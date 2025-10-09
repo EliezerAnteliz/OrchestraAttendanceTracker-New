@@ -290,8 +290,8 @@ export default function OrchestrasPage() {
         .select('id, first_name, last_name, instrument, orchestra_id, is_active')
         .eq('orchestra_id', orchestra.id)
         .eq('is_active', true)
-        .order('last_name', { ascending: true })
-        .order('first_name', { ascending: true });
+        .order('first_name', { ascending: true })
+        .order('last_name', { ascending: true });
 
       if (error) throw error;
       
