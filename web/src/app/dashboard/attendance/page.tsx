@@ -1220,20 +1220,6 @@ export default function AttendancePage() {
           
           <div className="flex flex-col sm:flex-row gap-2">
             <select
-              value={selectedInstrument}
-              onChange={(e) => handleInstrumentChange(e.target.value)}
-              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
-              aria-label={t('filter_by_instrument')}
-            >
-              <option value="all">{t('all_instruments')}</option>
-              {availableInstruments.map((instrument) => (
-                <option key={instrument} value={instrument}>
-                  {instrument}
-                </option>
-              ))}
-            </select>
-            
-            <select
               value={selectedOrchestra}
               onChange={(e) => handleOrchestraChange(e.target.value)}
               className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
@@ -1244,6 +1230,20 @@ export default function AttendancePage() {
               {availableOrchestras.map((orchestra) => (
                 <option key={orchestra.id} value={orchestra.id}>
                   {orchestra.name}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedInstrument}
+              onChange={(e) => handleInstrumentChange(e.target.value)}
+              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              aria-label={t('filter_by_instrument')}
+            >
+              <option value="all">{t('all_instruments')}</option>
+              {availableInstruments.map((instrument) => (
+                <option key={instrument} value={instrument}>
+                  {instrument}
                 </option>
               ))}
             </select>
