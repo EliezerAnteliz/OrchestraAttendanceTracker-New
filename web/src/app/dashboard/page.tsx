@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart, 
-         MdAssignmentTurnedIn, MdGroup, MdInsertChart } from 'react-icons/md';
+         MdAssignmentTurnedIn, MdGroup, MdInsertChart, MdMusicNote } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
@@ -16,7 +16,9 @@ export default function DashboardPage() {
     activeStudents: 0,
     attendanceToday: 0,
     attendanceRate: 0,
+    totalOrchestras: 0,
   });
+  const [orchestraStats, setOrchestraStats] = useState<Array<{name: string, studentCount: number}>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +27,8 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         if (!activeProgram?.id) {
-          setStats({ totalStudents: 0, activeStudents: 0, attendanceToday: 0, attendanceRate: 0 });
+          setStats({ totalStudents: 0, activeStudents: 0, attendanceToday: 0, attendanceRate: 0, totalOrchestras: 0 });
+          setOrchestraStats([]);
           return;
         }
         
@@ -99,12 +102,44 @@ export default function DashboardPage() {
 
         const attendanceRate = safeActiveStudents > 0 ? (attendanceToday / safeActiveStudents) * 100 : 0;
         
+        // Obtener estadísticas de orquestas
+        const { data: orchestrasData, error: orchestrasError } = await supabase
+          .from('orchestras')
+          .select('id, name')
+          .eq('program_id', activeProgram.id)
+          .eq('is_active', true);
+        
+        if (orchestrasError) {
+          console.warn('Error al cargar orquestas:', orchestrasError);
+        }
+        
+        // Contar estudiantes por orquesta
+        const orchestraStatsData = await Promise.all(
+          (orchestrasData || []).map(async (orchestra) => {
+            const { count } = await supabase
+              .from('students')
+              .select('*', { count: 'exact', head: true })
+              .eq('orchestra_id', orchestra.id)
+              .eq('is_active', true);
+            
+            return {
+              name: orchestra.name,
+              studentCount: count || 0
+            };
+          })
+        );
+        
+        // Ordenar por cantidad de estudiantes descendente
+        orchestraStatsData.sort((a, b) => b.studentCount - a.studentCount);
+        
         setStats({
           totalStudents: totalStudents || 0,
           activeStudents: activeStudents || 0,
           attendanceToday,
           attendanceRate,
+          totalOrchestras: orchestrasData?.length || 0,
         });
+        setOrchestraStats(orchestraStatsData);
       } catch (err: any) {
         const msg = err?.message || err?.hint || err?.details || 'No fue posible cargar los datos del dashboard.';
         console.error('Error al cargar datos del dashboard:', msg, err);
@@ -153,7 +188,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tarjetas de estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard 
           title={t('total_students')} 
           value={stats.totalStudents} 
@@ -178,7 +213,46 @@ export default function DashboardPage() {
           icon={<MdShowChart size={24} />}
           color="bg-orange-500"
         />
+        <StatCard 
+          title={t('lang') === 'es' ? 'Orquestas' : 'Orchestras'} 
+          value={stats.totalOrchestras} 
+          icon={<MdMusicNote size={24} />}
+          color="bg-indigo-500"
+        />
       </div>
+
+      {/* Sección de Orquestas */}
+      {orchestraStats.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <MdMusicNote className="mr-2 text-indigo-600" size={24} />
+            {t('lang') === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {orchestraStats.map((orchestra, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-lg shadow p-5 border-l-4 border-indigo-500 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 text-lg flex items-center">
+                      <MdMusicNote className="mr-2 text-indigo-600" size={20} />
+                      {orchestra.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {t('lang') === 'es' ? 'Estudiantes activos' : 'Active students'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-bold text-indigo-600">{orchestra.studentCount}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Sección de acceso rápido */}
       <div className="mt-8">
