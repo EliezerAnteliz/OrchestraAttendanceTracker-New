@@ -1117,6 +1117,12 @@ export default function AttendancePage() {
     );
     
     setSelectedStudentCount(0);
+    
+    // Reaplicar filtros después de cargar los datos
+    // Usar setTimeout para asegurar que los estudiantes se hayan actualizado
+    setTimeout(() => {
+      applyFilters(searchTerm, selectedInstrument, selectedOrchestra);
+    }, 100);
   };
 
   return (
