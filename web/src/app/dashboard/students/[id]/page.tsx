@@ -502,7 +502,7 @@ export default function StudentDetail() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75h.007v.008H12v-.008z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('confirm_delete_title')}</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('confirm_delete_title')}</h3>
             </div>
             <p className="text-gray-700 text-center mb-8 leading-relaxed">
               ¿Estás seguro de que deseas eliminar a <span className="font-semibold text-gray-900">{student.first_name} {student.last_name}</span>?
@@ -535,7 +535,7 @@ export default function StudentDetail() {
         {/* Personal Information Card */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold flex items-center text-gray-900">
+            <h2 className="text-lg font-semibold flex items-center text-gray-800">
               <div className="p-2 bg-blue-100 rounded-lg mr-3">
                 <MdPerson className="text-blue-600" size={20} />
               </div>
@@ -635,7 +635,7 @@ export default function StudentDetail() {
         {/* Orchestra Information Card */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold flex items-center text-gray-900">
+            <h2 className="text-lg font-semibold flex items-center text-gray-800">
               <div className="p-2 bg-purple-100 rounded-lg mr-3">
                 <MdMusicNote className="text-purple-600" size={20} />
               </div>
@@ -750,7 +750,7 @@ export default function StudentDetail() {
                     </div>
                   ) : (
                     <>
-                      <h3 className="font-semibold text-lg text-gray-900 mb-3">
+                      <h3 className="font-semibold text-lg text-gray-800 mb-3">
                         {parent.full_name}
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
