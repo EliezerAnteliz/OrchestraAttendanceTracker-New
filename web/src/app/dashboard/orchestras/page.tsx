@@ -1,5 +1,6 @@
 'use client';
 
+// Sistema de gestión de orquestas - Versión 1.0
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { MdAdd, MdEdit, MdDelete, MdMusicNote, MdSearch, MdPeople, MdPersonAdd, MdClose, MdCheckBox, MdCheckBoxOutlineBlank, MdVisibility, MdSwapHoriz, MdRemoveCircle } from 'react-icons/md';
