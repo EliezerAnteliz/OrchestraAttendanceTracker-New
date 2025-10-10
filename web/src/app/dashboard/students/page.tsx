@@ -548,7 +548,7 @@ export default function StudentsPage() {
                           <MdPerson className="mr-2 text-blue-600" size={18} />
                           {t('personal_info')}
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('first_name')}
@@ -558,7 +558,7 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.first_name}
                                 onChange={(e) => handleInputChange('first_name', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -575,7 +575,7 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.last_name}
                                 onChange={(e) => handleInputChange('last_name', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -592,7 +592,7 @@ export default function StudentsPage() {
                                 type="number"
                                 value={editFormData.age || ''}
                                 onChange={(e) => handleInputChange('age', parseInt(e.target.value) || null)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -609,7 +609,7 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.current_grade || ''}
                                 onChange={(e) => handleInputChange('current_grade', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -625,7 +625,7 @@ export default function StudentsPage() {
                               <select
                                 value={editFormData.is_active !== false ? 'true' : 'false'}
                                 onChange={(e) => handleInputChange('is_active', e.target.value === 'true')}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               >
                                 <option value="true">{t('active')}</option>
                                 <option value="false">{t('inactive')}</option>
@@ -647,7 +647,7 @@ export default function StudentsPage() {
                           <MdMusicNote className="mr-2 text-purple-600" size={18} />
                           {t('orchestra_info')}
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('instrument')}
@@ -657,7 +657,7 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.instrument || ''}
                                 onChange={(e) => handleInputChange('instrument', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -674,8 +674,8 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.instrument_size || ''}
                                 onChange={(e) => handleInputChange('instrument_size', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                                placeholder="3/4, 4/4, etc."
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                placeholder="3/4, 4/4"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
@@ -691,7 +691,7 @@ export default function StudentsPage() {
                               <select
                                 value={editFormData.orchestra_id || ''}
                                 onChange={(e) => handleInputChange('orchestra_id', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
                               >
                                 <option value="">{t('not_assigned')}</option>
                                 {orchestras.map((orch) => (
@@ -713,8 +713,8 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.orchestra_position || ''}
                                 onChange={(e) => handleInputChange('orchestra_position', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                                placeholder="Primer violín, etc."
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                placeholder="Section"
                               />
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
