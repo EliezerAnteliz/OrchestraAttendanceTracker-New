@@ -1428,59 +1428,51 @@ export default function AttendancePage() {
             </div>
             
             {/* Vista de tarjetas para móviles */}
-            <div className="md:hidden space-y-3">
+            <div className="md:hidden space-y-2">
               {filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
                   <div 
                     key={student.id} 
-                    className={`bg-white p-3 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
+                    className={`bg-white p-2.5 rounded-lg border ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-base">
+                    <div className="flex items-center justify-between gap-2">
+                      {/* Nombre y datos principales */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-800 text-sm truncate">
                           {student.first_name} {student.last_name}
                         </h3>
-                      </div>
-                      {attendanceMode && (
-                        <input
-                          type="checkbox"
-                          checked={student.selected || false}
-                          onChange={() => toggleStudentSelection(student.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                      )}
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600 font-medium">{t('instrument_label')}:</span>
-                        <span className="font-semibold text-gray-900">{student.instrument || t('not_specified')}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-medium">{lang === 'es' ? 'Orquesta:' : 'Orchestra:'}</span>
-                        {student.orchestra ? (
-                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                            🎵 {student.orchestra.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-medium">{t('attendance')}:</span>
-                        <div>
+                        <div className="flex items-center gap-2 mt-0.5 text-xs">
+                          <span className="text-gray-600">{student.instrument || t('not_specified')}</span>
+                          {student.orchestra && (
+                            <>
+                              <span className="text-gray-400">•</span>
+                              <span className="text-blue-600 font-medium">🎵 {student.orchestra.name}</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="mt-1">
                           {student.attendance_status ? (
                             <AttendanceStatusIndicator
                               key={`${student.id}-${student.attendance_status || 'none'}`}
                               statusCode={student.attendance_status}
                             />
                           ) : (
-                            <span className="text-sm font-medium text-gray-500">{t('not_recorded')}</span>
+                            <span className="text-xs text-gray-500">{t('not_recorded')}</span>
                           )}
                         </div>
                       </div>
+                      
+                      {/* Checkbox */}
+                      {attendanceMode && (
+                        <input
+                          type="checkbox"
+                          checked={student.selected || false}
+                          onChange={() => toggleStudentSelection(student.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
+                        />
+                      )}
                     </div>
                   </div>
                 ))
