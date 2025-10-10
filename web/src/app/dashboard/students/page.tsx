@@ -470,19 +470,19 @@ export default function StudentsPage() {
         </div>
       )}
 
-      {/* Drawer lateral con información del estudiante */}
+      {/* Modal centrado con información del estudiante */}
       {showStudentDrawer && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Overlay */}
           <div 
             className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
             onClick={closeDrawer}
           />
           
-          {/* Panel lateral */}
-          <div className="fixed inset-y-0 right-0 max-w-full flex items-center justify-center p-4">
-            <div className="w-full max-w-3xl mx-auto">
-              <div className="h-full flex flex-col bg-white shadow-xl">
+          {/* Modal centrado */}
+          <div className="relative w-full max-w-4xl max-h-[90vh] mx-auto">
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+              <div className="flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                   <div className="flex items-center justify-between">
@@ -647,12 +647,12 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Padres */}
-                      {studentDetails.parents && studentDetails.parents.length > 0 && (
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <MdContacts className="mr-2 text-green-600" size={20} />
-                            {t('parents_info')}
-                          </h3>
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <MdContacts className="mr-2 text-green-600" size={20} />
+                          {t('parents_info')}
+                        </h3>
+                        {studentDetails.parents && studentDetails.parents.length > 0 ? (
                           <div className="space-y-4">
                             {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
                               <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
@@ -722,8 +722,14 @@ export default function StudentsPage() {
                               </div>
                             ))}
                           </div>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="bg-white rounded-lg p-4 border border-green-200 text-center">
+                            <p className="text-sm text-gray-500">
+                              {t('no_parent_info') || 'No hay información de padres registrada'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : null}
                 </div>
