@@ -498,7 +498,7 @@ export default function StudentsPage() {
 
       {/* Modal centrado con información del estudiante */}
       {showStudentDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           {/* Overlay */}
           <div 
             className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -506,46 +506,46 @@ export default function StudentsPage() {
           />
           
           {/* Modal centrado */}
-          <div className="relative w-full max-w-4xl max-h-[90vh] mx-auto">
-            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-              <div className="flex flex-col max-h-[90vh]">
+          <div className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] mx-auto">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
+              <div className="flex flex-col max-h-[95vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                        <MdPerson size={24} />
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
+                        <MdPerson size={20} className="sm:w-6 sm:h-6" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-semibold">
+                        <h2 className="text-lg sm:text-xl font-semibold">
                           {selectedStudent?.first_name} {selectedStudent?.last_name}
                         </h2>
-                        <p className="text-sm text-blue-100">
+                        <p className="text-xs sm:text-sm text-blue-100">
                           {t('student_profile')}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={closeDrawer}
-                      className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                      className="p-1.5 sm:p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                     >
-                      <MdClose size={24} />
+                      <MdClose size={20} className="sm:w-6 sm:h-6" />
                     </button>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                   {loadingDetails ? (
                     <div className="flex items-center justify-center h-64">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                     </div>
                   ) : studentDetails && editFormData ? (
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       {/* Información Personal */}
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                          <MdPerson className="mr-2 text-blue-600" size={20} />
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-blue-100">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                          <MdPerson className="mr-2 text-blue-600" size={18} />
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -642,9 +642,9 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Orquesta */}
-                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                          <MdMusicNote className="mr-2 text-purple-600" size={20} />
+                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-purple-100">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                          <MdMusicNote className="mr-2 text-purple-600" size={18} />
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -726,9 +726,9 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Padres */}
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                          <MdContacts className="mr-2 text-green-600" size={20} />
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-green-100">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                          <MdContacts className="mr-2 text-green-600" size={18} />
                           {t('parents_info')}
                         </h3>
                         {studentDetails.parents && studentDetails.parents.length > 0 ? (
@@ -772,51 +772,42 @@ export default function StudentsPage() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <>
-                                    <div className="flex items-center justify-between mb-3">
-                                      <p className="font-semibold text-gray-900">
+                                  <div className="space-y-3">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <p className="font-semibold text-gray-800 text-base">
                                         {parent.full_name}
                                       </p>
-                                      <div className="flex gap-2">
-                                        {parent.is_primary_contact && (
-                                          <span className="px-2 py-1 text-xs font-medium bg-green-200 text-green-800 rounded-full">
-                                            {t('primary_contact') || 'Contacto Principal'}
-                                          </span>
-                                        )}
-                                        {parent.relationship && (
-                                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                                            {parent.relationship}
-                                          </span>
-                                        )}
-                                      </div>
+                                      {parent.relationship && (
+                                        <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded">
+                                          {parent.relationship}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="space-y-2">
                                       {parent.phone_number && (
-                                        <div className="flex items-center text-sm">
-                                          <MdPhone className="mr-2 text-green-600" size={16} />
-                                          <span className="text-gray-600">{t('phone')}:</span>
+                                        <div className="flex items-center gap-2">
+                                          <MdPhone className="text-green-600 flex-shrink-0" size={18} />
                                           <a 
                                             href={`tel:${parent.phone_number}`}
-                                            className="ml-2 font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
                                           >
                                             {parent.phone_number}
                                           </a>
                                         </div>
                                       )}
                                       {parent.email && (
-                                        <div className="flex items-center text-sm">
-                                          <MdEmail className="mr-2 text-green-600" size={16} />
-                                          <span className="text-gray-600">{t('email')}:</span>
+                                        <div className="flex items-center gap-2">
+                                          <MdEmail className="text-green-600 flex-shrink-0" size={18} />
                                           <a 
                                             href={`mailto:${parent.email}`}
-                                            className="ml-2 font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline break-all"
                                           >
                                             {parent.email}
                                           </a>
                                         </div>
                                       )}
                                     </div>
-                                  </>
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -834,21 +825,21 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                  <div className="flex justify-between items-center">
+                <div className="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-200">
+                  <div className="flex justify-between items-center gap-2">
                     {isEditMode ? (
                       <>
                         <button
                           onClick={handleCancelEdit}
-                          className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                         >
                           {t('cancel')}
                         </button>
                         <button
                           onClick={handleSaveEdit}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                          className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
                         >
-                          <MdCheckCircle className="mr-2" size={18} />
+                          <MdCheckCircle className="mr-1 sm:mr-2" size={16} />
                           {t('save')}
                         </button>
                       </>
@@ -856,16 +847,16 @@ export default function StudentsPage() {
                       <>
                         <button
                           onClick={closeDrawer}
-                          className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                         >
                           {t('close')}
                         </button>
                         {canEditStudents && (
                           <button
                             onClick={handleEditClick}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
                           >
-                            <MdEdit className="mr-2" size={18} />
+                            <MdEdit className="mr-1 sm:mr-2" size={16} />
                             {t('edit')}
                           </button>
                         )}
