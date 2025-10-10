@@ -1436,32 +1436,32 @@ export default function AttendancePage() {
                 filteredStudents.map((student) => (
                   <div 
                     key={student.id} 
-                    className={`bg-white p-2.5 rounded-lg border ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
+                    className={`bg-white p-3 rounded-lg border ${student.selected ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer hover:border-gray-300' : ''} transition-all`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-start justify-between gap-3">
                       {/* Nombre y datos principales */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-800 text-sm truncate">
+                        <h3 className="font-semibold text-gray-900 text-base leading-tight truncate mb-1">
                           {student.first_name} {student.last_name}
                         </h3>
-                        <div className="flex items-center gap-2 mt-0.5 text-xs">
-                          <span className="text-gray-600">{student.instrument || t('not_specified')}</span>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1.5">
+                          <span className="font-medium">{student.instrument || t('not_specified')}</span>
                           {student.orchestra && (
                             <>
                               <span className="text-gray-400">•</span>
-                              <span className="text-blue-600 font-medium">🎵 {student.orchestra.name}</span>
+                              <span className="font-medium text-gray-700">{student.orchestra.name}</span>
                             </>
                           )}
                         </div>
-                        <div className="mt-1">
+                        <div>
                           {student.attendance_status ? (
                             <AttendanceStatusIndicator
                               key={`${student.id}-${student.attendance_status || 'none'}`}
                               statusCode={student.attendance_status}
                             />
                           ) : (
-                            <span className="text-xs text-gray-500">{t('not_recorded')}</span>
+                            <span className="inline-block px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded">{t('not_recorded')}</span>
                           )}
                         </div>
                       </div>
@@ -1473,7 +1473,7 @@ export default function AttendancePage() {
                           checked={student.selected || false}
                           onChange={() => toggleStudentSelection(student.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
+                          className="h-5 w-5 mt-0.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
                         />
                       )}
                     </div>
