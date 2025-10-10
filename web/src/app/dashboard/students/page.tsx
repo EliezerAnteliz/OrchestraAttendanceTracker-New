@@ -41,6 +41,21 @@ export default function StudentsPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editFormData, setEditFormData] = useState<any>(null);
   const [orchestras, setOrchestras] = useState<any[]>([]);
+  const [showNewStudentModal, setShowNewStudentModal] = useState(false);
+  const [newStudentData, setNewStudentData] = useState({
+    first_name: '',
+    last_name: '',
+    age: '',
+    current_grade: '',
+    instrument: '',
+    instrument_size: '',
+    orchestra_position: '',
+    is_active: true,
+    parent_name: '',
+    parent_phone: '',
+    parent_email: ''
+  });
+  const [savingNewStudent, setSavingNewStudent] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -273,6 +288,137 @@ export default function StudentsPage() {
     setEditFormData({ ...editFormData, parents: updatedParents });
   };
 
+  const handleNewStudentChange = (field: string, value: any) => {
+    setNewStudentData({ ...newStudentData, [field]: value });
+  };
+
+  const handleSaveNewStudent = async () => {
+    try {
+      setSavingNewStudent(true);
+      
+      // Validar campos requeridos
+      if (!newStudentData.first_name || !newStudentData.last_name) {
+        alert(t('required_fields_error') || 'Por favor complete los campos requeridos');
+        return;
+      }
+
+      if (!activeProgram?.id) {
+        alert('No hay programa activo seleccionado');
+        return;
+      }
+
+      // Obtener organization_id del programa activo
+      const { data: programData, error: programError } = await supabase
+        .from('programs')
+        .select('organization_id')
+        .eq('id', activeProgram.id)
+        .single();
+
+      if (programError || !programData) {
+        throw new Error('Error al obtener información del programa');
+      }
+
+      // Generar student_id único
+      const randomNum = Math.floor(Math.random() * 10000);
+      const studentId = `S${randomNum}`;
+
+      // Insertar nuevo estudiante
+      const { data: studentData, error: insertError } = await supabase
+        .from('students')
+        .insert({
+          student_id: studentId,
+          first_name: newStudentData.first_name,
+          last_name: newStudentData.last_name,
+          age: newStudentData.age ? parseInt(newStudentData.age) : null,
+          current_grade: newStudentData.current_grade || null,
+          instrument: newStudentData.instrument || null,
+          instrument_size: newStudentData.instrument_size || null,
+          orchestra_position: newStudentData.orchestra_position || null,
+          is_active: newStudentData.is_active,
+          program_id: activeProgram.id,
+          organization_id: programData.organization_id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Insertar información de contacto del padre si se proporcionó
+      if (studentData && (newStudentData.parent_name || newStudentData.parent_phone || newStudentData.parent_email)) {
+        const { data: parentData, error: parentError } = await supabase
+          .from('parents')
+          .insert({
+            full_name: newStudentData.parent_name || null,
+            phone_number: newStudentData.parent_phone || null,
+            email: newStudentData.parent_email || null,
+            organization_id: programData.organization_id,
+            program_id: activeProgram.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (!parentError && parentData) {
+          await supabase
+            .from('student_parents')
+            .insert({
+              student_id: studentData.id,
+              parent_id: parentData.id,
+              program_id: activeProgram.id,
+              is_primary_contact: true,
+              created_at: new Date().toISOString()
+            });
+        }
+      }
+
+      // Recargar lista de estudiantes
+      await fetchStudents();
+      
+      // Cerrar modal y resetear formulario
+      setShowNewStudentModal(false);
+      setNewStudentData({
+        first_name: '',
+        last_name: '',
+        age: '',
+        current_grade: '',
+        instrument: '',
+        instrument_size: '',
+        orchestra_position: '',
+        is_active: true,
+        parent_name: '',
+        parent_phone: '',
+        parent_email: ''
+      });
+      
+      alert(t('student_created_successfully') || 'Estudiante creado exitosamente');
+    } catch (error) {
+      console.error('Error creating student:', error);
+      alert(t('error_creating_student') || 'Error al crear estudiante');
+    } finally {
+      setSavingNewStudent(false);
+    }
+  };
+
+  const closeNewStudentModal = () => {
+    setShowNewStudentModal(false);
+    setNewStudentData({
+      first_name: '',
+      last_name: '',
+      age: '',
+      current_grade: '',
+      instrument: '',
+      instrument_size: '',
+      orchestra_position: '',
+      is_active: true,
+      parent_name: '',
+      parent_phone: '',
+      parent_email: ''
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -311,9 +457,12 @@ export default function StudentsPage() {
             </button>
           )}
           {canEditStudents && (
-            <Link href="/dashboard/students/new" className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center">
+            <button 
+              onClick={() => setShowNewStudentModal(true)}
+              className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-[#0060c0] transition-colors"
+            >
               <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
-            </Link>
+            </button>
           )}
         </div>
       </div>
@@ -855,6 +1004,239 @@ export default function StudentsPage() {
                         )}
                       </>
                     )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para Nuevo Estudiante */}
+      {showNewStudentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-4 pb-20 sm:pb-4 safe-area-inset">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
+            onClick={closeNewStudentModal}
+          />
+          
+          {/* Modal centrado */}
+          <div className="relative w-full max-w-4xl max-h-[80vh] sm:max-h-[90vh] mx-auto">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
+              <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
+                {/* Header */}
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
+                        <MdAdd size={20} className="sm:w-6 sm:h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-lg sm:text-xl font-semibold">
+                          {t('new_student')}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-blue-100">
+                          {t('complete_student_info')}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={closeNewStudentModal}
+                      className="p-1.5 sm:p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                    >
+                      <MdClose size={20} className="sm:w-6 sm:h-6" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+                  <div className="space-y-4 sm:space-y-6">
+                    {/* Información Personal */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-blue-100">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                        <MdPerson className="mr-2 text-blue-600" size={18} />
+                        {t('personal_info')}
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('first_name')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.first_name}
+                            onChange={(e) => handleNewStudentChange('first_name', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('first_name_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('last_name')} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.last_name}
+                            onChange={(e) => handleNewStudentChange('last_name', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('last_name_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('age') || 'Edad'}
+                          </label>
+                          <input
+                            type="number"
+                            value={newStudentData.age}
+                            onChange={(e) => handleNewStudentChange('age', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder="8"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('grade')}
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.current_grade}
+                            onChange={(e) => handleNewStudentChange('current_grade', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('grade_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('status')}
+                          </label>
+                          <select
+                            value={newStudentData.is_active ? 'true' : 'false'}
+                            onChange={(e) => handleNewStudentChange('is_active', e.target.value === 'true')}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                          >
+                            <option value="true">{t('active')}</option>
+                            <option value="false">{t('inactive')}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información de Orquesta */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-purple-100">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                        <MdMusicNote className="mr-2 text-purple-600" size={18} />
+                        {t('orchestra_info')}
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('instrument')}
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.instrument}
+                            onChange={(e) => handleNewStudentChange('instrument', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('instrument_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('instrument_size') || 'Tamaño'}
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.instrument_size}
+                            onChange={(e) => handleNewStudentChange('instrument_size', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder="3/4, 4/4"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('orchestra_position') || 'Posición'}
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.orchestra_position}
+                            onChange={(e) => handleNewStudentChange('orchestra_position', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder="Section"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Información de Padres */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-green-100">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                        <MdContacts className="mr-2 text-green-600" size={18} />
+                        {t('parent_contact_info')}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('parent_name')}
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudentData.parent_name}
+                            onChange={(e) => handleNewStudentChange('parent_name', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('parent_name_placeholder')}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('parent_phone') || 'Teléfono'}
+                          </label>
+                          <input
+                            type="tel"
+                            value={newStudentData.parent_phone}
+                            onChange={(e) => handleNewStudentChange('parent_phone', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('parent_phone_placeholder')}
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                            {t('parent_email') || 'Email'}
+                          </label>
+                          <input
+                            type="email"
+                            value={newStudentData.parent_email}
+                            onChange={(e) => handleNewStudentChange('parent_email', e.target.value)}
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                            placeholder={t('parent_email_placeholder')}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer con acciones */}
+                <div className="px-3 sm:px-6 py-2.5 sm:py-4 bg-gray-50 border-t border-gray-200">
+                  <div className="flex justify-between items-center gap-2">
+                    <button
+                      onClick={closeNewStudentModal}
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                    >
+                      {t('cancel')}
+                    </button>
+                    <button
+                      onClick={handleSaveNewStudent}
+                      disabled={savingNewStudent || !newStudentData.first_name || !newStudentData.last_name}
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center ${
+                        (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <MdCheckCircle className="mr-1 sm:mr-2" size={16} />
+                      {savingNewStudent ? t('saving') : t('save')}
+                    </button>
                   </div>
                 </div>
               </div>
