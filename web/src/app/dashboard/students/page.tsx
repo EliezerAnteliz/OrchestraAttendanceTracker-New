@@ -141,11 +141,34 @@ export default function StudentsPage() {
         orchestraData = orchestra;
       }
 
-      // Obtener información de los padres
-      const { data: parentsData } = await supabase
-        .from('parents')
-        .select('*')
+      // Obtener información de los padres a través de la tabla de relación student_parents
+      const { data: studentParentsData } = await supabase
+        .from('student_parents')
+        .select(`
+          parent_id,
+          relationship,
+          is_primary_contact,
+          parents (
+            id,
+            full_name,
+            phone_number,
+            email
+          )
+        `)
         .eq('student_id', studentId);
+
+      // Formatear datos de padres
+      const parentsData = studentParentsData?.map(sp => {
+        const parent = Array.isArray(sp.parents) ? sp.parents[0] : sp.parents;
+        return {
+          id: parent?.id,
+          full_name: parent?.full_name,
+          phone_number: parent?.phone_number,
+          email: parent?.email,
+          relationship: sp.relationship,
+          is_primary_contact: sp.is_primary_contact
+        };
+      }) || [];
 
       // Obtener lista de orquestas para el selector
       const { data: orchestrasData } = await supabase
@@ -159,7 +182,7 @@ export default function StudentsPage() {
       const details = {
         ...studentData,
         orchestra_name: orchestraData?.name || null,
-        parents: parentsData || []
+        parents: parentsData
       };
 
       setStudentDetails(details);
@@ -202,8 +225,11 @@ export default function StudentsPage() {
         .update({
           first_name: editFormData.first_name,
           last_name: editFormData.last_name,
+          age: editFormData.age,
           current_grade: editFormData.current_grade,
           instrument: editFormData.instrument,
+          instrument_size: editFormData.instrument_size,
+          orchestra_position: editFormData.orchestra_position,
           orchestra_id: editFormData.orchestra_id || null,
           is_active: editFormData.is_active
         })
@@ -522,7 +548,7 @@ export default function StudentsPage() {
                           <MdPerson className="mr-2 text-blue-600" size={20} />
                           {t('personal_info')}
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('first_name')}
@@ -554,6 +580,23 @@ export default function StudentsPage() {
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
                                 {studentDetails.last_name}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('age') || 'Edad'}
+                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="number"
+                                value={editFormData.age || ''}
+                                onChange={(e) => handleInputChange('age', parseInt(e.target.value) || null)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.age ? `${studentDetails.age} años` : t('not_specified')}
                               </p>
                             )}
                           </div>
@@ -604,7 +647,7 @@ export default function StudentsPage() {
                           <MdMusicNote className="mr-2 text-purple-600" size={20} />
                           {t('orchestra_info')}
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('instrument')}
@@ -619,6 +662,24 @@ export default function StudentsPage() {
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
                                 {studentDetails.instrument || t('not_assigned')}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('instrument_size') || 'Tamaño'}
+                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.instrument_size || ''}
+                                onChange={(e) => handleInputChange('instrument_size', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                placeholder="3/4, 4/4, etc."
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.instrument_size || t('not_specified')}
                               </p>
                             )}
                           </div>
@@ -640,6 +701,24 @@ export default function StudentsPage() {
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
                                 {studentDetails.orchestra_name || t('not_assigned')}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('orchestra_position') || 'Posición'}
+                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.orchestra_position || ''}
+                                onChange={(e) => handleInputChange('orchestra_position', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                placeholder="Primer violín, etc."
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.orchestra_position || t('not_specified')}
                               </p>
                             )}
                           </div>
@@ -694,26 +773,46 @@ export default function StudentsPage() {
                                   </div>
                                 ) : (
                                   <>
-                                    <p className="font-semibold text-gray-900 mb-3">
-                                      {parent.full_name}
-                                    </p>
+                                    <div className="flex items-center justify-between mb-3">
+                                      <p className="font-semibold text-gray-900">
+                                        {parent.full_name}
+                                      </p>
+                                      <div className="flex gap-2">
+                                        {parent.is_primary_contact && (
+                                          <span className="px-2 py-1 text-xs font-medium bg-green-200 text-green-800 rounded-full">
+                                            {t('primary_contact') || 'Contacto Principal'}
+                                          </span>
+                                        )}
+                                        {parent.relationship && (
+                                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                            {parent.relationship}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
                                     <div className="space-y-2">
                                       {parent.phone_number && (
                                         <div className="flex items-center text-sm">
                                           <MdPhone className="mr-2 text-green-600" size={16} />
                                           <span className="text-gray-600">{t('phone')}:</span>
-                                          <span className="ml-2 font-medium text-gray-900">
+                                          <a 
+                                            href={`tel:${parent.phone_number}`}
+                                            className="ml-2 font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                          >
                                             {parent.phone_number}
-                                          </span>
+                                          </a>
                                         </div>
                                       )}
                                       {parent.email && (
                                         <div className="flex items-center text-sm">
                                           <MdEmail className="mr-2 text-green-600" size={16} />
                                           <span className="text-gray-600">{t('email')}:</span>
-                                          <span className="ml-2 font-medium text-gray-900">
+                                          <a 
+                                            href={`mailto:${parent.email}`}
+                                            className="ml-2 font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                          >
                                             {parent.email}
-                                          </span>
+                                          </a>
                                         </div>
                                       )}
                                     </div>
