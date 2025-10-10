@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday } from 'react-icons/md';
+import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -38,6 +38,9 @@ export default function StudentsPage() {
   const [showStudentDrawer, setShowStudentDrawer] = useState(false);
   const [studentDetails, setStudentDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editFormData, setEditFormData] = useState<any>(null);
+  const [orchestras, setOrchestras] = useState<any[]>([]);
 
   const fetchStudents = async () => {
     try {
@@ -144,12 +147,23 @@ export default function StudentsPage() {
         .select('*')
         .eq('student_id', studentId);
 
-      setStudentDetails({
+      // Obtener lista de orquestas para el selector
+      const { data: orchestrasData } = await supabase
+        .from('orchestras')
+        .select('*')
+        .eq('program_id', activeProgram?.id)
+        .order('name');
+
+      setOrchestras(orchestrasData || []);
+
+      const details = {
         ...studentData,
         orchestra_name: orchestraData?.name || null,
         parents: parentsData || []
-      });
-      
+      };
+
+      setStudentDetails(details);
+      setEditFormData(details);
       setShowStudentDrawer(true);
     } catch (error) {
       console.error('Error fetching student details:', error);
@@ -167,6 +181,70 @@ export default function StudentsPage() {
     setShowStudentDrawer(false);
     setSelectedStudent(null);
     setStudentDetails(null);
+    setIsEditMode(false);
+    setEditFormData(null);
+  };
+
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditFormData(studentDetails);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      // Actualizar información del estudiante
+      const { error: updateError } = await supabase
+        .from('students')
+        .update({
+          first_name: editFormData.first_name,
+          last_name: editFormData.last_name,
+          current_grade: editFormData.current_grade,
+          instrument: editFormData.instrument,
+          orchestra_id: editFormData.orchestra_id || null,
+          is_active: editFormData.is_active
+        })
+        .eq('id', selectedStudent.id);
+
+      if (updateError) throw updateError;
+
+      // Actualizar padres si existen
+      if (editFormData.parents && editFormData.parents.length > 0) {
+        for (const parent of editFormData.parents) {
+          if (parent.id) {
+            await supabase
+              .from('parents')
+              .update({
+                full_name: parent.full_name,
+                phone_number: parent.phone_number,
+                email: parent.email
+              })
+              .eq('id', parent.id);
+          }
+        }
+      }
+
+      // Recargar datos
+      await fetchStudents();
+      await fetchStudentDetails(selectedStudent.id);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('Error updating student:', error);
+      alert(t('error_updating_student') || 'Error al actualizar estudiante');
+    }
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setEditFormData({ ...editFormData, [field]: value });
+  };
+
+  const handleParentChange = (index: number, field: string, value: any) => {
+    const updatedParents = [...(editFormData.parents || [])];
+    updatedParents[index] = { ...updatedParents[index], [field]: value };
+    setEditFormData({ ...editFormData, parents: updatedParents });
   };
 
   if (loading) {
@@ -402,8 +480,8 @@ export default function StudentsPage() {
           />
           
           {/* Panel lateral */}
-          <div className="fixed inset-y-0 right-0 max-w-full flex">
-            <div className="w-screen max-w-2xl">
+          <div className="fixed inset-y-0 right-0 max-w-full flex items-center justify-center p-4">
+            <div className="w-full max-w-3xl mx-auto">
               <div className="h-full flex flex-col bg-white shadow-xl">
                 {/* Header */}
                 <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
@@ -436,7 +514,7 @@ export default function StudentsPage() {
                     <div className="flex items-center justify-center h-64">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                     </div>
-                  ) : studentDetails ? (
+                  ) : studentDetails && editFormData ? (
                     <div className="space-y-6">
                       {/* Información Personal */}
                       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
@@ -449,35 +527,73 @@ export default function StudentsPage() {
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('first_name')}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {studentDetails.first_name}
-                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.first_name}
+                                onChange={(e) => handleInputChange('first_name', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.first_name}
+                              </p>
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('last_name')}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {studentDetails.last_name}
-                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.last_name}
+                                onChange={(e) => handleInputChange('last_name', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.last_name}
+                              </p>
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('grade')}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {studentDetails.current_grade || t('not_specified')}
-                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.current_grade || ''}
+                                onChange={(e) => handleInputChange('current_grade', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.current_grade || t('not_specified')}
+                              </p>
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('status')}
                             </p>
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              studentDetails.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                            }`}>
-                              {studentDetails.is_active !== false ? t('active') : t('inactive')}
-                            </span>
+                            {isEditMode ? (
+                              <select
+                                value={editFormData.is_active !== false ? 'true' : 'false'}
+                                onChange={(e) => handleInputChange('is_active', e.target.value === 'true')}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              >
+                                <option value="true">{t('active')}</option>
+                                <option value="false">{t('inactive')}</option>
+                              </select>
+                            ) : (
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                studentDetails.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              }`}>
+                                {studentDetails.is_active !== false ? t('active') : t('inactive')}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -493,17 +609,39 @@ export default function StudentsPage() {
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('instrument')}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {studentDetails.instrument || t('not_assigned')}
-                            </p>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editFormData.instrument || ''}
+                                onChange={(e) => handleInputChange('instrument', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              />
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.instrument || t('not_assigned')}
+                              </p>
+                            )}
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                               {t('orchestra')}
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
-                              {studentDetails.orchestra_name || t('not_assigned')}
-                            </p>
+                            {isEditMode ? (
+                              <select
+                                value={editFormData.orchestra_id || ''}
+                                onChange={(e) => handleInputChange('orchestra_id', e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                              >
+                                <option value="">{t('not_assigned')}</option>
+                                {orchestras.map((orch) => (
+                                  <option key={orch.id} value={orch.id}>{orch.name}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {studentDetails.orchestra_name || t('not_assigned')}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -516,31 +654,71 @@ export default function StudentsPage() {
                             {t('parents_info')}
                           </h3>
                           <div className="space-y-4">
-                            {studentDetails.parents.map((parent: any, index: number) => (
+                            {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
                               <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
-                                <p className="font-semibold text-gray-900 mb-3">
-                                  {parent.full_name}
-                                </p>
-                                <div className="space-y-2">
-                                  {parent.phone_number && (
-                                    <div className="flex items-center text-sm">
-                                      <MdPhone className="mr-2 text-green-600" size={16} />
-                                      <span className="text-gray-600">{t('phone')}:</span>
-                                      <span className="ml-2 font-medium text-gray-900">
-                                        {parent.phone_number}
-                                      </span>
+                                {isEditMode ? (
+                                  <div className="space-y-3">
+                                    <div>
+                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                        {t('parent_name')}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={parent.full_name || ''}
+                                        onChange={(e) => handleParentChange(index, 'full_name', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                      />
                                     </div>
-                                  )}
-                                  {parent.email && (
-                                    <div className="flex items-center text-sm">
-                                      <MdEmail className="mr-2 text-green-600" size={16} />
-                                      <span className="text-gray-600">{t('email')}:</span>
-                                      <span className="ml-2 font-medium text-gray-900">
-                                        {parent.email}
-                                      </span>
+                                    <div>
+                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                        {t('phone')}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={parent.phone_number || ''}
+                                        onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                      />
                                     </div>
-                                  )}
-                                </div>
+                                    <div>
+                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                        {t('email')}
+                                      </label>
+                                      <input
+                                        type="email"
+                                        value={parent.email || ''}
+                                        onChange={(e) => handleParentChange(index, 'email', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                      />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className="font-semibold text-gray-900 mb-3">
+                                      {parent.full_name}
+                                    </p>
+                                    <div className="space-y-2">
+                                      {parent.phone_number && (
+                                        <div className="flex items-center text-sm">
+                                          <MdPhone className="mr-2 text-green-600" size={16} />
+                                          <span className="text-gray-600">{t('phone')}:</span>
+                                          <span className="ml-2 font-medium text-gray-900">
+                                            {parent.phone_number}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {parent.email && (
+                                        <div className="flex items-center text-sm">
+                                          <MdEmail className="mr-2 text-green-600" size={16} />
+                                          <span className="text-gray-600">{t('email')}:</span>
+                                          <span className="ml-2 font-medium text-gray-900">
+                                            {parent.email}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -553,20 +731,40 @@ export default function StudentsPage() {
                 {/* Footer con acciones */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                   <div className="flex justify-between items-center">
-                    <button
-                      onClick={closeDrawer}
-                      className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
-                    >
-                      {t('close')}
-                    </button>
-                    {canEditStudents && (
-                      <Link
-                        href={`/dashboard/students/${selectedStudent?.id}`}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
-                      >
-                        <MdEdit className="mr-2" size={18} />
-                        {t('edit')}
-                      </Link>
+                    {isEditMode ? (
+                      <>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                        >
+                          {t('cancel')}
+                        </button>
+                        <button
+                          onClick={handleSaveEdit}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                        >
+                          <MdCheckCircle className="mr-2" size={18} />
+                          {t('save')}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={closeDrawer}
+                          className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                        >
+                          {t('close')}
+                        </button>
+                        {canEditStudents && (
+                          <button
+                            onClick={handleEditClick}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                          >
+                            <MdEdit className="mr-2" size={18} />
+                            {t('edit')}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
