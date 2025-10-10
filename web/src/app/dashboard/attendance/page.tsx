@@ -1128,16 +1128,16 @@ export default function AttendancePage() {
 
   return (
     <div className="h-full">
-      <div className="flex flex-col gap-4 mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h1 className="text-2xl font-bold text-gray-800">{t('attendance_title')}</h1>
+      <div className="flex flex-col gap-2 sm:gap-4 mb-3 sm:mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t('attendance_title')}</h1>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative">
               <DatePicker
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat="dd/MM/yyyy"
-                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] text-black font-medium shadow-sm w-full sm:w-44"
+                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] text-black font-medium shadow-sm w-full sm:w-44 text-sm"
                 wrapperClassName="date-picker-wrapper w-full sm:w-44"
                 locale={lang === 'es' ? es : enUS}
                 showMonthYearPicker={false}
@@ -1179,7 +1179,7 @@ export default function AttendancePage() {
             {canEditStudents && (
               <button
                 onClick={toggleAttendanceMode}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium w-full sm:w-auto ${
+                className={`px-3 py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium w-full sm:w-auto ${
                   attendanceMode 
                     ? 'bg-red-500 hover:bg-red-600 text-white' 
                     : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
@@ -1194,11 +1194,11 @@ export default function AttendancePage() {
 
       {/* Mensaje de éxito */}
       {showSuccessMessage && successMessage && (
-        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md relative">
+        <div className="mb-2 sm:mb-4 p-2 sm:p-3 bg-green-100 border border-green-400 text-green-700 rounded-md relative text-sm">
           <span className="block sm:inline">{successMessage}</span>
           <button 
             onClick={() => setShowSuccessMessage(false)}
-            className="absolute top-0 right-0 px-4 py-3"
+            className="absolute top-0 right-0 px-3 py-2 sm:px-4 sm:py-3"
           >
             <span className="text-green-500 hover:text-green-800">×</span>
           </button>
