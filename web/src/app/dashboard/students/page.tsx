@@ -498,7 +498,7 @@ export default function StudentsPage() {
 
       {/* Modal centrado con información del estudiante */}
       {showStudentDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
           {/* Overlay */}
           <div 
             className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -506,9 +506,9 @@ export default function StudentsPage() {
           />
           
           {/* Modal centrado */}
-          <div className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] mx-auto">
+          <div className="relative w-full max-w-4xl max-h-[85vh] sm:max-h-[90vh] mx-auto">
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
-              <div className="flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+              <div className="flex flex-col max-h-[85vh] sm:max-h-[90vh]">
                 {/* Header */}
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                   <div className="flex items-center justify-between">
@@ -818,19 +818,19 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-200">
+                <div className="px-3 sm:px-6 py-2.5 sm:py-4 bg-gray-50 border-t border-gray-200">
                   <div className="flex justify-between items-center gap-2">
                     {isEditMode ? (
                       <>
                         <button
                           onClick={handleCancelEdit}
-                          className="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                         >
                           {t('cancel')}
                         </button>
                         <button
                           onClick={handleSaveEdit}
-                          className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
                         >
                           <MdCheckCircle className="mr-1 sm:mr-2" size={16} />
                           {t('save')}
@@ -840,14 +840,14 @@ export default function StudentsPage() {
                       <>
                         <button
                           onClick={closeDrawer}
-                          className="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
                         >
                           {t('close')}
                         </button>
                         {canEditStudents && (
                           <button
                             onClick={handleEditClick}
-                            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
                           >
                             <MdEdit className="mr-1 sm:mr-2" size={16} />
                             {t('edit')}
