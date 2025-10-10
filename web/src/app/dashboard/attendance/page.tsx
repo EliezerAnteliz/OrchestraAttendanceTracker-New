@@ -1205,24 +1205,24 @@ export default function AttendancePage() {
         </div>
       )}
       
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-        <div className="flex flex-col gap-3 mb-4">
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm mb-4">
+        <div className="flex flex-col gap-2 sm:gap-3 mb-3">
           <div className="relative">
             <input
               type="text"
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="w-full pl-9 pr-3 py-2 sm:py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
             />
-            <span className="absolute left-3 top-3 text-gray-400">🔍</span>
+            <span className="absolute left-3 top-2.5 sm:top-3 text-gray-400 text-sm">🔍</span>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <select
               value={selectedOrchestra}
               onChange={(e) => handleOrchestraChange(e.target.value)}
-              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
               aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
             >
               <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
@@ -1237,7 +1237,7 @@ export default function AttendancePage() {
             <select
               value={selectedInstrument}
               onChange={(e) => handleInstrumentChange(e.target.value)}
-              className="flex-1 px-3 py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
               aria-label={t('filter_by_instrument')}
             >
               <option value="all">{t('all_instruments')}</option>
@@ -1250,25 +1250,25 @@ export default function AttendancePage() {
           </div>
         </div>
         
-        <div className="text-sm text-gray-600 font-medium mb-3">
+        <div className="text-xs sm:text-sm text-gray-600 font-medium mb-2 sm:mb-3">
           {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
         </div>
         
         {attendanceMode && (
-          <div className="mb-4 space-y-3">
-            <div className="flex flex-col sm:flex-row gap-2">
+          <div className="mb-3 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={selectAllStudents}
-                className="flex-1 sm:flex-none px-3 py-2 rounded-md flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium"
+                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm font-medium"
               >
-                <span className="mr-2">☑</span>
+                <span className="mr-1">☑</span>
                 {t('select_all')}
               </button>
               <button
                 onClick={deselectAllStudents}
-                className="flex-1 sm:flex-none px-3 py-2 rounded-md flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium"
+                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white text-xs sm:text-sm font-medium"
               >
-                <span className="mr-2">☐</span>
+                <span className="mr-1">☐</span>
                 {t('deselect_all')}
               </button>
             </div>
@@ -1277,55 +1277,58 @@ export default function AttendancePage() {
               <button
                 onClick={() => markAttendance('A')}
                 disabled={selectedStudentCount === 0}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-green-500 hover:bg-green-600 text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 <span className="mr-1">✓</span>
-                {t('mark_present')}
+                <span className="hidden sm:inline">{t('mark_present')}</span>
+                <span className="sm:hidden">{lang === 'es' ? 'Presente' : 'Present'}</span>
               </button>
               <button
                 onClick={() => markAttendance('EA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 <span className="mr-1">!</span>
-                {t('mark_excused_absence')}
+                <span className="hidden sm:inline">{t('mark_excused_absence')}</span>
+                <span className="sm:hidden">{lang === 'es' ? 'Justif.' : 'Excused'}</span>
               </button>
               <button
                 onClick={() => markAttendance('UA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
                   selectedStudentCount > 0
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 <span className="mr-1">✗</span>
-                {t('mark_unexcused_absence')}
+                <span className="hidden sm:inline">{t('mark_unexcused_absence')}</span>
+                <span className="sm:hidden">{lang === 'es' ? 'Falta' : 'Absent'}</span>
               </button>
               
               <button
                 onClick={clearAttendanceForDate}
                 disabled={selectedStudentCount === 0 || isLoading}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
                   selectedStudentCount > 0 && !isLoading
                     ? 'bg-orange-600 hover:bg-orange-700 text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
                 title={selectedStudentCount > 0 ? `Limpiar asistencia de ${selectedStudentCount} estudiante(s) seleccionado(s)` : 'Selecciona estudiantes para limpiar su asistencia'}
               >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 <span className="hidden sm:inline">{t('clear_attendance')}</span>
-                <span className="sm:hidden">{t('clear_attendance_short')}</span>
+                <span className="sm:hidden">{lang === 'es' ? 'Limpiar' : 'Clear'}</span>
               </button>
             </div>
           </div>
