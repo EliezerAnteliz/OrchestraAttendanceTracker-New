@@ -1433,17 +1433,14 @@ export default function AttendancePage() {
                 filteredStudents.map((student) => (
                   <div 
                     key={student.id} 
-                    className={`bg-white p-4 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
+                    className={`bg-white p-3 rounded-lg border shadow-sm ${student.selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
-                    <div className="flex justify-between items-start mb-3">
+                    <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-800 text-base">
                           {student.first_name} {student.last_name}
                         </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {t('grade')}: {student.current_grade || t('not_specified')}
-                        </p>
                       </div>
                       {attendanceMode && (
                         <input
@@ -1470,14 +1467,6 @@ export default function AttendancePage() {
                         ) : (
                           <span className="text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
                         )}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-medium">{t('status')}:</span>
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {student.is_active ? t('active') : t('inactive')}
-                        </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600 font-medium">{t('attendance')}:</span>
