@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContacts, MdUpload, MdClose } from 'react-icons/md';
+import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -34,6 +34,10 @@ export default function StudentsPage() {
   const [availableInstruments, setAvailableInstruments] = useState<string[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadResults, setUploadResults] = useState<{ added: number; updated: number; errors: number } | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+  const [showStudentDrawer, setShowStudentDrawer] = useState(false);
+  const [studentDetails, setStudentDetails] = useState<any>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -109,6 +113,61 @@ export default function StudentsPage() {
     
     setFilteredStudents(result);
   }, [searchQuery, showActiveOnly, selectedInstrument, students]);
+
+  const fetchStudentDetails = async (studentId: string) => {
+    try {
+      setLoadingDetails(true);
+      
+      // Obtener información del estudiante
+      const { data: studentData, error: studentError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('id', studentId)
+        .single();
+
+      if (studentError) throw studentError;
+
+      // Obtener información de la orquesta
+      let orchestraData = null;
+      if (studentData.orchestra_id) {
+        const { data: orchestra } = await supabase
+          .from('orchestras')
+          .select('name')
+          .eq('id', studentData.orchestra_id)
+          .single();
+        orchestraData = orchestra;
+      }
+
+      // Obtener información de los padres
+      const { data: parentsData } = await supabase
+        .from('parents')
+        .select('*')
+        .eq('student_id', studentId);
+
+      setStudentDetails({
+        ...studentData,
+        orchestra_name: orchestraData?.name || null,
+        parents: parentsData || []
+      });
+      
+      setShowStudentDrawer(true);
+    } catch (error) {
+      console.error('Error fetching student details:', error);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleStudentClick = (student: Student) => {
+    setSelectedStudent(student);
+    fetchStudentDetails(student.id);
+  };
+
+  const closeDrawer = () => {
+    setShowStudentDrawer(false);
+    setSelectedStudent(null);
+    setStudentDetails(null);
+  };
 
   if (loading) {
     return (
@@ -208,13 +267,16 @@ export default function StudentsPage() {
                 <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('instrument')}</th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('grade')}</th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('status')}</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredStudents.length > 0 ? (
                 filteredStudents.map((student) => (
-                  <tr key={student.id}>
+                  <tr 
+                    key={student.id}
+                    onClick={() => handleStudentClick(student)}
+                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
@@ -237,16 +299,11 @@ export default function StudentsPage() {
                         {student.is_active !== false ? t('active') : t('inactive')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link href={`/dashboard/students/${student.id}`} className="text-[#0073ea] hover:text-[#0060c0] mr-4">
-                        <MdVisibility className="inline mr-1" /> {t('view')}
-                      </Link>
-                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-black">
+                  <td colSpan={4} className="px-6 py-4 text-center text-black">
                     {t('no_students_found')}
                   </td>
                 </tr>
@@ -259,7 +316,11 @@ export default function StudentsPage() {
         <div className="md:hidden space-y-3">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
-              <div key={student.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+              <div 
+                key={student.id} 
+                onClick={() => handleStudentClick(student)}
+                className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:border-blue-400 hover:shadow-md cursor-pointer transition-all"
+              >
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold text-gray-800 text-base">
                     {student.first_name} {student.last_name}
@@ -271,7 +332,7 @@ export default function StudentsPage() {
                   </span>
                 </div>
                 
-                <div className="flex justify-between items-center text-sm mb-2">
+                <div className="flex justify-between items-center text-sm">
                   <div className="flex-1">
                     <span className="text-gray-600">{t('instrument')}:</span>
                     <span className="ml-1 font-medium text-gray-900">{student.instrument || t('not_assigned')}</span>
@@ -280,15 +341,6 @@ export default function StudentsPage() {
                     <span className="text-gray-600">{t('grade')}:</span>
                     <span className="ml-1 font-medium text-gray-900">{student.current_grade || t('not_assigned')}</span>
                   </div>
-                </div>
-                
-                <div className="pt-2 border-t border-gray-100">
-                  <Link 
-                    href={`/dashboard/students/${student.id}`} 
-                    className="flex items-center justify-center w-full px-3 py-2 bg-[#0073ea] text-white rounded-md text-sm font-medium hover:bg-[#0060c0] transition-colors"
-                  >
-                    <MdVisibility className="mr-2" size={16} /> {t('view_details')}
-                  </Link>
                 </div>
               </div>
             ))
@@ -335,6 +387,190 @@ export default function StudentsPage() {
                   }
                 }} 
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Drawer lateral con información del estudiante */}
+      {showStudentDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
+            onClick={closeDrawer}
+          />
+          
+          {/* Panel lateral */}
+          <div className="fixed inset-y-0 right-0 max-w-full flex">
+            <div className="w-screen max-w-2xl">
+              <div className="h-full flex flex-col bg-white shadow-xl">
+                {/* Header */}
+                <div className="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-white bg-opacity-20 rounded-lg">
+                        <MdPerson size={24} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold">
+                          {selectedStudent?.first_name} {selectedStudent?.last_name}
+                        </h2>
+                        <p className="text-sm text-blue-100">
+                          {t('student_profile')}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={closeDrawer}
+                      className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                    >
+                      <MdClose size={24} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  {loadingDetails ? (
+                    <div className="flex items-center justify-center h-64">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : studentDetails ? (
+                    <div className="space-y-6">
+                      {/* Información Personal */}
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <MdPerson className="mr-2 text-blue-600" size={20} />
+                          {t('personal_info')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('first_name')}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {studentDetails.first_name}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('last_name')}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {studentDetails.last_name}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('grade')}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {studentDetails.current_grade || t('not_specified')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('status')}
+                            </p>
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              studentDetails.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {studentDetails.is_active !== false ? t('active') : t('inactive')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Información de Orquesta */}
+                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                          <MdMusicNote className="mr-2 text-purple-600" size={20} />
+                          {t('orchestra_info')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('instrument')}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {studentDetails.instrument || t('not_assigned')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                              {t('orchestra')}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {studentDetails.orchestra_name || t('not_assigned')}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Información de Padres */}
+                      {studentDetails.parents && studentDetails.parents.length > 0 && (
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <MdContacts className="mr-2 text-green-600" size={20} />
+                            {t('parents_info')}
+                          </h3>
+                          <div className="space-y-4">
+                            {studentDetails.parents.map((parent: any, index: number) => (
+                              <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
+                                <p className="font-semibold text-gray-900 mb-3">
+                                  {parent.full_name}
+                                </p>
+                                <div className="space-y-2">
+                                  {parent.phone_number && (
+                                    <div className="flex items-center text-sm">
+                                      <MdPhone className="mr-2 text-green-600" size={16} />
+                                      <span className="text-gray-600">{t('phone')}:</span>
+                                      <span className="ml-2 font-medium text-gray-900">
+                                        {parent.phone_number}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {parent.email && (
+                                    <div className="flex items-center text-sm">
+                                      <MdEmail className="mr-2 text-green-600" size={16} />
+                                      <span className="text-gray-600">{t('email')}:</span>
+                                      <span className="ml-2 font-medium text-gray-900">
+                                        {parent.email}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Footer con acciones */}
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={closeDrawer}
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                    >
+                      {t('close')}
+                    </button>
+                    {canEditStudents && (
+                      <Link
+                        href={`/dashboard/students/${selectedStudent?.id}`}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center"
+                      >
+                        <MdEdit className="mr-2" size={18} />
+                        {t('edit')}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
