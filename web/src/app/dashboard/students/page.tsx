@@ -745,7 +745,7 @@ export default function StudentsPage() {
                                         type="text"
                                         value={parent.full_name || ''}
                                         onChange={(e) => handleParentChange(index, 'full_name', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
                                       />
                                     </div>
                                     <div>
@@ -756,7 +756,7 @@ export default function StudentsPage() {
                                         type="text"
                                         value={parent.phone_number || ''}
                                         onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
                                       />
                                     </div>
                                     <div>
@@ -767,22 +767,15 @@ export default function StudentsPage() {
                                         type="email"
                                         value={parent.email || ''}
                                         onChange={(e) => handleParentChange(index, 'email', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
                                       />
                                     </div>
                                   </div>
                                 ) : (
                                   <div className="space-y-3">
-                                    <div className="flex items-start justify-between gap-2">
-                                      <p className="font-semibold text-gray-800 text-base">
-                                        {parent.full_name}
-                                      </p>
-                                      {parent.relationship && (
-                                        <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded">
-                                          {parent.relationship}
-                                        </span>
-                                      )}
-                                    </div>
+                                    <p className="font-semibold text-gray-800 text-base">
+                                      {parent.full_name}
+                                    </p>
                                     <div className="space-y-2">
                                       {parent.phone_number && (
                                         <div className="flex items-center gap-2">
