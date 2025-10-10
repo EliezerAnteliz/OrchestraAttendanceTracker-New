@@ -498,7 +498,7 @@ export default function StudentsPage() {
 
       {/* Modal centrado con información del estudiante */}
       {showStudentDrawer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-4 pb-20 sm:pb-4 safe-area-inset">
           {/* Overlay */}
           <div 
             className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
@@ -506,9 +506,9 @@ export default function StudentsPage() {
           />
           
           {/* Modal centrado */}
-          <div className="relative w-full max-w-4xl max-h-[85vh] sm:max-h-[90vh] mx-auto">
+          <div className="relative w-full max-w-4xl max-h-[80vh] sm:max-h-[90vh] mx-auto">
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
-              <div className="flex flex-col max-h-[85vh] sm:max-h-[90vh]">
+              <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                   <div className="flex items-center justify-between">
