@@ -532,16 +532,42 @@ export default function OrchestrasPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                {editingOrchestra 
-                  ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
-                  : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
-                }
-              </h2>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-4 bg-[#0073ea] text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
+                    {editingOrchestra ? <MdEdit size={20} /> : <MdAdd size={20} />}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      {editingOrchestra 
+                        ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
+                        : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
+                      }
+                    </h2>
+                    <p className="text-sm text-blue-100">
+                      {lang === 'es' ? 'Completa la información de la orquesta' : 'Complete orchestra information'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingOrchestra(null);
+                    setFormData({ name: '', description: '', is_active: true });
+                  }}
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                >
+                  <MdClose size={20} />
+                </button>
+              </div>
+            </div>
 
+            {/* Content */}
+            <div className="p-6">
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div>
@@ -599,8 +625,9 @@ export default function OrchestrasPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors"
+                    className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center"
                   >
+                    {editingOrchestra ? <MdEdit className="mr-2" size={18} /> : <MdAdd className="mr-2" size={18} />}
                     {editingOrchestra 
                       ? (lang === 'es' ? 'Actualizar' : 'Update')
                       : (lang === 'es' ? 'Crear' : 'Create')
@@ -615,20 +642,24 @@ export default function OrchestrasPage() {
 
       {/* Modal de Asignación de Estudiantes */}
       {showAssignModal && assigningOrchestra && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="px-6 py-4 bg-[#0073ea] text-white">
               <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                    <MdPersonAdd className="mr-2 text-green-600" size={24} />
-                    {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
-                    <span className="font-semibold">{assigningOrchestra.name}</span>
-                  </p>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
+                    <MdPersonAdd size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
+                    </h2>
+                    <p className="text-sm text-blue-100">
+                      {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
+                      <span className="font-semibold">{assigningOrchestra.name}</span>
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => {
@@ -636,9 +667,9 @@ export default function OrchestrasPage() {
                     setAssigningOrchestra(null);
                     setSelectedStudents(new Set());
                   }}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 >
-                  <MdClose size={24} />
+                  <MdClose size={20} />
                 </button>
               </div>
             </div>
@@ -765,18 +796,23 @@ export default function OrchestrasPage() {
 
       {/* Modal para Ver Estudiantes de la Orquesta */}
       {showStudentsModal && viewingOrchestra && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200">
+            <div className="px-6 py-4 bg-[#0073ea] text-white">
               <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    {viewingOrchestra.name}
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {orchestraStudents.length} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
-                  </p>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
+                    <MdVisibility size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      {viewingOrchestra.name}
+                    </h2>
+                    <p className="text-sm text-blue-100">
+                      {orchestraStudents.length} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => {
@@ -784,9 +820,9 @@ export default function OrchestrasPage() {
                     setViewingOrchestra(null);
                     setOrchestraStudents([]);
                   }}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 >
-                  <MdClose size={24} />
+                  <MdClose size={20} />
                 </button>
               </div>
             </div>
