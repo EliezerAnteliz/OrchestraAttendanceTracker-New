@@ -1331,44 +1331,60 @@ ${dateTableEN}`;
   }
 
   return (
-    <div className="space-y-3 sm:space-y-6 px-2 sm:px-0">
-      {/* Selector de tipo de reporte */}
-      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
-        <h2 className="text-base sm:text-xl font-medium text-gray-800 mb-3 sm:mb-4">{t('report_type_title')}</h2>
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:space-x-4 sm:gap-0">
-          <button
-            onClick={() => {
-              setReportType('group');
-              setSelectedStudent(null);
-              setReportData(null);
-            }}
-            className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
-              reportType === 'group'
-                ? 'bg-[#0073ea] text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <MdGroups className="mr-2" /> {t('group')}
-          </button>
-          <button
-            onClick={() => {
-              setReportType('individual');
-              setReportData(null);
-              setStudentModalVisible(true);
-            }}
-            className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
-              reportType === 'individual'
-                ? 'bg-[#0073ea] text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <MdPerson className="mr-2" /> {t('individual')}
-          </button>
+    <div className="space-y-6 px-2 sm:px-4">
+      {/* Sección de Reportes de Asistencia */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 shadow-sm">
+        <div className="flex items-center mb-6">
+          <div className="p-2 bg-blue-100 rounded-lg mr-3">
+            <MdPieChart className="text-blue-600" size={24} />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {lang === 'es' ? 'Reportes de Asistencia' : 'Attendance Reports'}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {lang === 'es' ? 'Genera estadísticas y análisis de asistencia' : 'Generate attendance statistics and analysis'}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Información del período */}
-      <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+        {/* Selector de tipo de reporte */}
+        <div className="mb-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">{t('report_type_title')}</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => {
+                setReportType('group');
+                setSelectedStudent(null);
+                setReportData(null);
+              }}
+              className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
+                reportType === 'group'
+                  ? 'bg-[#0073ea] text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              <MdGroups className="mr-2" /> {t('group')}
+            </button>
+            <button
+              onClick={() => {
+                setReportType('individual');
+                setReportData(null);
+                setStudentModalVisible(true);
+              }}
+              className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
+                reportType === 'individual'
+                  ? 'bg-[#0073ea] text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              <MdPerson className="mr-2" /> {t('individual')}
+            </button>
+          </div>
+        </div>
+
+        {/* Información del período */}
+        <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
         <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4">
           <h2 className="text-base sm:text-xl font-medium text-gray-800 flex items-center">
             <MdCalendarMonth className="mr-2" /> {t('period')} {granularity === 'monthly' ? t('monthly') : granularity === 'weekly' ? t('weekly') : t('annual')}
@@ -1500,7 +1516,7 @@ ${dateTableEN}`;
             )}
           </div>
         </div>
-        <p className="text-gray-600">
+        <p className="text-sm text-gray-600">
           {t('showing_data_of', {
             label: (granularity === 'monthly'
               ? formatMonthLabel(period, customMonth)
@@ -1509,37 +1525,38 @@ ${dateTableEN}`;
               : formatAcademicYearLabel(academicYear))
           })}
         </p>
-      </div>
-      {/* Selección de estudiante (solo para reporte individual) */}
-      {reportType === 'individual' && (
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-base sm:text-xl font-medium text-gray-800 mb-3 sm:mb-4">{t('selected_student')}</h2>
-          {selectedStudent ? (
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-              <div className="flex-1">
-                <p className="text-base font-semibold text-gray-800 leading-snug">{selectedStudent.name}</p>
-                <p className="text-sm text-gray-600">{selectedStudent.instrument}</p>
+        </div>
+
+        {/* Selección de estudiante (solo para reporte individual) */}
+        {reportType === 'individual' && (
+          <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">{t('selected_student')}</h3>
+            {selectedStudent ? (
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div className="flex-1">
+                  <p className="text-base font-semibold text-gray-800 leading-snug">{selectedStudent.name}</p>
+                  <p className="text-sm text-gray-600">{selectedStudent.instrument}</p>
+                </div>
+                <button
+                  onClick={() => setStudentModalVisible(true)}
+                  className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium w-full sm:w-auto"
+                >
+                  {t('change')}
+                </button>
               </div>
+            ) : (
               <button
                 onClick={() => setStudentModalVisible(true)}
-                className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium w-full sm:w-auto"
+                className="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
               >
-                {t('change')}
+                {t('select_student_title')}
               </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setStudentModalVisible(true)}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-            >
-              {t('select_student_title')}
-            </button>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
 
-      {/* Botón para generar reporte */}
-      <div className="flex justify-center px-4">
+        {/* Botón para generar reporte */}
+        <div className="flex justify-center">
         <button
           onClick={handleGenerateReport}
           disabled={generating || (reportType === 'individual' && !selectedStudent)}
@@ -1560,11 +1577,12 @@ ${dateTableEN}`;
             </>
           )}
         </button>
+        </div>
       </div>
         
       {/* Sección separada para notificaciones de faltas (solo admin) */}
       {isAdmin && (
-        <div className="mt-8 px-4">
+        <div className="px-4">
           <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-lg p-6 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-red-100 rounded-lg mr-3">
