@@ -409,7 +409,7 @@ export default function OrchestrasPage() {
               setFormData({ name: '', description: '', is_active: true });
               setShowModal(true);
             }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition-colors"
+            className="bg-[#0073ea] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#0060c0] transition-colors"
           >
             <MdAdd className="mr-2" size={20} />
             {lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra'}
@@ -448,7 +448,7 @@ export default function OrchestrasPage() {
                 setFormData({ name: '', description: '', is_active: true });
                 setShowModal(true);
               }}
-              className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="mt-4 bg-[#0073ea] text-white px-6 py-2 rounded-md hover:bg-[#0060c0] transition-colors"
             >
               {lang === 'es' ? 'Crear Primera Orquesta' : 'Create First Orchestra'}
             </button>
@@ -460,13 +460,13 @@ export default function OrchestrasPage() {
             <div
               key={orchestra.id}
               className={`bg-white rounded-lg shadow-md p-6 border-2 transition-all ${
-                orchestra.is_active ? 'border-blue-200 hover:border-blue-400' : 'border-gray-200 opacity-60'
+                orchestra.is_active ? 'border-blue-100 hover:border-[#0073ea]' : 'border-gray-200 opacity-60'
               }`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                    <MdMusicNote className="mr-2 text-blue-600" size={20} />
+                    <MdMusicNote className="mr-2 text-[#0073ea]" size={20} />
                     {orchestra.name}
                   </h3>
                   {!orchestra.is_active && (
@@ -501,7 +501,7 @@ export default function OrchestrasPage() {
               )}
 
               <div className="flex items-center text-gray-700 bg-gray-50 rounded-md p-3 mb-3">
-                <MdPeople className="mr-2 text-blue-600" size={20} />
+                <MdPeople className="mr-2 text-[#0073ea]" size={20} />
                 <span className="font-medium">
                   {orchestra.student_count || 0} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
                 </span>
@@ -510,7 +510,7 @@ export default function OrchestrasPage() {
               <div className="space-y-2">
                 <button
                   onClick={() => handleViewStudents(orchestra)}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center font-medium"
+                  className="w-full px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center font-medium"
                 >
                   <MdVisibility className="mr-2" size={18} />
                   {lang === 'es' ? 'Ver Estudiantes' : 'View Students'}
@@ -553,7 +553,7 @@ export default function OrchestrasPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                       placeholder={lang === 'es' ? 'Ej: Mozart, Beethoven' : 'Ex: Mozart, Beethoven'}
                       required
                     />
@@ -566,7 +566,7 @@ export default function OrchestrasPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                       rows={3}
                       placeholder={lang === 'es' ? 'Descripción opcional' : 'Optional description'}
                     />
@@ -578,7 +578,7 @@ export default function OrchestrasPage() {
                       id="is_active"
                       checked={formData.is_active}
                       onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-[#0073ea] border-gray-300 rounded focus:ring-[#0073ea]"
                     />
                     <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
                       {lang === 'es' ? 'Orquesta activa' : 'Active orchestra'}
@@ -600,7 +600,7 @@ export default function OrchestrasPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors"
                   >
                     {editingOrchestra 
                       ? (lang === 'es' ? 'Actualizar' : 'Update')
@@ -653,7 +653,7 @@ export default function OrchestrasPage() {
                   placeholder={lang === 'es' ? 'Buscar estudiante...' : 'Search student...'}
                   value={studentSearchTerm}
                   onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-900"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
                 />
               </div>
               
@@ -773,7 +773,7 @@ export default function OrchestrasPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                    <MdMusicNote className="mr-2 text-blue-600" size={24} />
+                    <MdMusicNote className="mr-2 text-[#0073ea]" size={24} />
                     {viewingOrchestra.name}
                   </h2>
                   <p className="text-sm text-gray-600 mt-1">
