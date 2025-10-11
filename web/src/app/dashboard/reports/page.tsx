@@ -1630,7 +1630,6 @@ ${dateTableEN}`;
                 )}
               </button>
             </div>
-          </div>
         </div>
       )}
 
