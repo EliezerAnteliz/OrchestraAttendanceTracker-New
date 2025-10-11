@@ -1394,7 +1394,7 @@ export default function AttendancePage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           {student.orchestra ? (
                             <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-50 text-[#0073ea]">
-                              🎵 {student.orchestra.name}
+                              {student.orchestra.name}
                             </span>
                           ) : (
                             <span className="text-sm text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
