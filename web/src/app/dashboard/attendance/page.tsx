@@ -1259,7 +1259,7 @@ export default function AttendancePage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={selectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm font-medium"
+                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-[#0073ea] hover:bg-[#0060c0] text-white text-xs sm:text-sm font-medium"
               >
                 <span className="mr-1">☑</span>
                 {t('select_all')}
@@ -1393,7 +1393,7 @@ export default function AttendancePage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {student.orchestra ? (
-                            <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-50 text-[#0073ea]">
                               🎵 {student.orchestra.name}
                             </span>
                           ) : (
@@ -1436,7 +1436,7 @@ export default function AttendancePage() {
                 filteredStudents.map((student) => (
                   <div 
                     key={student.id} 
-                    className={`bg-white p-3 rounded-lg border ${student.selected ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer hover:border-gray-300' : ''} transition-all`}
+                    className={`bg-white p-3 rounded-lg border ${student.selected ? 'border-[#0073ea] bg-blue-50 shadow-sm' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer hover:border-gray-300' : ''} transition-all`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1450,7 +1450,7 @@ export default function AttendancePage() {
                           {student.orchestra && (
                             <>
                               <span className="text-gray-400">•</span>
-                              <span className="font-medium text-gray-700">{student.orchestra.name}</span>
+                              <span className="font-medium text-[#0073ea]">{student.orchestra.name}</span>
                             </>
                           )}
                         </div>
@@ -1473,7 +1473,7 @@ export default function AttendancePage() {
                           checked={student.selected || false}
                           onChange={() => toggleStudentSelection(student.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 mt-0.5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded flex-shrink-0"
+                          className="h-5 w-5 mt-0.5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded flex-shrink-0"
                         />
                       )}
                     </div>
