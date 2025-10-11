@@ -1245,62 +1245,78 @@ ${dateTableEN}`;
         onClick={onClose}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm"></div>
         
         {/* Dialog */}
         <div 
-          className="relative bg-white rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
+          className="relative bg-white rounded-lg shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 id="student-modal-title" className="text-lg font-normal text-gray-800">
-              {t('select_student_title')}
-            </h2>
-            <button
-              onClick={onClose}
-              className="h-8 px-3 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm"
-              aria-label={t('close')}
-            >
-              {t('close')}
-            </button>
+          <div className="px-6 py-4 bg-[#0073ea] text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-white bg-opacity-20 rounded-lg">
+                  <MdPerson size={20} />
+                </div>
+                <div>
+                  <h2 id="student-modal-title" className="text-xl font-semibold">
+                    {t('select_student_title')}
+                  </h2>
+                  <p className="text-sm text-blue-100">
+                    {lang === 'es' ? 'Selecciona un estudiante para ver su reporte individual' : 'Select a student to view their individual report'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                aria-label={t('close')}
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Search */}
-          <div className="px-5 pt-4">
+          <div className="px-6 pt-4">
             <div className="relative">
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por nombre o instrumento..."
-                className="w-full rounded-md border border-gray-200 px-3 py-2 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder={lang === 'es' ? 'Buscar por nombre o instrumento...' : 'Search by name or instrument...'}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea]"
               />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">ESC</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">ESC</span>
             </div>
           </div>
 
           {/* List */}
-          <div className="px-5 pb-4 max-h-[60vh] overflow-y-auto">
+          <div className="px-6 pb-4 pt-2 max-h-[60vh] overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="py-10 text-center text-gray-500 text-sm">No se encontraron estudiantes</div>
+              <div className="py-10 text-center text-gray-500 text-sm">
+                {lang === 'es' ? 'No se encontraron estudiantes' : 'No students found'}
+              </div>
             ) : (
               <ul className="divide-y divide-gray-100">
                 {filtered.map((student) => (
                   <li key={student.id}>
                     <button
                       onClick={() => onSelect(student)}
-                      className="w-full text-left flex items-center gap-3 px-2 py-3 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none rounded-md"
+                      className="w-full text-left flex items-center gap-3 px-3 py-3 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none rounded-md transition-colors"
                     >
                       {/* Avatar iniciales */}
-                      <div className="flex-shrink-0 w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0073ea] bg-opacity-10 text-[#0073ea] flex items-center justify-center font-semibold text-sm">
                         {student.first_name?.[0]}{student.last_name?.[0]}
                       </div>
                       <div className="flex-1">
-                        <p className="font-normal text-gray-800 leading-tight">{student.first_name} {student.last_name}</p>
+                        <p className="font-medium text-gray-800 leading-tight">{student.first_name} {student.last_name}</p>
                         <p className="text-xs text-gray-500">{student.instrument}</p>
                       </div>
-                      <span className="text-xs text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md">{t('select')}</span>
+                      <span className="text-xs text-white bg-[#0073ea] px-3 py-1 rounded-md font-medium hover:bg-[#0060c0] transition-colors">
+                        {t('select')}
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -1309,12 +1325,12 @@ ${dateTableEN}`;
           </div>
 
           {/* Footer */}
-          <div className="px-5 py-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
             <button 
               onClick={onClose}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-md hover:bg-gray-100 text-sm"
+              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
             >
-              Cancelar
+              {lang === 'es' ? 'Cancelar' : 'Cancel'}
             </button>
           </div>
         </div>
