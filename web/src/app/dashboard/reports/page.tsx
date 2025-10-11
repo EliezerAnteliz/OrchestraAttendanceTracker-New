@@ -1331,9 +1331,9 @@ ${dateTableEN}`;
   }
 
   return (
-    <div className="space-y-6 px-2 sm:px-4">
+    <div className="max-w-5xl mx-auto space-y-6 px-2 sm:px-4">
       {/* Sección de Reportes de Asistencia */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 shadow-sm">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 shadow-sm w-full">
         <div className="flex items-center mb-6">
           <div className="p-2 bg-blue-100 rounded-lg mr-3">
             <MdPieChart className="text-blue-600" size={24} />
@@ -1582,8 +1582,7 @@ ${dateTableEN}`;
         
       {/* Sección separada para notificaciones de faltas (solo admin) */}
       {isAdmin && (
-        <div className="px-4">
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-lg p-6 shadow-sm">
+        <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-lg p-6 shadow-sm w-full">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-red-100 rounded-lg mr-3">
                 <MdEmail className="text-red-600" size={24} />
