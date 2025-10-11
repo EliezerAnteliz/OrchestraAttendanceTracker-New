@@ -533,7 +533,7 @@ export default function StudentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
-                          <div className="text-sm font-semibold text-black">
+                          <div className="text-sm text-black">
                             {student.first_name} {student.last_name}
                           </div>
                         </div>
