@@ -1354,7 +1354,6 @@ export default function AttendancePage() {
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('name')}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('instrument_label')}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{lang === 'es' ? 'Orquesta' : 'Orchestra'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('status')}</th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('attendance')}</th>
                   </tr>
                 </thead>
@@ -1393,19 +1392,12 @@ export default function AttendancePage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {student.orchestra ? (
-                            <span className="px-2 inline-flex text-xs font-semibold rounded-full bg-blue-50 text-[#0073ea]">
+                            <span className="px-2 inline-flex text-sm rounded-full bg-blue-50 text-[#0073ea]">
                               {student.orchestra.name}
                             </span>
                           ) : (
                             <span className="text-sm text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
                           )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-sm font-medium rounded-full ${
-                            student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {student.is_active ? t('active') : t('inactive')}
-                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {student.attendance_status ? (
