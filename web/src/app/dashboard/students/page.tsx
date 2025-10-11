@@ -546,7 +546,7 @@ export default function StudentsPage() {
                       <div className="text-sm font-medium text-black">{student.current_grade || t('not_assigned')}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      <span className={`px-2 inline-flex text-xs leading-5 rounded-full ${
                         student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {student.is_active !== false ? t('active') : t('inactive')}
