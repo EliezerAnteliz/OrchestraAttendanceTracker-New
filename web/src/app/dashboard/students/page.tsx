@@ -659,11 +659,11 @@ export default function StudentsPage() {
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#0073ea] text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
-                        <MdPerson size={20} className="sm:w-6 sm:h-6" />
+                        <MdVisibility size={20} className="sm:w-6 sm:h-6" />
                       </div>
                       <div>
                         <h2 className="text-lg sm:text-xl font-semibold">
@@ -1026,7 +1026,7 @@ export default function StudentsPage() {
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#0073ea] text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
