@@ -11,6 +11,7 @@ import { INVENTORY_SUPABASE_CONFIG } from '../../../../../../../supabase.invento
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdCheckCircle, MdWarning, MdError, MdRemoveCircle } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 
 interface AuditSession {
@@ -30,6 +31,7 @@ interface ReportData {
 
 export default function AuditReportPage() {
   const { t, lang } = useI18n();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -42,6 +44,14 @@ export default function AuditReportPage() {
   useEffect(() => {
     loadReport();
   }, [sessionId]);
+
+  // Decisión ya tomada: solo Admin audita — si Staff/Viewer llega aquí por
+  // URL directa, lo regresamos al Dashboard.
+  useEffect(() => {
+    if (!roleLoading && !isAdmin) {
+      router.replace('/dashboard/inventory');
+    }
+  }, [roleLoading, isAdmin, router]);
 
   async function loadReport() {
     try {
@@ -116,6 +126,14 @@ export default function AuditReportPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  if (roleLoading || !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+      </div>
+    );
   }
 
   if (loading) {
