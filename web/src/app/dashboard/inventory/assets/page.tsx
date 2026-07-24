@@ -14,6 +14,7 @@ import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdFilterList, MdSearch, MdWarning, MdAdd, MdFileDownload } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -87,6 +88,7 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function AssetsListPage() {
   const { t } = useI18n();
+  const { isAdmin } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -425,13 +427,15 @@ export default function AssetsListPage() {
               <MdFileDownload size={20} />
               {t('inv_export_excel_button')}
             </button>
-            <button
-              onClick={() => router.push('/dashboard/inventory/assets/new')}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
-            >
-              <MdAdd size={20} />
-              {t('inv_new_asset_button')}
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => router.push('/dashboard/inventory/assets/new')}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+              >
+                <MdAdd size={20} />
+                {t('inv_new_asset_button')}
+              </button>
+            )}
           </div>
         </div>
         {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
