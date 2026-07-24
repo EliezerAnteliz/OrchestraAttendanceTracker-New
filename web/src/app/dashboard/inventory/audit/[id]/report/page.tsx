@@ -7,15 +7,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../../../supabase.inventory.config';
+import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdCheckCircle, MdWarning, MdError, MdRemoveCircle } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 
-const inventorySupabase = createClient(
-  INVENTORY_SUPABASE_CONFIG.url,
-  INVENTORY_SUPABASE_CONFIG.anonKey
-);
 
 interface AuditSession {
   id: string;
