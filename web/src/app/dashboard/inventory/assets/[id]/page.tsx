@@ -13,6 +13,7 @@ import { INVENTORY_SUPABASE_CONFIG } from '../../../../../../supabase.inventory.
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdSave, MdWarning, MdDelete, MdHistory, MdAdd } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -74,6 +75,7 @@ interface MaintenanceEvent {
 
 export default function AssetDetailPage() {
   const { t, lang } = useI18n();
+  const { isAdmin } = useUserRole();
   const router = useRouter();
   const params = useParams();
   const assetId = params.id as string;
@@ -429,7 +431,7 @@ export default function AssetDetailPage() {
               <p className="text-xl font-mono text-[#0073ea] mt-1">{asset.full_code}</p>
             )}
           </div>
-          {asset?.is_active && asset?.status_code !== 'retired' ? (
+          {isAdmin && (asset?.is_active && asset?.status_code !== 'retired' ? (
             <button
               onClick={() => setShowRetireModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -445,7 +447,7 @@ export default function AssetDetailPage() {
               <MdHistory size={20} />
               {t('inv_reactivate_button')}
             </button>
-          )}
+          ))}
         </div>
         {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
           <div className="mt-2 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
@@ -544,8 +546,12 @@ export default function AssetDetailPage() {
         </div>
       </div>
 
-      {/* Formulario Editable */}
+      {/* Formulario Editable — Staff/Viewer lo ven en solo lectura (fieldset
+          disabled deshabilita todos los campos/controles de adentro de una
+          vez), consistente con el RLS real: solo Admin puede escribir en
+          `assets`. */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      <fieldset disabled={!isAdmin} className="contents">
         {/* Información del Activo */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
@@ -708,6 +714,7 @@ export default function AssetDetailPage() {
             placeholder={t('inv_notes_placeholder')}
           />
         </div>
+      </fieldset>
 
         {/* Botones */}
         <div className="flex gap-4 justify-end flex-wrap pt-4 border-t">
@@ -719,14 +726,16 @@ export default function AssetDetailPage() {
           >
             {t('cancel')}
           </button>
-          <button
-            type="submit"
-            disabled={saving || !asset?.is_active}
-            className="flex items-center gap-2 px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:bg-gray-400"
-          >
-            <MdSave size={20} />
-            {saving ? t('saving') : t('inv_save_changes_button')}
-          </button>
+          {isAdmin && (
+            <button
+              type="submit"
+              disabled={saving || !asset?.is_active}
+              className="flex items-center gap-2 px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:bg-gray-400"
+            >
+              <MdSave size={20} />
+              {saving ? t('saving') : t('inv_save_changes_button')}
+            </button>
+          )}
         </div>
       </form>
 
@@ -737,13 +746,15 @@ export default function AssetDetailPage() {
             <MdHistory size={24} />
             {t('inv_maintenance_history_header')}
           </h2>
-          <button
-            onClick={() => setShowMaintenanceModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
-          >
-            <MdAdd size={20} />
-            {t('inv_add_event_button')}
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowMaintenanceModal(true)}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+            >
+              <MdAdd size={20} />
+              {t('inv_add_event_button')}
+            </button>
+          )}
         </div>
 
         {maintenanceEvents.length === 0 ? (
