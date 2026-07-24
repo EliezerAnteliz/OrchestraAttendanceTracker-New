@@ -12,17 +12,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
+import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdUpload, MdWarning, MdCheckCircle, MdError, MdExpandMore, MdDownload } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
 
 // Cliente de Supabase para ambiente de prueba
-const inventorySupabase = createClient(
-  INVENTORY_SUPABASE_CONFIG.url,
-  INVENTORY_SUPABASE_CONFIG.anonKey
-);
 
 interface ImportRow {
   rowNumber: number;
