@@ -13,6 +13,7 @@ import { INVENTORY_SUPABASE_CONFIG } from '../../../../../../supabase.inventory.
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdSave, MdWarning } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -36,6 +37,7 @@ interface Program {
 
 export default function NewAssetPage() {
   const { t } = useI18n();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,6 +82,15 @@ export default function NewAssetPage() {
   useEffect(() => {
     loadCatalogs();
   }, []);
+
+  // Solo Admin puede crear activos (RLS ya lo exige) — si Staff/Viewer llega
+  // aquí por URL directa, lo regresamos al Listado en vez de dejarlo ver un
+  // formulario que igual va a fallar al guardar.
+  useEffect(() => {
+    if (!roleLoading && !isAdmin) {
+      router.replace('/dashboard/inventory/assets');
+    }
+  }, [roleLoading, isAdmin, router]);
 
   useEffect(() => {
     // Derivar ubicación/área cuando se selecciona un programa (sede)
@@ -350,7 +361,7 @@ export default function NewAssetPage() {
     }
   }
 
-  if (loading) {
+  if (loading || roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
