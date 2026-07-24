@@ -82,13 +82,26 @@ export function useUserRole() {
   const canViewOnly = userRole === 'viewer';
   
   // Funciones para cambiar la vista (solo para admins)
+  // IMPORTANTE: se escribe a localStorage aquí mismo, de forma síncrona,
+  // ANTES de llamar a reload() — antes se dejaba ese guardado al useEffect
+  // que observa `viewingAsRole`, pero React no garantiza que ese efecto
+  // alcance a correr antes de que el navegador empiece a descargar la
+  // página por el reload(), así que a veces el valor nuevo no quedaba
+  // guardado a tiempo y el badge "Viendo como" no aparecía hasta la
+  // siguiente navegación (bug reportado 24/07).
   const switchToRole = (role: UserRole) => {
     if (actualUserRole === 'admin') {
       if (role === actualUserRole) {
         // Si selecciona su rol actual, resetear la vista
         setViewingAsRole(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin_viewing_as_role');
+        }
       } else {
         setViewingAsRole(role);
+        if (typeof window !== 'undefined' && role) {
+          localStorage.setItem('admin_viewing_as_role', role);
+        }
       }
       // Refrescar la página para aplicar cambios inmediatamente
       if (typeof window !== 'undefined') {
@@ -96,9 +109,12 @@ export function useUserRole() {
       }
     }
   };
-  
+
   const resetToActualRole = () => {
     setViewingAsRole(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('admin_viewing_as_role');
+    }
     // Refrescar la página para aplicar cambios inmediatamente
     if (typeof window !== 'undefined') {
       window.location.reload();

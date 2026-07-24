@@ -13,12 +13,15 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* NOTA (24/07): se quitó el @media (prefers-color-scheme: dark) que venía
+   por defecto de create-next-app. Esta app es 100% tema claro (bg-white en
+   todas las pantallas) — ese bloque solo hacía que --foreground pasara a
+   #ededed (casi blanco) para cualquier usuario con el sistema en modo
+   oscuro, lo cual es invisible/gris sobre fondo blanco en cualquier texto
+   que no tenga una clase de color de Tailwind explícita (ej. el dropdown
+   de RoleSwitcher). Causa raíz del reporte de "letras grises que no se
+   leen" — no era un problema de un componente puntual, sino de este
+   leftover global. */
 
 body {
   background: var(--background);

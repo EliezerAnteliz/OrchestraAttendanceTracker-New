@@ -90,7 +90,7 @@ export default function RoleSwitcher() {
                 <button
                   key={role}
                   onClick={() => handleRoleSelect(role)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 transition-colors ${
                     currentRole === role ? 'bg-gray-100 font-medium' : ''
                   }`}
                 >
