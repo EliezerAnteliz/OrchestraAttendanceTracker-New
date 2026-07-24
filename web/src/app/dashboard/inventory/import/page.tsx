@@ -17,6 +17,7 @@ import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdArrowBack, MdUpload, MdWarning, MdCheckCircle, MdError, MdExpandMore, MdDownload } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -51,6 +52,7 @@ interface ImportResult {
 
 export default function ImportInventoryPage() {
   const { t } = useI18n();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -84,6 +86,14 @@ export default function ImportInventoryPage() {
   useEffect(() => {
     loadCatalogs();
   }, []);
+
+  // Solo Admin puede importar (RLS ya lo exige para INSERT en `assets`) — si
+  // Staff/Viewer llega aquí por URL directa, lo regresamos al Listado.
+  useEffect(() => {
+    if (!roleLoading && !isAdmin) {
+      router.replace('/dashboard/inventory/assets');
+    }
+  }, [roleLoading, isAdmin, router]);
 
   async function loadCatalogs() {
     try {
@@ -586,6 +596,14 @@ export default function ImportInventoryPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (roleLoading || !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+      </div>
+    );
   }
 
   return (
