@@ -17,7 +17,7 @@
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
     "html5-qrcode": "^2.3.8",
-    "next": "15.4.6",
+    "next": "15.4.10",
     "react": "19.1.0",
     "react-datepicker": "^8.4.0",
     "react-dom": "19.1.0",
@@ -33,7 +33,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.4.6",
+    "eslint-config-next": "15.4.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
