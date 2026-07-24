@@ -11,6 +11,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { ProgramProvider, useProgram } from '@/contexts/ProgramContext';
 import { supabase } from '@/lib/supabase';
 import { useUserRole } from '@/hooks/useUserRole';
+import { UserRoleProvider } from '@/contexts/UserRoleContext';
 
 const sidebarItems = [
   { key: 'menu_dashboard', href: '/dashboard', icon: <MdDashboard size={24} /> },
@@ -258,7 +259,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <AuthProvider>
       <ProtectedRoute>
         <ProgramProvider>
-          <DashboardContent>{children}</DashboardContent>
+          {/* Una sola instancia de estado de rol para toda la app — antes
+              cada componente que llamaba useUserRole() (Sidebar, layout de
+              Inventario, páginas individuales) creaba su propia copia
+              independiente, lo que causó un caso real donde "viendo como
+              Staff" se reflejaba en un componente pero no en otro. */}
+          <UserRoleProvider>
+            <DashboardContent>{children}</DashboardContent>
+          </UserRoleProvider>
         </ProgramProvider>
       </ProtectedRoute>
     </AuthProvider>
