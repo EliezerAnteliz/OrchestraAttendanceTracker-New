@@ -14,15 +14,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { createClient } from '@supabase/supabase-js';
-import { INVENTORY_SUPABASE_CONFIG } from '../../../../../../supabase.inventory.config';
+import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdClose, MdCheckCircle, MdWarning, MdError } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 
-const inventorySupabase = createClient(
-  INVENTORY_SUPABASE_CONFIG.url,
-  INVENTORY_SUPABASE_CONFIG.anonKey
-);
 
 interface BarcodeScannerProps {
   sessionId: string;
