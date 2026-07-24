@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { MdDashboard, MdPeople, MdAssignment, MdInsertChart, MdLogout, MdMenu, MdClose, MdRefresh, MdMusicNote } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdAssignment, MdInsertChart, MdLogout, MdMenu, MdClose, MdRefresh, MdMusicNote, MdInventory } from 'react-icons/md';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useI18n } from '@/contexts/I18nContext';
@@ -18,6 +18,7 @@ const sidebarItems = [
   { key: 'menu_attendance', href: '/dashboard/attendance', icon: <MdAssignment size={24} /> },
   { key: 'menu_orchestras', href: '/dashboard/orchestras', icon: <MdMusicNote size={24} /> },
   { key: 'menu_reports', href: '/dashboard/reports', icon: <MdInsertChart size={24} /> },
+  { key: 'menu_inventory', href: '/dashboard/inventory', icon: <MdInventory size={24} /> },
 ];
 
 function ProgramSwitcher() {
@@ -244,10 +245,8 @@ function DashboardContent({ children }: { children: ReactNode }) {
           ) : null}
         </header>
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main className="flex-1 overflow-y-auto bg-gray-50">
+          {children}
         </main>
       </div>
     </div>
