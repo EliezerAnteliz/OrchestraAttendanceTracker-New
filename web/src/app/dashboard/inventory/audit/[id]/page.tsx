@@ -15,6 +15,7 @@ import ManualSelector from './ManualSelector';
 import PhotoOCR from './PhotoOCR';
 import AssetConfirmModal from './AssetConfirmModal';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 
 interface AuditSession {
@@ -63,6 +64,7 @@ interface PendingConfirm {
 
 export default function AuditSessionPage() {
   const { t } = useI18n();
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const router = useRouter();
   const params = useParams();
   const sessionId = params.id as string;
@@ -103,6 +105,14 @@ export default function AuditSessionPage() {
       router.push(`/dashboard/inventory/audit/${sessionId}/report`);
     }
   }, [session, sessionId, router]);
+
+  // Decisión ya tomada: solo Admin audita — si Staff/Viewer llega aquí por
+  // URL directa, lo regresamos al Dashboard.
+  useEffect(() => {
+    if (!roleLoading && !isAdmin) {
+      router.replace('/dashboard/inventory');
+    }
+  }, [roleLoading, isAdmin, router]);
 
   // Cargar el total de activos esperados de esta sede en cuanto se conoce
   // el program_id de la sesión (se necesita session.program_id, por eso va
@@ -382,6 +392,14 @@ export default function AuditSessionPage() {
       setError(err.message || t('inv_error_closing_session'));
       setLoading(false);
     }
+  }
+
+  if (roleLoading || !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+      </div>
+    );
   }
 
   if (loading && !session) {
