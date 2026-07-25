@@ -34,6 +34,12 @@ interface Program {
   name: string;
 }
 
+interface StudentOption {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
 
 export default function NewAssetPage() {
   const { t } = useI18n();
@@ -52,7 +58,10 @@ export default function NewAssetPage() {
   const [classes, setClasses] = useState<Catalog[]>([]);
   const [characteristics, setCharacteristics] = useState<Characteristic[]>([]);
   const [programs, setPrograms] = useState<Program[]>([]);
-  
+  const [programStudents, setProgramStudents] = useState<StudentOption[]>([]);
+  // true = "Asignado a" está en modo texto libre (no-estudiante, ej. "Terranova")
+  const [assignToOther, setAssignToOther] = useState(false);
+
   // Tipo de activo
   const [assetType, setAssetType] = useState<'sede' | 'admin' | ''>('');
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -75,6 +84,7 @@ export default function NewAssetPage() {
     status_code: 'available',
     current_program_id: '',
     assigned_to_text: '',
+    assigned_student_id: '',
     owner: '',
     notes: '',
   });
@@ -82,6 +92,31 @@ export default function NewAssetPage() {
   useEffect(() => {
     loadCatalogs();
   }, []);
+
+  // Estudiantes activos del programa/sede seleccionado, para el selector de
+  // "Asignado a" — se recarga cada vez que cambia la sede del activo.
+  useEffect(() => {
+    async function loadProgramStudents() {
+      if (!formData.current_program_id) {
+        setProgramStudents([]);
+        return;
+      }
+      const { data, error } = await inventorySupabase
+        .from('students')
+        .select('id, first_name, last_name')
+        .eq('program_id', formData.current_program_id)
+        .eq('is_active', true)
+        .order('first_name');
+
+      if (error) {
+        console.error('Error loading students for program:', error);
+        setProgramStudents([]);
+        return;
+      }
+      setProgramStudents(data || []);
+    }
+    loadProgramStudents();
+  }, [formData.current_program_id]);
 
   // Solo Admin puede crear activos (RLS ya lo exige) — si Staff/Viewer llega
   // aquí por URL directa, lo regresamos al Listado en vez de dejarlo ver un
@@ -306,7 +341,10 @@ export default function NewAssetPage() {
         estimated_cost: formData.estimated_cost ? parseFloat(formData.estimated_cost) : null,
         status_code: formData.status_code,
         current_program_id: formData.current_program_id || null,
-        assigned_to_text: formData.assigned_to_text || null,
+        assigned_student_id: formData.assigned_student_id || null,
+        // Si hay un estudiante enlazado, el texto libre no aplica (evita
+        // que quede un texto viejo desincronizado del enlace real).
+        assigned_to_text: formData.assigned_student_id ? null : (formData.assigned_to_text || null),
         owner: formData.owner || null,
         notes: formData.notes || null,
         is_active: true,
@@ -416,9 +454,11 @@ export default function NewAssetPage() {
                   status_code: 'available',
                   current_program_id: '',
                   assigned_to_text: '',
+                  assigned_student_id: '',
                   owner: '',
                   notes: '',
                 });
+                setAssignToOther(false);
                 setAssetType('');
                 setShowAdvanced(false);
                 // Los valores por defecto se reasignarán automáticamente por el useEffect
@@ -803,18 +843,47 @@ export default function NewAssetPage() {
               </p>
             </div>
 
-            {/* Asignado a (texto libre) */}
+            {/* Asignado a */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('inv_assigned_to_freetext_label')}
               </label>
-              <input
-                type="text"
-                value={formData.assigned_to_text}
-                onChange={(e) => setFormData({ ...formData, assigned_to_text: e.target.value })}
+              <select
+                value={assignToOther ? '__other__' : (formData.assigned_student_id || '')}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '__other__') {
+                    setAssignToOther(true);
+                    setFormData({ ...formData, assigned_student_id: '' });
+                  } else if (val === '') {
+                    setAssignToOther(false);
+                    setFormData({ ...formData, assigned_student_id: '', assigned_to_text: '' });
+                  } else {
+                    setAssignToOther(false);
+                    setFormData({ ...formData, assigned_student_id: val, assigned_to_text: '' });
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                placeholder={t('inv_assigned_to_placeholder_short')}
-              />
+                disabled={!formData.current_program_id}
+              >
+                <option value="">{t('inv_unassigned')}</option>
+                {programStudents.map((s) => (
+                  <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
+                ))}
+                <option value="__other__">{t('inv_assigned_other_option')}</option>
+              </select>
+              {!formData.current_program_id && (
+                <p className="text-xs text-gray-500 mt-1">{t('inv_assigned_to_needs_site')}</p>
+              )}
+              {assignToOther && (
+                <input
+                  type="text"
+                  value={formData.assigned_to_text}
+                  onChange={(e) => setFormData({ ...formData, assigned_to_text: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 mt-2"
+                  placeholder={t('inv_assigned_to_placeholder_short')}
+                />
+              )}
               <p className="text-xs text-gray-500 mt-1">
                 {t('inv_assigned_to_hint')}
               </p>

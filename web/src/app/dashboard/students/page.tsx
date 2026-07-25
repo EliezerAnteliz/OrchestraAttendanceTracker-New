@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdVisibility, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -41,6 +41,9 @@ export default function StudentsPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editFormData, setEditFormData] = useState<any>(null);
   const [orchestras, setOrchestras] = useState<any[]>([]);
+  // Activos de Inventario enlazados a este estudiante (assigned_student_id) —
+  // instrumento físico real, no el texto declarado en el propio estudiante.
+  const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
   const [showNewStudentModal, setShowNewStudentModal] = useState(false);
   const [newStudentData, setNewStudentData] = useState({
     first_name: '',
@@ -194,6 +197,23 @@ export default function StudentsPage() {
 
       setOrchestras(orchestrasData || []);
 
+      // Instrumento(s) real(es) de Inventario enlazados a este estudiante.
+      // Falla en silencio (deja la lista vacía) si la columna aún no existe
+      // en este ambiente o si el estudiante no tiene nada enlazado — no debe
+      // bloquear la carga del resto del perfil.
+      try {
+        const { data: assetsData, error: assetsError } = await supabase
+          .from('assets')
+          .select('id, full_code, description, brand, size, status_code')
+          .eq('assigned_student_id', studentId)
+          .eq('is_active', true);
+        if (assetsError) throw assetsError;
+        setLinkedAssets(assetsData || []);
+      } catch (assetsErr) {
+        console.error('Error fetching linked inventory assets:', assetsErr);
+        setLinkedAssets([]);
+      }
+
       const details = {
         ...studentData,
         orchestra_name: orchestraData?.name || null,
@@ -221,6 +241,7 @@ export default function StudentsPage() {
     setStudentDetails(null);
     setIsEditMode(false);
     setEditFormData(null);
+    setLinkedAssets([]);
   };
 
   const handleEditClick = () => {
@@ -664,21 +685,29 @@ export default function StudentsPage() {
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-                        <MdVisibility size={20} className="sm:w-6 sm:h-6 text-[#0073ea]" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0073ea] rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base flex-shrink-0">
+                        {`${selectedStudent?.first_name?.charAt(0) || ''}${selectedStudent?.last_name?.charAt(0) || ''}`.toUpperCase()}
                       </div>
                       <div>
                         <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                           {selectedStudent?.first_name} {selectedStudent?.last_name}
                         </h2>
-                        <p className="text-xs sm:text-sm text-gray-500">
-                          {t('student_profile')}
-                        </p>
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-0.5">
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            {t('student_profile')}
+                          </p>
+                          {selectedStudent?.instrument && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <MdMusicNote size={12} />
+                              {selectedStudent.instrument}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <button
                       onClick={closeDrawer}
-                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                     >
                       <MdClose size={20} className="sm:w-6 sm:h-6" />
                     </button>
@@ -693,13 +722,14 @@ export default function StudentsPage() {
                     </div>
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       {/* Información Personal */}
                       <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
                         <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                           <MdPerson className="mr-2 text-blue-600" size={18} />
                           {t('personal_info')}
                         </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('first_name')}
@@ -798,7 +828,7 @@ export default function StudentsPage() {
                           <MdMusicNote className="mr-2 text-purple-600" size={18} />
                           {t('orchestra_info')}
                         </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('instrument')}
@@ -874,6 +904,27 @@ export default function StudentsPage() {
                             )}
                           </div>
                         </div>
+                        {!isEditMode && linkedAssets.length > 0 && (
+                          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              {t('inv_linked_instrument_label')}
+                            </p>
+                            <div className="space-y-2">
+                              {linkedAssets.map((asset) => (
+                                <div key={asset.id} className="flex items-center gap-2 bg-white rounded-md p-2 border border-gray-200">
+                                  <MdMusicNote className="text-purple-600 flex-shrink-0" size={16} />
+                                  <div className="text-sm">
+                                    <span className="font-semibold text-gray-900">{asset.description}</span>
+                                    {asset.brand && <span className="text-gray-500"> · {asset.brand}</span>}
+                                    {asset.size && <span className="text-gray-500"> · {asset.size}</span>}
+                                    {asset.full_code && <span className="text-gray-400 font-mono text-xs ml-1">#{asset.full_code}</span>}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       </div>
 
                       {/* Información de Padres */}

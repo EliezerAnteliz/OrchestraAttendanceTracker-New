@@ -155,6 +155,7 @@ const translations: Translations = {
   not_specified: { es: "No especificado", en: "Not specified" },
 
   orchestra_info: { es: "Información de Orquesta", en: "Orchestra Information" },
+  orchestra: { es: "Orquesta", en: "Orchestra" },
   instrument: { es: "Instrumento", en: "Instrument" },
   instrument_size: { es: "Tamaño del Instrumento", en: "Instrument Size" },
   position: { es: "Posición", en: "Position" },
@@ -512,6 +513,9 @@ const translations: Translations = {
   inv_confirm_belongs_to: { es: "Pertenece a:", en: "Belongs to:" },
   inv_close_without_confirming: { es: "Cerrar sin confirmar", en: "Close without confirming" },
   inv_assigned_to: { es: "Asignado a", en: "Assigned to" },
+  inv_assigned_other_option: { es: "Otro (no es estudiante)", en: "Other (not a student)" },
+  inv_linked_instrument_label: { es: "Instrumento de Inventario (enlace real)", en: "Inventory instrument (real link)" },
+  inv_assigned_to_needs_site: { es: "Selecciona primero un programa/sede para poder buscar estudiantes.", en: "Select a program/site first to search students." },
   inv_mark_unassigned: { es: "Marcar como sin asignar", en: "Mark as unassigned" },
   inv_assigned_to_placeholder: { es: "Nombre del estudiante, proveedor, etc. (vacío = sin asignar)", en: "Student name, vendor, etc. (empty = unassigned)" },
   inv_system_said: { es: "En el sistema decía:", en: "System had:" },
