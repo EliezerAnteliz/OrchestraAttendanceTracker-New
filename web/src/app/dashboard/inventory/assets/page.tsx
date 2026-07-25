@@ -31,6 +31,7 @@ interface Asset {
   status_code: string;
   current_program_id: string | null;
   assigned_to_text: string | null;
+  assigned_student_id: string | null;
   notes: string | null;
   is_active: boolean;
   created_at: string;
@@ -43,6 +44,22 @@ interface Asset {
   current_program?: {
     name: string;
   } | null;
+  assigned_student?: {
+    first_name: string;
+    last_name: string;
+  } | null;
+}
+
+// Un activo puede estar asignado a un estudiante real (assigned_student_id,
+// enlace verdadero) o a texto libre (assigned_to_text, para no-estudiantes o
+// mientras se completa la vinculación) — nunca ambos a la vez. Esta función
+// centraliza esa prioridad para no repetirla en cada lugar que muestra
+// "a quién está asignado" (tabla, exportación a Excel, etc.).
+function getAssignedToDisplay(asset: Asset): string {
+  if (asset.assigned_student) {
+    return `${asset.assigned_student.first_name} ${asset.assigned_student.last_name}`;
+  }
+  return asset.assigned_to_text || '';
 }
 
 interface AssetLocation {
@@ -242,6 +259,7 @@ export default function AssetsListPage() {
           status_code,
           current_program_id,
           assigned_to_text,
+          assigned_student_id,
           notes,
           created_at,
           is_active,
@@ -249,7 +267,8 @@ export default function AssetsListPage() {
           asset_status:status_code(description),
           asset_groups:group_id(name),
           asset_sources:source_id(name),
-          current_program:current_program_id(name)
+          current_program:current_program_id(name),
+          assigned_student:assigned_student_id(first_name, last_name)
         `, { count: 'exact' });
 
       // Aplicar filtros
@@ -305,12 +324,14 @@ export default function AssetsListPage() {
         const assetStatusNormalized = Array.isArray(asset.asset_status) ? asset.asset_status[0] : asset.asset_status;
         const assetGroupsNormalized = Array.isArray(asset.asset_groups) ? asset.asset_groups[0] : asset.asset_groups;
         const currentProgramNormalized = Array.isArray(asset.current_program) ? asset.current_program[0] : asset.current_program;
-        
+        const assignedStudentNormalized = Array.isArray(asset.assigned_student) ? asset.assigned_student[0] : asset.assigned_student;
+
         return {
           ...asset,
           asset_status: assetStatusNormalized,
           asset_groups: assetGroupsNormalized,
           current_program: currentProgramNormalized,
+          assigned_student: assignedStudentNormalized,
         };
       });
 
@@ -352,7 +373,7 @@ export default function AssetsListPage() {
       'Tamaño': asset.size || '',
       'Procedencia': (asset as any).asset_sources?.name || '',
       'Estado': asset.asset_status?.description || '',
-      'Asignado a': asset.assigned_to_text || '',
+      'Asignado a': getAssignedToDisplay(asset),
       'Programa': asset.current_program?.name || '',
       'Owner': asset.owner || '',
       'Costo Estimado': asset.estimated_cost || '',
@@ -704,7 +725,7 @@ export default function AssetsListPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      {asset.assigned_to_text || '-'}
+                      {getAssignedToDisplay(asset) || '-'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {asset.current_program?.name || '-'}
