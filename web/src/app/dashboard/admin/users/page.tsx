@@ -2,10 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from '@/lib/supabase';
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { useI18n } from "@/contexts/I18nContext";
 import { useProgram } from "@/contexts/ProgramContext";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useRouter } from "next/navigation";
 import { MdAdd, MdEdit, MdDelete, MdWarning, MdRefresh, MdToggleOn, MdToggleOff, MdClose, MdPeople, MdCancel, MdSave } from 'react-icons/md';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 type Program = { id: string; name: string; organization_id: string };
 
@@ -26,6 +36,13 @@ type UserProfile = {
 
 export default function AdminUsersPage() {
   const { t } = useI18n();
+  const router = useRouter();
+  // Esta pantalla no tenía NINGÚN candado de rol a nivel de página (a
+  // diferencia de Inventario, donde sí se agregó) — cualquier usuario con
+  // sesión iniciada podía entrar por URL directa y ver/gestionar usuarios,
+  // aunque el RLS del lado de la base de datos bloqueara las escrituras
+  // reales. Mismo patrón ya usado en inventory/assets/new/page.tsx.
+  const { isAdmin, loading: roleLoading } = useUserRole();
   const [loading, setLoading] = useState(true);
   const { programs, refreshPrograms, loading: programsLoading } = useProgram();
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
@@ -74,6 +91,12 @@ export default function AdminUsersPage() {
       setSelectedProgramId(programs[0].id);
     }
   }, [programs, selectedProgramId]);
+
+  useEffect(() => {
+    if (!roleLoading && !isAdmin) {
+      router.replace('/dashboard');
+    }
+  }, [roleLoading, isAdmin, router]);
 
   const loadMembers = async () => {
     if (!selectedProgramId) return;
@@ -235,41 +258,28 @@ export default function AdminUsersPage() {
           })
           .eq('user_id', userId);
       } else {
-        // Create new user
+        // Crear usuario nuevo vía invitación por correo (server-side, la
+        // única forma de usar auth.admin.* — ver comentario en
+        // /api/admin/users/invite-user/route.ts sobre por qué ya no se usa
+        // signUp() con una contraseña fija "123456").
         isNewUser = true;
-        const { data: currentSession } = await supabase.auth.getSession();
-        
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password: '123456',
-          options: {
-            emailRedirectTo: undefined,
-            data: {
-              organization_id: selectedOrganizationId,
-              program_id: selectedProgramIds[0],
-              role: role,
-              full_name: fullName || email.split('@')[0]
-            }
-          }
+
+        const res = await fetch('/api/admin/users/invite-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            full_name: fullName || email.split('@')[0],
+            organization_id: selectedOrganizationId,
+            role,
+            program_id: selectedProgramIds[0],
+          }),
         });
-
-        // Restore admin session
-        if (currentSession?.session && authData.user && !authError) {
-          await supabase.auth.setSession(currentSession.session);
+        const inviteResult = await res.json();
+        if (!res.ok) {
+          throw new Error(inviteResult?.error || 'No se pudo invitar al usuario');
         }
-
-        if (authError?.message.includes('User already registered')) {
-          // Handle existing auth user without profile
-          const { data: authUsers } = await supabase.auth.admin.listUsers();
-          const existingAuthUser = authUsers?.users?.find(u => u.email === email);
-          if (existingAuthUser) {
-            userId = existingAuthUser.id;
-          }
-        } else if (!authError && authData.user) {
-          userId = authData.user.id;
-        } else if (authError) {
-          throw authError;
-        }
+        userId = inviteResult.user_id;
 
         // Create user profile
         if (userId) {
@@ -308,8 +318,8 @@ export default function AdminUsersPage() {
           throw membershipError;
         }
 
-        const successMessage = isNewUser 
-          ? `Usuario creado exitosamente. Password temporal: 123456`
+        const successMessage = isNewUser
+          ? `Usuario invitado exitosamente. Le llegará un correo a ${email} para que cree su propia contraseña.`
           : `Usuario actualizado exitosamente. Los programas y rol han sido actualizados.`;
         setSuccess(successMessage);
         
@@ -372,26 +382,26 @@ export default function AdminUsersPage() {
       
       console.log("AdminUsers: user profile deleted successfully", deletedProfile);
 
-      // Try to delete from Supabase Auth using service role (optional)
+      // Borrar la cuenta de Supabase Auth vía la ruta de servidor (la
+      // service role key no puede vivir en el navegador — ver comentario
+      // en /api/admin/users/delete-auth-user/route.ts). Antes esto llamaba
+      // getSupabaseAdmin() directo desde este componente "use client" y
+      // fallaba en silencio: el perfil se borraba pero la cuenta de Auth
+      // quedaba viva para siempre.
       try {
-        const supabaseAdmin = getSupabaseAdmin();
-        if (supabaseAdmin) {
-          const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(user.user_id);
-          if (authError) {
-            console.warn("AdminUsers: Could not delete from auth:", authError);
-          } else {
-            console.log("AdminUsers: user deleted from auth successfully");
-          }
+        const res = await fetch('/api/admin/users/delete-auth-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.user_id }),
+        });
+        const result = await res.json();
+        if (!res.ok) {
+          console.warn("AdminUsers: Could not delete from auth:", result?.error);
         } else {
-          console.warn("AdminUsers: No admin client available - user not deleted from auth");
+          console.log("AdminUsers: user deleted from auth successfully");
         }
       } catch (authErr: any) {
-        // Don't throw error if service role key is missing - this is expected in many setups
-        if (authErr?.message?.includes('SUPABASE_SERVICE_ROLE_KEY')) {
-          console.warn("AdminUsers: Service role key not configured - user must be deleted manually from Supabase Auth panel");
-        } else {
-          console.error("AdminUsers: Auth deletion failed:", authErr);
-        }
+        console.error("AdminUsers: Auth deletion failed:", authErr);
       }
 
       // Refresh the user list
@@ -661,7 +671,7 @@ export default function AdminUsersPage() {
   };
 
 
-  if (loading || programsLoading) {
+  if (loading || programsLoading || roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -1041,7 +1051,17 @@ export default function AdminUsersPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-black">{t('confirm_deletion')}</h3>
               </div>
-              <div className="text-black mb-6" dangerouslySetInnerHTML={{ __html: t('delete_user_confirmation', { email: deletingUser.email }) }} />
+              <div
+                className="text-black mb-6"
+                dangerouslySetInnerHTML={{
+                  // El email se escapa antes de interpolarse en el string de
+                  // traducción (que trae <strong> literal para resaltarlo) —
+                  // t() hace un replace() simple sin escapar, así que sin esto
+                  // un email con caracteres HTML se ejecutaría en el navegador
+                  // del Admin que abre este modal.
+                  __html: t('delete_user_confirmation', { email: escapeHtml(deletingUser.email) }),
+                }}
+              />
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
