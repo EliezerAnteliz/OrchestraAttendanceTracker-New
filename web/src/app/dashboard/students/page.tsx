@@ -135,10 +135,10 @@ export default function StudentsPage() {
     setFilteredStudents(result);
   }, [searchQuery, showActiveOnly, selectedInstrument, students]);
 
-  const fetchStudentDetails = async (studentId: string) => {
+  const fetchStudentDetails = async (studentId: string, silent = false) => {
     try {
-      setLoadingDetails(true);
-      
+      if (!silent) setLoadingDetails(true);
+
       // Obtener información del estudiante
       const { data: studentData, error: studentError } = await supabase
         .from('students')
@@ -289,9 +289,10 @@ export default function StudentsPage() {
         }
       }
 
-      // Recargar datos
+      // Recargar datos (silent: evita el parpadeo del spinner de pantalla completa
+      // sobre el modal ya abierto, ya que solo estamos refrescando, no abriendo)
       await fetchStudents();
-      await fetchStudentDetails(selectedStudent.id);
+      await fetchStudentDetails(selectedStudent.id, true);
       setIsEditMode(false);
     } catch (error) {
       console.error('Error updating student:', error);
