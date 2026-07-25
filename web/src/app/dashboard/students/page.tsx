@@ -50,6 +50,9 @@ export default function StudentsPage() {
     last_name: '',
     age: '',
     current_grade: '',
+    // asset_id: '' = sin instrumento, '__other__' = texto libre (no está en
+    // inventario todavía), un uuid = activo real de Inventario enlazado.
+    asset_id: '',
     instrument: '',
     instrument_size: '',
     orchestra_position: '',
@@ -59,6 +62,38 @@ export default function StudentsPage() {
     parent_email: ''
   });
   const [savingNewStudent, setSavingNewStudent] = useState(false);
+  // Instrumentos de Inventario disponibles (sin asignar) para el programa
+  // activo — se ofrecen para enlazar al crear un estudiante en vez de
+  // escribir el nombre del instrumento como texto suelto.
+  const [availableAssets, setAvailableAssets] = useState<any[]>([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+
+  useEffect(() => {
+    const fetchAvailableAssets = async () => {
+      if (!showNewStudentModal || !activeProgram?.id) return;
+      try {
+        setLoadingAssets(true);
+        const { data, error: assetsError } = await supabase
+          .from('assets')
+          .select('id, full_code, description, brand, size, serial_number')
+          .eq('current_program_id', activeProgram.id)
+          .eq('status_code', 'available')
+          .eq('is_active', true)
+          .is('assigned_student_id', null)
+          .order('description', { ascending: true });
+
+        if (assetsError) throw assetsError;
+        setAvailableAssets(data || []);
+      } catch (err) {
+        console.error('Error loading available assets:', err);
+        setAvailableAssets([]);
+      } finally {
+        setLoadingAssets(false);
+      }
+    };
+
+    fetchAvailableAssets();
+  }, [showNewStudentModal, activeProgram?.id]);
 
   const fetchStudents = async (silent = false) => {
     try {
@@ -315,6 +350,25 @@ export default function StudentsPage() {
     setNewStudentData({ ...newStudentData, [field]: value });
   };
 
+  // Maneja el selector de instrumento del modal "Nuevo Estudiante": puede
+  // elegirse un activo real de Inventario (enlace verdadero), "Otro" (texto
+  // libre, para instrumentos que aún no están en Inventario) o dejarlo vacío.
+  const handleNewStudentAssetChange = (value: string) => {
+    if (value === '__other__') {
+      setNewStudentData({ ...newStudentData, asset_id: '__other__', instrument: '', instrument_size: '' });
+    } else if (value === '') {
+      setNewStudentData({ ...newStudentData, asset_id: '', instrument: '', instrument_size: '' });
+    } else {
+      const asset = availableAssets.find((a) => a.id === value);
+      setNewStudentData({
+        ...newStudentData,
+        asset_id: value,
+        instrument: asset?.description || '',
+        instrument_size: asset?.size || '',
+      });
+    }
+  };
+
   const handleSaveNewStudent = async () => {
     try {
       setSavingNewStudent(true);
@@ -368,6 +422,31 @@ export default function StudentsPage() {
 
       if (insertError) throw insertError;
 
+      // Si se eligió un instrumento real de Inventario (no "__other__" ni
+      // vacío), enlazar ese activo al estudiante recién creado.
+      let assetLinkFailed = false;
+      if (studentData && newStudentData.asset_id && newStudentData.asset_id !== '__other__') {
+        const { error: assetLinkError } = await supabase
+          .from('assets')
+          .update({
+            assigned_student_id: studentData.id,
+            assigned_to_text: null,
+            status_code: 'assigned',
+          })
+          .eq('id', newStudentData.asset_id);
+
+        if (assetLinkError) {
+          // No revertimos la creación del estudiante por esto — el RLS de
+          // assets hoy solo permite escribir a Admin (ver "Only Admin can
+          // update assets"), así que si quien crea el estudiante es Staff
+          // esta actualización puede fallar por permisos. Se avisa al
+          // usuario en vez de fallar en silencio, para que sepa que debe
+          // pedirle a un Admin que enlace el instrumento desde Inventario.
+          console.error('Error linking asset to new student:', assetLinkError);
+          assetLinkFailed = true;
+        }
+      }
+
       // Insertar información de contacto del padre si se proporcionó
       if (studentData && (newStudentData.parent_name || newStudentData.parent_phone || newStudentData.parent_email)) {
         const { data: parentData, error: parentError } = await supabase
@@ -409,6 +488,7 @@ export default function StudentsPage() {
         last_name: '',
         age: '',
         current_grade: '',
+        asset_id: '',
         instrument: '',
         instrument_size: '',
         orchestra_position: '',
@@ -418,7 +498,11 @@ export default function StudentsPage() {
         parent_email: ''
       });
       
-      alert(t('student_created_successfully') || 'Estudiante creado exitosamente');
+      if (assetLinkFailed) {
+        alert(t('student_created_asset_link_failed') || 'Estudiante creado, pero no se pudo enlazar el instrumento (solo un Admin puede hacerlo desde Inventario).');
+      } else {
+        alert(t('student_created_successfully') || 'Estudiante creado exitosamente');
+      }
     } catch (error) {
       console.error('Error creating student:', error);
       alert(t('error_creating_student') || 'Error al crear estudiante');
@@ -1152,29 +1236,50 @@ export default function StudentsPage() {
                         {t('orchestra_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <div>
+                        <div className="col-span-2">
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('instrument')}
                           </label>
-                          <input
-                            type="text"
-                            value={newStudentData.instrument}
-                            onChange={(e) => handleNewStudentChange('instrument', e.target.value)}
+                          <select
+                            value={newStudentData.asset_id}
+                            onChange={(e) => handleNewStudentAssetChange(e.target.value)}
+                            disabled={loadingAssets}
                             className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
-                            placeholder={t('instrument_placeholder')}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            {t('instrument_size') || 'Tamaño'}
-                          </label>
-                          <input
-                            type="text"
-                            value={newStudentData.instrument_size}
-                            onChange={(e) => handleNewStudentChange('instrument_size', e.target.value)}
-                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
-                            placeholder="3/4, 4/4"
-                          />
+                          >
+                            <option value="">{t('no_instrument_assigned_option')}</option>
+                            {availableAssets.map((asset) => (
+                              <option key={asset.id} value={asset.id}>
+                                {asset.description}
+                                {asset.size ? ` · ${asset.size}` : ''}
+                                {asset.brand ? ` (${asset.brand})` : ''}
+                              </option>
+                            ))}
+                            <option value="__other__">{t('instrument_other_option')}</option>
+                          </select>
+                          {!loadingAssets && availableAssets.length === 0 && (
+                            <p className="text-xs text-gray-500 mt-1">{t('no_instruments_available')}</p>
+                          )}
+                          {newStudentData.asset_id === '__other__' && (
+                            <div className="grid grid-cols-2 gap-3 mt-2">
+                              <input
+                                type="text"
+                                value={newStudentData.instrument}
+                                onChange={(e) => handleNewStudentChange('instrument', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                                placeholder={t('instrument_placeholder')}
+                              />
+                              <input
+                                type="text"
+                                value={newStudentData.instrument_size}
+                                onChange={(e) => handleNewStudentChange('instrument_size', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
+                                placeholder="3/4, 4/4"
+                              />
+                            </div>
+                          )}
+                          {newStudentData.asset_id && newStudentData.asset_id !== '__other__' && (
+                            <p className="text-xs text-gray-500 mt-1">{t('instrument_from_inventory_hint')}</p>
+                          )}
                         </div>
                         <div>
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
@@ -1251,8 +1356,8 @@ export default function StudentsPage() {
                     <button
                       onClick={handleSaveNewStudent}
                       disabled={savingNewStudent || !newStudentData.first_name || !newStudentData.last_name}
-                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center ${
-                        (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : ''
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg font-medium flex items-center justify-center transition-all duration-200 ${
+                        (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md transform hover:scale-[1.01]'
                       }`}
                     >
                       <MdCheckCircle className="mr-1 sm:mr-2" size={16} />

@@ -185,6 +185,16 @@ const translations: Translations = {
   instrument_size: { es: "Tamaño del Instrumento", en: "Instrument Size" },
   position: { es: "Posición", en: "Position" },
   orchestra_position: { es: "Posición", en: "Position" },
+  no_instrument_assigned_option: { es: "Sin instrumento asignado", en: "No instrument assigned" },
+  instrument_other_option: { es: "Otro / no está en inventario", en: "Other / not in inventory" },
+  no_instruments_available: {
+    es: "No hay instrumentos disponibles en el inventario de este programa.",
+    en: "No instruments available in this program's inventory.",
+  },
+  instrument_from_inventory_hint: {
+    es: "Se asigna directo desde Inventario — el instrumento queda enlazado a este estudiante.",
+    en: "Assigned directly from Inventory — the instrument stays linked to this student.",
+  },
 
   parents_info: { es: "Información de Padres", en: "Parents Information" },
   manage_contacts: { es: "Administrar contactos", en: "Manage contacts" },
