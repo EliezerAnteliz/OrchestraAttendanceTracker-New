@@ -60,9 +60,9 @@ export default function StudentsPage() {
   });
   const [savingNewStudent, setSavingNewStudent] = useState(false);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       if (!activeProgram?.id) {
         setStudents([]);
         setFilteredStudents([]);
@@ -289,9 +289,10 @@ export default function StudentsPage() {
         }
       }
 
-      // Recargar datos (silent: evita el parpadeo del spinner de pantalla completa
-      // sobre el modal ya abierto, ya que solo estamos refrescando, no abriendo)
-      await fetchStudents();
+      // Recargar datos (silent: evita que la pantalla completa se ponga en
+      // "loading" y se desmonte todo -incluyendo este modal abierto- solo
+      // porque estamos refrescando la lista de fondo, no cargándola de cero)
+      await fetchStudents(true);
       await fetchStudentDetails(selectedStudent.id, true);
       setIsEditMode(false);
     } catch (error) {
@@ -396,9 +397,11 @@ export default function StudentsPage() {
         }
       }
 
-      // Recargar lista de estudiantes
-      await fetchStudents();
-      
+      // Recargar lista de estudiantes (silent: el modal de "Nuevo Estudiante"
+      // sigue abierto en este punto, no queremos que la pantalla completa
+      // se desmonte a un loading mientras se ve)
+      await fetchStudents(true);
+
       // Cerrar modal y resetear formulario
       setShowNewStudentModal(false);
       setNewStudentData({
@@ -660,9 +663,10 @@ export default function StudentsPage() {
                   setUploadResults(results);
                   if (results.added > 0 || results.updated > 0) {
                     // Si se agregaron o actualizaron estudiantes, recargar la lista
-                    fetchStudents();
+                    // en silencio: este modal de carga sigue abierto en pantalla
+                    fetchStudents(true);
                   }
-                }} 
+                }}
               />
             </div>
           </div>
