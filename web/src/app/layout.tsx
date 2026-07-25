@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Orchestra Attendance Tracker",
-  description: "Sistema de registro de asistencia para orquestas",
+  title: "SiteTrack",
+  description: "Gestión de asistencia, estudiantes e inventario para programas educativos con una o varias sedes",
   viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
 };
 

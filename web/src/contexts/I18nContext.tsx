@@ -14,7 +14,7 @@ const translations: Translations = {
   switch_to_es: { es: "Cambiar a Español", en: "Switch to Spanish" },
 
   // Landing
-  app_title: { es: "Ascend Attendance Tracker", en: "Ascend Attendance Tracker" },
+  app_title: { es: "SiteTrack", en: "SiteTrack" },
   login: { es: "Iniciar Sesión", en: "Log In" },
   access_dashboard: { es: "Acceder al Dashboard", en: "Go to Dashboard" },
   features: { es: "Características", en: "Features" },
@@ -22,20 +22,20 @@ const translations: Translations = {
   feature_profiles: { es: "Perfiles de estudiantes", en: "Student profiles" },
   feature_reports: { es: "Reportes detallados", en: "Detailed reports" },
   feature_access_any: { es: "Acceso desde cualquier dispositivo", en: "Access from any device" },
-  landing_headline: { es: "Gestión de Asistencia para el Programa Ascend", en: "Attendance Management for Ascend Program" },
+  landing_headline: { es: "Gestión completa para tu programa educativo", en: "Complete Management for Your Education Program" },
   landing_desc: {
-    es: "Una plataforma colaborativa en línea para registrar la asistencia de los estudiantes, elaborar informes claros y asegurar registros precisos y actualizados del Programa Ascend.",
-    en: "A collaborative online platform to record student attendance, create clear reports and ensure accurate and updated records for the Ascend Program.",
+    es: "Una plataforma colaborativa en línea para registrar la asistencia de tus estudiantes, administrar tu inventario y generar informes claros y actualizados — pensada para programas con una o varias sedes.",
+    en: "A collaborative online platform to record student attendance, manage your inventory, and generate clear, up-to-date reports — built for programs with one or multiple sites.",
   },
   start_free: { es: "Comenzar Gratis", en: "Start Free" },
-  benefits_title: { es: "Beneficios del Ascend Attendance Tracker", en: "Benefits of Ascend Attendance Tracker" },
-  benefits_desc: { es: "Una plataforma colaborativa diseñada para facilitar el registro de asistencia y generar informes precisos para el Programa Ascend", en: "A collaborative platform designed to facilitate attendance recording and generate accurate reports for the Ascend Program" },
+  benefits_title: { es: "Beneficios de SiteTrack", en: "Benefits of SiteTrack" },
+  benefits_desc: { es: "Una plataforma diseñada para simplificar la operación diaria de tu programa educativo, sin importar cuántas sedes tengas", en: "A platform designed to simplify the daily operation of your education program, no matter how many sites you run" },
   easy_to_use: { es: "Fácil de Usar", en: "Easy to Use" },
   easy_to_use_desc: { es: "Interfaz intuitiva que cualquier instructor puede dominar en minutos", en: "Intuitive interface that any instructor can master in minutes" },
   smart_reports: { es: "Reportes Inteligentes", en: "Smart Reports" },
   smart_reports_desc: { es: "Visualiza tendencias y patrones de asistencia con gráficos claros", en: "Visualize attendance trends and patterns with clear charts" },
-  for_musicians: { es: "Para el Programa Ascend", en: "For Ascend Program" },
-  for_musicians_desc: { es: "Diseñado específicamente para el Programa Ascend y sus instructores, facilitando la gestión educativa", en: "Specifically designed for the Ascend Program and its instructors, facilitating educational management" },
+  for_musicians: { es: "Hecho para tu Programa", en: "Built for Your Program" },
+  for_musicians_desc: { es: "Diseñado para instituciones educativas y sus equipos, facilitando la gestión de asistencia, estudiantes e inventario en un solo lugar", en: "Designed for educational institutions and their teams, making it easy to manage attendance, students, and inventory in one place" },
   student_management: { es: "Gestión de Estudiantes", en: "Student Management" },
   student_management_desc: { es: "Administra perfiles y datos de estudiantes", en: "Manage student profiles and data" },
   attendance_recording: { es: "Registro de Asistencia", en: "Attendance Recording" },
@@ -47,7 +47,10 @@ const translations: Translations = {
   back_to_home: { es: "Volver al inicio", en: "Back to home" },
   access_account_continue: { es: "Accede a tu cuenta para continuar", en: "Access your account to continue" },
   view_details: { es: "Ver Detalles", en: "View Details" },
-  footer_copyright: { es: " Eliezer Anteliz", en: " Eliezer Anteliz" },
+  // Antes decía solo " Eliezer Anteliz" sin usar {year} en absoluto (aunque
+  // page.tsx sí lo pasaba) — quedaba igual sin importar el año. Corregido
+  // de paso al quitar la marca "Ascend" del pie de página.
+  footer_copyright: { es: "© {year} SiteTrack", en: "© {year} SiteTrack" },
 
   // Auth
   email: { es: "Correo Electrónico", en: "Email" },
@@ -111,8 +114,8 @@ const translations: Translations = {
   error_creating_account: { es: "Error al crear la cuenta", en: "Error creating account" },
 
   // Dashboard layout
-  brand_title: { es: "Ascend", en: "Ascend" },
-  brand_subtitle: { es: "Attendance Tracker", en: "Attendance Tracker" },
+  brand_title: { es: "SiteTrack", en: "SiteTrack" },
+  brand_subtitle: { es: "Gestión de Programa", en: "Program Management" },
   menu_dashboard: { es: "Dashboard", en: "Dashboard" },
   menu_students: { es: "Estudiantes", en: "Students" },
   menu_orchestras: { es: "Orquestas", en: "Orchestras" },
@@ -120,7 +123,7 @@ const translations: Translations = {
   menu_reports: { es: "Reportes", en: "Reports" },
   menu_inventory: { es: "Inventario", en: "Inventory" },
   sign_out: { es: "Cerrar sesión", en: "Sign out" },
-  mobile_header: { es: "Ascend Attendance", en: "Ascend Attendance" },
+  mobile_header: { es: "SiteTrack", en: "SiteTrack" },
 
   // Dashboard page
   loading_data: { es: "Cargando datos...", en: "Loading data..." },
@@ -129,7 +132,7 @@ const translations: Translations = {
     en: "Could not load data. Please try again later.",
   },
   welcome_dashboard: { es: "Bienvenido al Dashboard", en: "Welcome to the Dashboard" },
-  dashboard_summary: { es: "Resumen de la actividad del programa Ascend", en: "Summary of Ascend program activity" },
+  dashboard_summary: { es: "Resumen de la actividad de tu programa", en: "Summary of your program's activity" },
   total_students: { es: "Total Estudiantes", en: "Total Students" },
   active_students: { es: "Estudiantes Activos", en: "Active Students" },
   attendance_today: { es: "Asistencia Hoy", en: "Attendance Today" },
@@ -852,7 +855,7 @@ const translations: Translations = {
   inv_new_asset_subtitle: { es: "Completa el formulario para crear un nuevo activo de inventario", en: "Complete the form to create a new inventory asset" },
   inv_coding_section_header: { es: "Codificación del Activo", en: "Asset Coding" },
   inv_asset_purpose_question: { es: "¿Para qué es este activo?", en: "What is this asset for?" },
-  inv_asset_type_site: { es: "Sede de Ascend (Stafford, Japhet, etc.)", en: "Ascend Site (Stafford, Japhet, etc.)" },
+  inv_asset_type_site: { es: "Sede del programa (ej. Stafford, Japhet)", en: "Program Site (e.g. Stafford, Japhet)" },
   inv_asset_type_admin: { es: "Administración general / Agrupación", en: "General Administration / Group" },
   inv_site_label: { es: "Sede", en: "Site" },
   inv_select_site_placeholder2: { es: "Seleccionar sede", en: "Select site" },
@@ -873,8 +876,8 @@ const translations: Translations = {
   inv_characteristic_simple_label: { es: "Característica", en: "Characteristic" },
   inv_select_characteristic_placeholder: { es: "Seleccionar característica", en: "Select characteristic" },
   inv_characteristic_hint: { es: "04 = Forma física tangible (para instrumentos y equipos)", en: "04 = Tangible physical form (for instruments and equipment)" },
-  inv_description_placeholder_example: { es: "Ej: VIOLIN - Ascend 4/4", en: "E.g.: VIOLIN - Ascend 4/4" },
-  inv_brand_placeholder_example: { es: "Ej: Ascend", en: "E.g.: Ascend" },
+  inv_description_placeholder_example: { es: "Ej: VIOLIN 4/4", en: "E.g.: VIOLIN 4/4" },
+  inv_brand_placeholder_example: { es: "Ej: Yamaha", en: "E.g.: Yamaha" },
   inv_size_placeholder_example: { es: "Ej: 4/4, 3/4, 1/2", en: "E.g.: 4/4, 3/4, 1/2" },
   inv_owner_entity_hint: { es: "Entidad propietaria del activo", en: "Entity that owns the asset" },
   inv_assigned_to_freetext_label: { es: "Asignado a (Texto libre)", en: "Assigned to (Free text)" },

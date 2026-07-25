@@ -1,5 +1,5 @@
 /**
- * Configuración de tema para la aplicación Orchestra Attendance Tracker
+ * Configuración de tema para la aplicación SiteTrack
  * Basado en el tema Monday.com con azul como color principal
  */
 
