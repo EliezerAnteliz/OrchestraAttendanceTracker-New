@@ -389,7 +389,7 @@ export default function OrchestrasPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
       </div>
     );
   }
@@ -831,7 +831,7 @@ export default function OrchestrasPage() {
             <div className="flex-1 overflow-y-auto p-6">
               {loadingStudents ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
                 </div>
               ) : orchestraStudents.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
@@ -865,7 +865,7 @@ export default function OrchestrasPage() {
                                 setStudentToMove(student);
                                 setTargetOrchestra('');
                               }}
-                              className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center text-sm"
+                              className="px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center text-sm"
                               title={lang === 'es' ? 'Cambiar de orquesta' : 'Change orchestra'}
                             >
                               <MdSwapHoriz size={18} className="mr-1" />

@@ -232,35 +232,35 @@ export default function DashboardPage() {
 
       {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatCard 
-          title={t('total_students')} 
-          value={stats.totalStudents} 
+        <StatCard
+          title={t('total_students')}
+          value={stats.totalStudents}
           icon={<MdPeople size={24} />}
-          color="bg-blue-500"
+          color="blue"
         />
-        <StatCard 
-          title={t('active_students')} 
-          value={stats.activeStudents} 
+        <StatCard
+          title={t('active_students')}
+          value={stats.activeStudents}
           icon={<MdCheckCircle size={24} />}
-          color="bg-green-500"
+          color="green"
         />
-        <StatCard 
-          title={t('attendance_today')} 
-          value={stats.attendanceToday} 
+        <StatCard
+          title={t('attendance_today')}
+          value={stats.attendanceToday}
           icon={<MdCalendarToday size={24} />}
-          color="bg-purple-500"
+          color="purple"
         />
-        <StatCard 
-          title={t('attendance_rate')} 
-          value={`${stats.attendanceRate.toFixed(1)}%`} 
+        <StatCard
+          title={t('attendance_rate')}
+          value={`${stats.attendanceRate.toFixed(1)}%`}
           icon={<MdShowChart size={24} />}
-          color="bg-orange-500"
+          color="orange"
         />
-        <StatCard 
-          title={lang === 'es' ? 'Orquestas' : 'Orchestras'} 
-          value={stats.totalOrchestras} 
+        <StatCard
+          title={lang === 'es' ? 'Orquestas' : 'Orchestras'}
+          value={stats.totalOrchestras}
           icon={<MdMusicNote size={24} />}
-          color="bg-indigo-500"
+          color="indigo"
         />
       </div>
 
@@ -272,17 +272,17 @@ export default function DashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {orchestraStats.map((orchestra, index) => (
-              <div 
+              <div
                 key={index}
-                className="bg-white rounded-lg shadow p-6 border border-gray-200"
+                className="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500"
               >
                 <div className="flex items-center">
-                  <div className="bg-indigo-500 p-3 rounded-full text-white mr-4">
-                    <MdMusicNote size={24} />
+                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
+                    <MdMusicNote className="text-indigo-600" size={24} />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">{orchestra.name}</p>
-                    <p className="text-2xl font-bold text-gray-800">{orchestra.studentCount}</p>
+                    <p className="text-sm text-gray-600 font-medium">{orchestra.name}</p>
+                    <p className="text-2xl font-bold text-gray-900">{orchestra.studentCount}</p>
                   </div>
                 </div>
               </div>
@@ -320,16 +320,28 @@ export default function DashboardPage() {
 }
 
 // Componente para las tarjetas de estadísticas
+// Mismo patrón visual que las tarjetas del Dashboard de Inventario: borde
+// izquierdo de color + ícono en círculo pastel (en vez del círculo de color
+// sólido con ícono blanco que tenía antes).
+const STAT_CARD_COLORS: Record<string, { border: string; iconBg: string; iconText: string }> = {
+  blue: { border: 'border-blue-500', iconBg: 'bg-blue-100', iconText: 'text-blue-600' },
+  green: { border: 'border-green-500', iconBg: 'bg-green-100', iconText: 'text-green-600' },
+  purple: { border: 'border-purple-500', iconBg: 'bg-purple-100', iconText: 'text-purple-600' },
+  orange: { border: 'border-orange-500', iconBg: 'bg-orange-100', iconText: 'text-orange-600' },
+  indigo: { border: 'border-indigo-500', iconBg: 'bg-indigo-100', iconText: 'text-indigo-600' },
+};
+
 function StatCard({ title, value, icon, color }: { title: string; value: number | string; icon: React.ReactNode; color: string }) {
+  const styles = STAT_CARD_COLORS[color] || STAT_CARD_COLORS.blue;
   return (
-    <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-      <div className="flex items-center">
-        <div className={`${color} p-3 rounded-full text-white mr-4`}>
-          {icon}
-        </div>
+    <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${styles.border}`}>
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="text-2xl font-bold text-gray-800">{value}</p>
+          <p className="text-sm text-gray-600 font-medium">{title}</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+        </div>
+        <div className={`${styles.iconBg} p-3 rounded-full`}>
+          <span className={styles.iconText}>{icon}</span>
         </div>
       </div>
     </div>

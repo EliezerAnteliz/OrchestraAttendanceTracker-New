@@ -34,7 +34,7 @@ const LoadingIndicator = ({ message }: { message?: string }) => {
   const msg = message ?? t('loading');
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea] mb-4"></div>
       <p className="text-gray-600">{msg}</p>
     </div>
   );
@@ -1663,7 +1663,7 @@ ${dateTableEN}`;
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center"
             >
               <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
@@ -1708,7 +1708,7 @@ ${dateTableEN}`;
                   <button 
                     onClick={() => setChartType('pie')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'pie' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'pie' ? 'bg-[#0073ea] text-white' : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   >
                     {t('pie')}
@@ -1716,7 +1716,7 @@ ${dateTableEN}`;
                   <button 
                     onClick={() => setChartType('bar')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'bar' ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'bar' ? 'bg-[#0073ea] text-white' : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   >
                     {t('bars')}

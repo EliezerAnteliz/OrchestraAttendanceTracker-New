@@ -687,10 +687,10 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Monday.com Style Header */}
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#0073ea] rounded-lg flex items-center justify-center">
               <MdPeople size={20} className="text-white" />
             </div>
             <div>
@@ -718,7 +718,7 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        {/* Monday.com Style Button */}
+        {/* Botón principal */}
         <div className="mb-6">
           <button
             onClick={() => {
@@ -727,7 +727,7 @@ export default function AdminUsersPage() {
                 loadOrganizations();
               }
             }}
-            className="inline-flex items-center space-x-3 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 shadow-sm"
+            className="inline-flex items-center space-x-3 px-6 py-3 bg-[#0073ea] hover:bg-[#0060c0] text-white rounded-lg transition-colors duration-200 shadow-sm"
           >
             <MdAdd size={18} className="text-white" />
             <span className="font-medium">{t('add_new_user')}</span>
@@ -739,7 +739,7 @@ export default function AdminUsersPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#0073ea] rounded-md flex items-center justify-center">
                   <MdPeople size={16} className="text-white" />
                 </div>
                 <div>
@@ -778,7 +778,7 @@ export default function AdminUsersPage() {
                   <tr key={user.user_id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
+                        <div className="w-8 h-8 bg-[#0073ea] rounded-full flex items-center justify-center text-white font-medium text-xs">
                           {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div className="text-sm font-medium text-gray-900 truncate max-w-36">{user.full_name}</div>
@@ -809,10 +809,13 @@ export default function AdminUsersPage() {
                       )}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-center">
+                      {/* Mismos colores por rol que el RoleSwitcher (Admin/Staff/Viewer)
+                          usado en Inventario y el resto de la app — antes esta tabla
+                          usaba morado para Admin y azul para Staff, un esquema distinto. */}
                       <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
-                        user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                        user.role === 'staff' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
+                        user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
+                        user.role === 'staff' ? 'bg-emerald-100 text-emerald-800' :
+                        'bg-gray-100 text-gray-800'
                       }`}>
                         {user.role === 'admin' ? t('admin_role') : user.role === 'staff' ? t('staff_role') : t('viewer_role_short')}
                       </span>
@@ -875,7 +878,7 @@ export default function AdminUsersPage() {
 
         {/* Create User Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
@@ -1017,7 +1020,7 @@ export default function AdminUsersPage() {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
+                    className="px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] disabled:opacity-50 transition-colors flex items-center space-x-2"
                   >
                     <MdAdd size={16} />
                     <span>{busy ? t('creating_user') : t('create_user_button')}</span>
@@ -1030,7 +1033,7 @@ export default function AdminUsersPage() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && deletingUser && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-100">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -1063,7 +1066,7 @@ export default function AdminUsersPage() {
 
         {/* Edit User Modal */}
         {editingUser && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto border border-gray-100">
               <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
                 <div className="flex items-center space-x-3">

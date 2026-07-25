@@ -689,7 +689,7 @@ export default function StudentsPage() {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                   {loadingDetails ? (
                     <div className="flex items-center justify-center h-64">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
                     </div>
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
@@ -981,7 +981,7 @@ export default function StudentsPage() {
                         </button>
                         <button
                           onClick={handleSaveEdit}
-                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center"
                         >
                           <MdCheckCircle className="mr-1 sm:mr-2" size={16} />
                           {t('save')}
@@ -998,7 +998,7 @@ export default function StudentsPage() {
                         {canEditStudents && (
                           <button
                             onClick={handleEditClick}
-                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center"
                           >
                             <MdEdit className="mr-1 sm:mr-2" size={16} />
                             {t('edit')}
@@ -1232,7 +1232,7 @@ export default function StudentsPage() {
                     <button
                       onClick={handleSaveNewStudent}
                       disabled={savingNewStudent || !newStudentData.first_name || !newStudentData.last_name}
-                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center ${
                         (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
