@@ -1435,7 +1435,7 @@ export default function AttendancePage() {
                 filteredStudents.map((student) => (
                   <div 
                     key={student.id} 
-                    className={`bg-white p-3 rounded-lg border ${student.selected ? 'border-[#0073ea] bg-blue-50 shadow-sm' : 'border-gray-200'} ${attendanceMode ? 'cursor-pointer hover:border-gray-300' : ''} transition-all`}
+                    className={`bg-white p-3 rounded-lg shadow-sm border-l-4 transition-shadow ${student.selected ? 'border-[#0073ea] bg-blue-50 shadow-md' : 'border-blue-500'} ${attendanceMode ? 'cursor-pointer hover:shadow-md' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
                     <div className="flex items-start justify-between gap-3">
