@@ -1373,7 +1373,10 @@ export default function AttendancePage() {
                         onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                       >
                         {attendanceMode && (
-                          <td className="px-6 py-4 whitespace-nowrap text-center" onClick={(e) => e.stopPropagation()}>
+                          <td
+                            className={`px-6 py-4 whitespace-nowrap text-center border-l-4 ${student.selected ? 'border-[#0073ea]' : 'border-blue-500'}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <input
                               type="checkbox"
                               checked={student.selected || false}
@@ -1382,7 +1385,7 @@ export default function AttendancePage() {
                             />
                           </td>
                         )}
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className={`px-6 py-4 whitespace-nowrap ${!attendanceMode ? `border-l-4 ${student.selected ? 'border-[#0073ea]' : 'border-blue-500'}` : ''}`}>
                           <div className="flex items-center">
                             <div>
                               <div className="text-sm font-medium text-gray-900">

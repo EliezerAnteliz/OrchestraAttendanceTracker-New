@@ -562,7 +562,7 @@ export default function StudentsPage() {
                     onClick={() => handleStudentClick(student)}
                     className="hover:bg-blue-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap border-l-4 border-blue-500">
                       <div className="flex items-center">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
