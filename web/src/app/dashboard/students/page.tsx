@@ -1251,7 +1251,11 @@ export default function StudentsPage() {
                               <option key={asset.id} value={asset.id}>
                                 {asset.description}
                                 {asset.size ? ` · ${asset.size}` : ''}
-                                {asset.brand ? ` (${asset.brand})` : ''}
+                                {asset.serial_number
+                                  ? ` — S/N ${asset.serial_number}`
+                                  : asset.full_code
+                                  ? ` — #${asset.full_code}`
+                                  : ''}
                               </option>
                             ))}
                             <option value="__other__">{t('instrument_other_option')}</option>
