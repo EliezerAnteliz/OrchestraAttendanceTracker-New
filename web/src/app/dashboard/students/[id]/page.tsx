@@ -191,7 +191,11 @@ export default function StudentDetail() {
       setIsEditing(false);
     } catch (err) {
       console.error('Error updating data:', err);
-      setError(err instanceof Error ? err.message : 'Error al actualizar datos');
+      // alert(), no setError(): setError dispara el "if (error) return" de arriba,
+      // que reemplaza TODA la página (formulario de edición incluido) por una
+      // pantalla de error genérica — perdería los cambios que el usuario tenía
+      // a medio editar. Un error al guardar debe quedarse en el modal/formulario.
+      alert(err instanceof Error ? err.message : 'Error al actualizar datos');
     } finally {
       setLoading(false);
     }
@@ -353,7 +357,9 @@ export default function StudentDetail() {
     } catch (err) {
       console.error('=== ERROR EN ELIMINACIÓN ===');
       console.error('Error completo:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido al eliminar estudiante');
+      // alert(), no setError(): ver nota en handleSaveChanges — no queremos que
+      // un intento de borrado fallido reemplace toda la página.
+      alert(err instanceof Error ? err.message : 'Error desconocido al eliminar estudiante');
       setLoading(false);
       setDeleteConfirm(false);
     }
@@ -493,7 +499,7 @@ export default function StudentDetail() {
 
       {/* Delete confirmation modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
             <div className="text-center mb-6">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
@@ -533,10 +539,10 @@ export default function StudentDetail() {
       {/* Student information cards - Monday.com style */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Personal Information Card */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-blue-500 overflow-hidden">
           <div className="bg-white px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold flex items-center text-gray-900">
-              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+              <div className="p-2 bg-blue-100 rounded-full mr-3">
                 <MdPerson className="text-blue-600" size={20} />
               </div>
               {t('personal_info')}
@@ -633,10 +639,10 @@ export default function StudentDetail() {
         </div>
             
         {/* Orchestra Information Card */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-purple-500 overflow-hidden">
           <div className="bg-white px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold flex items-center text-gray-900">
-              <div className="p-2 bg-purple-100 rounded-lg mr-3">
+              <div className="p-2 bg-purple-100 rounded-full mr-3">
                 <MdMusicNote className="text-purple-600" size={20} />
               </div>
               {t('orchestra_info')}
@@ -699,10 +705,10 @@ export default function StudentDetail() {
       </div>
 
       {/* Parents information card */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md border-l-4 border-green-500 overflow-hidden">
         <div className="bg-white px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold flex items-center text-gray-900">
-            <div className="p-2 bg-green-100 rounded-lg mr-3">
+            <div className="p-2 bg-green-100 rounded-full mr-3">
               <MdPerson className="text-green-600" size={20} />
             </div>
             {t('parents_info')}
@@ -755,11 +761,11 @@ export default function StudentDetail() {
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
-                          <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                          <div className="p-2 bg-blue-100 rounded-full mr-3 flex-shrink-0">
                             <MdPhone className="text-blue-600" size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">{t('phone') || 'Teléfono'}</p>
+                            <p className="text-sm font-medium text-gray-700">{t('phone') || 'Teléfono'}</p>
                             {parent.phone_number ? (
                               <p className="text-gray-900 font-medium truncate">{parent.phone_number}</p>
                             ) : (
@@ -768,11 +774,11 @@ export default function StudentDetail() {
                           </div>
                         </div>
                         <div className="flex items-center bg-white p-3 rounded-lg border border-gray-200">
-                          <div className="p-2 bg-green-100 rounded-lg mr-3">
+                          <div className="p-2 bg-green-100 rounded-full mr-3 flex-shrink-0">
                             <MdEmail className="text-green-600" size={16} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">{t('email') || 'Email'}</p>
+                            <p className="text-sm font-medium text-gray-700">{t('email') || 'Email'}</p>
                             {parent.email ? (
                               <p className="text-gray-900 font-medium truncate">{parent.email}</p>
                             ) : (

@@ -665,7 +665,7 @@ export default function AdminUsersPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando programas...</p>
         </div>
       </div>
@@ -917,7 +917,7 @@ export default function AdminUsersPage() {
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
                       placeholder={t('user_full_name_placeholder')}
                     />
                   </div>
@@ -929,7 +929,7 @@ export default function AdminUsersPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
                       placeholder={t('user_email_placeholder')}
                     />
                   </div>
@@ -941,7 +941,7 @@ export default function AdminUsersPage() {
                     <select
                       value={selectedOrganizationId}
                       onChange={(e) => setSelectedOrganizationId(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
                       required
                     >
                       <option value="">{t('select_organization_placeholder')}</option>
@@ -962,7 +962,7 @@ export default function AdminUsersPage() {
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value as any)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
                     >
                       <option value="admin">{t('admin_role')} - {t('admin_role_desc')}</option>
                       <option value="staff">{t('staff_role')} - {t('staff_role_desc')}</option>
@@ -989,7 +989,7 @@ export default function AdminUsersPage() {
                               setSelectedProgramIds(selectedProgramIds.filter(id => id !== program.id));
                             }
                           }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-[#0073ea] focus:ring-[#0073ea]"
                         />
                         <span className="text-sm text-gray-700">{program.name}</span>
                       </label>
@@ -1102,7 +1102,7 @@ export default function AdminUsersPage() {
                         required
                         value={editingUser.full_name || ''}
                         onChange={(e) => setEditingUser({...editingUser, full_name: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
                         placeholder={t('full_name_placeholder')}
                       />
                     </div>
@@ -1115,7 +1115,7 @@ export default function AdminUsersPage() {
                         required
                         value={editingUser.email || ''}
                         onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
                         placeholder={t('email_placeholder_user')}
                       />
                     </div>
@@ -1135,7 +1135,7 @@ export default function AdminUsersPage() {
                     <select
                       value={editingUser.role}
                       onChange={(e) => setEditingUser({...editingUser, role: e.target.value as any})}
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
                     >
                       <option value="admin">{t('administrator')}</option>
                       <option value="staff">{t('staff_member')}</option>
@@ -1159,7 +1159,7 @@ export default function AdminUsersPage() {
                                 type="checkbox"
                                 checked={isAssigned}
                                 onChange={(e) => handleProgramToggle({...program, organization_id: program.organization_id || ''}, e.target.checked)}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                className="w-4 h-4 text-[#0073ea] border-gray-300 rounded focus:ring-[#0073ea]"
                               />
                               <span className="text-sm text-gray-900">{program.name}</span>
                             </label>

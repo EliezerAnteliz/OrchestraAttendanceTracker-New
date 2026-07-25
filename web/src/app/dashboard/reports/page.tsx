@@ -1245,32 +1245,32 @@ ${dateTableEN}`;
         onClick={onClose}
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm"></div>
-        
+        <div className="absolute inset-0 bg-black/50"></div>
+
         {/* Dialog */}
-        <div 
+        <div
           className="relative bg-white rounded-lg shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-6 py-4 bg-[#0073ea] text-white">
+          <div className="px-6 py-4 bg-white border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                  <MdPerson size={20} />
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <MdPerson size={20} className="text-blue-600" />
                 </div>
                 <div>
-                  <h2 id="student-modal-title" className="text-xl font-semibold">
+                  <h2 id="student-modal-title" className="text-xl font-semibold text-gray-900">
                     {t('select_student_title')}
                   </h2>
-                  <p className="text-sm text-blue-100">
+                  <p className="text-sm text-gray-500">
                     {lang === 'es' ? 'Selecciona un estudiante para ver su reporte individual' : 'Select a student to view their individual report'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label={t('close')}
               >
                 <MdClose size={20} />
@@ -1849,17 +1849,19 @@ ${dateTableEN}`;
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="bg-[#0073ea] text-white px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <MdEmail className="mr-2" size={24} />
-                <h2 className="text-xl font-bold">{t('email_preview')}</h2>
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <MdEmail className="text-blue-600" size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">{t('email_preview')}</h2>
               </div>
               <button
                 onClick={() => {
                   setEmailPreviewVisible(false);
                   setEmailPreviewData(null);
                 }}
-                className="hover:bg-[#0060c0] rounded-full p-2 transition-colors"
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
               >
                 <MdClose size={24} />
               </button>
@@ -1955,16 +1957,18 @@ ${dateTableEN}`;
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <MdWarning className="mr-2" size={24} />
-                <h2 className="text-xl font-bold">
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <MdWarning className="text-red-600" size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">
                   {lang === 'es' ? 'Faltas Injustificadas' : 'Unexcused Absences'} - {selectedReportDate.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </h2>
               </div>
               <button
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
-                className="hover:bg-red-700 rounded-full p-2 transition-colors"
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
               >
                 <MdClose size={24} />
               </button>

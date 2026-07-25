@@ -66,10 +66,10 @@ export default function OrchestrasPage() {
     }
   }, [activeProgram]);
 
-  const fetchOrchestras = async () => {
+  const fetchOrchestras = async (silent = false) => {
     try {
-      setLoading(true);
-      
+      if (!silent) setLoading(true);
+
       // Obtener orquestas
       const { data: orchestrasData, error: orchestrasError } = await supabase
         .from('orchestras')
@@ -335,7 +335,8 @@ export default function OrchestrasPage() {
       if (viewingOrchestra) {
         handleViewStudents(viewingOrchestra);
       }
-      fetchOrchestras();
+      // silent: el modal "Ver estudiantes" sigue abierto en este punto
+      fetchOrchestras(true);
     } catch (error: any) {
       console.error('Error moving student:', error);
       alert(error.message || (lang === 'es' ? 'Error al mover estudiante' : 'Error moving student'));
@@ -368,7 +369,8 @@ export default function OrchestrasPage() {
       if (viewingOrchestra) {
         handleViewStudents(viewingOrchestra);
       }
-      fetchOrchestras();
+      // silent: el modal "Ver estudiantes" sigue abierto en este punto
+      fetchOrchestras(true);
     } catch (error: any) {
       console.error('Error removing student:', error);
       alert(error.message || (lang === 'es' ? 'Error al remover estudiante' : 'Error removing student'));
@@ -459,8 +461,8 @@ export default function OrchestrasPage() {
           {filteredOrchestras.map((orchestra) => (
             <div
               key={orchestra.id}
-              className={`bg-white rounded-lg shadow-md p-6 border-2 transition-all ${
-                orchestra.is_active ? 'border-blue-100 hover:border-[#0073ea]' : 'border-gray-200 opacity-60'
+              className={`bg-white rounded-lg shadow-md p-6 border-l-4 transition-shadow hover:shadow-lg ${
+                orchestra.is_active ? 'border-blue-500' : 'border-gray-300 opacity-60'
               }`}
             >
               <div className="flex justify-between items-start mb-4">
@@ -500,7 +502,9 @@ export default function OrchestrasPage() {
               )}
 
               <div className="flex items-center text-gray-700 bg-gray-50 rounded-md p-3 mb-3">
-                <MdPeople className="mr-2 text-[#0073ea]" size={20} />
+                <div className="bg-blue-100 p-2 rounded-full mr-2 flex-shrink-0">
+                  <MdPeople className="text-blue-600" size={18} />
+                </div>
                 <span className="font-medium">
                   {orchestra.student_count || 0} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
                 </span>
@@ -532,23 +536,23 @@ export default function OrchestrasPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-md w-full overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 bg-[#0073ea] text-white">
+            <div className="px-6 py-4 bg-white border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                    {editingOrchestra ? <MdEdit size={20} /> : <MdAdd size={20} />}
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    {editingOrchestra ? <MdEdit size={20} className="text-blue-600" /> : <MdAdd size={20} className="text-blue-600" />}
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
-                      {editingOrchestra 
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {editingOrchestra
                         ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
                         : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
                       }
                     </h2>
-                    <p className="text-sm text-blue-100">
+                    <p className="text-sm text-gray-500">
                       {lang === 'es' ? 'Completa la información de la orquesta' : 'Complete orchestra information'}
                     </p>
                   </div>
@@ -559,7 +563,7 @@ export default function OrchestrasPage() {
                     setEditingOrchestra(null);
                     setFormData({ name: '', description: '', is_active: true });
                   }}
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <MdClose size={20} />
                 </button>
@@ -642,20 +646,20 @@ export default function OrchestrasPage() {
 
       {/* Modal de Asignación de Estudiantes */}
       {showAssignModal && assigningOrchestra && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 bg-[#0073ea] text-white">
+            <div className="px-6 py-4 bg-white border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                    <MdPersonAdd size={20} />
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <MdPersonAdd size={20} className="text-green-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold text-gray-900">
                       {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
                     </h2>
-                    <p className="text-sm text-blue-100">
+                    <p className="text-sm text-gray-500">
                       {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
                       <span className="font-semibold">{assigningOrchestra.name}</span>
                     </p>
@@ -667,7 +671,7 @@ export default function OrchestrasPage() {
                     setAssigningOrchestra(null);
                     setSelectedStudents(new Set());
                   }}
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <MdClose size={20} />
                 </button>
@@ -796,20 +800,20 @@ export default function OrchestrasPage() {
 
       {/* Modal para Ver Estudiantes de la Orquesta */}
       {showStudentsModal && viewingOrchestra && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 bg-[#0073ea] text-white">
+            <div className="px-6 py-4 bg-white border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white bg-opacity-20 rounded-lg">
-                    <MdVisibility size={20} />
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <MdVisibility size={20} className="text-blue-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold text-gray-900">
                       {viewingOrchestra.name}
                     </h2>
-                    <p className="text-sm text-blue-100">
+                    <p className="text-sm text-gray-500">
                       {orchestraStudents.length} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
                     </p>
                   </div>
@@ -820,7 +824,7 @@ export default function OrchestrasPage() {
                     setViewingOrchestra(null);
                     setOrchestraStudents([]);
                   }}
-                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <MdClose size={20} />
                 </button>

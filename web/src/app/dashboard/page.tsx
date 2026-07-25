@@ -188,7 +188,7 @@ export default function DashboardPage() {
           <div className="h-6 bg-gray-200 rounded w-64 animate-pulse mb-4"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-6 border border-gray-200">
+              <div key={i} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-200">
                 <div className="flex items-center">
                   <div className="bg-gray-200 p-3 rounded-full mr-4 animate-pulse w-12 h-12"></div>
                   <div className="flex-1">
