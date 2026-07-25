@@ -61,7 +61,29 @@ const translations: Translations = {
   password_min: { es: "Mínimo 6 caracteres", en: "Minimum 6 characters" },
   already_have_account: { es: "¿Ya tienes una cuenta?", en: "Already have an account?" },
   sign_in_here: { es: "Inicia sesión aquí", en: "Sign in here" },
-  
+
+  // Recuperar / restablecer contraseña
+  forgot_password_link: { es: "¿Olvidaste tu contraseña?", en: "Forgot your password?" },
+  forgot_password_title: { es: "Recuperar contraseña", en: "Recover password" },
+  forgot_password_desc: { es: "Escribe tu correo y te enviaremos un link para crear una nueva contraseña.", en: "Enter your email and we'll send you a link to create a new password." },
+  send_reset_link: { es: "Enviar link", en: "Send link" },
+  sending_reset_link: { es: "Enviando...", en: "Sending..." },
+  reset_link_sent_title: { es: "Revisa tu correo", en: "Check your email" },
+  reset_link_sent_desc: { es: "Si {email} tiene una cuenta, te llegará un correo con un link para crear una nueva contraseña. Revisa también spam.", en: "If {email} has an account, you'll receive an email with a link to create a new password. Check your spam folder too." },
+  back_to_login: { es: "Volver a iniciar sesión", en: "Back to login" },
+  reset_password_title: { es: "Crear nueva contraseña", en: "Create new password" },
+  reset_password_desc: { es: "Escribe tu nueva contraseña.", en: "Enter your new password." },
+  new_password: { es: "Nueva contraseña", en: "New password" },
+  confirm_new_password: { es: "Confirmar nueva contraseña", en: "Confirm new password" },
+  update_password: { es: "Actualizar contraseña", en: "Update password" },
+  updating_password: { es: "Actualizando...", en: "Updating..." },
+  password_updated_title: { es: "¡Contraseña actualizada!", en: "Password updated!" },
+  password_updated_desc: { es: "Ya puedes iniciar sesión con tu nueva contraseña.", en: "You can now log in with your new password." },
+  go_to_login: { es: "Ir a iniciar sesión", en: "Go to login" },
+  invalid_reset_link_title: { es: "Este link ya no es válido", en: "This link is no longer valid" },
+  invalid_reset_link_desc: { es: "Puede haber expirado o ya haberse usado. Pide uno nuevo.", en: "It may have expired or already been used. Request a new one." },
+  request_new_link: { es: "Pedir un link nuevo", en: "Request a new link" },
+
   // Signup form translations
   email_placeholder: { es: "tu@email.com", en: "your@email.com" },
   organization: { es: "Organización", en: "Organization" },

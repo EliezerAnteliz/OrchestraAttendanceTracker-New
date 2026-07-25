@@ -112,9 +112,14 @@ export default function LoginPage() {
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-xs font-medium text-gray-700 mb-1">
-                  {t('password')}
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="password" className="block text-xs font-medium text-gray-700">
+                    {t('password')}
+                  </label>
+                  <Link href="/forgot-password" className="text-xs text-[#0073ea] hover:text-[#0060c0] hover:underline transition-colors">
+                    {t('forgot_password_link')}
+                  </Link>
+                </div>
                 <div className="relative">
                   <div className="hidden md:absolute md:inset-y-0 md:left-0 md:pl-3 md:flex md:items-center md:pointer-events-none">
                     <MdLock className="h-4 w-4 text-gray-400" />
