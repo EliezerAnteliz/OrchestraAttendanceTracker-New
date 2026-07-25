@@ -721,9 +721,11 @@ export default function StudentsPage() {
                     <div className="space-y-4 sm:space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       {/* Información Personal */}
-                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                          <MdPerson className="mr-2 text-blue-600" size={18} />
+                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
+                          <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+                            <MdPerson className="text-blue-600" size={16} />
+                          </span>
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -820,9 +822,11 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Orquesta */}
-                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                          <MdMusicNote className="mr-2 text-purple-600" size={18} />
+                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-purple-500">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
+                          <span className="bg-purple-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+                            <MdMusicNote className="text-purple-600" size={16} />
+                          </span>
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -833,7 +837,7 @@ export default function StudentsPage() {
                               </p>
                               <div className="space-y-2">
                                 {linkedAssets.map((asset) => (
-                                  <div key={asset.id} className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-200">
+                                  <div key={asset.id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
                                     <div className="bg-purple-100 p-2 rounded-full flex-shrink-0">
                                       <MdMusicNote className="text-purple-600" size={18} />
                                     </div>
@@ -932,9 +936,11 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Padres */}
-                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                          <MdContacts className="mr-2 text-green-600" size={18} />
+                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-green-500">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
+                          <span className="bg-green-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+                            <MdContacts className="text-green-600" size={16} />
+                          </span>
                           {t('parents_info')}
                         </h3>
                         {studentDetails.parents && studentDetails.parents.length > 0 ? (
