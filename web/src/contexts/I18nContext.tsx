@@ -514,7 +514,6 @@ const translations: Translations = {
   inv_close_without_confirming: { es: "Cerrar sin confirmar", en: "Close without confirming" },
   inv_assigned_to: { es: "Asignado a", en: "Assigned to" },
   inv_assigned_other_option: { es: "Otro (no es estudiante)", en: "Other (not a student)" },
-  inv_linked_instrument_label: { es: "Instrumento de Inventario (enlace real)", en: "Inventory instrument (real link)" },
   inv_assigned_to_needs_site: { es: "Selecciona primero un programa/sede para poder buscar estudiantes.", en: "Select a program/site first to search students." },
   inv_mark_unassigned: { es: "Marcar como sin asignar", en: "Mark as unassigned" },
   inv_assigned_to_placeholder: { es: "Nombre del estudiante, proveedor, etc. (vacío = sin asignar)", en: "Student name, vendor, etc. (empty = unassigned)" },

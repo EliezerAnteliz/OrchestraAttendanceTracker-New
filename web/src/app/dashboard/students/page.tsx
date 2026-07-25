@@ -204,7 +204,7 @@ export default function StudentsPage() {
       try {
         const { data: assetsData, error: assetsError } = await supabase
           .from('assets')
-          .select('id, full_code, description, brand, size, status_code')
+          .select('id, full_code, description, brand, size, serial_number, status_code')
           .eq('assigned_student_id', studentId)
           .eq('is_active', true);
         if (assetsError) throw assetsError;
@@ -693,13 +693,10 @@ export default function StudentsPage() {
                           {selectedStudent?.first_name} {selectedStudent?.last_name}
                         </h2>
                         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-0.5">
-                          <p className="text-xs sm:text-sm text-gray-500">
-                            {t('student_profile')}
-                          </p>
-                          {selectedStudent?.instrument && (
+                          {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               <MdMusicNote size={12} />
-                              {selectedStudent.instrument}
+                              {linkedAssets[0]?.description || selectedStudent.instrument}
                             </span>
                           )}
                         </div>
@@ -829,41 +826,68 @@ export default function StudentsPage() {
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
-                              {t('instrument')}
-                            </p>
-                            {isEditMode ? (
-                              <input
-                                type="text"
-                                value={editFormData.instrument || ''}
-                                onChange={(e) => handleInputChange('instrument', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                              />
-                            ) : (
-                              <p className="text-sm font-semibold text-gray-900">
-                                {studentDetails.instrument || t('not_assigned')}
+                          {linkedAssets.length > 0 ? (
+                            <div className="col-span-2">
+                              <p className="text-sm font-medium text-gray-700 mb-1">
+                                {t('instrument')}
                               </p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
-                              {t('instrument_size') || 'Tamaño'}
-                            </p>
-                            {isEditMode ? (
-                              <input
-                                type="text"
-                                value={editFormData.instrument_size || ''}
-                                onChange={(e) => handleInputChange('instrument_size', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                                placeholder="3/4, 4/4"
-                              />
-                            ) : (
-                              <p className="text-sm font-semibold text-gray-900">
-                                {studentDetails.instrument_size || t('not_specified')}
-                              </p>
-                            )}
-                          </div>
+                              <div className="space-y-2">
+                                {linkedAssets.map((asset) => (
+                                  <div key={asset.id} className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-200">
+                                    <div className="bg-purple-100 p-2 rounded-full flex-shrink-0">
+                                      <MdMusicNote className="text-purple-600" size={18} />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-bold text-gray-900">
+                                        {asset.description}{asset.size ? ` · ${asset.size}` : ''}
+                                      </p>
+                                      <p className="text-xs text-gray-500 truncate">
+                                        {[asset.brand, asset.serial_number ? `S/N ${asset.serial_number}` : null, asset.full_code ? `#${asset.full_code}` : null].filter(Boolean).join(' · ')}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div>
+                                <p className="text-sm font-medium text-gray-700 mb-1">
+                                  {t('instrument')}
+                                </p>
+                                {isEditMode ? (
+                                  <input
+                                    type="text"
+                                    value={editFormData.instrument || ''}
+                                    onChange={(e) => handleInputChange('instrument', e.target.value)}
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                  />
+                                ) : (
+                                  <p className="text-sm font-semibold text-gray-900">
+                                    {studentDetails.instrument || t('not_assigned')}
+                                  </p>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-700 mb-1">
+                                  {t('instrument_size') || 'Tamaño'}
+                                </p>
+                                {isEditMode ? (
+                                  <input
+                                    type="text"
+                                    value={editFormData.instrument_size || ''}
+                                    onChange={(e) => handleInputChange('instrument_size', e.target.value)}
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                    placeholder="3/4, 4/4"
+                                  />
+                                ) : (
+                                  <p className="text-sm font-semibold text-gray-900">
+                                    {studentDetails.instrument_size || t('not_specified')}
+                                  </p>
+                                )}
+                              </div>
+                            </>
+                          )}
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('orchestra')}
@@ -904,26 +928,6 @@ export default function StudentsPage() {
                             )}
                           </div>
                         </div>
-                        {!isEditMode && linkedAssets.length > 0 && (
-                          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
-                            <p className="text-sm font-medium text-gray-700 mb-2">
-                              {t('inv_linked_instrument_label')}
-                            </p>
-                            <div className="space-y-2">
-                              {linkedAssets.map((asset) => (
-                                <div key={asset.id} className="flex items-center gap-2 bg-white rounded-md p-2 border border-gray-200">
-                                  <MdMusicNote className="text-purple-600 flex-shrink-0" size={16} />
-                                  <div className="text-sm">
-                                    <span className="font-semibold text-gray-900">{asset.description}</span>
-                                    {asset.brand && <span className="text-gray-500"> · {asset.brand}</span>}
-                                    {asset.size && <span className="text-gray-500"> · {asset.size}</span>}
-                                    {asset.full_code && <span className="text-gray-400 font-mono text-xs ml-1">#{asset.full_code}</span>}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </div>
                       </div>
 
