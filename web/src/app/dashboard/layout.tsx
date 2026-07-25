@@ -137,7 +137,13 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
       <nav className="mt-6 px-2">
         <ul className="space-y-1">
           {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            // "Dashboard" (href = '/dashboard') es un caso especial: TODAS
+            // las rutas de la app empiezan con "/dashboard/", así que un
+            // startsWith normal lo dejaba siempre marcado como activo sin
+            // importar la página. Solo él necesita coincidencia exacta.
+            const isActive = item.href === '/dashboard'
+              ? pathname === item.href
+              : (pathname === item.href || pathname.startsWith(`${item.href}/`));
             return (
               <li key={item.key}>
                 <Link

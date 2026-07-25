@@ -158,7 +158,7 @@ export default function DashboardPage() {
   // Solo mostrar skeleton en la primera carga inicial
   if (loading && initialLoad) {
     return (
-      <div className="space-y-6 animate-fadeIn">
+      <div className="p-4 md:p-6 space-y-6 animate-fadeIn">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="flex-1">
@@ -206,14 +206,16 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 p-4 rounded-md border border-red-200">
-        <p className="text-red-700">{error}</p>
+      <div className="p-4 md:p-6">
+        <div className="bg-red-50 p-4 rounded-md border border-red-200">
+          <p className="text-red-700">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="p-4 md:p-6 space-y-6 animate-fadeIn">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
           <div className="flex-1">

@@ -421,7 +421,7 @@ export default function StudentsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64 p-4 md:p-6">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-black">{t('loading_students')}</p>
@@ -432,14 +432,16 @@ export default function StudentsPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 p-4 rounded-md border border-red-200">
-        <p className="text-red-700">{error}</p>
+      <div className="p-4 md:p-6">
+        <div className="bg-red-50 p-4 rounded-md border border-red-200">
+          <p className="text-red-700">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full p-4 md:p-6">
       {!activeProgram?.id && (
         <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
           {t('select_program_to_view_students') || 'Please select a program to view students.'}
