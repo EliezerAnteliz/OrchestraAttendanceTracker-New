@@ -763,6 +763,8 @@ export default function StudentsPage() {
                               </p>
                             )}
                           </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
                           <div>
                             <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('age') || 'Edad'}
