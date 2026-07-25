@@ -160,14 +160,10 @@ export default function LoginPage() {
               </button>
             </form>
             
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                {t('dont_have_account')}{' '}
-                <Link href="/signup" className="text-[#0073ea] hover:text-[#0060c0] font-medium hover:underline transition-colors">
-                  {t('sign_up_here')}
-                </Link>
-              </p>
-            </div>
+            {/* El link "¿No tienes cuenta? Regístrate aquí" → /signup se
+                quitó (26/07): el autorregistro público dejaba elegir una
+                organización real y auto-asignarse el rol Staff sin ninguna
+                aprobación. Las cuentas ahora se crean desde Admin/Usuarios. */}
 
             {/* Divider */}
             <div className="mt-6 pt-4 border-t border-gray-200">

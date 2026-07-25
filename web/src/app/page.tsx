@@ -37,14 +37,16 @@ export default function Home() {
                 </p>
               </div>
               
+              {/* El botón "Empezar Gratis" → /signup se quitó (26/07): el
+                  autorregistro público dejaba elegir una organización real
+                  de una lista y auto-asignarse el rol Staff (puede editar
+                  estudiantes) sin ninguna aprobación. Ahora todas las
+                  cuentas se crean desde Admin/Usuarios (invitación por
+                  correo). */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/dashboard" 
+                <Link href="/dashboard"
                   className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold text-sm sm:text-base">
                   {t("access_dashboard")}
-                </Link>
-                <Link href="/signup" 
-                  className="px-6 py-3 sm:px-8 sm:py-4 bg-white text-[#0073ea] rounded-xl border-2 border-[#0073ea] hover:bg-[#0073ea] hover:text-white transition-all duration-300 text-center font-semibold text-sm sm:text-base">
-                  {t("start_free")}
                 </Link>
               </div>
             </div>
