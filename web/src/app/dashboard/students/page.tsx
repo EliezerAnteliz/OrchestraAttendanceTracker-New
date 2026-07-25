@@ -543,80 +543,26 @@ export default function StudentsPage() {
           {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
         </div>
 
-        {/* Tabla para pantallas medianas y grandes */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('instrument')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grade')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status')}</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((student) => (
-                  <tr 
-                    key={student.id}
-                    onClick={() => handleStudentClick(student)}
-                    className="hover:bg-blue-50 cursor-pointer transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap border-l-4 border-blue-500">
-                      <div className="flex items-center">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {student.first_name} {student.last_name}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{student.instrument || t('not_assigned')}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{student.current_grade || t('not_assigned')}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 rounded-full ${
-                        student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {student.is_active !== false ? t('active') : t('inactive')}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                    {t('no_students_found')}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Vista de tarjetas para móviles - Optimizada */}
-        <div className="md:hidden space-y-3">
+        {/* Tarjetas de estudiante — mismo componente en móvil y escritorio */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
-              <div 
-                key={student.id} 
+              <div
+                key={student.id}
                 onClick={() => handleStudentClick(student)}
                 className="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md cursor-pointer transition-shadow"
               >
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-gray-800 text-base">
+                  <h3 className="font-semibold text-gray-800 text-base truncate mr-2">
                     {student.first_name} {student.last_name}
                   </h3>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  <span className={`shrink-0 px-2 py-1 text-xs font-medium rounded-full ${
                     student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {student.is_active !== false ? t('active') : t('inactive')}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex-1">
                     <span className="text-gray-600">{t('instrument')}:</span>
@@ -630,7 +576,7 @@ export default function StudentsPage() {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="col-span-full text-center py-8 text-gray-500">
               {t('no_students_found')}
             </div>
           )}

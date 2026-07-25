@@ -1350,94 +1350,12 @@ export default function AttendancePage() {
           </div>
         ) : (
           <div>
-            {/* Tabla para pantallas medianas y grandes */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    {attendanceMode && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10"></th>
-                    )}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('instrument_label')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{lang === 'es' ? 'Orquesta' : 'Orchestra'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('attendance')}</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredStudents.length > 0 ? (
-                    filteredStudents.map((student) => (
-                      <tr 
-                        key={student.id} 
-                        className={`${attendanceMode ? 'cursor-pointer' : ''} hover:bg-gray-50 ${student.selected ? 'bg-blue-50' : ''}`}
-                        onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
-                      >
-                        {attendanceMode && (
-                          <td
-                            className={`px-6 py-4 whitespace-nowrap text-center border-l-4 ${student.selected ? 'border-[#0073ea]' : 'border-blue-500'}`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={student.selected || false}
-                              onChange={() => toggleStudentSelection(student.id)}
-                              className="h-4 w-4"
-                            />
-                          </td>
-                        )}
-                        <td className={`px-6 py-4 whitespace-nowrap ${!attendanceMode ? `border-l-4 ${student.selected ? 'border-[#0073ea]' : 'border-blue-500'}` : ''}`}>
-                          <div className="flex items-center">
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {student.first_name} {student.last_name}
-                              </div>
-                              <div className="text-xs text-black font-medium">
-                                {t('grade')}: {student.current_grade || t('not_specified')}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{student.instrument || t('not_specified')}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.orchestra ? (
-                            <span className="px-2 inline-flex text-sm rounded-full bg-blue-50 text-[#0073ea]">
-                              {student.orchestra.name}
-                            </span>
-                          ) : (
-                            <span className="text-sm text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.attendance_status ? (
-                            <AttendanceStatusIndicator
-                              key={`${student.id}-${student.attendance_status || 'none'}`}
-                              statusCode={student.attendance_status}
-                            />
-                          ) : (
-                            <span className="text-sm font-medium text-gray-900">{t('not_recorded')}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={attendanceMode ? 5 : 4} className="px-6 py-4 text-center text-black">
-                        {t('no_students_found')}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Vista de tarjetas para móviles */}
-            <div className="md:hidden space-y-2">
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((student) => (
-                  <div 
-                    key={student.id} 
+            {/* Tarjetas de estudiante — mismo componente en móvil y escritorio */}
+            {filteredStudents.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                {filteredStudents.map((student) => (
+                  <div
+                    key={student.id}
                     className={`bg-white p-3 rounded-lg shadow-sm border-l-4 transition-shadow ${student.selected ? 'border-[#0073ea] bg-blue-50 shadow-md' : 'border-blue-500'} ${attendanceMode ? 'cursor-pointer hover:shadow-md' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
@@ -1447,12 +1365,20 @@ export default function AttendancePage() {
                         <h3 className="font-semibold text-gray-900 text-base leading-tight truncate mb-1">
                           {student.first_name} {student.last_name}
                         </h3>
+                        <div className="text-xs text-gray-600 mb-1">
+                          {t('grade')}: {student.current_grade || t('not_specified')}
+                        </div>
                         <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1.5">
                           <span className="font-medium">{student.instrument || t('not_specified')}</span>
-                          {student.orchestra && (
+                          {student.orchestra ? (
                             <>
                               <span className="text-gray-400">•</span>
                               <span className="font-medium text-[#0073ea]">{student.orchestra.name}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-400">•</span>
+                              <span className="text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
                             </>
                           )}
                         </div>
@@ -1467,7 +1393,7 @@ export default function AttendancePage() {
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Checkbox */}
                       {attendanceMode && (
                         <input
@@ -1480,14 +1406,14 @@ export default function AttendancePage() {
                       )}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <MdGroup className="mx-auto mb-2 text-gray-400" size={40} />
-                  <p className="font-medium">{t('no_students_found')}</p>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <MdGroup className="mx-auto mb-2 text-gray-400" size={40} />
+                <p className="font-medium">{t('no_students_found')}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
