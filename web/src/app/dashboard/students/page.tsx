@@ -609,24 +609,24 @@ export default function StudentsPage() {
 
       {/* Modal de carga masiva */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-300">
-            <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-800">
+            <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-white rounded-t-xl">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <MdUpload className="w-5 h-5 text-blue-600" />
+                  <MdUpload className="w-5 h-5 text-[#0073ea]" />
                 </div>
                 {t('bulk_upload_title')}
               </h2>
-              <button 
+              <button
                 onClick={() => {
                   setShowUploadModal(false);
                   if (uploadResults) {
                     fetchStudents(); // Recargar la lista si hubo cambios
                     setUploadResults(null);
                   }
-                }} 
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white hover:bg-opacity-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                }}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Close"
               >
                 <MdClose size={20} />
@@ -652,7 +652,7 @@ export default function StudentsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-4 pb-20 sm:pb-4 safe-area-inset">
           {/* Overlay */}
           <div 
-            className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-black/50 transition-opacity"
             onClick={closeDrawer}
           />
           
@@ -661,24 +661,24 @@ export default function StudentsPage() {
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#0073ea] text-white">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
-                        <MdVisibility size={20} className="sm:w-6 sm:h-6" />
+                      <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                        <MdVisibility size={20} className="sm:w-6 sm:h-6 text-[#0073ea]" />
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-semibold">
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                           {selectedStudent?.first_name} {selectedStudent?.last_name}
                         </h2>
-                        <p className="text-xs sm:text-sm text-blue-100">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {t('student_profile')}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={closeDrawer}
-                      className="p-1.5 sm:p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                       <MdClose size={20} className="sm:w-6 sm:h-6" />
                     </button>
@@ -694,14 +694,14 @@ export default function StudentsPage() {
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
                       {/* Información Personal */}
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-blue-100">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                           <MdPerson className="mr-2 text-blue-600" size={18} />
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('first_name')}
                             </p>
                             {isEditMode ? (
@@ -718,7 +718,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('last_name')}
                             </p>
                             {isEditMode ? (
@@ -735,7 +735,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('age') || 'Edad'}
                             </p>
                             {isEditMode ? (
@@ -752,7 +752,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('grade')}
                             </p>
                             {isEditMode ? (
@@ -769,7 +769,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('status')}
                             </p>
                             {isEditMode ? (
@@ -793,14 +793,14 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Orquesta */}
-                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-purple-100">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                           <MdMusicNote className="mr-2 text-purple-600" size={18} />
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('instrument')}
                             </p>
                             {isEditMode ? (
@@ -817,7 +817,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('instrument_size') || 'Tamaño'}
                             </p>
                             {isEditMode ? (
@@ -835,7 +835,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('orchestra')}
                             </p>
                             {isEditMode ? (
@@ -856,7 +856,7 @@ export default function StudentsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+                            <p className="text-sm font-medium text-gray-700 mb-1">
                               {t('orchestra_position') || 'Posición'}
                             </p>
                             {isEditMode ? (
@@ -877,19 +877,19 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Padres */}
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-green-100">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                      <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                           <MdContacts className="mr-2 text-green-600" size={18} />
                           {t('parents_info')}
                         </h3>
                         {studentDetails.parents && studentDetails.parents.length > 0 ? (
                           <div className="space-y-4">
                             {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
-                              <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
+                              <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
                                 {isEditMode ? (
                                   <div className="space-y-3">
                                     <div>
-                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
                                         {t('parent_name')}
                                       </label>
                                       <input
@@ -900,7 +900,7 @@ export default function StudentsPage() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
                                         {t('phone')}
                                       </label>
                                       <input
@@ -911,7 +911,7 @@ export default function StudentsPage() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
                                         {t('email')}
                                       </label>
                                       <input
@@ -957,7 +957,7 @@ export default function StudentsPage() {
                             ))}
                           </div>
                         ) : (
-                          <div className="bg-white rounded-lg p-4 border border-green-200 text-center">
+                          <div className="bg-white rounded-lg p-4 border border-gray-200 text-center">
                             <p className="text-sm text-gray-500">
                               {t('no_parent_info') || 'No hay información de padres registrada'}
                             </p>
@@ -1019,7 +1019,7 @@ export default function StudentsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 pt-16 sm:pt-4 pb-20 sm:pb-4 safe-area-inset">
           {/* Overlay */}
           <div 
-            className="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-black/50 transition-opacity"
             onClick={closeNewStudentModal}
           />
           
@@ -1028,24 +1028,24 @@ export default function StudentsPage() {
             <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-[#0073ea] text-white">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="p-1.5 sm:p-2 bg-white bg-opacity-20 rounded-lg">
-                        <MdAdd size={20} className="sm:w-6 sm:h-6" />
+                      <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                        <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#0073ea]" />
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-semibold">
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                           {t('new_student')}
                         </h2>
-                        <p className="text-xs sm:text-sm text-blue-100">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {t('complete_student_info')}
                         </p>
                       </div>
                     </div>
                     <button
                       onClick={closeNewStudentModal}
-                      className="p-1.5 sm:p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                       <MdClose size={20} className="sm:w-6 sm:h-6" />
                     </button>
@@ -1056,14 +1056,14 @@ export default function StudentsPage() {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                   <div className="space-y-4 sm:space-y-6">
                     {/* Información Personal */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-blue-100">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                         <MdPerson className="mr-2 text-blue-600" size={18} />
                         {t('personal_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('first_name')} <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1075,7 +1075,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('last_name')} <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1087,7 +1087,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('age') || 'Edad'}
                           </label>
                           <input
@@ -1099,7 +1099,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('grade')}
                           </label>
                           <input
@@ -1111,7 +1111,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('status')}
                           </label>
                           <select
@@ -1127,14 +1127,14 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Información de Orquesta */}
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-purple-100">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                         <MdMusicNote className="mr-2 text-purple-600" size={18} />
                         {t('orchestra_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('instrument')}
                           </label>
                           <input
@@ -1146,7 +1146,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('instrument_size') || 'Tamaño'}
                           </label>
                           <input
@@ -1158,7 +1158,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('orchestra_position') || 'Posición'}
                           </label>
                           <input
@@ -1173,14 +1173,14 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Información de Padres */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-green-100">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
                         <MdContacts className="mr-2 text-green-600" size={18} />
                         {t('parent_contact_info')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('parent_name')}
                           </label>
                           <input
@@ -1192,7 +1192,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('parent_phone') || 'Teléfono'}
                           </label>
                           <input
@@ -1204,7 +1204,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div className="md:col-span-2">
-                          <label className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1 block">
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('parent_email') || 'Email'}
                           </label>
                           <input

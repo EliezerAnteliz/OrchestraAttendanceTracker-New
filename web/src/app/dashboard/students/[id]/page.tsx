@@ -534,8 +534,8 @@ export default function StudentDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Personal Information Card */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold flex items-center text-gray-800">
+          <div className="bg-white px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold flex items-center text-gray-900">
               <div className="p-2 bg-blue-100 rounded-lg mr-3">
                 <MdPerson className="text-blue-600" size={20} />
               </div>
@@ -634,8 +634,8 @@ export default function StudentDetail() {
             
         {/* Orchestra Information Card */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold flex items-center text-gray-800">
+          <div className="bg-white px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold flex items-center text-gray-900">
               <div className="p-2 bg-purple-100 rounded-lg mr-3">
                 <MdMusicNote className="text-purple-600" size={20} />
               </div>
@@ -700,7 +700,7 @@ export default function StudentDetail() {
 
       {/* Parents information card */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
+        <div className="bg-white px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold flex items-center text-gray-900">
             <div className="p-2 bg-green-100 rounded-lg mr-3">
               <MdPerson className="text-green-600" size={20} />

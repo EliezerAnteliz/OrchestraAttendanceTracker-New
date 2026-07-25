@@ -1070,7 +1070,7 @@ export default function AdminUsersPage() {
             <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto border border-gray-100">
               <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-10 h-10 bg-[#0073ea] rounded-lg flex items-center justify-center shadow-md">
                     <MdEdit className="text-white" size={18} />
                   </div>
                   <div>
@@ -1182,7 +1182,7 @@ export default function AdminUsersPage() {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
+                    className="px-6 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] disabled:opacity-50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
                   >
                     {busy ? (
                       <>
