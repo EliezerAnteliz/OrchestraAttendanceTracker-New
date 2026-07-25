@@ -264,9 +264,13 @@ export default function AdminUsersPage() {
         // signUp() con una contraseña fija "123456").
         isNewUser = true;
 
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
         const res = await fetch('/api/admin/users/invite-user', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(currentSession?.access_token ? { Authorization: `Bearer ${currentSession.access_token}` } : {}),
+          },
           body: JSON.stringify({
             email,
             full_name: fullName || email.split('@')[0],
@@ -389,9 +393,13 @@ export default function AdminUsersPage() {
       // fallaba en silencio: el perfil se borraba pero la cuenta de Auth
       // quedaba viva para siempre.
       try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
         const res = await fetch('/api/admin/users/delete-auth-user', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(currentSession?.access_token ? { Authorization: `Bearer ${currentSession.access_token}` } : {}),
+          },
           body: JSON.stringify({ user_id: user.user_id }),
         });
         const result = await res.json();

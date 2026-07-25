@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 // Crea (o localiza) la cuenta de Supabase Auth de un usuario nuevo, vía el
@@ -23,6 +22,15 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 //
 // Autorización: mismo criterio que /api/admin/users/delete-auth-user
 // (sesión real + list_admin_visible_programs), no un token estático.
+//
+// La app usa el cliente plano de @supabase/supabase-js (lib/supabase.ts),
+// que guarda la sesión en localStorage, NO en cookies — por eso esta ruta
+// NO puede usar createRouteHandlerClient({ cookies }) (ese patrón es para
+// apps que sincronizan la sesión a cookies vía auth-helpers/middleware, y
+// aquí nunca hay cookies que leer, así que siempre daba "Unauthorized: no
+// session" incluso con sesión real activa). En vez de eso, el navegador
+// manda el access_token de su sesión actual en el header Authorization, y
+// aquí lo validamos contra Supabase directamente.
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -36,9 +44,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'email is required' }, { status: 400 });
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
-    const { data: { user: caller } } = await supabase.auth.getUser();
-    if (!caller) {
+    const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized: no session' }, { status: 401 });
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
+    );
+
+    const { data: { user: caller }, error: userError } = await supabase.auth.getUser(token);
+    if (userError || !caller) {
       return NextResponse.json({ error: 'Unauthorized: no session' }, { status: 401 });
     }
 
