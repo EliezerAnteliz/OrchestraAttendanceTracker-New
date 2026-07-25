@@ -108,15 +108,15 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
         top-0 left-0 
         h-full 
         w-64 
-        bg-gradient-to-b from-white to-gray-50 
-        border-r border-gray-200 
+        bg-white
+        border-r border-gray-200
         shadow-lg md:shadow-none 
         z-30 
         transition-transform duration-300 ease-in-out
         overflow-hidden
       `}
     >
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white">
+      <div className="p-4 border-b border-gray-200 bg-[#0073ea] text-white">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h2 className="text-lg font-bold text-white">{t('brand_title')}</h2>
@@ -151,8 +151,8 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
                   onClick={handleLinkClick}
                   className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white shadow-md'
-                      : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                      ? 'bg-[#0073ea] text-white shadow-md'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <span className={`mr-3 transition-transform duration-200 ${
@@ -170,8 +170,8 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
                 onClick={handleLinkClick}
                 className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
                   pathname.startsWith('/dashboard/admin')
-                    ? 'bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-white hover:shadow-sm'
+                    ? 'bg-[#0073ea] text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 <span className={`mr-3 transition-transform duration-200 ${
@@ -183,7 +183,7 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
           )}
         </ul>
       </nav>
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-600 truncate max-w-[140px] font-medium">{user?.email}</span>
           <button
@@ -207,8 +207,8 @@ function DashboardContent({ children }: { children: ReactNode }) {
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       {/* Overlay for mobile when sidebar is open */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm z-20 md:hidden" 
+        <div
+          className="fixed inset-0 bg-black/30 z-20 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -217,7 +217,7 @@ function DashboardContent({ children }: { children: ReactNode }) {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header with menu button */}
-        <header className="md:hidden bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white shadow-md safe-area-inset-top">
+        <header className="md:hidden bg-[#0073ea] text-white shadow-md safe-area-inset-top">
           <div className="p-3 flex items-center gap-3">
             <button 
               className="text-white hover:text-blue-200 flex-shrink-0 transition-colors duration-200"
