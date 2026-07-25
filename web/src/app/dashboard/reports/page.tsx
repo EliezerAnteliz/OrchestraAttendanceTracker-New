@@ -1339,15 +1339,23 @@ ${dateTableEN}`;
   };
 
   if (loading) {
-    return <LoadingIndicator message="Cargando datos de reportes..." />;
+    return (
+      <div className="p-4 md:p-6">
+        <LoadingIndicator message="Cargando datos de reportes..." />
+      </div>
+    );
   }
 
   if (error) {
-    return <ErrorDisplay message={error} />;
+    return (
+      <div className="p-4 md:p-6">
+        <ErrorDisplay message={error} />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 px-2 sm:px-4">
+    <div className="max-w-5xl mx-auto space-y-6 p-4 md:p-6">
       <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
         <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
           <MdInsertChart className="text-blue-600" size={20} />

@@ -390,7 +390,7 @@ export default function StudentDetail() {
 
   if (loading && !student) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64 p-4 md:p-6">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('loading_student_data')}</p>
@@ -401,28 +401,32 @@ export default function StudentDetail() {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">
-        <p>Error: {error}</p>
-        <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
-          {t('back_to_students')}
-        </Link>
+      <div className="p-4 md:p-6">
+        <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">
+          <p>Error: {error}</p>
+          <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
+            {t('back_to_students')}
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (!student) {
     return (
-      <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded mb-4">
-        <p>{t('student_not_found')}</p>
-        <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
-          {t('back_to_students')}
-        </Link>
+      <div className="p-4 md:p-6">
+        <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded mb-4">
+          <p>{t('student_not_found')}</p>
+          <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
+            {t('back_to_students')}
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full p-4 md:p-6">
       {!activeProgram?.id && (
         <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
           {t('select_program_to_view_student') || 'Please select a program to view this student.'}
