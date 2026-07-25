@@ -29,8 +29,12 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     let resolved = false;
 
+    // PASSWORD_RECOVERY dispara con el link de "olvidé mi contraseña";
+    // SIGNED_IN dispara con el link de invitación de usuario nuevo (crea
+    // sesión directo, sin evento de recovery) — esta pantalla sirve para
+    // ambos casos (poner contraseña por primera vez o cambiarla).
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
         resolved = true;
         setLinkStatus('valid');
       }

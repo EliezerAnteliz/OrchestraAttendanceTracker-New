@@ -70,8 +70,15 @@ export async function POST(request: Request) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
+    // redirectTo: sin esto, el link del correo manda a la Site URL por
+    // defecto (la landing page pública, sin ninguna lógica de sesión) y la
+    // invitación queda "aceptada" en silencio sin que la persona pueda
+    // poner su contraseña. Reusamos /reset-password: ya sabe detectar una
+    // sesión recién creada por el link y mostrar el formulario.
+    const siteUrl = new URL(request.url).origin;
     const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
       data: { organization_id, program_id, role, full_name: full_name || email.split('@')[0] },
+      redirectTo: `${siteUrl}/reset-password`,
     });
 
     if (inviteError) {
