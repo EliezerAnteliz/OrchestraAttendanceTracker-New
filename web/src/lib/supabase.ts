@@ -9,8 +9,9 @@ const supabaseAnonKey = envKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3Mi
 // Creamos el cliente de Supabase
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Logs de diagnóstico (solo en navegador)
-if (typeof window !== 'undefined') {
+// Logs de diagnóstico (solo en navegador y solo fuera de producción, igual
+// que el resto de los console.log de diagnóstico del proyecto)
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
   const usingDefaults = !envUrl || !envKey;
   // No exponemos la key completa en logs
   const anonKeyPrefix = (envKey || supabaseAnonKey).slice(0, 8);
