@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart, 
          MdAssignmentTurnedIn, MdGroup, MdInsertChart, MdMusicNote } from 'react-icons/md';
@@ -357,7 +358,7 @@ function StatCard({ title, value, icon, color }: { title: string; value: number 
 function QuickAccessCard({ title, description, href, icon, color }: { title: string; description: string; href: string; icon: React.ReactNode; color: string }) {
   const styles = STAT_CARD_COLORS[color] || STAT_CARD_COLORS.blue;
   return (
-    <a
+    <Link
       href={href}
       className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${styles.border} hover:shadow-lg transition-shadow flex items-start`}
     >
@@ -368,6 +369,6 @@ function QuickAccessCard({ title, description, href, icon, color }: { title: str
         <h3 className="font-medium text-gray-800">{title}</h3>
         <p className="text-sm text-gray-500 mt-1">{description}</p>
       </div>
-    </a>
+    </Link>
   );
 }
