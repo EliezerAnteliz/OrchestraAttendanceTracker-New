@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPeople, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -473,12 +473,17 @@ export default function StudentsPage() {
         </div>
       )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-        <h1 className="text-2xl font-bold text-gray-800">{t('students_title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+            <MdPeople className="text-blue-600" size={20} />
+          </span>
+          {t('students_title')}
+        </h1>
         <div className="flex gap-2 w-full sm:w-auto">
           {canBulkUpload && (
             <button 
               onClick={() => setShowUploadModal(true)} 
-              className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center"
+              className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-green-700 transition-colors"
             >
               <MdUpload className="mr-1" size={16} /> {t('bulk_upload_short')}
             </button>
@@ -503,9 +508,9 @@ export default function StudentsPage() {
               placeholder={t('search_student_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium"
+              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-gray-900 font-medium"
             />
-            <MdSearch className="absolute left-3 top-2.5 text-black font-bold" size={20} />
+            <MdSearch className="absolute left-3 top-2.5 text-gray-400" size={20} />
           </div>
           
           {/* Filtros en fila */}
@@ -514,7 +519,7 @@ export default function StudentsPage() {
             <select
               value={selectedInstrument}
               onChange={(e) => setSelectedInstrument(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-black font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
             >
               <option value="">{t('all_instruments')}</option>
               {availableInstruments.map((instrument) => (
@@ -525,7 +530,7 @@ export default function StudentsPage() {
             {/* Filtro activo/inactivo */}
             <button
               onClick={() => setShowActiveOnly(!showActiveOnly)}
-              className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-black font-medium whitespace-nowrap"
+              className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 font-medium whitespace-nowrap"
             >
               <MdFilterList className="mr-2" size={18} />
               {showActiveOnly ? t('show_all') : t('only_active')}
@@ -534,7 +539,7 @@ export default function StudentsPage() {
         </div>
 
         {/* Contador de estudiantes */}
-        <div className="text-sm text-black font-semibold mb-4">
+        <div className="text-sm text-gray-700 font-semibold mb-4">
           {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
         </div>
 
@@ -543,10 +548,10 @@ export default function StudentsPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('name')}</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('instrument')}</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('grade')}</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('instrument')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('grade')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -560,17 +565,17 @@ export default function StudentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
-                          <div className="text-sm text-black">
+                          <div className="text-sm font-medium text-gray-900">
                             {student.first_name} {student.last_name}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-black">{student.instrument || t('not_assigned')}</div>
+                      <div className="text-sm font-medium text-gray-900">{student.instrument || t('not_assigned')}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-black">{student.current_grade || t('not_assigned')}</div>
+                      <div className="text-sm font-medium text-gray-900">{student.current_grade || t('not_assigned')}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 rounded-full ${
@@ -583,7 +588,7 @@ export default function StudentsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-black">
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
                     {t('no_students_found')}
                   </td>
                 </tr>
@@ -599,7 +604,7 @@ export default function StudentsPage() {
               <div 
                 key={student.id} 
                 onClick={() => handleStudentClick(student)}
-                className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:border-blue-400 hover:shadow-md cursor-pointer transition-all"
+                className="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md cursor-pointer transition-shadow"
               >
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-semibold text-gray-800 text-base">
@@ -625,7 +630,7 @@ export default function StudentsPage() {
               </div>
             ))
           ) : (
-            <div className="text-center py-8 text-black">
+            <div className="text-center py-8 text-gray-500">
               {t('no_students_found')}
             </div>
           )}

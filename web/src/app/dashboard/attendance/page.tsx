@@ -2,6 +2,7 @@
 
 // Página de Asistencia con filtrado por Orquesta - v1.0
 import React, { useState, useEffect } from 'react';
+import { MdSearch, MdClose, MdAssignmentTurnedIn, MdGroup } from 'react-icons/md';
 import AttendanceStatusIndicator from '@/components/AttendanceStatusIndicator';
 import { supabase } from '../../../lib/supabase';
 import { format, parseISO } from 'date-fns';
@@ -1130,7 +1131,12 @@ export default function AttendancePage() {
     <div className="h-full p-4 md:p-6">
       <div className="flex flex-col gap-2 sm:gap-4 mb-3 sm:mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t('attendance_title')}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+              <MdAssignmentTurnedIn className="text-blue-600" size={20} />
+            </span>
+            {t('attendance_title')}
+          </h1>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <div className="relative">
               <DatePicker
@@ -1195,12 +1201,13 @@ export default function AttendancePage() {
       {/* Mensaje de éxito */}
       {showSuccessMessage && successMessage && (
         <div className="mb-2 sm:mb-4 p-2 sm:p-3 bg-green-100 border border-green-400 text-green-700 rounded-md relative text-sm">
-          <span className="block sm:inline">{successMessage}</span>
-          <button 
+          <span className="block sm:inline pr-6">{successMessage}</span>
+          <button
             onClick={() => setShowSuccessMessage(false)}
-            className="absolute top-0 right-0 px-3 py-2 sm:px-4 sm:py-3"
+            className="absolute top-1/2 right-2 -translate-y-1/2 p-1 text-green-600 hover:text-green-800 hover:bg-green-200 rounded-full transition-colors"
+            aria-label={t('close')}
           >
-            <span className="text-green-500 hover:text-green-800">×</span>
+            <MdClose size={16} />
           </button>
         </div>
       )}
@@ -1215,7 +1222,7 @@ export default function AttendancePage() {
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-9 pr-3 py-2 sm:py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
             />
-            <span className="absolute left-3 top-2.5 sm:top-3 text-gray-400 text-sm">🔍</span>
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           </div>
           
           <div className="grid grid-cols-2 gap-2">
@@ -1349,12 +1356,12 @@ export default function AttendancePage() {
                 <thead>
                   <tr>
                     {attendanceMode && (
-                      <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider w-10"></th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10"></th>
                     )}
-                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('name')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('instrument_label')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{lang === 'es' ? 'Orquesta' : 'Orchestra'}</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">{t('attendance')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('instrument_label')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{lang === 'es' ? 'Orquesta' : 'Orchestra'}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('attendance')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -1473,7 +1480,7 @@ export default function AttendancePage() {
                 ))
               ) : (
                 <div className="text-center py-12 text-gray-500">
-                  <div className="text-4xl mb-2">👥</div>
+                  <MdGroup className="mx-auto mb-2 text-gray-400" size={40} />
                   <p className="font-medium">{t('no_students_found')}</p>
                 </div>
               )}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '../../../lib/supabase';
-import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload, MdWarning, MdClose, MdEmail } from 'react-icons/md';
+import { MdPieChart, MdPerson, MdGroups, MdCalendarMonth, MdDownload, MdWarning, MdClose, MdEmail, MdInsertChart, MdCheckCircle, MdEventBusy, MdAssessment } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -1348,6 +1348,13 @@ ${dateTableEN}`;
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 px-2 sm:px-4">
+      <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
+          <MdInsertChart className="text-blue-600" size={20} />
+        </span>
+        {lang === 'es' ? 'Reportes' : 'Reports'}
+      </h1>
+
       {/* Sección de Reportes de Asistencia */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md w-full">
         <div className="flex items-center mb-6">
@@ -1462,7 +1469,7 @@ ${dateTableEN}`;
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-black bg-white font-normal"
                 />
               </div>
             ) : granularity === 'weekly' ? (
@@ -1490,7 +1497,7 @@ ${dateTableEN}`;
                     setReportData(null);
                   }}
                   ariaLabelledBy="weekPicker"
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-black bg-white font-normal"
                 />
               </div>
             ) : (
@@ -1501,7 +1508,7 @@ ${dateTableEN}`;
                   value={academicYear}
                   onChange={(e) => { setAcademicYear(parseInt(e.target.value, 10)); setReportData(null); }}
                   aria-label={t('academic_year')}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-800 bg-white"
                 >
                   {Array.from({ length: 7 }).map((_, idx) => {
                     const y = defaultAcademicYear - 3 + idx;
@@ -1521,7 +1528,7 @@ ${dateTableEN}`;
                   id="instrumentFilter"
                   value={instrumentFilter}
                   onChange={(e) => { setInstrumentFilter(e.target.value); setReportData(null); }}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-800 bg-white"
                 >
                   <option value="all">{t('all')}</option>
                   {instruments.map(inst => (
@@ -1654,7 +1661,7 @@ ${dateTableEN}`;
 
       {/* Resultados del reporte */}
       {reportData && (
-        <div className="bg-white p-4 rounded-lg shadow">
+        <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
             <h2 className="text-lg sm:text-xl font-medium text-gray-800">
               {reportType === 'individual' && selectedStudent
@@ -1675,27 +1682,47 @@ ${dateTableEN}`;
               <h3 className="font-medium text-gray-700 text-lg">{t('statistics')}</h3>
               
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-green-50 p-3 sm:p-4 rounded-md border border-green-100">
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('attendance_label')}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-green-700">{reportData.total_attendance}</p>
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-green-500">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('attendance_label')}</p>
+                    <div className="bg-green-100 p-1.5 rounded-full flex-shrink-0">
+                      <MdCheckCircle className="text-green-600" size={16} />
+                    </div>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_attendance}</p>
                   <p className="text-xs sm:text-sm text-gray-500">{reportData.attendance_percentage.toFixed(1)}%</p>
                 </div>
-                
-                <div className="bg-yellow-50 p-3 sm:p-4 rounded-md border border-yellow-100">
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('excused_absences_short')}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-yellow-700">{reportData.total_excused_absences}</p>
+
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-yellow-500">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('excused_absences_short')}</p>
+                    <div className="bg-yellow-100 p-1.5 rounded-full flex-shrink-0">
+                      <MdEventBusy className="text-yellow-600" size={16} />
+                    </div>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_excused_absences}</p>
                   <p className="text-xs sm:text-sm text-gray-500">{reportData.excused_percentage.toFixed(1)}%</p>
                 </div>
-                
-                <div className="bg-red-50 p-3 sm:p-4 rounded-md border border-red-100">
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('unexcused_absences_short')}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-red-700">{reportData.total_unexcused_absences}</p>
+
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-red-500">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('unexcused_absences_short')}</p>
+                    <div className="bg-red-100 p-1.5 rounded-full flex-shrink-0">
+                      <MdWarning className="text-red-600" size={16} />
+                    </div>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_unexcused_absences}</p>
                   <p className="text-xs sm:text-sm text-gray-500">{reportData.unexcused_percentage.toFixed(1)}%</p>
                 </div>
-                
-                <div className="bg-blue-50 p-3 sm:p-4 rounded-md border border-blue-100">
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('total_records')}</p>
-                  <p className="text-xl sm:text-2xl font-bold text-blue-700">{reportData.total}</p>
+
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-blue-500">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('total_records')}</p>
+                    <div className="bg-blue-100 p-1.5 rounded-full flex-shrink-0">
+                      <MdAssessment className="text-blue-600" size={16} />
+                    </div>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total}</p>
                 </div>
               </div>
             </div>
