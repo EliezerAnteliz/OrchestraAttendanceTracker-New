@@ -295,23 +295,26 @@ export default function DashboardPage() {
       <div className="mt-8">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('quick_access')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <QuickAccessCard 
-            title={t('quick_register_attendance')} 
+          <QuickAccessCard
+            title={t('quick_register_attendance')}
             description={t('quick_register_attendance_desc')}
             href="/dashboard/attendance"
             icon={<MdAssignmentTurnedIn size={24} />}
+            color="blue"
           />
-          <QuickAccessCard 
-            title={t('quick_student_list')} 
+          <QuickAccessCard
+            title={t('quick_student_list')}
             description={t('quick_student_list_desc')}
             href="/dashboard/students"
             icon={<MdGroup size={24} />}
+            color="green"
           />
-          <QuickAccessCard 
-            title={t('quick_generate_reports')} 
+          <QuickAccessCard
+            title={t('quick_generate_reports')}
             description={t('quick_generate_reports_desc')}
             href="/dashboard/reports"
             icon={<MdInsertChart size={24} />}
+            color="orange"
           />
         </div>
       </div>
@@ -348,15 +351,18 @@ function StatCard({ title, value, icon, color }: { title: string; value: number 
   );
 }
 
-// Componente para las tarjetas de acceso rápido
-function QuickAccessCard({ title, description, href, icon }: { title: string; description: string; href: string; icon: React.ReactNode }) {
+// Componente para las tarjetas de acceso rápido — mismo lenguaje visual que
+// las StatCard de arriba (borde izquierdo de color + ícono en círculo pastel),
+// en vez del borde gris plano + lila fijo que tenía antes.
+function QuickAccessCard({ title, description, href, icon, color }: { title: string; description: string; href: string; icon: React.ReactNode; color: string }) {
+  const styles = STAT_CARD_COLORS[color] || STAT_CARD_COLORS.blue;
   return (
-    <a 
+    <a
       href={href}
-      className="bg-white rounded-lg shadow p-6 border border-gray-200 hover:border-[#0073ea] transition-colors flex items-start"
+      className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${styles.border} hover:shadow-lg transition-shadow flex items-start`}
     >
-      <div className="bg-[#ede7f6] p-3 rounded-full text-[#0073ea] mr-4">
-        {icon}
+      <div className={`${styles.iconBg} p-3 rounded-full mr-4 flex-shrink-0`}>
+        <span className={styles.iconText}>{icon}</span>
       </div>
       <div>
         <h3 className="font-medium text-gray-800">{title}</h3>
