@@ -847,7 +847,7 @@ export default function OrchestrasPage() {
                   {orchestraStudents.map((student) => (
                     <div
                       key={student.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-all bg-white"
+                      className="p-4 rounded-lg shadow-sm hover:shadow-md border-l-4 border-blue-400 transition-all bg-white"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -869,7 +869,7 @@ export default function OrchestrasPage() {
                                 setStudentToMove(student);
                                 setTargetOrchestra('');
                               }}
-                              className="px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center text-sm"
+                              className="px-3 py-2 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
                               title={lang === 'es' ? 'Cambiar de orquesta' : 'Change orchestra'}
                             >
                               <MdSwapHoriz size={18} className="mr-1" />
@@ -877,7 +877,7 @@ export default function OrchestrasPage() {
                             </button>
                             <button
                               onClick={() => handleRemoveStudent(student)}
-                              className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center text-sm"
+                              className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
                               title={lang === 'es' ? 'Remover de orquesta' : 'Remove from orchestra'}
                             >
                               <MdRemoveCircle size={18} className="mr-1" />

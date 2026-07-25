@@ -1266,27 +1266,27 @@ export default function AttendancePage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={selectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-[#0073ea] hover:bg-[#0060c0] text-white text-xs sm:text-sm font-medium"
+                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
               >
                 <span className="mr-1">☑</span>
                 {t('select_all')}
               </button>
               <button
                 onClick={deselectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center bg-gray-500 hover:bg-gray-600 text-white text-xs sm:text-sm font-medium"
+                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
               >
                 <span className="mr-1">☐</span>
                 {t('deselect_all')}
               </button>
             </div>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 onClick={() => markAttendance('A')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
                   selectedStudentCount > 0
-                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-md transform hover:scale-[1.01]'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
@@ -1297,9 +1297,9 @@ export default function AttendancePage() {
               <button
                 onClick={() => markAttendance('EA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
                   selectedStudentCount > 0
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:shadow-md transform hover:scale-[1.01]'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
@@ -1310,9 +1310,9 @@ export default function AttendancePage() {
               <button
                 onClick={() => markAttendance('UA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
                   selectedStudentCount > 0
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-md transform hover:scale-[1.01]'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
@@ -1320,13 +1320,13 @@ export default function AttendancePage() {
                 <span className="hidden sm:inline">{t('mark_unexcused_absence')}</span>
                 <span className="sm:hidden">{lang === 'es' ? 'Falta' : 'Absent'}</span>
               </button>
-              
+
               <button
                 onClick={clearAttendanceForDate}
                 disabled={selectedStudentCount === 0 || isLoading}
-                className={`px-2 py-1.5 sm:py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium ${
+                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
                   selectedStudentCount > 0 && !isLoading
-                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:shadow-md transform hover:scale-[1.01]'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
                 title={selectedStudentCount > 0 ? `Limpiar asistencia de ${selectedStudentCount} estudiante(s) seleccionado(s)` : 'Selecciona estudiantes para limpiar su asistencia'}
