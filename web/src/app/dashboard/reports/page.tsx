@@ -1853,11 +1853,22 @@ ${dateTableEN}`;
                     const meanY = yVals.reduce((a, b) => a + b, 0) / 4;
                     const intercept = meanY - trendSlope * meanX;
                     const trendVals = [0, 1, 2, 3].map(x => Math.max(0, Math.min(100, intercept + trendSlope * x)));
-                    const xPos = (i: number) => 30 + i * 80;
-                    const yPos = (v: number) => 55 - v * 0.5;
+                    // viewBox 400x120 pensado para calzar con el ancho máximo
+                    // del contenedor (max-w-md, 448px) y la altura (h-24,
+                    // 96px) de abajo — en pantallas anchas el gráfico antes
+                    // se estiraba a todo el ancho de la tarjeta (~700-900px)
+                    // sobre solo 56px de alto, y una línea tan aplastada se
+                    // ve prácticamente plana aunque los datos varíen mucho.
+                    // Limitar el ancho máximo y subir el alto lo arregla.
+                    const padX = 40;
+                    const padY = 15;
+                    const vbW = 400;
+                    const vbH = 120;
+                    const xPos = (i: number) => padX + i * ((vbW - 2 * padX) / 3);
+                    const yPos = (v: number) => (vbH - padY) - v * ((vbH - 2 * padY) / 100);
                     return (
-                      <div className="mb-3 p-3 bg-white border border-gray-200 rounded-md">
-                        <svg viewBox="0 0 300 60" className="w-full h-14" preserveAspectRatio="none">
+                      <div className="mb-3 p-3 bg-white border border-gray-200 rounded-md max-w-md mx-auto">
+                        <svg viewBox={`0 0 ${vbW} ${vbH}`} className="w-full h-24" preserveAspectRatio="none">
                           <polyline
                             points={trendVals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')}
                             fill="none"
