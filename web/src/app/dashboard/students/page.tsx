@@ -20,6 +20,29 @@ type Student = {
   orchestra_position?: string;
 };
 
+// Listas fijas para estandarizar "Grado" y "Posición" — antes eran texto
+// libre y en producción terminaron con variantes como "4th", "4th grade",
+// "4th " (espacio de más), "2nd grado", etc. Con un select, todos los
+// estudiantes nuevos quedan en el mismo formato.
+const GRADE_OPTIONS = [
+  'Kindergarten',
+  '1st Grade',
+  '2nd Grade',
+  '3rd Grade',
+  '4th Grade',
+  '5th Grade',
+  '6th Grade',
+  '7th Grade',
+  '8th Grade',
+  '9th Grade',
+  '10th Grade',
+  '11th Grade',
+  '12th Grade',
+];
+
+// Jerarquía típica dentro de una orquesta escolar.
+const POSITION_OPTIONS = ['Concert Master', 'Principal', 'Assistant', 'Section'];
+
 export default function StudentsPage() {
   const { t } = useI18n();
   const { activeProgram, loading: programLoading } = useProgram();
@@ -827,12 +850,16 @@ export default function StudentsPage() {
                               {t('grade')}
                             </p>
                             {isEditMode ? (
-                              <input
-                                type="text"
+                              <select
                                 value={editFormData.current_grade || ''}
                                 onChange={(e) => handleInputChange('current_grade', e.target.value)}
                                 className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                              />
+                              >
+                                <option value="">{t('not_specified')}</option>
+                                {GRADE_OPTIONS.map((g) => (
+                                  <option key={g} value={g}>{g}</option>
+                                ))}
+                              </select>
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
                                 {studentDetails.current_grade || t('not_specified')}
@@ -960,13 +987,16 @@ export default function StudentsPage() {
                               {t('orchestra_position') || 'Posición'}
                             </p>
                             {isEditMode ? (
-                              <input
-                                type="text"
+                              <select
                                 value={editFormData.orchestra_position || ''}
                                 onChange={(e) => handleInputChange('orchestra_position', e.target.value)}
                                 className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
-                                placeholder="Section"
-                              />
+                              >
+                                <option value="">{t('not_assigned')}</option>
+                                {POSITION_OPTIONS.map((p) => (
+                                  <option key={p} value={p}>{p}</option>
+                                ))}
+                              </select>
                             ) : (
                               <p className="text-sm font-semibold text-gray-900">
                                 {studentDetails.orchestra_position || t('not_specified')}
@@ -1205,13 +1235,16 @@ export default function StudentsPage() {
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('grade')}
                           </label>
-                          <input
-                            type="text"
+                          <select
                             value={newStudentData.current_grade}
                             onChange={(e) => handleNewStudentChange('current_grade', e.target.value)}
                             className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
-                            placeholder={t('grade_placeholder')}
-                          />
+                          >
+                            <option value="">{t('not_specified')}</option>
+                            {GRADE_OPTIONS.map((g) => (
+                              <option key={g} value={g}>{g}</option>
+                            ))}
+                          </select>
                         </div>
                         <div>
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
@@ -1289,13 +1322,16 @@ export default function StudentsPage() {
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
                             {t('orchestra_position') || 'Posición'}
                           </label>
-                          <input
-                            type="text"
+                          <select
                             value={newStudentData.orchestra_position}
                             onChange={(e) => handleNewStudentChange('orchestra_position', e.target.value)}
                             className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-900"
-                            placeholder="Section"
-                          />
+                          >
+                            <option value="">{t('not_assigned')}</option>
+                            {POSITION_OPTIONS.map((p) => (
+                              <option key={p} value={p}>{p}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>
