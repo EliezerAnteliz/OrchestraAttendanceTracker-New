@@ -1139,16 +1139,6 @@ ${dateTableEN}`;
     // Math.max(1, ...) evita dividir por 0 (NaN en la altura de las barras)
     // cuando el período no tiene ningún registro de asistencia.
     const maxValue = Math.max(1, data.total_attendance, data.total_excused_absences, data.total_unexcused_absences);
-    const barWidth = 50; // Ancho de las barras
-    const gap = 30; // Espacio entre barras
-    const chartHeight = 200; // Altura fija para el gráfico
-    const labelHeight = 20; // Altura para las etiquetas
-    const totalWidth = (barWidth + gap) * 3 - gap; // Ancho total del gráfico
-    
-    // Función para calcular la altura de la barra
-    const getBarHeight = (value: number) => {
-      return (value / maxValue) * (chartHeight - labelHeight - 20);
-    };
 
     // Datos para las barras
     const bars = [
@@ -1176,29 +1166,35 @@ ${dateTableEN}`;
     ];
 
     return (
-      <div className="relative w-full h-full flex flex-col justify-end">
-        <div className="flex items-end justify-center mb-8 md:mb-10" style={{ height: `${chartHeight}px`, gap: `${gap}px` }}>
+      <div className="relative w-full h-full flex flex-col">
+        {/* Área de barras: antes tenía un alto fijo en píxeles (200px) sin
+            importar el alto real del contenedor (300px en móvil, 350px en
+            escritorio) — dejaba un espacio vacío arriba y las barras se
+            veían chicas comparadas con el gráfico de torta, que sí llena
+            el espacio disponible. Ahora la altura de cada barra es un
+            porcentaje de "flex-1" (el espacio que realmente hay), igual
+            que el gráfico de torta y las mini-barras de tendencia semanal. */}
+        <div className="flex-1 flex items-end justify-center gap-8 sm:gap-14 px-4 pb-2 min-h-0">
           {bars.map((bar, index) => {
-            const height = getBarHeight(bar.value);
+            const heightPct = Math.max(4, Math.round((bar.value / maxValue) * 100));
             return (
-              <div 
-                key={bar.label} 
-                className="flex flex-col items-center relative"
-                style={{
-                  width: `${barWidth}px`,
-                  height: `${chartHeight}px`,
-                  paddingBottom: '16px',
-                }}
-              >
-                {/* Barra con animación (anclada abajo) */}
-                <div 
-                  className={`${bar.color} rounded-t-lg shadow-md overflow-hidden`}
+              <div key={bar.label} className="flex flex-col items-center justify-end h-full w-16 sm:w-20">
+                {/* Valor numérico */}
+                <div
+                  className="text-sm font-semibold text-gray-800 mb-2 whitespace-nowrap opacity-0"
                   style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    width: '100%',
-                    height: `${height}px`,
+                    animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.4}s forwards`,
+                    textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+                  }}
+                >
+                  {bar.value}
+                </div>
+
+                {/* Barra con animación (anclada abajo, alto en % del espacio disponible) */}
+                <div
+                  className={`${bar.color} rounded-t-lg shadow-md overflow-hidden relative w-full`}
+                  style={{
+                    height: `${heightPct}%`,
                     transformOrigin: 'bottom center',
                     animation: `barGrow 0.8s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s both`,
                     willChange: 'transform, opacity',
@@ -1208,31 +1204,22 @@ ${dateTableEN}`;
                   {/* Efecto de gradiente sutil */}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10"></div>
                 </div>
-                
-                {/* Valor numérico */}
-                <div 
-                  className="absolute text-sm font-semibold text-gray-800 whitespace-nowrap transition-all duration-300 opacity-0"
-                  style={{
-                    bottom: `${height + 14}px`,
-                    animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.4}s forwards`,
-                    textShadow: '0 1px 2px rgba(255,255,255,0.8)'
-                  }}
-                >
-                  {bar.value}
-                </div>
-                
-                {/* Etiqueta */}
-                <div 
-                  className="absolute -bottom-10 text-sm font-medium text-gray-800 text-center transition-all duration-300 opacity-0"
-                  style={{
-                    animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.3}s forwards`
-                  }}
-                >
-                  {bar.label}
-                </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Etiquetas debajo de cada barra */}
+        <div className="flex items-start justify-center gap-8 sm:gap-14 px-4 pt-1 mb-6 sm:mb-8">
+          {bars.map((bar, index) => (
+            <div
+              key={bar.label}
+              className="w-16 sm:w-20 text-sm font-medium text-gray-800 text-center opacity-0"
+              style={{ animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.3}s forwards` }}
+            >
+              {bar.label}
+            </div>
+          ))}
         </div>
         {/* Leyenda unificada (mismo formato que el gráfico circular) */}
         <div className="mt-4 grid grid-cols-3 gap-2 px-4">
