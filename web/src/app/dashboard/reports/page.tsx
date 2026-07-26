@@ -170,6 +170,11 @@ export default function ReportsPage() {
   // Tendencia semanal (últimas 4 semanas)
   const [weeklyTrend, setWeeklyTrend] = useState<Array<{ week: string; label: string; percentage: number }>>([]);
   const [trendDirection, setTrendDirection] = useState<'up' | 'down' | 'flat'>('flat');
+  // Pendiente numérica (puntos porcentuales por semana) de la regresión de
+  // las 4 semanas — se usa para la línea de tendencia y el texto de apoyo
+  // junto a la flecha (ej. "-2.4 pp/semana"), para que quede claro que la
+  // flecha resume las 4 semanas y no solo el cambio de la última.
+  const [trendSlope, setTrendSlope] = useState<number>(0);
   // Desglose anual por mes (Sep-May)
   const [annualBreakdown, setAnnualBreakdown] = useState<Array<{ key: string; label: string; a: number; ea: number; ua: number; total: number }>>([]);
 
@@ -424,6 +429,7 @@ export default function ReportsPage() {
         // limpia según la granularidad).
         setWeeklyTrend([]);
         setTrendDirection('flat');
+        setTrendSlope(0);
         setAnnualBreakdown([]);
         return;
       }
@@ -570,8 +576,10 @@ export default function ReportsPage() {
           const slope = denom !== 0 ? (n*sumXY - sumX*sumY) / denom : 0;
           const slopeThreshold = 0.5; // puntos porcentuales por semana
           setTrendDirection(slope > slopeThreshold ? 'up' : slope < -slopeThreshold ? 'down' : 'flat');
+          setTrendSlope(slope);
         } else {
           setTrendDirection('flat');
+          setTrendSlope(0);
         }
       } else if (granularity === 'annual') {
         // Calcular desglose por mes del año académico seleccionado (Sep -> May)
@@ -630,6 +638,7 @@ export default function ReportsPage() {
       } else {
         setWeeklyTrend([]);
         setTrendDirection('flat');
+        setTrendSlope(0);
         setAnnualBreakdown([]);
       }
 
@@ -1813,12 +1822,73 @@ ${dateTableEN}`;
               {/* Tendencia semanal: últimas 4 semanas */}
               {granularity === 'weekly' && weeklyTrend.length > 0 && (
                 <div className="mt-20 sm:mt-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-gray-700">{t('weekly_trend_title')}</h3>
-                    <span className={`${trendDirection === 'up' ? 'text-green-600' : trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'} text-sm font-medium`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div>
+                      <h3 className="font-medium text-gray-700">{t('weekly_trend_title')}</h3>
+                      <p className="text-[11px] text-gray-500">
+                        {lang === 'es' ? 'Según la pendiente de las 4 semanas, no solo la última' : 'Based on the 4-week slope, not just the latest week'}
+                      </p>
+                    </div>
+                    <span
+                      className={`${trendDirection === 'up' ? 'text-green-600' : trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'} text-sm font-medium whitespace-nowrap`}
+                      title={
+                        lang === 'es'
+                          ? `Pendiente promedio: ${trendSlope >= 0 ? '+' : ''}${trendSlope.toFixed(1)} pp por semana (calculada con las 4 semanas)`
+                          : `Average slope: ${trendSlope >= 0 ? '+' : ''}${trendSlope.toFixed(1)} pp per week (calculated across all 4 weeks)`
+                      }
+                    >
                       {trendDirection === 'up' ? `▲ ${t('trend_up')}` : trendDirection === 'down' ? `▼ ${t('trend_down')}` : `▬ ${t('trend_flat')}`}
                     </span>
                   </div>
+
+                  {/* Mini-gráfico: valor real de cada semana vs. la línea de
+                      tendencia (pendiente de las 4 semanas) — para que se
+                      entienda de un vistazo por qué la flecha puede decir
+                      "Downward" aunque la última semana haya subido fuerte:
+                      la línea punteada resume las 4 semanas, no solo la
+                      última. */}
+                  {weeklyTrend.length === 4 && (() => {
+                    const yVals = weeklyTrend.map(w => Math.max(0, Math.min(100, w.percentage)));
+                    const meanX = 1.5;
+                    const meanY = yVals.reduce((a, b) => a + b, 0) / 4;
+                    const intercept = meanY - trendSlope * meanX;
+                    const trendVals = [0, 1, 2, 3].map(x => Math.max(0, Math.min(100, intercept + trendSlope * x)));
+                    const xPos = (i: number) => 30 + i * 80;
+                    const yPos = (v: number) => 55 - v * 0.5;
+                    return (
+                      <div className="mb-3 p-3 bg-white border border-gray-200 rounded-md">
+                        <svg viewBox="0 0 300 60" className="w-full h-14" preserveAspectRatio="none">
+                          <polyline
+                            points={trendVals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')}
+                            fill="none"
+                            stroke="#9ca3af"
+                            strokeWidth="2"
+                            strokeDasharray="5,4"
+                          />
+                          <polyline
+                            points={yVals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')}
+                            fill="none"
+                            stroke="#4f46e5"
+                            strokeWidth="2"
+                          />
+                          {yVals.map((v, i) => (
+                            <circle key={weeklyTrend[i].week} cx={xPos(i)} cy={yPos(v)} r="3" fill="#4f46e5" />
+                          ))}
+                        </svg>
+                        <div className="flex items-center gap-4 mt-1 text-[10px] text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <span className="inline-block w-3 h-0.5 bg-indigo-600" />
+                            {lang === 'es' ? 'Real' : 'Actual'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span className="inline-block w-3 border-t-2 border-dashed border-gray-400" />
+                            {lang === 'es' ? 'Tendencia (4 semanas)' : 'Trend (4 weeks)'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     {weeklyTrend.map((w) => {
                     const isCurrent = w.week === customWeek;
@@ -1844,15 +1914,21 @@ ${dateTableEN}`;
                   {weeklyTrend.length === 4 && (
                     <div className="mt-3 grid grid-cols-3 gap-3">
                       {Array.from({ length: 3 }).map((_, i) => {
-                        const a = weeklyTrend[i].percentage;
-                        const b = weeklyTrend[i + 1].percentage;
+                        // Redondeamos ANTES de restar, con los mismos enteros
+                        // que se muestran en cada tarjeta (Math.round arriba)
+                        // — si no, dos semanas que se ven iguales en pantalla
+                        // (ej. "19%" y "19%") podían mostrar un delta que no
+                        // era exactamente 0 (ej. "-0.4 pp"), por diferencias
+                        // de menos de un punto que no se ven en la etiqueta.
+                        const a = Math.round(weeklyTrend[i].percentage);
+                        const b = Math.round(weeklyTrend[i + 1].percentage);
                         const diff = b - a;
                         const sign = diff > 0 ? '+' : '';
                         const color = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-600';
                         const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '▬';
                         return (
                           <div key={`delta-${i}`} className="text-sm font-medium text-center bg-white border border-gray-200 rounded-md py-2">
-                            <span className={`${color}`}>{arrow} {sign}{diff.toFixed(1)} pp</span>
+                            <span className={`${color}`}>{arrow} {sign}{diff} pp</span>
                           </div>
                         );
                       })}
