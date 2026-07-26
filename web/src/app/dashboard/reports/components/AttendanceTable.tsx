@@ -1,3 +1,8 @@
+// ⚠️ COMPONENTE SIN USAR — ninguna pantalla lo importa (Reportes usa su
+// propia UI en dashboard/reports/page.tsx). Depende de reportService.ts,
+// que tiene IDs de organización/programa hardcodeados y consultas sin
+// paginar — ver la advertencia al inicio de ese archivo antes de reactivar
+// esto.
 import React from 'react';
 import { MdFileDownload, MdRefresh } from 'react-icons/md';
 import LoadingIndicator from './LoadingIndicator';

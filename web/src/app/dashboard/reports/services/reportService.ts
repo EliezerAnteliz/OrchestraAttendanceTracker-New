@@ -1,6 +1,32 @@
+/**
+ * ⚠️ ARCHIVO SIN USAR — NO REACTIVAR TAL CUAL.
+ *
+ * Nada en la app importa las funciones de este archivo (se confirmó con una
+ * búsqueda de uso en todo `src/`); los únicos "consumidores" son
+ * AttendanceTable.tsx y AttendanceCharts.tsx, que a su vez tampoco los
+ * importa ninguna pantalla real — es una rama de código huérfana de una
+ * versión anterior de Reportes, reemplazada por la lógica que hoy vive
+ * directamente en `dashboard/reports/page.tsx`.
+ *
+ * Se deja documentado en vez de borrarlo porque tiene dos problemas reales
+ * que alguien podría reintroducir sin darse cuenta si reactiva este código:
+ *
+ * 1. ORGANIZATION_ID/PROGRAM_ID hardcodeados abajo — de antes de que la app
+ *    soportara múltiples organizaciones/sedes. Usarlo tal cual mezclaría
+ *    datos de sedes que no son la del usuario actual.
+ * 2. calculateAttendanceStats / getAttendanceByDate / getAttendanceByInstrument
+ *    consultan `attendance` con `.select()` sin `.range()` — el mismo bug de
+ *    paginación (Supabase corta en 1000 filas) que causó que el reporte
+ *    Anual de asistencia mostrara solo ~2 meses de datos, ya corregido en
+ *    `reports/page.tsx` con `fetchAllAttendanceRecords`.
+ *
+ * Si algún día se necesita esto, reescribirlo usando `activeProgram.id` (ver
+ * `ProgramContext`) y el helper de paginación de `reports/page.tsx`, no
+ * copiar estas funciones como están.
+ */
 import { supabase } from '@/lib/supabase';
 
-// Constantes para IDs de organización y programa
+// Constantes para IDs de organización y programa — ver advertencia arriba.
 const ORGANIZATION_ID = 'a0d1e7a6-87ad-45d1-9cb5-f08f083f24c4';
 const PROGRAM_ID = '9d7dc91c-7bbe-49cd-bc64-755467bf91da';
 

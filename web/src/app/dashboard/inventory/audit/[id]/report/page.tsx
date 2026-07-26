@@ -29,6 +29,39 @@ interface ReportData {
   missing: any[];
 }
 
+// Supabase/PostgREST devuelve máximo 1000 filas por consulta si no se pagina
+// explícitamente con .range() — el mismo bug que ya se corrigió en el
+// reporte Anual de Asistencia. Sin esto, una sesión de auditoría con más de
+// 1000 eventos mostraría conteos de encontrados/faltantes/mismatch
+// incompletos en el reporte final, de forma silenciosa.
+const AUDIT_EVENTS_PAGE_SIZE = 1000;
+async function fetchAllAuditEvents(sessionId: string) {
+  const all: any[] = [];
+  let from = 0;
+  for (let page = 0; page < 200; page++) {
+    const to = from + AUDIT_EVENTS_PAGE_SIZE - 1;
+    const { data, error } = await inventorySupabase
+      .from('audit_events')
+      .select(`
+        id,
+        result,
+        source,
+        scanned_code,
+        assets:asset_id(id, full_code, description, brand, serial_number)
+      `)
+      .eq('audit_session_id', sessionId)
+      .order('id', { ascending: true })
+      .range(from, to);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < AUDIT_EVENTS_PAGE_SIZE) break;
+    from += AUDIT_EVENTS_PAGE_SIZE;
+  }
+  return all;
+}
+
 export default function AuditReportPage() {
   const { t, lang } = useI18n();
   const { isAdmin, loading: roleLoading } = useUserRole();
@@ -67,19 +100,8 @@ export default function AuditReportPage() {
       if (sessionError) throw sessionError;
       setSession(sessionData);
 
-      // Cargar eventos de la sesión
-      const { data: events, error: eventsError } = await inventorySupabase
-        .from('audit_events')
-        .select(`
-          id,
-          result,
-          source,
-          scanned_code,
-          assets:asset_id(id, full_code, description, brand, serial_number)
-        `)
-        .eq('audit_session_id', sessionId);
-
-      if (eventsError) throw eventsError;
+      // Cargar eventos de la sesión (paginado, ver fetchAllAuditEvents)
+      const events = await fetchAllAuditEvents(sessionId);
 
       // Separar por resultado
       const found = events?.filter(e => e.result === 'found') || [];

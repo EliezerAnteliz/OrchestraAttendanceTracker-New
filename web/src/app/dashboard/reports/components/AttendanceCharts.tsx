@@ -1,3 +1,8 @@
+// ⚠️ COMPONENTE SIN USAR — ninguna pantalla lo importa (Reportes usa su
+// propia UI en dashboard/reports/page.tsx, con su propio PieChart/BarChart).
+// Depende de reportService.ts, que tiene IDs de organización/programa
+// hardcodeados y consultas sin paginar — ver la advertencia al inicio de
+// ese archivo antes de reactivar esto.
 import React from 'react';
 import LoadingIndicator from './LoadingIndicator';
 import ErrorDisplay from './ErrorDisplay';

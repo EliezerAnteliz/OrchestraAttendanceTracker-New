@@ -62,6 +62,47 @@ interface PendingConfirm {
   mismatchProgramName?: string | null;
 }
 
+// Supabase/PostgREST devuelve máximo 1000 filas por consulta si no se pagina
+// explícitamente con .range() — el mismo bug que ya se corrigió en el
+// reporte Anual de Asistencia (ver web/src/app/dashboard/reports/page.tsx).
+// Una sesión de auditoría larga (varios escáneres a la vez, reintentos,
+// códigos duplicados/desconocidos) puede superar 1000 eventos sin que se
+// note: la pantalla en vivo simplemente dejaría de mostrar eventos nuevos y
+// el conteo de "auditados" quedaría incompleto de forma silenciosa.
+const AUDIT_EVENTS_PAGE_SIZE = 1000;
+async function fetchAllAuditEvents(sessionId: string) {
+  const all: any[] = [];
+  let from = 0;
+  for (let page = 0; page < 200; page++) {
+    const to = from + AUDIT_EVENTS_PAGE_SIZE - 1;
+    const { data, error } = await inventorySupabase
+      .from('audit_events')
+      .select(`
+        id,
+        source,
+        result,
+        scanned_at,
+        scanned_code,
+        assets:asset_id(id, full_code, description, brand, size, assigned_to_text)
+      `)
+      .eq('audit_session_id', sessionId)
+      // Desempate por id además de scanned_at: dos escaneos casi
+      // simultáneos pueden compartir el mismo timestamp, y sin un
+      // desempate estable el corte entre páginas podría saltarse o
+      // repetir una fila.
+      .order('scanned_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < AUDIT_EVENTS_PAGE_SIZE) break;
+    from += AUDIT_EVENTS_PAGE_SIZE;
+  }
+  return all;
+}
+
 export default function AuditSessionPage() {
   const { t } = useI18n();
   const { isAdmin, loading: roleLoading } = useUserRole();
@@ -149,21 +190,8 @@ export default function AuditSessionPage() {
 
   async function loadEvents() {
     try {
-      const { data, error: eventsError } = await inventorySupabase
-        .from('audit_events')
-        .select(`
-          id,
-          source,
-          result,
-          scanned_at,
-          scanned_code,
-          assets:asset_id(id, full_code, description, brand, size, assigned_to_text)
-        `)
-        .eq('audit_session_id', sessionId)
-        .order('scanned_at', { ascending: false });
-
-      if (eventsError) throw eventsError;
-      setEvents(data || []);
+      const data = await fetchAllAuditEvents(sessionId);
+      setEvents(data);
     } catch (err: any) {
       console.error('Error loading events:', err);
     }
