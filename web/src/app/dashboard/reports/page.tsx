@@ -78,6 +78,45 @@ interface AttendanceStats {
   total: number;
 }
 
+// "Notificaciones de Inasistencias" (envío de emails a padres) no se usó en
+// el ciclo 2025-2026 — se deja el código completo (queda apagado, no se
+// borra) por si más adelante se retoma. Para volver a mostrarlo, poner esto
+// en `true`.
+const SHOW_ABSENCE_NOTIFICATIONS = false;
+
+// Supabase/PostgREST devuelve máximo 1000 filas por consulta si no se pagina
+// explícitamente con .range(). El reporte de asistencia puede fácilmente
+// superar eso (un solo mes de un programa activo ya llegó a ~940 registros
+// reales) — sin paginar, esto corta los datos en silencio y las estadísticas
+// quedan incompletas (ej. el reporte Anual solo mostraba los primeros 1-2
+// meses del año académico). Esta función trae TODAS las filas del rango,
+// pidiendo de a `PAGE_SIZE` hasta que una página vuelve incompleta.
+const ATTENDANCE_FETCH_PAGE_SIZE = 1000;
+async function fetchAllAttendanceRecords(programId: string, startDate: string, endDate: string) {
+  const all: any[] = [];
+  let from = 0;
+  // Límite de seguridad para no quedar en un loop infinito ante algo inesperado.
+  for (let page = 0; page < 200; page++) {
+    const to = from + ATTENDANCE_FETCH_PAGE_SIZE - 1;
+    const { data, error } = await supabase
+      .from('attendance')
+      .select('*')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .eq('program_id', programId)
+      .order('date', { ascending: true })
+      .range(from, to);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+
+    all.push(...data);
+    if (data.length < ATTENDANCE_FETCH_PAGE_SIZE) break; // última página
+    from += ATTENDANCE_FETCH_PAGE_SIZE;
+  }
+  return all;
+}
+
 // Componente principal
 export default function ReportsPage() {
   const { t, lang } = useI18n();
@@ -303,24 +342,15 @@ export default function ReportsPage() {
       console.log('Consultando datos de asistencia con enfoque simple...');
       
       let attendanceRecords: any[] | null = null;
-      
+
       try {
-        // Primero obtenemos los registros de asistencia sin relaciones
-        const { data, error } = await supabase
-          .from('attendance')
-          .select('*')
-          .gte('date', startDate)
-          .lte('date', endDate)
-          .eq('program_id', activeProgram.id);
-        
-        if (error) {
-          console.error('Error al consultar datos de asistencia:', error);
-          throw new Error(`Error al consultar datos: ${error.message || 'Error desconocido'}`);
-        }
-        
+        // Traemos TODOS los registros de asistencia del rango (paginado, ver
+        // fetchAllAttendanceRecords) — antes esto se cortaba en 1000 filas.
+        const data = await fetchAllAttendanceRecords(activeProgram.id, startDate, endDate);
+
         console.log(`Datos obtenidos: ${data?.length || 0} registros`);
         console.log('Muestra de datos:', data?.slice(0, 2));
-        
+
         // Filtrar por estudiante si es reporte individual
         if (reportType === 'individual' && selectedStudent) {
           attendanceRecords = data?.filter(record => record.student_id === selectedStudent.id) || [];
@@ -461,13 +491,7 @@ export default function ReportsPage() {
         const trendStartStr = trendStart.toISOString().split('T')[0];
         const trendEndStr = trendEnd.toISOString().split('T')[0];
 
-        const { data: allWeeklyData, error: allWeeklyError } = await supabase
-          .from('attendance')
-          .select('*')
-          .gte('date', trendStartStr)
-          .lte('date', trendEndStr)
-          .eq('program_id', activeProgram.id);
-        if (allWeeklyError) throw allWeeklyError;
+        const allWeeklyData = await fetchAllAttendanceRecords(activeProgram.id, trendStartStr, trendEndStr);
 
         let records2 = allWeeklyData || [];
         if (reportType === 'individual' && selectedStudent) {
@@ -1086,7 +1110,9 @@ ${dateTableEN}`;
 
   // Componente de gráfico de barras con animación moderna
   const BarChart = ({ data }: { data: AttendanceStats }) => {
-    const maxValue = Math.max(data.total_attendance, data.total_excused_absences, data.total_unexcused_absences);
+    // Math.max(1, ...) evita dividir por 0 (NaN en la altura de las barras)
+    // cuando el período no tiene ningún registro de asistencia.
+    const maxValue = Math.max(1, data.total_attendance, data.total_excused_absences, data.total_unexcused_absences);
     const barWidth = 50; // Ancho de las barras
     const gap = 30; // Espacio entre barras
     const chartHeight = 200; // Altura fija para el gráfico
@@ -1611,8 +1637,10 @@ ${dateTableEN}`;
         </div>
       </div>
         
-      {/* Sección separada para notificaciones de faltas (solo admin) */}
-      {isAdmin && (
+      {/* Sección separada para notificaciones de faltas (solo admin) — apagada
+          este ciclo (SHOW_ABSENCE_NOTIFICATIONS, ver arriba), código intacto
+          para retomarla más adelante */}
+      {SHOW_ABSENCE_NOTIFICATIONS && isAdmin && (
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md w-full">
             <div className="flex items-center mb-4">
               <div className="p-2 bg-red-100 rounded-lg mr-3">
