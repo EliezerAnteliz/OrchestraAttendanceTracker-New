@@ -68,6 +68,19 @@ function ProgramSwitcher() {
   );
 }
 
+// Iniciales a partir del correo (no tenemos nombre real disponible en el
+// usuario de Auth) — mismo patrón de avatar circular ya usado en otras
+// partes de la app (ej. el selector de estudiante de Reportes). Si el
+// correo tiene separador (ej. "eliezer.anteliz@...") usa la primera letra
+// de cada parte; si no, las 2 primeras letras del usuario.
+const getInitials = (email?: string | null) => {
+  if (!email) return '?';
+  const local = email.split('@')[0];
+  const parts = local.split(/[._-]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return local.slice(0, 2).toUpperCase();
+};
+
 function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: boolean) => void }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
@@ -100,29 +113,30 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
   }, []);
 
   return (
-    <aside 
+    <aside
       className={`
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-        md:translate-x-0 
-        fixed md:static 
-        top-0 left-0 
-        h-full 
-        w-64 
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0
+        fixed md:static
+        top-0 left-0
+        h-full
+        w-64
         bg-white
         border-r border-gray-200
-        shadow-lg md:shadow-none 
-        z-30 
+        shadow-lg md:shadow-none
+        z-30
         transition-transform duration-300 ease-in-out
         overflow-hidden
+        flex flex-col
       `}
     >
-      <div className="p-4 border-b border-gray-200 bg-[#0073ea] text-white">
+      <div className="p-4 border-b border-gray-200 bg-[#0073ea] text-white flex-shrink-0">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h2 className="text-lg font-bold text-white">{t('brand_title')}</h2>
             <p className="text-xs text-blue-100 opacity-90">{t('brand_subtitle')}</p>
           </div>
-          <button 
+          <button
             className="md:hidden text-white hover:text-blue-200 transition-colors"
             onClick={() => setIsOpen(false)}
           >
@@ -134,7 +148,11 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
           <ProgramSwitcher />
         </div>
       </div>
-      <nav className="mt-6 px-2">
+      {/* flex-1 + overflow-y-auto: si algún día se agregan más ítems de los
+          que caben en pantallas cortas, el menú scrollea en vez de empujar
+          o quedar tapado por el pie de cuenta (que ahora vive en el flujo
+          normal, no con position:absolute). */}
+      <nav className="mt-6 px-2 flex-1 overflow-y-auto">
         <ul className="space-y-1">
           {sidebarItems.map((item) => {
             // "Dashboard" (href = '/dashboard') es un caso especial: TODAS
@@ -183,14 +201,27 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
           )}
         </ul>
       </nav>
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-600 truncate max-w-[140px] font-medium">{user?.email}</span>
+      {/* mt-auto en vez de position:absolute — vive en el flujo normal del
+          flex column del <aside>, así que nunca puede quedar tapando el
+          último ítem del menú si algún día se agrega uno más en pantallas
+          cortas. */}
+      <div className="flex-shrink-0 mt-auto p-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Avatar circular con iniciales — mismo patrón ya usado en el
+              selector de estudiante de Reportes, para que el pie de cuenta
+              se sienta parte del mismo sistema visual en vez de solo texto
+              suelto. */}
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0073ea]/10 text-[#0073ea] flex items-center justify-center font-semibold text-xs">
+            {getInitials(user?.email)}
+          </div>
+          <span className="flex-1 min-w-0 text-xs text-gray-600 truncate font-medium">{user?.email}</span>
           <button
             onClick={signOut}
-            className="flex items-center text-xs text-gray-600 hover:text-[#0060c0] transition-colors duration-200 bg-white hover:bg-gray-50 px-2 py-1 rounded-md border border-gray-200 hover:border-gray-300"
+            title={t('sign_out')}
+            aria-label={t('sign_out')}
+            className="flex-shrink-0 flex items-center justify-center text-xs text-gray-600 hover:text-[#0060c0] transition-colors duration-200 bg-white hover:bg-gray-50 p-1.5 rounded-md border border-gray-200 hover:border-gray-300"
           >
-            <MdLogout className="mr-1" size={14} /> {t('sign_out')}
+            <MdLogout size={14} />
           </button>
         </div>
       </div>

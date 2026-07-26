@@ -1401,7 +1401,7 @@ ${dateTableEN}`;
             el espacio disponible. Ahora la altura de cada barra es un
             porcentaje de "flex-1" (el espacio que realmente hay), igual
             que el gráfico de torta y las mini-barras de tendencia semanal. */}
-        <div className="flex-1 flex items-end justify-center gap-8 sm:gap-14 px-4 pb-2 min-h-0">
+        <div className="flex-1 flex items-end justify-center gap-4 sm:gap-14 px-4 pb-2 min-h-0">
           {bars.map((bar, index) => {
             const heightPct = Math.max(4, Math.round((bar.value / maxValue) * 100));
             return (
@@ -1436,8 +1436,13 @@ ${dateTableEN}`;
           })}
         </div>
 
-        {/* Etiquetas debajo de cada barra */}
-        <div className="flex items-start justify-center gap-8 sm:gap-14 px-4 pt-1 mb-6 sm:mb-8">
+        {/* Etiquetas debajo de cada barra. gap-4 en móvil (antes gap-8): con
+            3 barras de w-16 (64px) + los padding de las tarjetas que las
+            envuelven, gap-8 (32px) se quedaba sin espacio en pantallas
+            angostas (~360px, común en Android) y podía recortar la tercera
+            barra. gap-4 deja margen de sobra sin afectar el diseño de
+            escritorio (sm:gap-14 no cambia). */}
+        <div className="flex items-start justify-center gap-4 sm:gap-14 px-4 pt-1 mb-6 sm:mb-8">
           {bars.map((bar, index) => (
             <div
               key={bar.label}
