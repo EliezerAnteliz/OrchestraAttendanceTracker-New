@@ -1302,7 +1302,7 @@ ${dateTableEN}`;
 
         {/* Dialog */}
         <div
-          className="relative bg-white rounded-lg shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
+          className="relative bg-white rounded-lg sm:rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -1310,7 +1310,7 @@ ${dateTableEN}`;
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <MdPerson size={20} className="text-blue-600" />
+                  <MdPerson size={20} className="text-[#0073ea]" />
                 </div>
                 <div>
                   <h2 id="student-modal-title" className="text-xl font-semibold text-gray-900">
@@ -1359,15 +1359,20 @@ ${dateTableEN}`;
                       onClick={() => onSelect(student)}
                       className="w-full text-left flex items-center gap-3 px-3 py-3 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none rounded-md transition-colors"
                     >
-                      {/* Avatar iniciales */}
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0073ea] bg-opacity-10 text-[#0073ea] flex items-center justify-center font-semibold text-sm">
+                      {/* Avatar iniciales — antes usaba bg-opacity-10, una
+                          utilidad que no aplica sobre colores arbitrarios
+                          (bg-[#0073ea]) en esta versión de Tailwind, así que
+                          el círculo salía azul sólido y las iniciales (del
+                          mismo azul) quedaban invisibles. bg-[#0073ea]/10 es
+                          la sintaxis que sí funciona. */}
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0073ea]/10 text-[#0073ea] flex items-center justify-center font-semibold text-sm">
                         {student.first_name?.[0]}{student.last_name?.[0]}
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-800 leading-tight">{student.first_name} {student.last_name}</p>
                         <p className="text-xs text-gray-500">{student.instrument}</p>
                       </div>
-                      <span className="text-xs text-white bg-[#0073ea] px-3 py-1 rounded-md font-medium hover:bg-[#0060c0] transition-colors">
+                      <span className="text-xs text-white bg-gradient-to-r from-[#0073ea] to-[#0060c0] px-3 py-1 rounded-md font-medium hover:shadow-md transform hover:scale-[1.03] transition-all duration-200">
                         {t('select')}
                       </span>
                     </button>
@@ -1377,11 +1382,14 @@ ${dateTableEN}`;
             )}
           </div>
 
-          {/* Footer */}
+          {/* Footer — botón "fantasma" (sin fondo, solo hover), mismo
+              patrón que el Cancelar del modal de Nuevo Estudiante; antes
+              tenía un gris sólido distinto (bg-gray-200) que no coincidía
+              con el resto de la app. */}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
-            <button 
+            <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
             >
               {lang === 'es' ? 'Cancelar' : 'Cancel'}
             </button>
