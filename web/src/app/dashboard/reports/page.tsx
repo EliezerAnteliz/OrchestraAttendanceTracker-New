@@ -963,10 +963,14 @@ ${dateTableEN}`;
     const excusedPercentage = data.excused_percentage;
     const unexcusedPercentage = data.unexcused_percentage;
 
+    // Mismos colores que las Barras y la leyenda (Tailwind green/yellow/red-500)
+    // — antes la torta usaba tonos -400 (#4ade80/#fbbf24/#f87171), más
+    // pálidos que las barras y que los cuadritos de la leyenda, por eso se
+    // veían "menos vivos" al lado del gráfico de Barras.
     const pieData = [
-      { name: t('total_attendances'), value: data.total_attendance, color: '#4ade80' },
-      { name: t('total_excused_absences'), value: data.total_excused_absences, color: '#fbbf24' },
-      { name: t('total_unexcused_absences'), value: data.total_unexcused_absences, color: '#f87171' },
+      { name: t('total_attendances'), value: data.total_attendance, color: '#22c55e' },
+      { name: t('total_excused_absences'), value: data.total_excused_absences, color: '#eab308' },
+      { name: t('total_unexcused_absences'), value: data.total_unexcused_absences, color: '#ef4444' },
     ];
 
     // Detectar casos de 100% en una sola categoría
@@ -1019,10 +1023,13 @@ ${dateTableEN}`;
       ].join(" ");
     };
     
-    // Aumentamos las dimensiones del gráfico
+    // radius subido de 120 a 142 (de un círculo que dejaba ~20% de margen
+    // vacío dentro de su propio lienzo 300x300, a solo ~5%) — junto con el
+    // recorte de padding/max-width de abajo, hace que la torta se vea con
+    // el mismo "peso" visual que las Barras, que sí llegan hasta el borde.
     const centerX = 150;
     const centerY = 150;
-    const radius = 120;
+    const radius = 142;
     
     // Componente para renderizar un sector con animación moderna
     const AnimatedSector = ({ startAngle, endAngle, color, index }: { 
@@ -1085,16 +1092,14 @@ ${dateTableEN}`;
       // espacio que le da el contenedor padre (300px en móvil, 350px en
       // escritorio) — igual que ahora hace el gráfico de Barras.
       <div className="flex flex-col h-full w-full">
-        <div className="flex-1 min-h-0 flex items-center justify-center p-2">
-          {/* width/height 100% + preserveAspectRatio (por defecto "meet")
-              en vez de un tamaño fijo en píxeles: el círculo se agranda o
-              achica según el espacio real disponible sin deformarse (a
-              diferencia de las Barras, la torta sí debe mantener su
-              proporción 1:1). Antes el SVG media 300x300px fijos sin
-              importar el contenedor, por lo que en pantallas angostas
-              podía desbordar y en el contenedor de 350px de escritorio no
-              aprovechaba el alto extra. */}
-          <svg viewBox="0 0 300 300" className="w-full h-full max-w-[320px]">
+        <div className="flex-1 min-h-0 flex items-center justify-center">
+          {/* w-full h-full + viewBox cuadrado (preserveAspectRatio por
+              defecto es "meet", así que el círculo nunca se deforma): el
+              SVG usa TODO el espacio que le da el flex-1 en vez de un
+              tamaño fijo en píxeles o un max-width que lo topaba antes de
+              llegar al borde — así se ve con el mismo tamaño/peso que las
+              Barras, que también llegan hasta el borde de su contenedor. */}
+          <svg viewBox="0 0 300 300" className="w-full h-full">
             {/* Capa de fondo */}
             <circle cx={centerX} cy={centerY} r={radius} fill="#f0f0f0" />
 
