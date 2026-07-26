@@ -22,7 +22,7 @@ interface AuditSession {
   id: string;
   program_id: string;
   started_at: string;
-  status: 'open' | 'closed';
+  status: 'open' | 'closed' | 'cancelled';
   programs?: {
     name: string;
   };
@@ -120,6 +120,8 @@ export default function AuditSessionPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<AuditMode>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [savingConfirm, setSavingConfirm] = useState(false);
   // Para deshacer un activo auditado por error (ej. se seleccionó el
@@ -140,10 +142,13 @@ export default function AuditSessionPage() {
     loadEvents();
   }, [sessionId]);
 
-  // Redirigir a reporte si la sesión está cerrada
+  // Redirigir a reporte si la sesión está cerrada, o de vuelta a la lista si
+  // fue cancelada (una sesión cancelada no tiene reporte que mostrar).
   useEffect(() => {
     if (session && session.status === 'closed') {
       router.push(`/dashboard/inventory/audit/${sessionId}/report`);
+    } else if (session && session.status === 'cancelled') {
+      router.push('/dashboard/inventory/audit');
     }
   }, [session, sessionId, router]);
 
@@ -422,6 +427,34 @@ export default function AuditSessionPage() {
     }
   }
 
+  // Cancelar una auditoría que se inició por error o que no se va a
+  // completar — a diferencia de "Finalizar", no genera reporte. Los eventos
+  // ya registrados en esta sesión se dejan tal cual (no se borran, quedan
+  // como historial), pero la sesión pasa a 'cancelled' y ya no bloquea que
+  // se inicie una auditoría nueva para esta misma sede (createNewSession en
+  // la lista solo reanuda sesiones con status='open').
+  async function cancelSession() {
+    try {
+      setCancelling(true);
+      const { error: updateError } = await inventorySupabase
+        .from('audit_sessions')
+        .update({
+          status: 'cancelled',
+          ended_at: new Date().toISOString(),
+        })
+        .eq('id', sessionId);
+
+      if (updateError) throw updateError;
+
+      router.push('/dashboard/inventory/audit');
+    } catch (err: any) {
+      console.error('Error cancelling session:', err);
+      setError(err.message || t('inv_error_cancelling_session'));
+      setCancelling(false);
+      setShowCancelConfirm(false);
+    }
+  }
+
   if (roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -457,13 +490,18 @@ export default function AuditSessionPage() {
     );
   }
 
-  // Si la sesión está cerrada, el useEffect se encargará de redirigir
-  if (session.status === 'closed') {
+  // Si la sesión está cerrada o cancelada, el useEffect se encargará de
+  // redirigir (a reporte o a la lista, respectivamente) — este bloque solo
+  // cubre el instante intermedio para no mostrar la pantalla de auditoría
+  // activa de una sesión que ya no lo está.
+  if (session.status === 'closed' || session.status === 'cancelled') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_redirecting_to_report')}</p>
+          <p className="mt-4 text-gray-600">
+            {session.status === 'closed' ? t('inv_redirecting_to_report') : t('inv_cancelling')}
+          </p>
         </div>
       </div>
     );
@@ -701,13 +739,23 @@ export default function AuditSessionPage() {
         </div>
       )}
 
-      {/* Close Session Button - Fixed at bottom */}
+      {/* Close/Cancel Session Buttons - Fixed at bottom */}
       {!activeMode && (
         <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto flex gap-2">
+            {/* Cancelar: para cuando la auditoría se inició por error o no
+                se va a completar — no genera reporte. Botón secundario
+                (ghost) para que no compita visualmente con "Finalizar",
+                que es la acción esperada la mayoría de las veces. */}
+            <button
+              onClick={() => setShowCancelConfirm(true)}
+              className="px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium border border-gray-300"
+            >
+              {t('inv_cancel_audit')}
+            </button>
             <button
               onClick={() => setShowCloseConfirm(true)}
-              className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
             >
               {t('inv_finalize_audit')}
             </button>
@@ -736,6 +784,34 @@ export default function AuditSessionPage() {
                 className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
               >
                 {loading ? t('inv_finalizing') : t('inv_finalize')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
+          <div className="bg-white w-full sm:max-w-md sm:rounded-lg rounded-t-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('inv_cancel_audit_question')}</h2>
+            <p className="text-gray-600 mb-6">
+              {t('inv_cancel_audit_desc', { n: foundCount })}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                disabled={cancelling}
+                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+              >
+                {t('inv_keep_going')}
+              </button>
+              <button
+                onClick={cancelSession}
+                disabled={cancelling}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
+              >
+                {cancelling ? t('inv_cancelling') : t('inv_yes_cancel_audit')}
               </button>
             </div>
           </div>

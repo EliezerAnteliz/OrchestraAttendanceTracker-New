@@ -645,6 +645,7 @@ const translations: Translations = {
   inv_unknown_site: { es: "Sede desconocida", en: "Unknown site" },
   inv_open_status: { es: "Abierta", en: "Open" },
   inv_closed_status: { es: "Cerrada", en: "Closed" },
+  inv_cancelled_status: { es: "Cancelada", en: "Cancelled" },
   inv_assets_audited_count: { es: "{n} activos auditados", en: "{n} assets audited" },
   inv_finished_on: { es: "Finalizada {date}", en: "Finished {date}" },
   inv_select_site_label: { es: "Seleccionar Sede", en: "Select Site" },
@@ -686,6 +687,13 @@ const translations: Translations = {
   inv_finalize_audit_desc: { es: "Se generará el reporte final con {n} activos encontrados. Esta acción no se puede deshacer.", en: "The final report will be generated with {n} assets found. This action cannot be undone." },
   inv_finalizing: { es: "Finalizando...", en: "Finishing..." },
   inv_finalize: { es: "Finalizar", en: "Finish" },
+  inv_cancel_audit: { es: "Cancelar auditoría", en: "Cancel audit" },
+  inv_cancel_audit_question: { es: "¿Cancelar esta auditoría?", en: "Cancel this audit?" },
+  inv_cancel_audit_desc: { es: "No se generará ningún reporte. Los {n} activos ya auditados en esta sesión quedarán registrados, pero la sesión se marcará como cancelada y no contará en el historial. Esta acción no se puede deshacer.", en: "No report will be generated. The {n} assets already audited in this session will stay recorded, but the session will be marked as cancelled and won't count in the history. This action cannot be undone." },
+  inv_cancelling: { es: "Cancelando...", en: "Cancelling..." },
+  inv_yes_cancel_audit: { es: "Sí, cancelar", en: "Yes, cancel" },
+  inv_error_cancelling_session: { es: "Error al cancelar la auditoría", en: "Error cancelling the audit" },
+  inv_keep_going: { es: "No, seguir auditando", en: "No, keep auditing" },
 
   // ========================================
   // Inventory module — audit/[id]/report/page.tsx

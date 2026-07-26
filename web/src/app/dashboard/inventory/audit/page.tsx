@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdArrowBack } from 'react-icons/md';
+import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdArrowBack, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -27,7 +27,7 @@ interface AuditSession {
   program_id: string;
   started_at: string;
   ended_at: string | null;
-  status: 'open' | 'closed';
+  status: 'open' | 'closed' | 'cancelled';
   programs?: {
     name: string;
   } | {
@@ -304,6 +304,11 @@ export default function AuditPage() {
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                       <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
                       {t('inv_open_status')}
+                    </span>
+                  ) : session.status === 'cancelled' ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium">
+                      <MdClose size={14} />
+                      {t('inv_cancelled_status')}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
