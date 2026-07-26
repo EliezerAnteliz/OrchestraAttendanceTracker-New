@@ -76,6 +76,7 @@ interface Student {
   first_name: string;
   last_name: string;
   instrument: string;
+  orchestra_position: string;
 }
 
 interface AttendanceStats {
@@ -177,6 +178,16 @@ export default function ReportsPage() {
   const [trendSlope, setTrendSlope] = useState<number>(0);
   // Desglose anual por mes (Sep-May)
   const [annualBreakdown, setAnnualBreakdown] = useState<Array<{ key: string; label: string; a: number; ea: number; ua: number; total: number }>>([]);
+
+  // --- Métricas nuevas (pedidas por Eliezer tras revisar Reportes) ---
+  // Top 5 estudiantes con mejor % de asistencia en el período (solo reporte grupal).
+  const [topAttendance, setTopAttendance] = useState<Array<{ id: string; name: string; instrument: string; percentage: number; total: number }>>([]);
+  // Comparación vs. el período anterior (Mensual y Anual — Semanal ya tiene
+  // su propia tendencia de 4 semanas, así que no se duplica aquí).
+  const [periodComparison, setPeriodComparison] = useState<{ previousLabel: string; previousPercentage: number; deltaPct: number } | null>(null);
+  // Desglose de % de asistencia por instrumento y por posición (solo reporte grupal).
+  const [instrumentBreakdown, setInstrumentBreakdown] = useState<Array<{ label: string; percentage: number; total: number }>>([]);
+  const [positionBreakdown, setPositionBreakdown] = useState<Array<{ label: string; percentage: number; total: number }>>([]);
 
   // Año académico base (septiembre a mayo). Si estamos en septiembre o después, el año es el actual; de lo contrario, el anterior.
   const defaultAcademicYear = (() => {
@@ -292,6 +303,20 @@ export default function ReportsPage() {
     return firstDay.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
   };
 
+  // Mes calendario inmediatamente anterior al mes elegido (customMonth),
+  // usado para "comparación vs. período anterior" en el reporte Mensual.
+  // new Date(year, month - 1, ...) resuelve solo el rollover de año
+  // (ej. enero -> diciembre del año anterior).
+  const getPreviousMonthRange = (monthStr: string) => {
+    const [yearStr, monthOnly] = monthStr.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthOnly, 10) - 1; // 0-based
+    const prevMonthDate = new Date(year, month - 1, 1);
+    const firstDay = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1);
+    const lastDay = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth() + 1, 0);
+    return { firstDay, lastDay };
+  };
+
   // Cargar estudiantes al inicio
   useEffect(() => {
     const loadStudents = async () => {
@@ -304,7 +329,7 @@ export default function ReportsPage() {
         }
         const { data, error } = await supabase
           .from('students')
-          .select('id, first_name, last_name, instrument')
+          .select('id, first_name, last_name, instrument, orchestra_position')
           .eq('is_active', true)
           .eq('program_id', activeProgram.id);
 
@@ -315,7 +340,8 @@ export default function ReportsPage() {
           name: `${student.first_name} ${student.last_name}`,
           first_name: student.first_name,
           last_name: student.last_name,
-          instrument: student.instrument
+          instrument: student.instrument,
+          orchestra_position: student.orchestra_position || ''
         }));
 
         setStudents(formattedStudents);
@@ -431,6 +457,10 @@ export default function ReportsPage() {
         setTrendDirection('flat');
         setTrendSlope(0);
         setAnnualBreakdown([]);
+        setTopAttendance([]);
+        setInstrumentBreakdown([]);
+        setPositionBreakdown([]);
+        setPeriodComparison(null);
         return;
       }
       
@@ -503,6 +533,107 @@ export default function ReportsPage() {
       // Procesar y guardar datos del período seleccionado
       const attendanceStats = processAttendanceData(attendanceRecords);
       setReportData(attendanceStats);
+
+      // --- Top 5 asistencia, y desglose por instrumento/posición ---
+      // Solo tiene sentido en el reporte grupal (el individual ya es un solo
+      // estudiante). Usamos el listado de estudiantes activos del programa
+      // (cargado al inicio) para resolver nombre/instrumento/posición de
+      // cada student_id de los registros de asistencia.
+      if (reportType === 'group') {
+        const studentInfoMap = new Map(students.map(s => [s.id, s]));
+
+        // Agrupar registros por estudiante para el ranking
+        const perStudent = new Map<string, any[]>();
+        for (const r of attendanceRecords) {
+          if (!perStudent.has(r.student_id)) perStudent.set(r.student_id, []);
+          perStudent.get(r.student_id)!.push(r);
+        }
+        const ranking = Array.from(perStudent.entries())
+          .map(([studentId, records]) => {
+            const stats = processAttendanceData(records);
+            const info = studentInfoMap.get(studentId);
+            return {
+              id: studentId,
+              name: info?.name || (lang === 'es' ? 'Estudiante no encontrado' : 'Unknown student'),
+              instrument: info?.instrument || '',
+              percentage: stats.attendance_percentage,
+              total: stats.total,
+            };
+          })
+          // Exigimos al menos 2 registros en el período para que el % no
+          // sea solo un día suelto con 100%/0%.
+          .filter(s => s.total >= 2)
+          .sort((a, b) => b.percentage - a.percentage || b.total - a.total)
+          .slice(0, 5);
+        setTopAttendance(ranking);
+
+        // Agrupar por instrumento y por posición para comparar categorías
+        const byInstrument = new Map<string, any[]>();
+        const byPosition = new Map<string, any[]>();
+        for (const r of attendanceRecords) {
+          const info = studentInfoMap.get(r.student_id);
+          const instLabel = info?.instrument?.trim() || (lang === 'es' ? 'Sin instrumento' : 'No instrument');
+          const posLabel = info?.orchestra_position?.trim() || (lang === 'es' ? 'Sin posición' : 'No position');
+          if (!byInstrument.has(instLabel)) byInstrument.set(instLabel, []);
+          byInstrument.get(instLabel)!.push(r);
+          if (!byPosition.has(posLabel)) byPosition.set(posLabel, []);
+          byPosition.get(posLabel)!.push(r);
+        }
+        const toBreakdown = (map: Map<string, any[]>) =>
+          Array.from(map.entries())
+            .map(([label, records]) => {
+              const stats = processAttendanceData(records);
+              return { label, percentage: stats.attendance_percentage, total: stats.total };
+            })
+            .sort((a, b) => b.percentage - a.percentage);
+        setInstrumentBreakdown(toBreakdown(byInstrument));
+        setPositionBreakdown(toBreakdown(byPosition));
+      } else {
+        setTopAttendance([]);
+        setInstrumentBreakdown([]);
+        setPositionBreakdown([]);
+      }
+
+      // --- Comparación vs. el período anterior (Mensual y Anual) ---
+      // Semanal ya tiene su propia tendencia de 4 semanas más abajo, así
+      // que no se duplica aquí para no saturar la pantalla.
+      if (granularity === 'monthly' || granularity === 'annual') {
+        const prevRange = granularity === 'monthly'
+          ? getPreviousMonthRange(customMonth)
+          : getAcademicYearRange(academicYear - 1);
+        const prevStartDate = prevRange.firstDay.toISOString().split('T')[0];
+        const prevEndDate = prevRange.lastDay.toISOString().split('T')[0];
+
+        const prevData = await fetchAllAttendanceRecords(activeProgram.id, prevStartDate, prevEndDate);
+        let prevRecords = prevData || [];
+        if (reportType === 'individual' && selectedStudent) {
+          prevRecords = prevRecords.filter(r => r.student_id === selectedStudent.id);
+        }
+        if (reportType === 'group' && instrumentFilter !== 'all') {
+          const allowedIds = new Set(
+            students.filter(s => s.instrument?.trim() === instrumentFilter).map(s => s.id)
+          );
+          prevRecords = prevRecords.filter(r => allowedIds.has(r.student_id));
+        }
+        const prevStats = processAttendanceData(prevRecords);
+
+        if (prevStats.total > 0) {
+          const prevLabel = granularity === 'monthly'
+            ? formatMonthLabel('custom', `${prevRange.firstDay.getFullYear()}-${String(prevRange.firstDay.getMonth() + 1).padStart(2, '0')}`)
+            : formatAcademicYearLabel(academicYear - 1);
+          setPeriodComparison({
+            previousLabel: prevLabel,
+            previousPercentage: prevStats.attendance_percentage,
+            deltaPct: attendanceStats.attendance_percentage - prevStats.attendance_percentage,
+          });
+        } else {
+          // Sin datos del período anterior para comparar (ej. es el primer
+          // mes/año con registros) — no mostramos la comparación.
+          setPeriodComparison(null);
+        }
+      } else {
+        setPeriodComparison(null);
+      }
 
       // Calcular tendencia (3 semanas previas + semana actual) si aplica
       if (granularity === 'weekly') {
@@ -1750,8 +1881,30 @@ ${dateTableEN}`;
           <div className="space-y-6">
             {/* Estadísticas */}
             <div className="space-y-4">
-              <h3 className="font-medium text-gray-700 text-lg">{t('statistics')}</h3>
-              
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h3 className="font-medium text-gray-700 text-lg">{t('statistics')}</h3>
+                {/* Comparación vs. el período anterior (Mensual/Anual — Semanal
+                    ya tiene su propia tendencia de 4 semanas más abajo). Solo
+                    aparece si hay datos del período anterior para comparar. */}
+                {periodComparison && (
+                  <span className="flex items-center gap-1.5 text-sm">
+                    <span
+                      className={`font-semibold ${
+                        periodComparison.deltaPct > 0.5 ? 'text-green-600' : periodComparison.deltaPct < -0.5 ? 'text-red-600' : 'text-gray-500'
+                      }`}
+                    >
+                      {periodComparison.deltaPct > 0.5 ? '▲' : periodComparison.deltaPct < -0.5 ? '▼' : '▬'}{' '}
+                      {periodComparison.deltaPct >= 0 ? '+' : ''}{periodComparison.deltaPct.toFixed(1)} pp
+                    </span>
+                    <span className="text-gray-500">
+                      {lang === 'es'
+                        ? `vs. ${periodComparison.previousLabel} (${periodComparison.previousPercentage.toFixed(1)}%)`
+                        : `vs. ${periodComparison.previousLabel} (${periodComparison.previousPercentage.toFixed(1)}%)`}
+                    </span>
+                  </span>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-green-500">
                   <div className="flex items-center justify-between mb-1">
@@ -1828,6 +1981,89 @@ ${dateTableEN}`;
                   <BarChart data={reportData} />
                 )}
               </div>
+
+              {/* Top 5 — mejor % de asistencia individual en el período
+                  (solo reporte grupal; en el individual ya se ve un solo
+                  estudiante). Pide al menos 2 registros por estudiante para
+                  que el % no sea un solo día suelto. */}
+              {reportType === 'group' && topAttendance.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-medium text-gray-700 mb-2">
+                    {lang === 'es' ? 'Top 5 — Mejor Asistencia' : 'Top 5 — Best Attendance'}
+                  </h3>
+                  <div className="space-y-2">
+                    {topAttendance.map((s, idx) => (
+                      <div key={s.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2">
+                        <span
+                          className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                            idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-gray-400' : idx === 2 ? 'bg-amber-700' : 'bg-[#0073ea]'
+                          }`}
+                        >
+                          {idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
+                        </div>
+                        <span className="text-sm font-semibold text-emerald-600 flex-shrink-0">{Math.round(s.percentage)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Desglose de % de asistencia por Instrumento y por Posición
+                  (solo reporte grupal). El de Instrumento solo aparece si el
+                  filtro está en "Todos" (con un instrumento ya filtrado,
+                  comparar contra sí mismo no aporta nada) y si hay más de
+                  una categoría real con datos. */}
+              {reportType === 'group' && (
+                (instrumentFilter === 'all' && instrumentBreakdown.length > 1) || positionBreakdown.length > 1
+              ) && (
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {instrumentFilter === 'all' && instrumentBreakdown.length > 1 && (
+                    <div>
+                      <h3 className="font-medium text-gray-700 mb-2">
+                        {lang === 'es' ? 'Asistencia por Instrumento' : 'Attendance by Instrument'}
+                      </h3>
+                      <div className="space-y-2">
+                        {instrumentBreakdown.map((b) => (
+                          <div key={b.label}>
+                            <div className="flex justify-between text-xs text-gray-600 mb-0.5">
+                              <span className="truncate">{b.label}</span>
+                              <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                              <div className="h-full bg-[#0073ea] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {positionBreakdown.length > 1 && (
+                    <div>
+                      <h3 className="font-medium text-gray-700 mb-2">
+                        {lang === 'es' ? 'Asistencia por Posición' : 'Attendance by Position'}
+                      </h3>
+                      <div className="space-y-2">
+                        {positionBreakdown.map((b) => (
+                          <div key={b.label}>
+                            <div className="flex justify-between text-xs text-gray-600 mb-0.5">
+                              <span className="truncate">{b.label}</span>
+                              <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Tendencia semanal: últimas 4 semanas */}
               {granularity === 'weekly' && weeklyTrend.length > 0 && (
                 <div className="mt-20 sm:mt-6">
