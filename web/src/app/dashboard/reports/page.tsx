@@ -10,12 +10,21 @@ import { es as esLocale, enUS } from 'date-fns/locale';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useUserRole } from '@/hooks/useUserRole';
 
-// Registrar locales para react-datepicker (forzar que la semana empiece en lunes)
+// Registrar locales para react-datepicker (forzar que la semana empiece en
+// lunes, y que la semana 1 del año sea la que contiene el primer jueves —
+// regla ISO-8601, firstWeekContainsDate: 4). Sin esto, el número de semana
+// que muestra el calendario (selector "wo") se calcula con la convención de
+// EE.UU. (firstWeekContainsDate: 1) y puede no coincidir con el número de
+// semana ISO real que usa el resto de la app (getISOWeekString más abajo)
+// para consultar los datos — el rango de fechas consultado siempre es
+// correcto porque se calcula del día exacto que se hace clic, pero la
+// etiqueta en pantalla podía mostrar un número de semana distinto.
 const enMonday: typeof enUS = {
   ...enUS,
   options: {
     ...(enUS as any).options,
     weekStartsOn: 1,
+    firstWeekContainsDate: 4,
   },
 } as any;
 const esMonday: typeof esLocale = {
@@ -23,6 +32,7 @@ const esMonday: typeof esLocale = {
   options: {
     ...(esLocale as any).options,
     weekStartsOn: 1,
+    firstWeekContainsDate: 4,
   },
 } as any;
 registerLocale('es-mon', esMonday);
@@ -1528,7 +1538,7 @@ ${dateTableEN}`;
                     setCustomWeek(isoWeek);
                     setReportData(null);
                   }}
-                  dateFormat="wo yyyy"
+                  dateFormat={lang === 'en' ? "'Week' wo, yyyy" : "'Semana' wo 'de' yyyy"}
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
                   showWeekNumbers
                   showWeekPicker
@@ -1624,10 +1634,10 @@ ${dateTableEN}`;
         <button
           onClick={handleGenerateReport}
           disabled={generating || (reportType === 'individual' && !selectedStudent)}
-          className={`w-full sm:w-auto px-6 py-3 rounded-md flex items-center justify-center font-medium ${
+          className={`w-full sm:w-auto px-6 py-3 rounded-lg flex items-center justify-center font-medium transition-all duration-200 ${
             generating || (reportType === 'individual' && !selectedStudent)
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-[#0073ea] text-white hover:bg-[#0060c0] shadow-sm'
+              : 'bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white hover:shadow-md transform hover:scale-[1.01]'
           }`}
         >
           {generating ? (

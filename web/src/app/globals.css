@@ -104,16 +104,18 @@ html, body {
 .react-datepicker__day-name {
   color: #6b7280;
   font-weight: 500;
-  width: 2rem;
+  width: 2.25rem;
   margin: 0.2rem;
 }
 
+/* Celdas de día un poco más grandes que el default de la librería (2rem):
+   mejor lectura y objetivo de toque más cómodo en móvil/tablet. */
 .react-datepicker__day {
   color: #374151;
   font-weight: 500;
-  width: 2rem;
-  height: 2rem;
-  line-height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  line-height: 2.25rem;
   margin: 0.2rem;
   border-radius: 9999px;
 }
@@ -122,6 +124,16 @@ html, body {
 .react-datepicker__year-text {
   color: #374151;
   font-weight: 500;
+}
+
+/* Selector de mes/año (Reportes > Mensual): un poco más de aire que el
+   default (4rem de ancho, 2px de margen) para que no se vea apretado. */
+.react-datepicker__month .react-datepicker__month-text,
+.react-datepicker__month .react-datepicker__quarter-text,
+.react-datepicker__year .react-datepicker__year-text {
+  width: 4.5rem;
+  padding: 0.35rem 0;
+  margin: 0.2rem;
 }
 
 .react-datepicker__day:hover,
@@ -137,6 +149,43 @@ html, body {
   color: white;
   font-weight: bold;
   border-radius: 9999px;
+}
+
+/* Selector de mes (showMonthYearPicker, usado en Reportes > Mensual): sin
+   esta regla, react-datepicker pinta el mes elegido con su azul por
+   defecto (#216ba5), que no coincide con el azul de marca de la app. */
+.react-datepicker__month-text--selected,
+.react-datepicker__month-text--keyboard-selected {
+  background-color: #0073ea;
+  color: white;
+  font-weight: bold;
+  border-radius: 0.375rem;
+}
+
+.react-datepicker__month-text--selected:hover,
+.react-datepicker__month-text--keyboard-selected:hover {
+  background-color: #0060c0;
+}
+
+/* Selector de semana (Reportes > Semanal, showWeekPicker + showWeekNumbers):
+   el número de semana a la izquierda y el resaltado de toda la fila al
+   pasar el mouse usan las mismas clases de "rango" que el default de la
+   librería pinta en su azul (#216ba5) — sin esto se veía un azul distinto
+   al del resto de la app. */
+.react-datepicker__week-number--selected {
+  background-color: #0073ea;
+  color: white;
+  font-weight: bold;
+}
+
+.react-datepicker__week-number--selected:hover {
+  background-color: #0060c0;
+}
+
+.react-datepicker__day--in-range,
+.react-datepicker__day--in-selecting-range {
+  background-color: #e6f7ff;
+  color: #0073ea;
 }
 
 .react-datepicker__day--outside-month {
