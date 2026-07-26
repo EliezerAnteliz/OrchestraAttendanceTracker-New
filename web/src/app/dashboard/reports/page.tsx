@@ -180,8 +180,14 @@ export default function ReportsPage() {
   const [annualBreakdown, setAnnualBreakdown] = useState<Array<{ key: string; label: string; a: number; ea: number; ua: number; total: number }>>([]);
 
   // --- Métricas nuevas (pedidas por Eliezer tras revisar Reportes) ---
-  // Top 5 estudiantes con mejor % de asistencia en el período (solo reporte grupal).
-  const [topAttendance, setTopAttendance] = useState<Array<{ id: string; name: string; instrument: string; percentage: number; total: number }>>([]);
+  // Top 5 estudiantes con mejor % de asistencia en el período (solo reporte
+  // grupal). "rank" es un rank denso por % redondeado: varios estudiantes
+  // empatados en el mismo % comparten el mismo rank (ver handleGenerateReport).
+  const [topAttendance, setTopAttendance] = useState<Array<{ id: string; name: string; instrument: string; percentage: number; total: number; rank: number }>>([]);
+  // Cuando un empate en el 5º lugar deja fuera más estudiantes de los que
+  // se alcanzan a mostrar, esto guarda cuántos y con qué % para el aviso
+  // "+N más con X%" debajo de la lista.
+  const [topAttendanceMoreTied, setTopAttendanceMoreTied] = useState<{ count: number; percentage: number } | null>(null);
   // Comparación vs. el período anterior (Mensual y Anual — Semanal ya tiene
   // su propia tendencia de 4 semanas, así que no se duplica aquí).
   const [periodComparison, setPeriodComparison] = useState<{ previousLabel: string; previousPercentage: number; deltaPct: number } | null>(null);
@@ -317,6 +323,16 @@ export default function ReportsPage() {
     return { firstDay, lastDay };
   };
 
+  // Directorio de estudiantes por id (incluye INACTIVOS) — solo para
+  // resolver nombre/instrumento/posición al armar el Top 5 y los
+  // desgloses. Un reporte Anual cubre 9 meses; un estudiante que se dio
+  // de baja a mitad de año sigue teniendo registros de asistencia
+  // históricos válidos, pero no aparecía en `students` (que solo trae
+  // activos) y salía como "Unknown student" en el ranking. `students`
+  // (activos) se deja intacto para no afectar el selector de estudiante
+  // ni el filtro de instrumento, que sí deben mostrar solo activos.
+  const [studentDirectory, setStudentDirectory] = useState<Map<string, { name: string; instrument: string; orchestra_position: string }>>(new Map());
+
   // Cargar estudiantes al inicio
   useEffect(() => {
     const loadStudents = async () => {
@@ -324,6 +340,7 @@ export default function ReportsPage() {
         setLoading(true);
         if (!activeProgram?.id) {
           setStudents([]);
+          setStudentDirectory(new Map());
           setLoading(false);
           return;
         }
@@ -345,6 +362,25 @@ export default function ReportsPage() {
         }));
 
         setStudents(formattedStudents);
+
+        // Directorio completo (activos + inactivos) para resolver nombres
+        // en reportes que cubren un rango largo (ej. Anual).
+        const { data: allData, error: allError } = await supabase
+          .from('students')
+          .select('id, first_name, last_name, instrument, orchestra_position')
+          .eq('program_id', activeProgram.id);
+
+        if (!allError && allData) {
+          const dir = new Map(
+            allData.map((s) => [
+              s.id,
+              { name: `${s.first_name} ${s.last_name}`, instrument: s.instrument || '', orchestra_position: s.orchestra_position || '' },
+            ])
+          );
+          setStudentDirectory(dir);
+        } else if (allError) {
+          console.warn('No se pudo cargar el directorio completo de estudiantes (activos+inactivos):', allError.message);
+        }
       } catch (err) {
         console.error('Error al cargar estudiantes:', err);
         setError(t('couldnt_load_students_try_again'));
@@ -458,6 +494,7 @@ export default function ReportsPage() {
         setTrendSlope(0);
         setAnnualBreakdown([]);
         setTopAttendance([]);
+        setTopAttendanceMoreTied(null);
         setInstrumentBreakdown([]);
         setPositionBreakdown([]);
         setPeriodComparison(null);
@@ -540,7 +577,12 @@ export default function ReportsPage() {
       // (cargado al inicio) para resolver nombre/instrumento/posición de
       // cada student_id de los registros de asistencia.
       if (reportType === 'group') {
-        const studentInfoMap = new Map(students.map(s => [s.id, s]));
+        // studentDirectory incluye activos + inactivos (ver arriba) — un
+        // reporte Anual puede incluir estudiantes que ya se dieron de baja
+        // a mitad de año; con solo `students` (activos) salían como
+        // "Unknown student" aunque sus registros de asistencia fueran
+        // válidos.
+        const studentInfoMap = studentDirectory;
 
         // Agrupar registros por estudiante para el ranking
         const perStudent = new Map<string, any[]>();
@@ -548,7 +590,7 @@ export default function ReportsPage() {
           if (!perStudent.has(r.student_id)) perStudent.set(r.student_id, []);
           perStudent.get(r.student_id)!.push(r);
         }
-        const ranking = Array.from(perStudent.entries())
+        const fullRanking = Array.from(perStudent.entries())
           .map(([studentId, records]) => {
             const stats = processAttendanceData(records);
             const info = studentInfoMap.get(studentId);
@@ -563,9 +605,39 @@ export default function ReportsPage() {
           // Exigimos al menos 2 registros en el período para que el % no
           // sea solo un día suelto con 100%/0%.
           .filter(s => s.total >= 2)
-          .sort((a, b) => b.percentage - a.percentage || b.total - a.total)
-          .slice(0, 5);
-        setTopAttendance(ranking);
+          // Desempate: más registros primero, y de ahí alfabético — solo
+          // para tener un orden estable dentro de un mismo % (el "rank"
+          // real de abajo no depende de este orden interno).
+          .sort((a, b) => b.percentage - a.percentage || b.total - a.total || a.name.localeCompare(b.name, lang === 'en' ? 'en' : 'es'));
+
+        // Rank "denso" sobre el % REDONDEADO (el mismo número que se
+        // muestra en pantalla): si 5 estudiantes muestran "90%", todos
+        // comparten el lugar 1 en vez de que el orden interno los reparta
+        // arbitrariamente entre el 1º y el 5º cuando en realidad están
+        // empatados.
+        let rank = 0;
+        let lastRounded: number | null = null;
+        const rankedAll = fullRanking.map((s) => {
+          const rounded = Math.round(s.percentage);
+          if (lastRounded === null || rounded !== lastRounded) {
+            rank += 1;
+            lastRounded = rounded;
+          }
+          return { ...s, rank };
+        });
+
+        // Mostramos todos los que caen en los primeros 5 LUGARES (puede
+        // ser más de 5 filas si hay empates), con un tope para no inundar
+        // la pantalla si hay una cantidad enorme de empatados; el resto se
+        // resume con un contador "+N más".
+        const MAX_TOP_ROWS = 10;
+        const withinTop5Places = rankedAll.filter(s => s.rank <= 5);
+        const shownTop = withinTop5Places.slice(0, MAX_TOP_ROWS);
+        const hiddenCount = withinTop5Places.length - shownTop.length;
+        setTopAttendance(shownTop);
+        setTopAttendanceMoreTied(
+          hiddenCount > 0 ? { count: hiddenCount, percentage: shownTop[shownTop.length - 1].percentage } : null
+        );
 
         // Agrupar por instrumento y por posición para comparar categorías
         const byInstrument = new Map<string, any[]>();
@@ -590,6 +662,7 @@ export default function ReportsPage() {
         setPositionBreakdown(toBreakdown(byPosition));
       } else {
         setTopAttendance([]);
+        setTopAttendanceMoreTied(null);
         setInstrumentBreakdown([]);
         setPositionBreakdown([]);
       }
@@ -1172,8 +1245,15 @@ ${dateTableEN}`;
       const path = createArc(centerX, centerY, radius, startAngle, endAngle);
       const midAngle = (startAngle + endAngle) / 2;
       const labelPos = polarToCartesian(centerX, centerY, radius * 0.65, midAngle);
-      const percentage = ((sectors[index].value / total) * 100).toFixed(0);
-      
+      const percentageValue = (sectors[index].value / total) * 100;
+      const percentage = percentageValue.toFixed(0);
+      // Una porción angosta (ej. 1%) es más angosta que el propio texto del
+      // "1%", así que el label se sale del gajo y se solapa con el gajo
+      // vecino. La leyenda de abajo ya muestra el número exacto de cada
+      // categoría, así que para gajos muy chicos simplemente no dibujamos
+      // el número adentro (el color del gajo + la leyenda ya lo explican).
+      const showInlineLabel = percentageValue >= 6;
+
       // Calcular la rotación inicial para que el sector empiece desde la línea vertical
       const sectorRotation = midAngle - 90;
       
@@ -1197,23 +1277,25 @@ ${dateTableEN}`;
               transformBox: 'fill-box'
             }}
           />
-          <text 
-            x={labelPos.x} 
-            y={labelPos.y} 
-            textAnchor="middle" 
-            dominantBaseline="middle"
-            fill="white"
-            fontSize="16"
-            fontWeight="bold"
-            className="opacity-0"
-            style={{ 
-              animation: 'fadeIn 0.5s ease-out forwards',
-              animationDelay: `${animationDelay + 0.4}s`,
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-            }}
-          >
-            {percentage}%
-          </text>
+          {showInlineLabel && (
+            <text
+              x={labelPos.x}
+              y={labelPos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="white"
+              fontSize="16"
+              fontWeight="bold"
+              className="opacity-0"
+              style={{
+                animation: 'fadeIn 0.5s ease-out forwards',
+                animationDelay: `${animationDelay + 0.4}s`,
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+              }}
+            >
+              {percentage}%
+            </text>
+          )}
         </g>
       );
     };
@@ -1992,23 +2074,48 @@ ${dateTableEN}`;
                     {lang === 'es' ? 'Top 5 — Mejor Asistencia' : 'Top 5 — Best Attendance'}
                   </h3>
                   <div className="space-y-2">
-                    {topAttendance.map((s, idx) => (
-                      <div key={s.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2">
-                        <span
-                          className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                            idx === 0 ? 'bg-yellow-500' : idx === 1 ? 'bg-gray-400' : idx === 2 ? 'bg-amber-700' : 'bg-[#0073ea]'
-                          }`}
-                        >
-                          {idx + 1}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
-                        </div>
-                        <span className="text-sm font-semibold text-emerald-600 flex-shrink-0">{Math.round(s.percentage)}%</span>
-                      </div>
-                    ))}
+                    {(() => {
+                      // Cuántas filas comparten cada "rank" (empate real, no
+                      // solo posición en la lista) — para mostrar "(empate)"
+                      // junto al % cuando aplica.
+                      const rankCounts = new Map<number, number>();
+                      topAttendance.forEach(s => rankCounts.set(s.rank, (rankCounts.get(s.rank) || 0) + 1));
+                      return topAttendance.map((s) => {
+                        const isTied = (rankCounts.get(s.rank) || 0) > 1;
+                        return (
+                          <div key={s.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2">
+                            <span
+                              className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                                s.rank === 1 ? 'bg-yellow-500' : s.rank === 2 ? 'bg-gray-400' : s.rank === 3 ? 'bg-amber-700' : 'bg-[#0073ea]'
+                              }`}
+                              title={isTied ? (lang === 'es' ? `Empatado en el lugar ${s.rank}` : `Tied for place ${s.rank}`) : undefined}
+                            >
+                              {s.rank}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
+                            </div>
+                            <span className="text-right flex-shrink-0">
+                              <span className="text-sm font-semibold text-emerald-600">{Math.round(s.percentage)}%</span>
+                              {isTied && (
+                                <span className="block text-[10px] text-gray-400 leading-tight">
+                                  {lang === 'es' ? 'empate' : 'tied'}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
+                  {topAttendanceMoreTied && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      {lang === 'es'
+                        ? `+${topAttendanceMoreTied.count} estudiante(s) más también con ${Math.round(topAttendanceMoreTied.percentage)}%.`
+                        : `+${topAttendanceMoreTied.count} more student(s) also at ${Math.round(topAttendanceMoreTied.percentage)}%.`}
+                    </p>
+                  )}
                 </div>
               )}
 
