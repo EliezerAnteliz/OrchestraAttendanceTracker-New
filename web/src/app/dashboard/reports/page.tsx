@@ -408,6 +408,13 @@ export default function ReportsPage() {
           unexcused_percentage: 0,
           total: 0
         });
+        // Sin esto, un período vacío dejaba en pantalla el desglose
+        // mensual/tendencia semanal del último reporte CON datos (el
+        // "return" de abajo se saltaba el bloque que normalmente los
+        // limpia según la granularidad).
+        setWeeklyTrend([]);
+        setTrendDirection('flat');
+        setAnnualBreakdown([]);
         return;
       }
       
