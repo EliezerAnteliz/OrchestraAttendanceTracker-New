@@ -1081,42 +1081,51 @@ ${dateTableEN}`;
     };
 
     return (
-      <div className="flex flex-col h-[350px] w-full">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full h-[250px] flex justify-center">
-            <svg width="300" height="300" viewBox="0 0 300 300">
-              {/* Capa de fondo */}
-              <circle cx={centerX} cy={centerY} r={radius} fill="#f0f0f0" />
-              
-              {/* Si 100% pertenece a una categoría, pintar círculo completo con su color */}
-              {isAllAttendance || isAllExcused || isAllUnexcused ? (
-                <>
-                  <circle cx={centerX} cy={centerY} r={radius} fill={isAllAttendance ? '#4ade80' : isAllExcused ? '#fbbf24' : '#f87171'} />
-                  <text 
-                    x={centerX} y={centerY} textAnchor="middle" dominantBaseline="middle"
-                    fill="#ffffff" fontSize="28" fontWeight="bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
-                  >
-                    100%
-                  </text>
-                </>
-              ) : (
-                // Renderizar sectores con animación de abanico (sin los de 0%)
-                sectors.map((sector, index) => (
-                  <AnimatedSector
-                    key={`sector-${index}`}
-                    startAngle={sector.startAngle}
-                    endAngle={sector.endAngle}
-                    color={filteredPieData[index].color}
-                    index={index}
-                  />
-                ))
-              )}
-            </svg>
-          </div>
+      // h-full (antes h-[350px] fijo) para que ocupe exactamente el mismo
+      // espacio que le da el contenedor padre (300px en móvil, 350px en
+      // escritorio) — igual que ahora hace el gráfico de Barras.
+      <div className="flex flex-col h-full w-full">
+        <div className="flex-1 min-h-0 flex items-center justify-center p-2">
+          {/* width/height 100% + preserveAspectRatio (por defecto "meet")
+              en vez de un tamaño fijo en píxeles: el círculo se agranda o
+              achica según el espacio real disponible sin deformarse (a
+              diferencia de las Barras, la torta sí debe mantener su
+              proporción 1:1). Antes el SVG media 300x300px fijos sin
+              importar el contenedor, por lo que en pantallas angostas
+              podía desbordar y en el contenedor de 350px de escritorio no
+              aprovechaba el alto extra. */}
+          <svg viewBox="0 0 300 300" className="w-full h-full max-w-[320px]">
+            {/* Capa de fondo */}
+            <circle cx={centerX} cy={centerY} r={radius} fill="#f0f0f0" />
+
+            {/* Si 100% pertenece a una categoría, pintar círculo completo con su color */}
+            {isAllAttendance || isAllExcused || isAllUnexcused ? (
+              <>
+                <circle cx={centerX} cy={centerY} r={radius} fill={isAllAttendance ? '#4ade80' : isAllExcused ? '#fbbf24' : '#f87171'} />
+                <text
+                  x={centerX} y={centerY} textAnchor="middle" dominantBaseline="middle"
+                  fill="#ffffff" fontSize="28" fontWeight="bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
+                >
+                  100%
+                </text>
+              </>
+            ) : (
+              // Renderizar sectores con animación de abanico (sin los de 0%)
+              sectors.map((sector, index) => (
+                <AnimatedSector
+                  key={`sector-${index}`}
+                  startAngle={sector.startAngle}
+                  endAngle={sector.endAngle}
+                  color={filteredPieData[index].color}
+                  index={index}
+                />
+              ))
+            )}
+          </svg>
         </div>
-        
-        {/* Leyenda unificada */}
-        <div className="mt-8 grid grid-cols-3 gap-2 px-4">
+
+        {/* Leyenda unificada (mt-4 para calzar con la del gráfico de Barras) */}
+        <div className="mt-4 grid grid-cols-3 gap-2 px-4">
           <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
             <div className="w-4 h-4 bg-green-500 mr-2 rounded-sm"></div>
             <span className="text-xs text-gray-800">{t('total_attendances')}: {data.total_attendance} ({presentPercentage.toFixed(1)}%)</span>
