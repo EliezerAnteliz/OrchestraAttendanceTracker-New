@@ -297,8 +297,16 @@ export default function AuditReportPage() {
           </div>
         ) : (
           currentList.map((item: any, index: number) => {
-            const asset = Array.isArray(item.assets) ? item.assets[0] : item.assets;
-            
+            // "Faltantes" (missing) es una lista de ACTIVOS directos —
+            // viene de allAssets.filter(...) en loadReport(), no de
+            // audit_events. Found/Otra sede/No encontrado sí son eventos de
+            // auditoría con una relación anidada item.assets. Sin esta
+            // distinción, item.assets siempre daba undefined para
+            // "Faltantes" y cada fila mostraba "Unknown".
+            const asset = activeTab === 'missing'
+              ? item
+              : (Array.isArray(item.assets) ? item.assets[0] : item.assets);
+
             return (
               <div key={index} className="bg-white rounded-lg border border-gray-200 p-3">
                 <div className="font-medium text-gray-900">
