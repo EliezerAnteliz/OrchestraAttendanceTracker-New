@@ -160,7 +160,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
             <button
               onClick={handleConfirm}
               disabled={saving}
-              className="flex-[2] px-4 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium disabled:opacity-50"
+              className="flex-[2] px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
             >
               {saving ? t('saving') : (assignmentChanged || statusChanged) ? t('inv_save_and_confirm') : t('inv_confirm_audit')}
             </button>
