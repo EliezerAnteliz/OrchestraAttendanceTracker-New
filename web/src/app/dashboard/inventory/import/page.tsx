@@ -601,7 +601,7 @@ export default function ImportInventoryPage() {
   if (roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
@@ -746,7 +746,7 @@ export default function ImportInventoryPage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MdUpload size={20} />
             {loading ? t('inv_processing') : t('inv_upload_file_button')}
@@ -871,7 +871,7 @@ export default function ImportInventoryPage() {
             <button
               onClick={confirmImport}
               disabled={loading || previewData.some(r => r.error)}
-              className="px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t('inv_importing') : t('inv_confirm_import_button')}
             </button>
@@ -911,7 +911,7 @@ export default function ImportInventoryPage() {
           <div className="mt-4 flex justify-end gap-4">
             <button
               onClick={() => router.push('/dashboard/inventory/assets')}
-              className="px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
             >
               {t('inv_view_assets_list')}
             </button>
