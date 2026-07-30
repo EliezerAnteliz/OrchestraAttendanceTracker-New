@@ -216,7 +216,7 @@ export default function AuditPage() {
   if (roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
@@ -225,7 +225,7 @@ export default function AuditPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_loading_audits')}</p>
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function AuditPage() {
 
           <button
             onClick={() => setShowNewSessionModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
           >
             <MdAdd size={24} />
             {t('inv_new_audit')}
@@ -368,7 +368,7 @@ export default function AuditPage() {
               <button
                 onClick={createNewSession}
                 disabled={!selectedProgramId || loading}
-                className="flex-1 px-4 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? t('inv_creating') : t('inv_start')}
               </button>
