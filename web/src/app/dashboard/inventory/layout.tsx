@@ -44,7 +44,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
                     isActive
-                      ? 'bg-[#0073ea] text-white'
+                      ? 'bg-[#C2492B] text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
