@@ -153,7 +153,7 @@ export default function AuditReportPage() {
   if (roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
@@ -162,7 +162,7 @@ export default function AuditReportPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_generating_report')}</p>
         </div>
       </div>
@@ -176,7 +176,7 @@ export default function AuditReportPage() {
           <p className="text-gray-600">{t('inv_could_not_load_report')}</p>
           <button
             onClick={() => router.push('/dashboard/inventory/audit')}
-            className="mt-4 px-4 py-2 bg-[#0073ea] text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg"
           >
             {t('inv_go_back')}
           </button>
