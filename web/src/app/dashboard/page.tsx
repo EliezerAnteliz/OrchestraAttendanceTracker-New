@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart,
-         MdAssignmentTurnedIn, MdGroup, MdInsertChart, MdMusicNote } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -267,89 +265,92 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Tarjetas de estadísticas */}
+      {/* Tarjetas de estadísticas — sin ícono, como en el mockup: solo
+          etiqueta + número + una línea de contexto debajo. */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           title={t('total_students')}
           value={stats.totalStudents}
-          icon={<MdPeople size={22} />}
+          subtitle={lang === 'es' ? 'en todos los sitios' : 'across all sites'}
         />
         <StatCard
           title={t('active_students')}
           value={stats.activeStudents}
-          icon={<MdCheckCircle size={22} />}
+          subtitle={lang === 'es' ? `inscritos en ${activeProgram?.name || 'este sitio'}` : `enrolled at ${activeProgram?.name || 'this site'}`}
         />
         <StatCard
           title={t('attendance_today')}
           value={stats.attendanceToday}
-          icon={<MdCalendarToday size={22} />}
+          subtitle={lang === 'es' ? 'nada registrado aún hoy' : 'nothing recorded yet today'}
         />
         <StatCard
           title={t('attendance_rate')}
           value={`${stats.attendanceRate.toFixed(1)}%`}
-          icon={<MdShowChart size={22} />}
+          subtitle={lang === 'es' ? 'hoy, este sitio' : 'today, this site'}
           accent
         />
         <StatCard
           title={lang === 'es' ? 'Orquestas' : 'Orchestras'}
           value={stats.totalOrchestras}
-          icon={<MdMusicNote size={22} />}
+          subtitle={orchestraStats.map((o) => o.name).join(' · ')}
         />
       </div>
 
-      {/* Sección de Orquestas */}
-      {orchestraStats.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-[15px] font-medium text-[#1B1917] mb-4">
-            {lang === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {orchestraStats.map((orchestra, index) => (
-              <div
-                key={index}
-                className="bg-[#FFFDFA] rounded-xl p-5 border border-[#EAE3D6]"
-              >
-                <div className="flex items-center">
-                  <div className="bg-[#EFE9DD] p-3 rounded-full mr-4">
-                    <MdMusicNote className="text-[#C2492B]" size={22} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#8A8177] font-medium">{orchestra.name}</p>
-                    <p
-                      className="text-2xl text-[#1B1917] mt-0.5"
-                      style={{ fontFamily: 'var(--font-newsreader), serif' }}
-                    >
+      {/* Orquestas + Acceso rápido — una sola fila de 2 columnas (1.15fr /
+          1fr), como el mockup: no dos secciones apiladas a todo el ancho. */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-4 mt-4">
+        {orchestraStats.length > 0 && (
+          <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-5">
+            <h2 className="text-[14.5px] font-medium text-[#1B1917] mb-5">
+              {lang === 'es' ? 'Estudiantes por orquesta' : 'Students per orchestra'}
+            </h2>
+            <div className="flex flex-col gap-4">
+              {orchestraStats.map((orchestra, index) => {
+                const maxCount = Math.max(...orchestraStats.map((o) => o.studentCount), 1);
+                const pct = Math.round((orchestra.studentCount / maxCount) * 100);
+                return (
+                  <div key={index} className="grid grid-cols-[92px_minmax(0,1fr)_34px] items-center gap-3.5">
+                    <span className="text-[17px] text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif' }}>
+                      {orchestra.name}
+                    </span>
+                    <span className="h-2 rounded-full bg-[#EFE9DD] block relative overflow-hidden">
+                      <span
+                        className="absolute inset-y-0 left-0 rounded-full block"
+                        style={{ width: `${pct}%`, background: index === 0 ? '#C2492B' : '#C2A08B' }}
+                      />
+                    </span>
+                    <span className="text-right text-[20px] text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif' }}>
                       {orchestra.studentCount}
-                    </p>
+                    </span>
                   </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+            <div className="border-t border-[#EFE9DD] mt-5 pt-3.5 text-[12.5px] text-[#8A8177]">
+              {lang === 'es'
+                ? `${orchestraStats.reduce((a, o) => a + o.studentCount, 0)} de ${stats.totalStudents} estudiantes asignados a una orquesta en este sitio`
+                : `${orchestraStats.reduce((a, o) => a + o.studentCount, 0)} of ${stats.totalStudents} students assigned to an orchestra at this site`}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Sección de acceso rápido */}
-      <div className="mt-8">
-        <h2 className="text-[15px] font-medium text-[#1B1917] mb-4">{t('quick_access')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] px-5 pt-5">
+          <h2 className="text-[14.5px] font-medium text-[#1B1917] mb-1.5">{t('quick_access')}</h2>
           <QuickAccessCard
             title={t('quick_register_attendance')}
             description={t('quick_register_attendance_desc')}
             href="/dashboard/attendance"
-            icon={<MdAssignmentTurnedIn size={22} />}
           />
           <QuickAccessCard
             title={t('quick_student_list')}
             description={t('quick_student_list_desc')}
             href="/dashboard/students"
-            icon={<MdGroup size={22} />}
           />
           <QuickAccessCard
             title={t('quick_generate_reports')}
             description={t('quick_generate_reports_desc')}
             href="/dashboard/reports"
-            icon={<MdInsertChart size={22} />}
+            last
           />
         </div>
       </div>
@@ -362,41 +363,34 @@ export default function DashboardPage() {
 // mismo patrón (crema + acento terracota) en toda la fila de estadísticas
 // en vez de un color distinto por tarjeta. `accent` colorea el valor en
 // terracota para la métrica destacada (tasa de asistencia).
-function StatCard({ title, value, icon, accent }: { title: string; value: number | string; icon: React.ReactNode; accent?: boolean }) {
+function StatCard({ title, value, subtitle, accent }: { title: string; value: number | string; subtitle?: string; accent?: boolean }) {
   return (
     <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[11px] uppercase tracking-wide text-[#8A8177] font-medium">{title}</p>
-          <p
-            className="mt-2 text-[#1B1917]"
-            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300, fontSize: 30, color: accent ? '#C2492B' : undefined }}
-          >
-            {value}
-          </p>
-        </div>
-        <div className="bg-[#EFE9DD] p-2.5 rounded-full text-[#C2492B]">
-          {icon}
-        </div>
-      </div>
+      <p className="text-[11px] uppercase tracking-wide text-[#8A8177] font-medium">{title}</p>
+      <p
+        className="mt-2.5 text-[#1B1917] leading-none"
+        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300, fontSize: 30, color: accent ? '#C2492B' : undefined }}
+      >
+        {value}
+      </p>
+      {subtitle ? <p className="text-[12.5px] text-[#6E675E] mt-1.5">{subtitle}</p> : null}
     </div>
   );
 }
 
-// Tarjetas de acceso rápido — mismo lenguaje visual que StatCard de arriba.
-function QuickAccessCard({ title, description, href, icon }: { title: string; description: string; href: string; icon: React.ReactNode }) {
+// Fila de "acceso rápido" — sin ícono, solo texto + descripción + flecha,
+// con una línea divisoria arriba de cada fila (igual que el mockup).
+function QuickAccessCard({ title, description, href, last }: { title: string; description: string; href: string; last?: boolean }) {
   return (
     <Link
       href={href}
-      className="bg-[#FFFDFA] rounded-xl p-5 border border-[#EAE3D6] hover:border-[#C2492B] transition-colors flex items-start"
+      className={`flex items-baseline justify-between gap-4 border-t border-[#EFE9DD] py-3.5 group ${last ? 'pb-1' : ''}`}
     >
-      <div className="bg-[#EFE9DD] p-3 rounded-full mr-4 flex-shrink-0 text-[#C2492B]">
-        {icon}
-      </div>
-      <div>
-        <h3 className="font-medium text-[#1B1917]">{title}</h3>
-        <p className="text-sm text-[#8A8177] mt-1">{description}</p>
-      </div>
+      <span className="flex flex-col gap-0.5 min-w-0">
+        <span className="text-[15px] text-[#1B1917] group-hover:text-[#C2492B] transition-colors">{title}</span>
+        <span className="text-[12.5px] text-[#8A8177]">{description}</span>
+      </span>
+      <span className="text-[#C2492B] flex-shrink-0">→</span>
     </Link>
   );
 }
