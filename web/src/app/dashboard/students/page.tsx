@@ -555,7 +555,7 @@ export default function StudentsPage() {
     return (
       <div className="flex items-center justify-center h-64 p-4 md:p-6">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-black">{t('loading_students')}</p>
         </div>
       </div>
@@ -598,7 +598,7 @@ export default function StudentsPage() {
           {canEditStudents && (
             <button 
               onClick={() => setShowNewStudentModal(true)}
-              className="bg-[#0073ea] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-[#0060c0] transition-colors"
+              className="bg-[#C2492B] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-[#A83A20] transition-colors"
             >
               <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
             </button>
@@ -615,7 +615,7 @@ export default function StudentsPage() {
               placeholder={t('search_student_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-gray-900 font-medium"
+              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-gray-900 font-medium"
             />
             <MdSearch className="absolute left-3 top-2.5 text-gray-400" size={20} />
           </div>
@@ -626,7 +626,7 @@ export default function StudentsPage() {
             <select
               value={selectedInstrument}
               onChange={(e) => setSelectedInstrument(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#0073ea]"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]"
             >
               <option value="">{t('all_instruments')}</option>
               {availableInstruments.map((instrument) => (
@@ -697,7 +697,7 @@ export default function StudentsPage() {
             <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-white rounded-t-xl">
               <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <MdUpload className="w-5 h-5 text-[#0073ea]" />
+                  <MdUpload className="w-5 h-5 text-[#C2492B]" />
                 </div>
                 {t('bulk_upload_title')}
               </h2>
@@ -748,7 +748,7 @@ export default function StudentsPage() {
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0073ea] rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base flex-shrink-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#C2492B] rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base flex-shrink-0">
                         {`${selectedStudent?.first_name?.charAt(0) || ''}${selectedStudent?.last_name?.charAt(0) || ''}`.toUpperCase()}
                       </div>
                       <div>
@@ -778,7 +778,7 @@ export default function StudentsPage() {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                   {loadingDetails ? (
                     <div className="flex items-center justify-center h-64">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
                     </div>
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
@@ -1114,7 +1114,7 @@ export default function StudentsPage() {
                         </button>
                         <button
                           onClick={handleSaveEdit}
-                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium flex items-center justify-center"
                         >
                           <MdCheckCircle className="mr-1 sm:mr-2" size={16} />
                           {t('save')}
@@ -1131,7 +1131,7 @@ export default function StudentsPage() {
                         {canEditStudents && (
                           <button
                             onClick={handleEditClick}
-                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center justify-center"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium flex items-center justify-center"
                           >
                             <MdEdit className="mr-1 sm:mr-2" size={16} />
                             {t('edit')}
@@ -1165,7 +1165,7 @@ export default function StudentsPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-                        <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#0073ea]" />
+                        <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#C2492B]" />
                       </div>
                       <div>
                         <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
@@ -1396,7 +1396,7 @@ export default function StudentsPage() {
                     <button
                       onClick={handleSaveNewStudent}
                       disabled={savingNewStudent || !newStudentData.first_name || !newStudentData.last_name}
-                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg font-medium flex items-center justify-center transition-all duration-200 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium flex items-center justify-center transition-all duration-200 ${
                         (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md transform hover:scale-[1.01]'
                       }`}
                     >
