@@ -25,7 +25,7 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
           onClick={() => handlePeriodChange('week')}
           className={`flex flex-row items-center px-3 py-2 rounded-sm border
             ${periodType === 'week' 
-              ? 'bg-[#0073ea] text-white border-[#0073ea]' 
+              ? 'bg-[#C2492B] text-white border-[#C2492B]' 
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
         >
           <MdCalendarViewWeek size={18} className="mr-2" />
@@ -36,7 +36,7 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
           onClick={() => handlePeriodChange('month')}
           className={`flex flex-row items-center px-3 py-2 rounded-sm border
             ${periodType === 'month' 
-              ? 'bg-[#0073ea] text-white border-[#0073ea]' 
+              ? 'bg-[#C2492B] text-white border-[#C2492B]' 
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
         >
           <MdCalendarMonth size={18} className="mr-2" />
@@ -47,7 +47,7 @@ const PeriodSelector: React.FC<PeriodSelectorProps> = ({
           onClick={() => handlePeriodChange('year')}
           className={`flex flex-row items-center px-3 py-2 rounded-sm border
             ${periodType === 'year' 
-              ? 'bg-[#0073ea] text-white border-[#0073ea]' 
+              ? 'bg-[#C2492B] text-white border-[#C2492B]' 
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
         >
           <MdToday size={18} className="mr-2" />
