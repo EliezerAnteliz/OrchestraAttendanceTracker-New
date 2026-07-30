@@ -26,7 +26,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
           onClick={() => handleInstrumentChange('all')}
           className={`flex-shrink-0 px-3 py-1.5 rounded-sm border text-sm
             ${selectedInstrument === 'all' 
-              ? 'bg-[#0073ea20] text-[#0073ea] border-[#0073ea]' 
+              ? 'bg-[#C2492B20] text-[#C2492B] border-[#C2492B]' 
               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
         >
           Todos
@@ -38,7 +38,7 @@ const InstrumentFilter: React.FC<InstrumentFilterProps> = ({
             onClick={() => handleInstrumentChange(instrument)}
             className={`flex-shrink-0 px-3 py-1.5 rounded-sm border text-sm
               ${selectedInstrument === instrument 
-                ? 'bg-[#0073ea20] text-[#0073ea] border-[#0073ea]' 
+                ? 'bg-[#C2492B20] text-[#C2492B] border-[#C2492B]' 
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
           >
             {instrument}
