@@ -392,7 +392,7 @@ export default function StudentDetail() {
     return (
       <div className="flex items-center justify-center h-64 p-4 md:p-6">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">{t('loading_student_data')}</p>
         </div>
       </div>
@@ -404,7 +404,7 @@ export default function StudentDetail() {
       <div className="p-4 md:p-6">
         <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded mb-4">
           <p>Error: {error}</p>
-          <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
+          <Link href="/dashboard/students" className="text-[#C2492B] hover:underline mt-2 inline-block">
             {t('back_to_students')}
           </Link>
         </div>
@@ -417,7 +417,7 @@ export default function StudentDetail() {
       <div className="p-4 md:p-6">
         <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded mb-4">
           <p>{t('student_not_found')}</p>
-          <Link href="/dashboard/students" className="text-[#0073ea] hover:underline mt-2 inline-block">
+          <Link href="/dashboard/students" className="text-[#C2492B] hover:underline mt-2 inline-block">
             {t('back_to_students')}
           </Link>
         </div>
@@ -461,7 +461,7 @@ export default function StudentDetail() {
                     setIsEditing(true);
                     setEditedParents([...parents]);
                   }}
-                  className="flex-1 sm:flex-none px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors flex items-center justify-center text-sm font-medium"
                 >
                   <MdEdit className="mr-2" size={16} /> {t('edit')}
                 </button>
@@ -562,7 +562,7 @@ export default function StudentDetail() {
                     name="first_name"
                     value={editedStudent?.first_name || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -573,7 +573,7 @@ export default function StudentDetail() {
                     name="last_name"
                     value={editedStudent?.last_name || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -584,7 +584,7 @@ export default function StudentDetail() {
                     name="current_grade"
                     value={editedStudent?.current_grade || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -595,7 +595,7 @@ export default function StudentDetail() {
                     name="age"
                     value={editedStudent?.age || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -607,7 +607,7 @@ export default function StudentDetail() {
                       name="is_active"
                       checked={editedStudent?.is_active || false}
                       onChange={handleInputChange}
-                      className="h-5 w-5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded"
+                      className="h-5 w-5 text-[#C2492B] focus:ring-[#C2492B] border-gray-300 rounded"
                     />
                     <span className="ml-2 text-gray-700">{t('active')}</span>
                   </div>
@@ -662,7 +662,7 @@ export default function StudentDetail() {
                     name="instrument"
                     value={editedStudent?.instrument || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -673,7 +673,7 @@ export default function StudentDetail() {
                     name="instrument_size"
                     value={editedStudent?.instrument_size || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
                 
@@ -684,7 +684,7 @@ export default function StudentDetail() {
                     name="orchestra_position"
                     value={editedStudent?.orchestra_position || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                   />
                 </div>
               </div>
@@ -732,7 +732,7 @@ export default function StudentDetail() {
                           type="text"
                           value={parent.full_name || ''}
                           onChange={(e) => handleParentInputChange(parent.id, 'full_name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                         />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -742,7 +742,7 @@ export default function StudentDetail() {
                             type="tel"
                             value={parent.phone_number || ''}
                             onChange={(e) => handleParentInputChange(parent.id, 'phone_number', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                             placeholder={t('phone_placeholder') || 'Número de teléfono'}
                           />
                         </div>
@@ -752,7 +752,7 @@ export default function StudentDetail() {
                             type="email"
                             value={parent.email || ''}
                             onChange={(e) => handleParentInputChange(parent.id, 'email', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                             placeholder={t('email_placeholder') || 'Correo electrónico'}
                           />
                         </div>
