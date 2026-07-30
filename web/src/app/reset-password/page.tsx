@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-4 shadow-lg">
+      <header className="bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white p-4 shadow-lg">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <span className="text-2xl font-bold">{t('app_title')}</span>
@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             {linkStatus === 'checking' && (
               <div className="text-center py-6">
-                <div className="w-8 h-8 border-2 border-[#0073ea] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <div className="w-8 h-8 border-2 border-[#C2492B] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                 <p className="text-sm text-gray-600">...</p>
               </div>
             )}
@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
                 <p className="text-sm text-gray-600 mb-6">{t('invalid_reset_link_desc')}</p>
                 <Link
                   href="/forgot-password"
-                  className="inline-block w-full py-2.5 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg font-medium hover:shadow-md transition-all duration-200 text-sm"
+                  className="inline-block w-full py-2.5 px-4 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium hover:shadow-md transition-all duration-200 text-sm"
                 >
                   {t('request_new_link')}
                 </Link>
@@ -124,7 +124,7 @@ export default function ResetPasswordPage() {
             {linkStatus === 'valid' && !success && (
               <>
                 <div className="text-center mb-6">
-                  <div className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] p-3 rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                  <div className="bg-gradient-to-r from-[#C2492B] to-[#A83A20] p-3 rounded-full w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                     <MdMusicNote size={24} className="text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-800 mb-1">{t('reset_password_title')}</h2>
@@ -154,7 +154,7 @@ export default function ResetPasswordPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
-                        className="w-full pl-3 md:pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
+                        className="w-full pl-3 md:pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C2492B] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                         placeholder="••••••••"
                       />
                       <button
@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-3 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#0073ea] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
+                      className="w-full pl-3 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#C2492B] focus:border-transparent transition-all duration-200 text-sm text-gray-900"
                       placeholder="••••••••"
                     />
                   </div>
@@ -190,7 +190,7 @@ export default function ResetPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`w-full py-2.5 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 text-sm ${
+                    className={`w-full py-2.5 px-4 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 text-sm ${
                       loading ? 'opacity-70 cursor-not-allowed transform-none' : ''
                     }`}
                   >
@@ -216,7 +216,7 @@ export default function ResetPasswordPage() {
                 <p className="text-sm text-gray-600 mb-6">{t('password_updated_desc')}</p>
                 <button
                   onClick={() => router.push('/login')}
-                  className="inline-block w-full py-2.5 px-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg font-medium hover:shadow-md transition-all duration-200 text-sm"
+                  className="inline-block w-full py-2.5 px-4 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium hover:shadow-md transition-all duration-200 text-sm"
                 >
                   {t('go_to_login')}
                 </button>
