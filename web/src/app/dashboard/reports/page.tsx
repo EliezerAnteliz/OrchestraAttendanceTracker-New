@@ -44,7 +44,7 @@ const LoadingIndicator = ({ message }: { message?: string }) => {
   const msg = message ?? t('loading');
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea] mb-4"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B] mb-4"></div>
       <p className="text-gray-600">{msg}</p>
     </div>
   );
@@ -1528,7 +1528,7 @@ ${dateTableEN}`;
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <MdPerson size={20} className="text-[#0073ea]" />
+                  <MdPerson size={20} className="text-[#C2492B]" />
                 </div>
                 <div>
                   <h2 id="student-modal-title" className="text-xl font-semibold text-gray-900">
@@ -1557,7 +1557,7 @@ ${dateTableEN}`;
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={lang === 'es' ? 'Buscar por nombre o instrumento...' : 'Search by name or instrument...'}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea]"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B]"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">ESC</span>
             </div>
@@ -1579,18 +1579,18 @@ ${dateTableEN}`;
                     >
                       {/* Avatar iniciales — antes usaba bg-opacity-10, una
                           utilidad que no aplica sobre colores arbitrarios
-                          (bg-[#0073ea]) en esta versión de Tailwind, así que
+                          (bg-[#C2492B]) en esta versión de Tailwind, así que
                           el círculo salía azul sólido y las iniciales (del
-                          mismo azul) quedaban invisibles. bg-[#0073ea]/10 es
+                          mismo azul) quedaban invisibles. bg-[#C2492B]/10 es
                           la sintaxis que sí funciona. */}
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0073ea]/10 text-[#0073ea] flex items-center justify-center font-semibold text-sm">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C2492B]/10 text-[#C2492B] flex items-center justify-center font-semibold text-sm">
                         {student.first_name?.[0]}{student.last_name?.[0]}
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-800 leading-tight">{student.first_name} {student.last_name}</p>
                         <p className="text-xs text-gray-500">{student.instrument}</p>
                       </div>
-                      <span className="text-xs text-white bg-gradient-to-r from-[#0073ea] to-[#0060c0] px-3 py-1 rounded-md font-medium hover:shadow-md transform hover:scale-[1.03] transition-all duration-200">
+                      <span className="text-xs text-white bg-gradient-to-r from-[#C2492B] to-[#A83A20] px-3 py-1 rounded-md font-medium hover:shadow-md transform hover:scale-[1.03] transition-all duration-200">
                         {t('select')}
                       </span>
                     </button>
@@ -1670,7 +1670,7 @@ ${dateTableEN}`;
               }}
               className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
                 reportType === 'group'
-                  ? 'bg-[#0073ea] text-white'
+                  ? 'bg-[#C2492B] text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
             >
@@ -1684,7 +1684,7 @@ ${dateTableEN}`;
               }}
               className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
                 reportType === 'individual'
-                  ? 'bg-[#0073ea] text-white'
+                  ? 'bg-[#C2492B] text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
             >
@@ -1704,7 +1704,7 @@ ${dateTableEN}`;
           <div className="grid grid-cols-3 gap-1 bg-gray-100 rounded-md overflow-hidden p-1">
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'monthly' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'monthly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
               }`}
               onClick={() => { setGranularity('monthly'); setReportData(null); }}
             >
@@ -1712,7 +1712,7 @@ ${dateTableEN}`;
             </button>
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'weekly' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'weekly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
               }`}
               onClick={() => { setGranularity('weekly'); setReportData(null); }}
             >
@@ -1720,7 +1720,7 @@ ${dateTableEN}`;
             </button>
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'annual' ? 'bg-[#0073ea] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'annual' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
               }`}
               onClick={() => { setGranularity('annual'); setReportData(null); }}
             >
@@ -1756,7 +1756,7 @@ ${dateTableEN}`;
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-black bg-white font-normal"
                 />
               </div>
             ) : granularity === 'weekly' ? (
@@ -1784,7 +1784,7 @@ ${dateTableEN}`;
                     setReportData(null);
                   }}
                   ariaLabelledBy="weekPicker"
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-black bg-white font-normal"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-black bg-white font-normal"
                 />
               </div>
             ) : (
@@ -1795,7 +1795,7 @@ ${dateTableEN}`;
                   value={academicYear}
                   onChange={(e) => { setAcademicYear(parseInt(e.target.value, 10)); setReportData(null); }}
                   aria-label={t('academic_year')}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-800 bg-white"
                 >
                   {Array.from({ length: 7 }).map((_, idx) => {
                     const y = defaultAcademicYear - 3 + idx;
@@ -1815,7 +1815,7 @@ ${dateTableEN}`;
                   id="instrumentFilter"
                   value={instrumentFilter}
                   onChange={(e) => { setInstrumentFilter(e.target.value); setReportData(null); }}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-800 bg-white"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-800 bg-white"
                 >
                   <option value="all">{t('all')}</option>
                   {instruments.map(inst => (
@@ -1873,7 +1873,7 @@ ${dateTableEN}`;
           className={`w-full sm:w-auto px-6 py-3 rounded-lg flex items-center justify-center font-medium transition-all duration-200 ${
             generating || (reportType === 'individual' && !selectedStudent)
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white hover:shadow-md transform hover:scale-[1.01]'
+              : 'bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white hover:shadow-md transform hover:scale-[1.01]'
           }`}
         >
           {generating ? (
@@ -1959,7 +1959,7 @@ ${dateTableEN}`;
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#0073ea] rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#C2492B] rounded-md hover:bg-[#A83A20] transition-colors flex items-center justify-center"
             >
               <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
@@ -2046,7 +2046,7 @@ ${dateTableEN}`;
                   <button 
                     onClick={() => setChartType('pie')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'pie' ? 'bg-[#0073ea] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'pie' ? 'bg-[#C2492B] text-white' : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   >
                     {t('pie')}
@@ -2054,7 +2054,7 @@ ${dateTableEN}`;
                   <button 
                     onClick={() => setChartType('bar')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'bar' ? 'bg-[#0073ea] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'bar' ? 'bg-[#C2492B] text-white' : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   >
                     {t('bars')}
@@ -2091,7 +2091,7 @@ ${dateTableEN}`;
                           <div key={s.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2">
                             <span
                               className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                                s.rank === 1 ? 'bg-yellow-500' : s.rank === 2 ? 'bg-gray-400' : s.rank === 3 ? 'bg-amber-700' : 'bg-[#0073ea]'
+                                s.rank === 1 ? 'bg-yellow-500' : s.rank === 2 ? 'bg-gray-400' : s.rank === 3 ? 'bg-amber-700' : 'bg-[#C2492B]'
                               }`}
                               title={isTied ? (lang === 'es' ? `Empatado en el lugar ${s.rank}` : `Tied for place ${s.rank}`) : undefined}
                             >
@@ -2146,7 +2146,7 @@ ${dateTableEN}`;
                               <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
                             </div>
                             <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                              <div className="h-full bg-[#0073ea] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
+                              <div className="h-full bg-[#C2492B] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
                             </div>
                           </div>
                         ))}
@@ -2465,7 +2465,7 @@ ${dateTableEN}`;
                 </button>
                 <button
                   onClick={handleConfirmSendEmail}
-                  className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors font-medium flex items-center"
+                  className="px-4 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors font-medium flex items-center"
                 >
                   <MdEmail className="mr-2" size={18} />
                   {t('send_email')}
@@ -2548,7 +2548,7 @@ ${dateTableEN}`;
                               {item.parentInfo.email && (
                                 <button
                                   onClick={() => handlePreviewEmail(item)}
-                                  className="w-full px-3 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center text-sm font-medium"
+                                  className="w-full px-3 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors flex items-center justify-center text-sm font-medium"
                                 >
                                   <MdEmail className="mr-2" size={16} />
                                   {t('preview_email')}
