@@ -520,7 +520,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
             <div className="space-y-2">
               <button
                 onClick={startCamera}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
               >
                 <MdCameraAlt size={24} />
                 {t('inv_open_camera')}
@@ -585,7 +585,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
               </button>
               <button
                 onClick={capturePhoto}
-                className="px-8 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors font-medium flex items-center gap-2"
+                className="px-8 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium flex items-center gap-2"
               >
                 <MdCameraAlt size={24} />
                 {t('inv_capture_photo')}
@@ -599,7 +599,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
       {processing && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
             <p className="mt-4 text-gray-600">{t('inv_processing_image')}</p>
           </div>
         </div>
@@ -634,7 +634,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
               />
               <button
                 onClick={handleManualSearch}
-                className="px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+                className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
               >
                 {t('inv_search_button')}
               </button>
