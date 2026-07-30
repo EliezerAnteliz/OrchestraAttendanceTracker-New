@@ -403,7 +403,7 @@ export default function NewAssetPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_loading_catalogs')}</p>
         </div>
       </div>
@@ -430,7 +430,7 @@ export default function NewAssetPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <button
               onClick={() => router.push('/dashboard/inventory/assets')}
-              className="px-6 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+              className="px-6 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
             >
               {t('inv_view_assets_list')}
             </button>
@@ -633,7 +633,7 @@ export default function NewAssetPage() {
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center gap-2 text-sm text-[#0073ea] hover:text-[#0060c0] font-medium"
+                className="flex items-center gap-2 text-sm text-[#C2492B] hover:text-[#A83A20] font-medium"
               >
                 <span>{showAdvanced ? '▼' : '▶'}</span>
                 {t('inv_advanced_options_toggle')}
@@ -918,7 +918,7 @@ export default function NewAssetPage() {
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:bg-gray-400"
+            className="flex items-center gap-2 px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:bg-gray-400"
           >
             <MdSave size={20} />
             {saving ? t('saving') : t('inv_create_asset_button')}
