@@ -43,10 +43,10 @@ function ProgramSwitcher() {
   }
   return (
     <div className="w-full">
-      <label className="block text-xs text-blue-100 mb-2 font-medium">{t('select_site_label')}</label>
+      <label className="block text-xs text-[#8A8177] mb-2 font-medium">{t('select_site_label')}</label>
       <div className="flex items-center gap-2">
         <select
-          className="flex-1 border border-blue-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white/95 backdrop-blur-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white"
+          className="flex-1 border border-[#E3DDD1] rounded-lg px-3 py-2 text-sm text-[#1B1917] bg-[#FFFDFA] font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B]"
           value={activeProgram?.id || ''}
           onChange={(e) => setActiveProgramId(e.target.value)}
         >
@@ -59,7 +59,7 @@ function ProgramSwitcher() {
           onClick={refreshPrograms}
           title={t('refresh_sites')}
           aria-label={t('refresh_sites')}
-          className="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-2 text-white hover:bg-white/30 transition-all duration-200 shadow-sm"
+          className="inline-flex items-center justify-center bg-[#FFFDFA] border border-[#E3DDD1] rounded-lg px-2 py-2 text-[#6E675E] hover:text-[#C2492B] hover:border-[#C2492B] transition-all duration-200 shadow-sm"
         >
           <MdRefresh size={16} />
         </button>
@@ -121,8 +121,8 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
         top-0 left-0
         h-full
         w-64
-        bg-white
-        border-r border-gray-200
+        bg-[#F4F0E8]
+        border-r border-[#E7E0D2]
         shadow-lg md:shadow-none
         z-30
         transition-transform duration-300 ease-in-out
@@ -130,14 +130,31 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
         flex flex-col
       `}
     >
-      <div className="p-4 border-b border-gray-200 bg-[#0073ea] text-white flex-shrink-0">
+      <div className="p-4 border-b border-[#E7E0D2] flex-shrink-0">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-white">{t('brand_title')}</h2>
-            <p className="text-xs text-blue-100 opacity-90">{t('brand_subtitle')}</p>
+            <div className="flex items-center gap-2">
+              <span
+                className="grid grid-cols-2 grid-rows-2 gap-[2.5px] flex-shrink-0"
+                style={{ width: 18, height: 18 }}
+                aria-hidden="true"
+              >
+                <span className="bg-[#1B1917] rounded-[2px]" />
+                <span className="bg-[#1B1917] rounded-[2px]" />
+                <span className="bg-[#1B1917] rounded-[2px]" />
+                <span className="bg-[#C2492B] rounded-[2px]" />
+              </span>
+              <span
+                className="text-xl leading-none text-[#1B1917]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', letterSpacing: '-0.02em' }}
+              >
+                Site<span style={{ color: '#C2492B' }}>Track</span>
+              </span>
+            </div>
+            <p className="text-[10px] tracking-wider uppercase text-[#A29889] mt-1 pl-[26px]">{t('brand_subtitle')}</p>
           </div>
           <button
-            className="md:hidden text-white hover:text-blue-200 transition-colors"
+            className="md:hidden text-[#6E675E] hover:text-[#C2492B] transition-colors"
             onClick={() => setIsOpen(false)}
           >
             <MdClose size={20} />
@@ -169,8 +186,8 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
                   onClick={handleLinkClick}
                   className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
                     isActive
-                      ? 'bg-[#0073ea] text-white shadow-md'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-[#EFE0D5] text-[#1B1917] font-medium'
+                      : 'text-[#6E675E] hover:bg-[#EFE9DD]'
                   }`}
                 >
                   <span className={`mr-3 transition-transform duration-200 ${
@@ -188,8 +205,8 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
                 onClick={handleLinkClick}
                 className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-all duration-200 group ${
                   pathname.startsWith('/dashboard/admin')
-                    ? 'bg-[#0073ea] text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-[#EFE0D5] text-[#1B1917] font-medium'
+                    : 'text-[#6E675E] hover:bg-[#EFE9DD]'
                 }`}
               >
                 <span className={`mr-3 transition-transform duration-200 ${
@@ -205,21 +222,21 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
           flex column del <aside>, así que nunca puede quedar tapando el
           último ítem del menú si algún día se agrega uno más en pantallas
           cortas. */}
-      <div className="flex-shrink-0 mt-auto p-4 border-t border-gray-200 bg-gray-50">
+      <div className="flex-shrink-0 mt-auto p-4 border-t border-[#E7E0D2] bg-[#EFE9DD]">
         <div className="flex items-center gap-2 min-w-0">
           {/* Avatar circular con iniciales — mismo patrón ya usado en el
               selector de estudiante de Reportes, para que el pie de cuenta
               se sienta parte del mismo sistema visual en vez de solo texto
               suelto. */}
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0073ea]/10 text-[#0073ea] flex items-center justify-center font-semibold text-xs">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#E4DCCB] text-[#56504A] flex items-center justify-center font-semibold text-xs">
             {getInitials(user?.email)}
           </div>
-          <span className="flex-1 min-w-0 text-xs text-gray-600 truncate font-medium">{user?.email}</span>
+          <span className="flex-1 min-w-0 text-xs text-[#6E675E] truncate font-medium">{user?.email}</span>
           <button
             onClick={signOut}
             title={t('sign_out')}
             aria-label={t('sign_out')}
-            className="flex-shrink-0 flex items-center justify-center text-xs text-gray-600 hover:text-[#0060c0] transition-colors duration-200 bg-white hover:bg-gray-50 p-1.5 rounded-md border border-gray-200 hover:border-gray-300"
+            className="flex-shrink-0 flex items-center justify-center text-xs text-[#6E675E] hover:text-[#C2492B] transition-colors duration-200 bg-[#FFFDFA] hover:bg-[#FFFDFA] p-1.5 rounded-md border border-[#E3DDD1] hover:border-[#C2492B]"
           >
             <MdLogout size={14} />
           </button>
@@ -248,21 +265,26 @@ function DashboardContent({ children }: { children: ReactNode }) {
       
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Mobile header with menu button */}
-        <header className="md:hidden bg-[#0073ea] text-white shadow-md safe-area-inset-top">
+        <header className="md:hidden bg-[#F4F0E8] border-b border-[#E7E0D2] shadow-md safe-area-inset-top">
           <div className="p-3 flex items-center gap-3">
-            <button 
-              className="text-white hover:text-blue-200 flex-shrink-0 transition-colors duration-200"
+            <button
+              className="text-[#6E675E] hover:text-[#C2492B] flex-shrink-0 transition-colors duration-200"
               onClick={() => setIsSidebarOpen(true)}
             >
               <MdMenu size={20} />
             </button>
-            <h1 className="text-sm font-bold text-white truncate flex-1 min-w-0">{t('mobile_header')}</h1>
+            <h1
+              className="text-base truncate flex-1 min-w-0 text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', letterSpacing: '-0.02em' }}
+            >
+              Site<span style={{ color: '#C2492B' }}>Track</span>
+            </h1>
           </div>
           {/* Program selector in separate row for better mobile layout */}
           {programs?.length ? (
             <div className="px-3 pb-3 flex items-center gap-2">
               <select
-                className="flex-1 border border-blue-200 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white/95 backdrop-blur-sm font-medium shadow-sm min-w-0 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="flex-1 border border-[#E3DDD1] rounded-lg px-3 py-2 text-sm text-[#1B1917] bg-[#FFFDFA] font-medium shadow-sm min-w-0 focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
                 value={activeProgram?.id || ''}
                 onChange={(e) => setActiveProgramId(e.target.value)}
               >
@@ -275,7 +297,7 @@ function DashboardContent({ children }: { children: ReactNode }) {
                 onClick={() => (typeof window !== 'undefined') && (window as any).requestIdleCallback ? (window as any).requestIdleCallback(() => refreshPrograms()) : refreshPrograms()}
                 title={t('refresh_sites')}
                 aria-label={t('refresh_sites')}
-                className="inline-flex items-center justify-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-2 text-white hover:bg-white/30 transition-all duration-200 shadow-sm flex-shrink-0"
+                className="inline-flex items-center justify-center bg-[#FFFDFA] border border-[#E3DDD1] rounded-lg px-2 py-2 text-[#6E675E] hover:text-[#C2492B] transition-all duration-200 shadow-sm flex-shrink-0"
               >
                 <MdRefresh size={14} />
               </button>
