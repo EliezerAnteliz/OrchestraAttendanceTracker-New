@@ -23,7 +23,7 @@ const NoDataDisplay: React.FC<NoDataDisplayProps> = ({
       {action && (
         <button
           onClick={action.onClick}
-          className="px-4 py-2 bg-[#0073ea] text-white rounded-sm hover:bg-[#0060c0] transition-colors"
+          className="px-4 py-2 bg-[#C2492B] text-white rounded-sm hover:bg-[#A83A20] transition-colors"
         >
           {action.label}
         </button>
