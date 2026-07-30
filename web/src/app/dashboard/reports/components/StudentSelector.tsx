@@ -82,7 +82,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({
               placeholder="Buscar por nombre o instrumento..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent"
+              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent"
             />
             <MdSearch size={20} className="absolute left-3 top-2.5 text-gray-500" />
           </div>
@@ -94,7 +94,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({
               <button
                 key={student.id}
                 className={`w-full flex items-center justify-between p-3 hover:bg-gray-50 border-b border-gray-100 text-left
-                  ${selectedStudent?.id === student.id ? 'bg-[#0073ea10]' : ''}`}
+                  ${selectedStudent?.id === student.id ? 'bg-[#C2492B10]' : ''}`}
                 onClick={() => onSelectStudent(student)}
               >
                 <div className="flex items-center">
@@ -109,7 +109,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({
                   </div>
                 </div>
                 {selectedStudent?.id === student.id && (
-                  <MdCheck size={20} className="text-[#0073ea]" />
+                  <MdCheck size={20} className="text-[#C2492B]" />
                 )}
               </button>
             ))
@@ -129,7 +129,7 @@ export const StudentModal: React.FC<StudentModalProps> = ({
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#0073ea] text-white rounded-sm hover:bg-[#0060c0]"
+            className="px-4 py-2 bg-[#C2492B] text-white rounded-sm hover:bg-[#A83A20]"
             disabled={!selectedStudent}
           >
             Aceptar
