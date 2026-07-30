@@ -13,6 +13,24 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* Paleta cálida del rediseño (30/07/26) — usada por ahora solo en el
+   Dashboard y el menú lateral (ver dashboard/layout.tsx y dashboard/page.tsx).
+   El resto de la app sigue con el azul #0073ea sin cambios; esto es
+   puramente aditivo, no sobreescribe ningún selector existente. */
+:root {
+  --warm-page: #FAF7F2;
+  --warm-sidebar: #F4F0E8;
+  --warm-sidebar-active: #EFE0D5;
+  --warm-card: #FFFDFA;
+  --warm-border: #E3DDD1;
+  --warm-border-soft: #EAE3D6;
+  --warm-ink: #1B1917;
+  --warm-muted: #6E675E;
+  --warm-muted-2: #8A8177;
+  --warm-accent: #C2492B;
+  --warm-accent-soft: #EFE9DD;
+}
+
 /* NOTA (24/07): se quitó el @media (prefers-color-scheme: dark) que venía
    por defecto de create-next-app. Esta app es 100% tema claro (bg-white en
    todas las pantallas) — ese bloque solo hacía que --foreground pasara a
