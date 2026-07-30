@@ -192,7 +192,7 @@ export default function NewStudent() {
               {/* Personal Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
-                  <MdPerson className="mr-2 text-[#0073ea]" /> {t('personal_information')}
+                  <MdPerson className="mr-2 text-[#C2492B]" /> {t('personal_information')}
                 </h2>
                 
                 <div className="space-y-6">
@@ -206,7 +206,7 @@ export default function NewStudent() {
                       value={student.first_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('first_name_placeholder')}
                     />
                   </div>
@@ -221,7 +221,7 @@ export default function NewStudent() {
                       value={student.last_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('last_name_placeholder')}
                     />
                   </div>
@@ -233,7 +233,7 @@ export default function NewStudent() {
                       name="grade"
                       value={student.grade}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('grade_placeholder')}
                     />
                   </div>
@@ -246,7 +246,7 @@ export default function NewStudent() {
                         name="is_active"
                         checked={student.is_active}
                         onChange={handleInputChange}
-                        className="h-4 w-4 text-[#0073ea] focus:ring-[#0073ea] border-[#d0d4e4] rounded"
+                        className="h-4 w-4 text-[#C2492B] focus:ring-[#C2492B] border-[#d0d4e4] rounded"
                       />
                       <span className="ml-3 text-[#323338] font-medium">{t('active')}</span>
                     </div>
@@ -257,7 +257,7 @@ export default function NewStudent() {
               {/* Parent Contact Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
-                  <MdPerson className="mr-2 text-[#0073ea]" /> {t('parent_contact_info')}
+                  <MdPerson className="mr-2 text-[#C2492B]" /> {t('parent_contact_info')}
                 </h2>
                 
                 <div className="space-y-6">
@@ -268,7 +268,7 @@ export default function NewStudent() {
                       name="parent_name"
                       value={student.parent_name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('parent_name_placeholder')}
                     />
                   </div>
@@ -280,7 +280,7 @@ export default function NewStudent() {
                       name="parent_phone"
                       value={student.parent_phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('parent_phone_placeholder')}
                     />
                   </div>
@@ -292,7 +292,7 @@ export default function NewStudent() {
                       name="parent_email"
                       value={student.parent_email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('parent_email_placeholder')}
                     />
                   </div>
@@ -302,7 +302,7 @@ export default function NewStudent() {
               {/* Orchestra Information */}
               <div>
                 <h2 className="text-lg font-semibold mb-6 flex items-center text-gray-800">
-                  <MdMusicNote className="mr-2 text-[#0073ea]" /> {t('orchestra_info')}
+                  <MdMusicNote className="mr-2 text-[#C2492B]" /> {t('orchestra_info')}
                 </h2>
                 
                 <div className="space-y-6">
@@ -313,7 +313,7 @@ export default function NewStudent() {
                       name="instrument"
                       value={student.instrument}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('instrument_placeholder')}
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function NewStudent() {
                       name="instrument_size"
                       value={student.instrument_size}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('instrument_size_placeholder')}
                     />
                   </div>
@@ -337,7 +337,7 @@ export default function NewStudent() {
                       name="position"
                       value={student.position}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
+                      className="w-full px-3 py-2 border border-[#d0d4e4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200 bg-white hover:border-[#a1a6b8] text-[#323338] placeholder:text-gray-400"
                       placeholder={t('position_placeholder')}
                     />
                   </div>
@@ -358,7 +358,7 @@ export default function NewStudent() {
             <button
               type="submit"
               disabled={loading || !student.first_name || !student.last_name}
-              className={`px-8 py-2.5 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-all duration-200 flex items-center justify-center font-medium ${
+              className={`px-8 py-2.5 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-all duration-200 flex items-center justify-center font-medium ${
                 (loading || !student.first_name || !student.last_name) ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
