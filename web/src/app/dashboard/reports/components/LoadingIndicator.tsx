@@ -18,7 +18,7 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   };
 
   const spinner = (
-    <div className={`${sizeClasses[size]} border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin`}></div>
+    <div className={`${sizeClasses[size]} border-t-[#C2492B] border-r-[#C2492B] border-b-gray-200 border-l-gray-200 rounded-full animate-spin`}></div>
   );
 
   if (overlay) {
