@@ -451,7 +451,7 @@ export default function AssetsListPage() {
             {isAdmin && (
               <button
                 onClick={() => router.push('/dashboard/inventory/assets/new')}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
               >
                 <MdAdd size={20} />
                 {t('inv_new_asset_button')}
@@ -636,7 +636,7 @@ export default function AssetsListPage() {
           {loading && (
             <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
                 <p className="mt-4 text-gray-600">{t('inv_loading_assets')}</p>
               </div>
             </div>
