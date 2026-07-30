@@ -425,7 +425,7 @@ export default function AssetDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_loading_asset')}</p>
         </div>
       </div>
@@ -470,7 +470,7 @@ export default function AssetDetailPage() {
               )}
             </h1>
             {asset?.full_code && (
-              <p className="text-xl font-mono text-[#0073ea] mt-1">{asset.full_code}</p>
+              <p className="text-xl font-mono text-[#C2492B] mt-1">{asset.full_code}</p>
             )}
           </div>
           {isAdmin && (asset?.is_active && asset?.status_code !== 'retired' ? (
@@ -520,7 +520,7 @@ export default function AssetDetailPage() {
         {/* Código Completo */}
         <div className="mb-6 pb-4 border-b border-gray-300">
           <span className="text-gray-600 font-medium text-sm">{t('inv_full_code_colon')}</span>
-          <p className="font-mono font-bold text-2xl text-[#0073ea] mt-1">{asset?.full_code || t('inv_no_code')}</p>
+          <p className="font-mono font-bold text-2xl text-[#C2492B] mt-1">{asset?.full_code || t('inv_no_code')}</p>
         </div>
 
         {/* Segmentos del Código Decodificados */}
@@ -801,7 +801,7 @@ export default function AssetDetailPage() {
             <button
               type="submit"
               disabled={saving || !asset?.is_active}
-              className="flex items-center gap-2 px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors disabled:bg-gray-400"
+              className="flex items-center gap-2 px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:bg-gray-400"
             >
               <MdSave size={20} />
               {saving ? t('saving') : t('inv_save_changes_button')}
@@ -820,7 +820,7 @@ export default function AssetDetailPage() {
           {isAdmin && (
             <button
               onClick={() => setShowMaintenanceModal(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
             >
               <MdAdd size={20} />
               {t('inv_add_event_button')}
@@ -1060,7 +1060,7 @@ export default function AssetDetailPage() {
                 <button
                   type="submit"
                   disabled={saving || !maintenanceForm.event_date || !maintenanceForm.event_type}
-                  className="px-4 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] disabled:bg-gray-400"
+                  className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] disabled:bg-gray-400"
                 >
                   {saving ? t('saving') : t('inv_add_event_button')}
                 </button>
