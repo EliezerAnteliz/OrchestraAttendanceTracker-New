@@ -246,7 +246,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 animate-fadeIn bg-[#FAF7F2] min-h-full">
+    <div className="p-4 md:p-7 animate-fadeIn bg-[#FAF7F2] min-h-full">
+    <div className="max-w-[1420px] mx-auto space-y-6">
       <div className="flex flex-col gap-4 pb-5 border-b border-[#E3DDD1]">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
           <div className="flex-1">
@@ -352,6 +353,7 @@ export default function DashboardPage() {
           />
         </div>
       </div>
+    </div>
     </div>
   );
 }
