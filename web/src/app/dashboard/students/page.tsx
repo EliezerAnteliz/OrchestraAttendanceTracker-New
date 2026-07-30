@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPeople, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -573,117 +573,108 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="h-full p-4 md:p-6">
+    <div className="h-full p-4 md:p-6 bg-[#FAF7F2]">
       {!activeProgram?.id && (
         <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
           {t('select_program_to_view_students') || 'Please select a program to view students.'}
         </div>
       )}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-            <MdPeople className="text-blue-600" size={20} />
-          </span>
-          {t('students_title')}
-        </h1>
+      <div className="flex flex-col sm:flex-row justify-between items-end sm:items-end gap-4 pb-5 border-b border-[#E3DDD1]">
+        <div>
+          <h1
+            className="text-[32px] leading-tight text-[#1B1917]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          >
+            {t('students_title')}
+          </h1>
+          <p className="text-[#8A8177] mt-2 text-sm">
+            {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
+          </p>
+        </div>
         <div className="flex gap-2 w-full sm:w-auto">
           {canBulkUpload && (
-            <button 
-              onClick={() => setShowUploadModal(true)} 
-              className="bg-green-600 text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-green-700 transition-colors"
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="border border-[#DED7C9] text-[#56504A] px-4 py-2.5 rounded-lg flex items-center text-sm flex-1 sm:flex-none justify-center hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
             >
-              <MdUpload className="mr-1" size={16} /> {t('bulk_upload_short')}
+              <MdUpload className="mr-1.5" size={16} /> {t('bulk_upload_short')}
             </button>
           )}
           {canEditStudents && (
-            <button 
+            <button
               onClick={() => setShowNewStudentModal(true)}
-              className="bg-[#C2492B] text-white px-3 py-2 rounded-md flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-[#A83A20] transition-colors"
+              className="bg-[#C2492B] text-[#FAF7F2] font-medium px-4 py-2.5 rounded-lg flex items-center text-sm flex-1 sm:flex-none justify-center hover:bg-[#A83A20] transition-colors"
             >
-              <MdAdd className="mr-1" size={16} /> {t('new_student_short')}
+              <MdAdd className="mr-1.5" size={16} /> {t('new_student_short')}
             </button>
           )}
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-        <div className="flex flex-col gap-3 mb-4">
+      <div className="mt-5">
+        <div className="flex flex-col sm:flex-row gap-3">
           {/* Barra de búsqueda */}
-          <div className="relative">
+          <div className="relative flex-1">
             <input
               type="text"
               placeholder={t('search_student_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-gray-900 font-medium"
+              className="w-full pl-10 pr-4 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium"
             />
-            <MdSearch className="absolute left-3 top-2.5 text-gray-400" size={20} />
+            <MdSearch className="absolute left-3 top-3.5 text-[#A29889]" size={18} />
           </div>
-          
-          {/* Filtros en fila */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            {/* Filtro de instrumento */}
-            <select
-              value={selectedInstrument}
-              onChange={(e) => setSelectedInstrument(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]"
-            >
-              <option value="">{t('all_instruments')}</option>
-              {availableInstruments.map((instrument) => (
-                <option key={instrument} value={instrument}>{instrument}</option>
-              ))}
-            </select>
-            
-            {/* Filtro activo/inactivo */}
-            <button
-              onClick={() => setShowActiveOnly(!showActiveOnly)}
-              className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 font-medium whitespace-nowrap"
-            >
-              <MdFilterList className="mr-2" size={18} />
-              {showActiveOnly ? t('show_all') : t('only_active')}
-            </button>
-          </div>
-        </div>
 
-        {/* Contador de estudiantes */}
-        <div className="text-sm text-gray-700 font-semibold mb-4">
-          {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
+          {/* Filtro de instrumento */}
+          <select
+            value={selectedInstrument}
+            onChange={(e) => setSelectedInstrument(e.target.value)}
+            className="sm:w-56 px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+          >
+            <option value="">{t('all_instruments')}</option>
+            {availableInstruments.map((instrument) => (
+              <option key={instrument} value={instrument}>{instrument}</option>
+            ))}
+          </select>
+
+          {/* Filtro activo/inactivo */}
+          <button
+            onClick={() => setShowActiveOnly(!showActiveOnly)}
+            className="flex items-center justify-center px-4 py-3 bg-[#FFFDFA] border border-[#E3DDD1] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] text-[#56504A] font-medium whitespace-nowrap transition-colors"
+          >
+            <MdFilterList className="mr-2" size={18} />
+            {showActiveOnly ? t('show_all') : t('only_active')}
+          </button>
         </div>
 
         {/* Tarjetas de estudiante — mismo componente en móvil y escritorio */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
-              <div
+              <button
                 key={student.id}
                 onClick={() => handleStudentClick(student)}
-                className="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md cursor-pointer transition-shadow"
+                className="text-left bg-[#FFFDFA] border border-[#EAE3D6] hover:border-[#D6C9BB] rounded-xl p-4 cursor-pointer transition-colors flex flex-col gap-2.5"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-gray-800 text-base truncate mr-2">
+                <div className="flex justify-between items-baseline gap-2">
+                  <h3 className="text-[15.5px] font-medium text-[#1B1917] truncate">
                     {student.first_name} {student.last_name}
                   </h3>
-                  <span className={`shrink-0 px-2 py-1 text-xs font-medium rounded-full ${
-                    student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  <span className={`shrink-0 text-[11.5px] tracking-wide uppercase ${
+                    student.is_active !== false ? 'text-[#6E7F63]' : 'text-[#A8402A]'
                   }`}>
                     {student.is_active !== false ? t('active') : t('inactive')}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex-1">
-                    <span className="text-gray-600">{t('instrument')}:</span>
-                    <span className="ml-1 font-medium text-gray-900">{student.instrument || t('not_assigned')}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-gray-600">{t('grade')}:</span>
-                    <span className="ml-1 font-medium text-gray-900">{student.current_grade || t('not_assigned')}</span>
-                  </div>
+                <div className="flex justify-between items-baseline gap-2 text-[13px] text-[#8A8177]">
+                  <span>{student.instrument || t('not_assigned')}</span>
+                  <span>{student.current_grade ? `${t('grade')} ${student.current_grade}` : t('not_assigned')}</span>
                 </div>
-              </div>
+              </button>
             ))
           ) : (
-            <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="col-span-full text-center py-8 text-[#A29889]">
               {t('no_students_found')}
             </div>
           )}
@@ -696,7 +687,7 @@ export default function StudentsPage() {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-300">
             <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-white rounded-t-xl">
               <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-[#EFE9DD] rounded-lg">
                   <MdUpload className="w-5 h-5 text-[#C2492B]" />
                 </div>
                 {t('bulk_upload_title')}
@@ -709,7 +700,7 @@ export default function StudentsPage() {
                     setUploadResults(null);
                   }
                 }}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
                 aria-label="Close"
               >
                 <MdClose size={20} />
@@ -748,16 +739,19 @@ export default function StudentsPage() {
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#C2492B] rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base flex-shrink-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#C2492B] rounded-full flex items-center justify-center text-[#FAF7F2] font-semibold text-sm sm:text-base flex-shrink-0">
                         {`${selectedStudent?.first_name?.charAt(0) || ''}${selectedStudent?.last_name?.charAt(0) || ''}`.toUpperCase()}
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                        <h2
+                          className="text-xl sm:text-2xl text-[#1B1917]"
+                          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                        >
                           {selectedStudent?.first_name} {selectedStudent?.last_name}
                         </h2>
-                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-0.5">
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1">
                           {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span className="inline-flex items-center gap-1 text-[11.5px] tracking-wide uppercase text-[#C2492B]">
                               <MdMusicNote size={12} />
                               {linkedAssets[0]?.description || selectedStudent.instrument}
                             </span>
@@ -784,11 +778,9 @@ export default function StudentsPage() {
                     <div className="space-y-4 sm:space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       {/* Información Personal */}
-                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-blue-500">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
-                          <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-                            <MdPerson className="text-blue-600" size={16} />
-                          </span>
+                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                          <MdPerson className="text-[#C2492B]" size={14} />
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -880,8 +872,8 @@ export default function StudentsPage() {
                                 <option value="false">{t('inactive')}</option>
                               </select>
                             ) : (
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                studentDetails.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                                studentDetails.is_active !== false ? 'bg-[#EDF1E9] text-[#5F7A57]' : 'bg-[#F8E9E4] text-[#A8402A]'
                               }`}>
                                 {studentDetails.is_active !== false ? t('active') : t('inactive')}
                               </span>
@@ -891,11 +883,9 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Orquesta */}
-                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-purple-500">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
-                          <span className="bg-purple-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-                            <MdMusicNote className="text-purple-600" size={16} />
-                          </span>
+                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                          <MdMusicNote className="text-[#C2492B]" size={14} />
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -906,9 +896,9 @@ export default function StudentsPage() {
                               </p>
                               <div className="space-y-2">
                                 {linkedAssets.map((asset) => (
-                                  <div key={asset.id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-200">
-                                    <div className="bg-purple-100 p-2 rounded-full flex-shrink-0">
-                                      <MdMusicNote className="text-purple-600" size={18} />
+                                  <div key={asset.id} className="flex items-center gap-3 bg-[#F4F0E8] rounded-lg p-3 border border-[#E7E0D2]">
+                                    <div className="bg-[#EFE9DD] p-2 rounded-full flex-shrink-0">
+                                      <MdMusicNote className="text-[#C2492B]" size={18} />
                                     </div>
                                     <div className="min-w-0">
                                       <p className="text-sm font-bold text-gray-900">
@@ -1008,17 +998,15 @@ export default function StudentsPage() {
                       </div>
 
                       {/* Información de Padres */}
-                      <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-green-500">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center gap-2">
-                          <span className="bg-green-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-                            <MdContacts className="text-green-600" size={16} />
-                          </span>
+                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                          <MdContacts className="text-[#C2492B]" size={14} />
                           {t('parents_info')}
                         </h3>
                         {studentDetails.parents && studentDetails.parents.length > 0 ? (
                           <div className="space-y-4">
                             {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
-                              <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                              <div key={index} className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6]">
                                 {isEditMode ? (
                                   <div className="space-y-3">
                                     <div>
@@ -1063,10 +1051,10 @@ export default function StudentsPage() {
                                     <div className="space-y-2">
                                       {parent.phone_number && (
                                         <div className="flex items-center gap-2">
-                                          <MdPhone className="text-green-600 flex-shrink-0" size={18} />
-                                          <a 
+                                          <MdPhone className="text-[#C2492B] flex-shrink-0" size={18} />
+                                          <a
                                             href={`tel:${parent.phone_number}`}
-                                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                            className="text-sm font-medium text-[#1B1917] hover:text-[#C2492B] hover:underline"
                                           >
                                             {parent.phone_number}
                                           </a>
@@ -1074,10 +1062,10 @@ export default function StudentsPage() {
                                       )}
                                       {parent.email && (
                                         <div className="flex items-center gap-2">
-                                          <MdEmail className="text-green-600 flex-shrink-0" size={18} />
-                                          <a 
+                                          <MdEmail className="text-[#C2492B] flex-shrink-0" size={18} />
+                                          <a
                                             href={`mailto:${parent.email}`}
-                                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline break-all"
+                                            className="text-sm font-medium text-[#1B1917] hover:text-[#C2492B] hover:underline break-all"
                                           >
                                             {parent.email}
                                           </a>
@@ -1090,8 +1078,8 @@ export default function StudentsPage() {
                             ))}
                           </div>
                         ) : (
-                          <div className="bg-white rounded-lg p-4 border border-gray-200 text-center">
-                            <p className="text-sm text-gray-500">
+                          <div className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6] text-center">
+                            <p className="text-sm text-[#8A8177]">
                               {t('no_parent_info') || 'No hay información de padres registrada'}
                             </p>
                           </div>
@@ -1164,14 +1152,17 @@ export default function StudentsPage() {
                 <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                      <div className="p-1.5 sm:p-2 bg-[#EFE9DD] rounded-lg">
                         <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#C2492B]" />
                       </div>
                       <div>
-                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                        <h2
+                          className="text-xl sm:text-2xl text-[#1B1917]"
+                          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                        >
                           {t('new_student')}
                         </h2>
-                        <p className="text-xs sm:text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-[#8A8177]">
                           {t('complete_student_info')}
                         </p>
                       </div>
@@ -1189,9 +1180,9 @@ export default function StudentsPage() {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-6">
                   <div className="space-y-4 sm:space-y-6">
                     {/* Información Personal */}
-                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                        <MdPerson className="mr-2 text-blue-600" size={18} />
+                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
+                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                        <MdPerson className="mr-2 text-[#C2492B]" size={14} />
                         {t('personal_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -1263,9 +1254,9 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Información de Orquesta */}
-                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                        <MdMusicNote className="mr-2 text-purple-600" size={18} />
+                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
+                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                        <MdMusicNote className="mr-2 text-[#C2492B]" size={14} />
                         {t('orchestra_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -1337,9 +1328,9 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Información de Padres */}
-                    <div className="bg-gray-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-gray-200">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 pb-2 border-b border-gray-200 mb-3 sm:mb-4 flex items-center">
-                        <MdContacts className="mr-2 text-green-600" size={18} />
+                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
+                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                        <MdContacts className="mr-2 text-[#C2492B]" size={14} />
                         {t('parent_contact_info')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
