@@ -683,7 +683,7 @@ export default function AdminUsersPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando programas...</p>
         </div>
       </div>
@@ -708,7 +708,7 @@ export default function AdminUsersPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-[#0073ea] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#C2492B] rounded-lg flex items-center justify-center">
               <MdPeople size={20} className="text-white" />
             </div>
             <div>
@@ -745,7 +745,7 @@ export default function AdminUsersPage() {
                 loadOrganizations();
               }
             }}
-            className="inline-flex items-center space-x-3 px-6 py-3 bg-[#0073ea] hover:bg-[#0060c0] text-white rounded-lg transition-colors duration-200 shadow-sm"
+            className="inline-flex items-center space-x-3 px-6 py-3 bg-[#C2492B] hover:bg-[#A83A20] text-white rounded-lg transition-colors duration-200 shadow-sm"
           >
             <MdAdd size={18} className="text-white" />
             <span className="font-medium">{t('add_new_user')}</span>
@@ -757,7 +757,7 @@ export default function AdminUsersPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#0073ea] rounded-md flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#C2492B] rounded-md flex items-center justify-center">
                   <MdPeople size={16} className="text-white" />
                 </div>
                 <div>
@@ -796,7 +796,7 @@ export default function AdminUsersPage() {
                   <tr key={user.user_id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-[#0073ea] rounded-full flex items-center justify-center text-white font-medium text-xs">
+                        <div className="w-8 h-8 bg-[#C2492B] rounded-full flex items-center justify-center text-white font-medium text-xs">
                           {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div className="text-sm font-medium text-gray-900 truncate max-w-36">{user.full_name}</div>
@@ -935,7 +935,7 @@ export default function AdminUsersPage() {
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
                       placeholder={t('user_full_name_placeholder')}
                     />
                   </div>
@@ -947,7 +947,7 @@ export default function AdminUsersPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
                       placeholder={t('user_email_placeholder')}
                     />
                   </div>
@@ -959,7 +959,7 @@ export default function AdminUsersPage() {
                     <select
                       value={selectedOrganizationId}
                       onChange={(e) => setSelectedOrganizationId(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
                       required
                     >
                       <option value="">{t('select_organization_placeholder')}</option>
@@ -980,7 +980,7 @@ export default function AdminUsersPage() {
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value as any)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-colors"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
                     >
                       <option value="admin">{t('admin_role')} - {t('admin_role_desc')}</option>
                       <option value="staff">{t('staff_role')} - {t('staff_role_desc')}</option>
@@ -1007,7 +1007,7 @@ export default function AdminUsersPage() {
                               setSelectedProgramIds(selectedProgramIds.filter(id => id !== program.id));
                             }
                           }}
-                          className="rounded border-gray-300 text-[#0073ea] focus:ring-[#0073ea]"
+                          className="rounded border-gray-300 text-[#C2492B] focus:ring-[#C2492B]"
                         />
                         <span className="text-sm text-gray-700">{program.name}</span>
                       </label>
@@ -1038,7 +1038,7 @@ export default function AdminUsersPage() {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] disabled:opacity-50 transition-colors flex items-center space-x-2"
+                    className="px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] disabled:opacity-50 transition-colors flex items-center space-x-2"
                   >
                     <MdAdd size={16} />
                     <span>{busy ? t('creating_user') : t('create_user_button')}</span>
@@ -1098,7 +1098,7 @@ export default function AdminUsersPage() {
             <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto border border-gray-100">
               <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-[#0073ea] rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-10 h-10 bg-[#C2492B] rounded-lg flex items-center justify-center shadow-md">
                     <MdEdit className="text-white" size={18} />
                   </div>
                   <div>
@@ -1130,7 +1130,7 @@ export default function AdminUsersPage() {
                         required
                         value={editingUser.full_name || ''}
                         onChange={(e) => setEditingUser({...editingUser, full_name: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
+                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
                         placeholder={t('full_name_placeholder')}
                       />
                     </div>
@@ -1143,7 +1143,7 @@ export default function AdminUsersPage() {
                         required
                         value={editingUser.email || ''}
                         onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
+                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
                         placeholder={t('email_placeholder_user')}
                       />
                     </div>
@@ -1163,7 +1163,7 @@ export default function AdminUsersPage() {
                     <select
                       value={editingUser.role}
                       onChange={(e) => setEditingUser({...editingUser, role: e.target.value as any})}
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] transition-all duration-200"
+                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
                     >
                       <option value="admin">{t('administrator')}</option>
                       <option value="staff">{t('staff_member')}</option>
@@ -1187,7 +1187,7 @@ export default function AdminUsersPage() {
                                 type="checkbox"
                                 checked={isAssigned}
                                 onChange={(e) => handleProgramToggle({...program, organization_id: program.organization_id || ''}, e.target.checked)}
-                                className="w-4 h-4 text-[#0073ea] border-gray-300 rounded focus:ring-[#0073ea]"
+                                className="w-4 h-4 text-[#C2492B] border-gray-300 rounded focus:ring-[#C2492B]"
                               />
                               <span className="text-sm text-gray-900">{program.name}</span>
                             </label>
@@ -1210,7 +1210,7 @@ export default function AdminUsersPage() {
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] disabled:opacity-50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
+                    className="px-6 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] disabled:opacity-50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
                   >
                     {busy ? (
                       <>
