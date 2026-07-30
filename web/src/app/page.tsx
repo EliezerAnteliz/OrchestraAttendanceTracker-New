@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white p-2 sm:p-4 shadow-lg">
+      <header className="bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white p-2 sm:p-4 shadow-lg">
         <div className="container mx-auto flex justify-between items-center gap-2">
           <div className="flex items-center min-w-0 flex-1">
             <h1 className="text-sm sm:text-2xl font-bold truncate">{t("app_title")}</h1>
@@ -45,7 +45,7 @@ export default function Home() {
                   correo). */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/dashboard"
-                  className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold text-sm sm:text-base">
+                  className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-center font-semibold text-sm sm:text-base">
                   {t("access_dashboard")}
                 </Link>
               </div>
@@ -151,7 +151,7 @@ function BenefitCard({ icon, title, description }: {
 }) {
   return (
     <div className="text-center p-6">
-      <div className="text-[#0073ea] mb-4 flex justify-center">
+      <div className="text-[#C2492B] mb-4 flex justify-center">
         {icon}
       </div>
       <h4 className="text-xl font-bold text-black mb-3">{title}</h4>
