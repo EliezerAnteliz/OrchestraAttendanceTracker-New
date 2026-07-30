@@ -458,7 +458,7 @@ export default function AuditSessionPage() {
   if (roleLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
@@ -467,7 +467,7 @@ export default function AuditSessionPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_loading_audit')}</p>
         </div>
       </div>
@@ -481,7 +481,7 @@ export default function AuditSessionPage() {
           <p className="text-gray-600">{t('inv_session_not_found')}</p>
           <button
             onClick={() => router.push('/dashboard/inventory/audit')}
-            className="mt-4 px-4 py-2 bg-[#0073ea] text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg"
           >
             {t('inv_go_back')}
           </button>
@@ -498,7 +498,7 @@ export default function AuditSessionPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">
             {session.status === 'closed' ? t('inv_redirecting_to_report') : t('inv_cancelling')}
           </p>
@@ -580,7 +580,7 @@ export default function AuditSessionPage() {
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setActiveMode('scan')}
-                className="flex flex-col items-center gap-1 px-3 py-3 bg-[#0073ea] text-white rounded-lg hover:bg-[#0060c0] transition-colors"
+                className="flex flex-col items-center gap-1 px-3 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
               >
                 <MdQrCodeScanner size={24} />
                 <span className="text-xs font-medium">{t('inv_action_scan')}</span>
