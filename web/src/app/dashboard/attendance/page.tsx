@@ -1143,7 +1143,7 @@ export default function AttendancePage() {
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat="dd/MM/yyyy"
-                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-[#0073ea] text-black font-medium shadow-sm w-full sm:w-44 text-sm"
+                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] text-black font-medium shadow-sm w-full sm:w-44 text-sm"
                 wrapperClassName="date-picker-wrapper w-full sm:w-44"
                 locale={lang === 'es' ? es : enUS}
                 showMonthYearPicker={false}
@@ -1175,7 +1175,7 @@ export default function AttendancePage() {
                 </div>
               )}
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#0073ea]">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C2492B]">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -1188,7 +1188,7 @@ export default function AttendancePage() {
                 className={`px-3 py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium w-full sm:w-auto ${
                   attendanceMode 
                     ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-[#0073ea] hover:bg-[#0060c0] text-white'
+                    : 'bg-[#C2492B] hover:bg-[#A83A20] text-white'
                 }`}
               >
                 {attendanceMode ? t('disable_attendance_mode') : t('enable_attendance_mode')}
@@ -1220,7 +1220,7 @@ export default function AttendancePage() {
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 sm:py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
+              className="w-full pl-9 pr-3 py-2 sm:py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
             />
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           </div>
@@ -1229,7 +1229,7 @@ export default function AttendancePage() {
             <select
               value={selectedOrchestra}
               onChange={(e) => handleOrchestraChange(e.target.value)}
-              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
+              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
               aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
             >
               <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
@@ -1244,7 +1244,7 @@ export default function AttendancePage() {
             <select
               value={selectedInstrument}
               onChange={(e) => handleInstrumentChange(e.target.value)}
-              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] focus:border-transparent text-black font-medium text-sm"
+              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
               aria-label={t('filter_by_instrument')}
             >
               <option value="all">{t('all_instruments')}</option>
@@ -1266,7 +1266,7 @@ export default function AttendancePage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={selectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
               >
                 <span className="mr-1">☑</span>
                 {t('select_all')}
@@ -1344,7 +1344,7 @@ export default function AttendancePage() {
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <div className="w-12 h-12 border-4 border-t-[#0073ea] border-r-[#0073ea] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-black">{t('loading_students')}</p>
             </div>
           </div>
@@ -1356,7 +1356,7 @@ export default function AttendancePage() {
                 {filteredStudents.map((student) => (
                   <div
                     key={student.id}
-                    className={`bg-white p-3 rounded-lg shadow-sm border-l-4 transition-shadow ${student.selected ? 'border-[#0073ea] bg-blue-50 shadow-md' : 'border-blue-500'} ${attendanceMode ? 'cursor-pointer hover:shadow-md' : ''}`}
+                    className={`bg-white p-3 rounded-lg shadow-sm border-l-4 transition-shadow ${student.selected ? 'border-[#C2492B] bg-blue-50 shadow-md' : 'border-blue-500'} ${attendanceMode ? 'cursor-pointer hover:shadow-md' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1373,7 +1373,7 @@ export default function AttendancePage() {
                           {student.orchestra ? (
                             <>
                               <span className="text-gray-400">•</span>
-                              <span className="font-medium text-[#0073ea]">{student.orchestra.name}</span>
+                              <span className="font-medium text-[#C2492B]">{student.orchestra.name}</span>
                             </>
                           ) : (
                             <>
@@ -1401,7 +1401,7 @@ export default function AttendancePage() {
                           checked={student.selected || false}
                           onChange={() => toggleStudentSelection(student.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 mt-0.5 text-[#0073ea] focus:ring-[#0073ea] border-gray-300 rounded flex-shrink-0"
+                          className="h-5 w-5 mt-0.5 text-[#C2492B] focus:ring-[#C2492B] border-gray-300 rounded flex-shrink-0"
                         />
                       )}
                     </div>
