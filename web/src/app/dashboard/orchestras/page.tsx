@@ -391,7 +391,7 @@ export default function OrchestrasPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
@@ -411,7 +411,7 @@ export default function OrchestrasPage() {
               setFormData({ name: '', description: '', is_active: true });
               setShowModal(true);
             }}
-            className="bg-[#0073ea] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#0060c0] transition-colors"
+            className="bg-[#C2492B] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#A83A20] transition-colors"
           >
             <MdAdd className="mr-2" size={20} />
             {lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra'}
@@ -450,7 +450,7 @@ export default function OrchestrasPage() {
                 setFormData({ name: '', description: '', is_active: true });
                 setShowModal(true);
               }}
-              className="mt-4 bg-[#0073ea] text-white px-6 py-2 rounded-md hover:bg-[#0060c0] transition-colors"
+              className="mt-4 bg-[#C2492B] text-white px-6 py-2 rounded-md hover:bg-[#A83A20] transition-colors"
             >
               {lang === 'es' ? 'Crear Primera Orquesta' : 'Create First Orchestra'}
             </button>
@@ -513,7 +513,7 @@ export default function OrchestrasPage() {
               <div className="space-y-2">
                 <button
                   onClick={() => handleViewStudents(orchestra)}
-                  className="w-full px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center justify-center font-medium"
+                  className="w-full px-4 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors flex items-center justify-center font-medium"
                 >
                   <MdVisibility className="mr-2" size={18} />
                   {lang === 'es' ? 'Ver Estudiantes' : 'View Students'}
@@ -582,7 +582,7 @@ export default function OrchestrasPage() {
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                       placeholder={lang === 'es' ? 'Ej: Mozart, Beethoven' : 'Ex: Mozart, Beethoven'}
                       required
                     />
@@ -595,7 +595,7 @@ export default function OrchestrasPage() {
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                       rows={3}
                       placeholder={lang === 'es' ? 'Descripción opcional' : 'Optional description'}
                     />
@@ -607,7 +607,7 @@ export default function OrchestrasPage() {
                       id="is_active"
                       checked={formData.is_active}
                       onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                      className="w-4 h-4 text-[#0073ea] border-gray-300 rounded focus:ring-[#0073ea]"
+                      className="w-4 h-4 text-[#C2492B] border-gray-300 rounded focus:ring-[#C2492B]"
                     />
                     <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
                       {lang === 'es' ? 'Orquesta activa' : 'Active orchestra'}
@@ -629,7 +629,7 @@ export default function OrchestrasPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#0073ea] text-white rounded-md hover:bg-[#0060c0] transition-colors flex items-center"
+                    className="px-4 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors flex items-center"
                   >
                     {editingOrchestra ? <MdEdit className="mr-2" size={18} /> : <MdAdd className="mr-2" size={18} />}
                     {editingOrchestra 
@@ -687,7 +687,7 @@ export default function OrchestrasPage() {
                   placeholder={lang === 'es' ? 'Buscar estudiante...' : 'Search student...'}
                   value={studentSearchTerm}
                   onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0073ea] text-gray-900"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
                 />
               </div>
               
@@ -835,7 +835,7 @@ export default function OrchestrasPage() {
             <div className="flex-1 overflow-y-auto p-6">
               {loadingStudents ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0073ea]"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
                 </div>
               ) : orchestraStudents.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
@@ -869,7 +869,7 @@ export default function OrchestrasPage() {
                                 setStudentToMove(student);
                                 setTargetOrchestra('');
                               }}
-                              className="px-3 py-2 bg-gradient-to-r from-[#0073ea] to-[#0060c0] text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
+                              className="px-3 py-2 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
                               title={lang === 'es' ? 'Cambiar de orquesta' : 'Change orchestra'}
                             >
                               <MdSwapHoriz size={18} className="mr-1" />
