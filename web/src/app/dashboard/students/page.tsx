@@ -573,7 +573,8 @@ export default function StudentsPage() {
   }
 
   return (
-    <div className="h-full p-4 md:p-6 bg-[#FAF7F2]">
+    <div className="h-full p-4 md:p-7 bg-[#FAF7F2]">
+    <div className="max-w-[1420px] mx-auto">
       {!activeProgram?.id && (
         <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
           {t('select_program_to_view_students') || 'Please select a program to view students.'}
@@ -647,8 +648,11 @@ export default function StudentsPage() {
           </button>
         </div>
 
-        {/* Tarjetas de estudiante — mismo componente en móvil y escritorio */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
+        {/* Tarjetas de estudiante — mismo componente en móvil y escritorio.
+            grid-cols con auto-fill/minmax (no un número fijo de columnas)
+            para que el ancho de cada tarjeta se mantenga ~310px como en el
+            mockup, en vez de estirarse al ancho disponible. */}
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(310px,1fr))] gap-3 mt-5">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
               <button
@@ -731,45 +735,40 @@ export default function StudentsPage() {
             onClick={closeDrawer}
           />
           
-          {/* Modal centrado */}
-          <div className="relative w-full max-w-4xl max-h-[80vh] sm:max-h-[90vh] mx-auto">
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
-              <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
+          {/* Modal centrado — ancho contenido (no ocupa toda la pantalla),
+              como en el mockup: min(760px, 100%) en vez de estirarse. */}
+          <div className="relative w-full sm:max-w-[760px] max-h-[80vh] sm:max-h-[86vh] mx-auto">
+            <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl border border-[#E3DDD1] shadow-xl overflow-hidden">
+              <div className="flex flex-col max-h-[80vh] sm:max-h-[86vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#C2492B] rounded-full flex items-center justify-center text-[#FAF7F2] font-semibold text-sm sm:text-base flex-shrink-0">
-                        {`${selectedStudent?.first_name?.charAt(0) || ''}${selectedStudent?.last_name?.charAt(0) || ''}`.toUpperCase()}
-                      </div>
-                      <div>
-                        <h2
-                          className="text-xl sm:text-2xl text-[#1B1917]"
-                          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
-                        >
-                          {selectedStudent?.first_name} {selectedStudent?.last_name}
-                        </h2>
-                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1">
-                          {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
-                            <span className="inline-flex items-center gap-1 text-[11.5px] tracking-wide uppercase text-[#C2492B]">
-                              <MdMusicNote size={12} />
-                              {linkedAssets[0]?.description || selectedStudent.instrument}
-                            </span>
-                          )}
-                        </div>
+                <div className="px-4 sm:px-7 py-4 sm:py-5 border-b border-[#E3DDD1]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2
+                        className="text-2xl sm:text-[32px] leading-none text-[#1B1917]"
+                        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                      >
+                        {selectedStudent?.first_name} {selectedStudent?.last_name}
+                      </h2>
+                      <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
+                        {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
+                          <span className="inline-flex items-center gap-1 text-[12.5px] tracking-wide uppercase text-[#C2492B]">
+                            {linkedAssets[0]?.description || selectedStudent.instrument}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <button
                       onClick={closeDrawer}
-                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                      className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
                     >
-                      <MdClose size={20} className="sm:w-6 sm:h-6" />
+                      <MdClose size={18} />
                     </button>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-7">
                   {loadingDetails ? (
                     <div className="flex items-center justify-center h-64">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
@@ -777,8 +776,10 @@ export default function StudentsPage() {
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                      {/* Información Personal */}
-                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                      {/* Información Personal — sin caja/borde alrededor,
+                          solo la etiqueta en mayúsculas + línea divisoria,
+                          igual que el mockup (no "una sección = una tarjeta"). */}
+                      <div>
                         <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdPerson className="text-[#C2492B]" size={14} />
                           {t('personal_info')}
@@ -882,8 +883,8 @@ export default function StudentsPage() {
                         </div>
                       </div>
 
-                      {/* Información de Orquesta */}
-                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                      {/* Información de Orquesta — sin caja/borde, mismo patrón. */}
+                      <div>
                         <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdMusicNote className="text-[#C2492B]" size={14} />
                           {t('orchestra_info')}
@@ -997,8 +998,8 @@ export default function StudentsPage() {
                       </div>
                       </div>
 
-                      {/* Información de Padres */}
-                      <div className="bg-[#FFFDFA] rounded-lg sm:rounded-xl border border-[#EAE3D6] p-4 sm:p-6">
+                      {/* Información de Padres — sin caja/borde, mismo patrón. */}
+                      <div>
                         <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdContacts className="text-[#C2492B]" size={14} />
                           {t('parents_info')}
@@ -1090,13 +1091,13 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-3 sm:px-6 py-2.5 sm:py-4 bg-gray-50 border-t border-gray-200">
-                  <div className="flex justify-between items-center gap-2">
+                <div className="px-4 sm:px-7 py-3 sm:py-5 border-t border-[#E3DDD1]">
+                  <div className="flex justify-end items-center gap-2">
                     {isEditMode ? (
                       <>
                         <button
                           onClick={handleCancelEdit}
-                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                         >
                           {t('cancel')}
                         </button>
@@ -1112,7 +1113,7 @@ export default function StudentsPage() {
                       <>
                         <button
                           onClick={closeDrawer}
-                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                         >
                           {t('close')}
                         </button>
@@ -1144,13 +1145,13 @@ export default function StudentsPage() {
             onClick={closeNewStudentModal}
           />
           
-          {/* Modal centrado */}
-          <div className="relative w-full max-w-4xl max-h-[80vh] sm:max-h-[90vh] mx-auto">
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl overflow-hidden">
+          {/* Modal centrado — ancho contenido, no toda la pantalla */}
+          <div className="relative w-full sm:max-w-[760px] max-h-[80vh] sm:max-h-[90vh] mx-auto">
+            <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl border border-[#E3DDD1] shadow-xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
-                  <div className="flex items-center justify-between">
+                <div className="px-4 sm:px-7 py-4 sm:py-5 border-b border-[#E3DDD1]">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <div className="p-1.5 sm:p-2 bg-[#EFE9DD] rounded-lg">
                         <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#C2492B]" />
@@ -1169,15 +1170,15 @@ export default function StudentsPage() {
                     </div>
                     <button
                       onClick={closeNewStudentModal}
-                      className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
                     >
-                      <MdClose size={20} className="sm:w-6 sm:h-6" />
+                      <MdClose size={18} />
                     </button>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-7">
                   <div className="space-y-4 sm:space-y-6">
                     {/* Información Personal */}
                     <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
@@ -1376,18 +1377,18 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-3 sm:px-6 py-2.5 sm:py-4 bg-gray-50 border-t border-gray-200">
-                  <div className="flex justify-between items-center gap-2">
+                <div className="px-4 sm:px-7 py-3 sm:py-5 border-t border-[#E3DDD1]">
+                  <div className="flex justify-end items-center gap-2">
                     <button
                       onClick={closeNewStudentModal}
-                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                     >
                       {t('cancel')}
                     </button>
                     <button
                       onClick={handleSaveNewStudent}
                       disabled={savingNewStudent || !newStudentData.first_name || !newStudentData.last_name}
-                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium flex items-center justify-center transition-all duration-200 ${
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 text-sm bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg font-medium flex items-center justify-center transition-all duration-200 ${
                         (savingNewStudent || !newStudentData.first_name || !newStudentData.last_name) ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md transform hover:scale-[1.01]'
                       }`}
                     >
@@ -1401,6 +1402,7 @@ export default function StudentsPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
