@@ -301,7 +301,7 @@ export default function InventoryDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0073ea] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
           <p className="mt-4 text-gray-600">{t('inv_loading_dashboard')}</p>
         </div>
       </div>
@@ -329,7 +329,7 @@ export default function InventoryDashboard() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <MdInventory className="text-[#0073ea]" />
+          <MdInventory className="text-[#C2492B]" />
           {t('inv_dashboard_title')}
         </h1>
         <p className="text-gray-600 mt-1">
@@ -537,7 +537,7 @@ export default function InventoryDashboard() {
           <h2 className="text-lg font-semibold text-gray-900">{t('inv_latest_assets_registered')}</h2>
           <Link
             href="/dashboard/inventory/assets"
-            className="text-sm text-[#0073ea] hover:text-[#0060c0] font-medium"
+            className="text-sm text-[#C2492B] hover:text-[#A83A20] font-medium"
           >
             {t('inv_view_all_arrow')}
           </Link>
