@@ -54,7 +54,7 @@ const GenerateReportButton: React.FC<GenerateReportButtonProps> = ({
           disabled={!canGenerate()}
           className={`flex items-center justify-center px-4 py-2 rounded-sm transition-colors
             ${canGenerate()
-              ? 'bg-[#0073ea] text-white hover:bg-[#0060c0]'
+              ? 'bg-[#C2492B] text-white hover:bg-[#A83A20]'
               : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
         >
