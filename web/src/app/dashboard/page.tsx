@@ -3,15 +3,45 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart, 
+import { MdPeople, MdCheckCircle, MdCalendarToday, MdShowChart,
          MdAssignmentTurnedIn, MdGroup, MdInsertChart, MdMusicNote } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
+import { useAuth } from '@/contexts/AuthContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
+
+// Saludo + fecha/hora en vivo del encabezado — nombre viene de
+// user_metadata.full_name (lo mismo que ya guarda la invitación de
+// usuarios, ver api/admin/users/invite-user/route.ts), sin ninguna
+// consulta nueva a Supabase. Si no hay full_name, cae al usuario del correo.
+function useGreeting() {
+  const { user } = useAuth();
+  const { lang } = useI18n();
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  const fullName = (user?.user_metadata as any)?.full_name as string | undefined;
+  const name = (fullName?.trim().split(/\s+/)[0]) || user?.email?.split('@')[0] || '';
+
+  const hour = now ? now.getHours() : 12;
+  const greetingKey = hour < 12 ? 'greeting_morning' : hour < 19 ? 'greeting_afternoon' : 'greeting_evening';
+
+  const dateTimeLabel = now
+    ? `${now.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })} · ${now.toLocaleTimeString(lang === 'es' ? 'es-ES' : 'en-US', { hour: 'numeric', minute: '2-digit' })}`
+    : '';
+
+  return { name, greetingKey, dateTimeLabel };
+}
 
 export default function DashboardPage() {
   const { t, lang } = useI18n();
   const { activeProgram } = useProgram();
+  const { name, greetingKey, dateTimeLabel } = useGreeting();
   const [stats, setStats] = useState({
     totalStudents: 0,
     activeStudents: 0,
@@ -216,13 +246,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-6 animate-fadeIn">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+    <div className="p-4 md:p-6 space-y-6 animate-fadeIn bg-[#FAF7F2] min-h-full">
+      <div className="flex flex-col gap-4 pb-5 border-b border-[#E3DDD1]">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-800">{t('welcome_dashboard')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('dashboard_summary')}
+            <h1
+              className="text-[28px] md:text-[32px] leading-tight text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t(greetingKey, { name })}
+            </h1>
+            <p className="text-[#8A8177] mt-2 text-sm">
+              {t('dashboard_summary')}{dateTimeLabel ? ` · ${dateTimeLabel}` : ''}
             </p>
           </div>
           <div className="sm:ml-4">
@@ -232,58 +267,59 @@ export default function DashboardPage() {
       </div>
 
       {/* Tarjetas de estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           title={t('total_students')}
           value={stats.totalStudents}
-          icon={<MdPeople size={24} />}
-          color="blue"
+          icon={<MdPeople size={22} />}
         />
         <StatCard
           title={t('active_students')}
           value={stats.activeStudents}
-          icon={<MdCheckCircle size={24} />}
-          color="green"
+          icon={<MdCheckCircle size={22} />}
         />
         <StatCard
           title={t('attendance_today')}
           value={stats.attendanceToday}
-          icon={<MdCalendarToday size={24} />}
-          color="purple"
+          icon={<MdCalendarToday size={22} />}
         />
         <StatCard
           title={t('attendance_rate')}
           value={`${stats.attendanceRate.toFixed(1)}%`}
-          icon={<MdShowChart size={24} />}
-          color="orange"
+          icon={<MdShowChart size={22} />}
+          accent
         />
         <StatCard
           title={lang === 'es' ? 'Orquestas' : 'Orchestras'}
           value={stats.totalOrchestras}
-          icon={<MdMusicNote size={24} />}
-          color="indigo"
+          icon={<MdMusicNote size={22} />}
         />
       </div>
 
       {/* Sección de Orquestas */}
       {orchestraStats.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-[15px] font-medium text-[#1B1917] mb-4">
             {lang === 'es' ? 'Estudiantes por Orquesta' : 'Students per Orchestra'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {orchestraStats.map((orchestra, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500"
+                className="bg-[#FFFDFA] rounded-xl p-5 border border-[#EAE3D6]"
               >
                 <div className="flex items-center">
-                  <div className="bg-indigo-100 p-3 rounded-full mr-4">
-                    <MdMusicNote className="text-indigo-600" size={24} />
+                  <div className="bg-[#EFE9DD] p-3 rounded-full mr-4">
+                    <MdMusicNote className="text-[#C2492B]" size={22} />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 font-medium">{orchestra.name}</p>
-                    <p className="text-2xl font-bold text-gray-900">{orchestra.studentCount}</p>
+                    <p className="text-sm text-[#8A8177] font-medium">{orchestra.name}</p>
+                    <p
+                      className="text-2xl text-[#1B1917] mt-0.5"
+                      style={{ fontFamily: 'var(--font-newsreader), serif' }}
+                    >
+                      {orchestra.studentCount}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -294,28 +330,25 @@ export default function DashboardPage() {
 
       {/* Sección de acceso rápido */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('quick_access')}</h2>
+        <h2 className="text-[15px] font-medium text-[#1B1917] mb-4">{t('quick_access')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <QuickAccessCard
             title={t('quick_register_attendance')}
             description={t('quick_register_attendance_desc')}
             href="/dashboard/attendance"
-            icon={<MdAssignmentTurnedIn size={24} />}
-            color="blue"
+            icon={<MdAssignmentTurnedIn size={22} />}
           />
           <QuickAccessCard
             title={t('quick_student_list')}
             description={t('quick_student_list_desc')}
             href="/dashboard/students"
-            icon={<MdGroup size={24} />}
-            color="green"
+            icon={<MdGroup size={22} />}
           />
           <QuickAccessCard
             title={t('quick_generate_reports')}
             description={t('quick_generate_reports_desc')}
             href="/dashboard/reports"
-            icon={<MdInsertChart size={24} />}
-            color="orange"
+            icon={<MdInsertChart size={22} />}
           />
         </div>
       </div>
@@ -323,51 +356,44 @@ export default function DashboardPage() {
   );
 }
 
-// Componente para las tarjetas de estadísticas
-// Mismo patrón visual que las tarjetas del Dashboard de Inventario: borde
-// izquierdo de color + ícono en círculo pastel (en vez del círculo de color
-// sólido con ícono blanco que tenía antes).
-const STAT_CARD_COLORS: Record<string, { border: string; iconBg: string; iconText: string }> = {
-  blue: { border: 'border-blue-500', iconBg: 'bg-blue-100', iconText: 'text-blue-600' },
-  green: { border: 'border-green-500', iconBg: 'bg-green-100', iconText: 'text-green-600' },
-  purple: { border: 'border-purple-500', iconBg: 'bg-purple-100', iconText: 'text-purple-600' },
-  orange: { border: 'border-orange-500', iconBg: 'bg-orange-100', iconText: 'text-orange-600' },
-  indigo: { border: 'border-indigo-500', iconBg: 'bg-indigo-100', iconText: 'text-indigo-600' },
-};
-
-function StatCard({ title, value, icon, color }: { title: string; value: number | string; icon: React.ReactNode; color: string }) {
-  const styles = STAT_CARD_COLORS[color] || STAT_CARD_COLORS.blue;
+// Tarjetas del Dashboard con la paleta cálida del rediseño (30/07/26) —
+// mismo patrón (crema + acento terracota) en toda la fila de estadísticas
+// en vez de un color distinto por tarjeta. `accent` colorea el valor en
+// terracota para la métrica destacada (tasa de asistencia).
+function StatCard({ title, value, icon, accent }: { title: string; value: number | string; icon: React.ReactNode; accent?: boolean }) {
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${styles.border}`}>
+    <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 font-medium">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+          <p className="text-[11px] uppercase tracking-wide text-[#8A8177] font-medium">{title}</p>
+          <p
+            className="mt-2 text-[#1B1917]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300, fontSize: 30, color: accent ? '#C2492B' : undefined }}
+          >
+            {value}
+          </p>
         </div>
-        <div className={`${styles.iconBg} p-3 rounded-full`}>
-          <span className={styles.iconText}>{icon}</span>
+        <div className="bg-[#EFE9DD] p-2.5 rounded-full text-[#C2492B]">
+          {icon}
         </div>
       </div>
     </div>
   );
 }
 
-// Componente para las tarjetas de acceso rápido — mismo lenguaje visual que
-// las StatCard de arriba (borde izquierdo de color + ícono en círculo pastel),
-// en vez del borde gris plano + lila fijo que tenía antes.
-function QuickAccessCard({ title, description, href, icon, color }: { title: string; description: string; href: string; icon: React.ReactNode; color: string }) {
-  const styles = STAT_CARD_COLORS[color] || STAT_CARD_COLORS.blue;
+// Tarjetas de acceso rápido — mismo lenguaje visual que StatCard de arriba.
+function QuickAccessCard({ title, description, href, icon }: { title: string; description: string; href: string; icon: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${styles.border} hover:shadow-lg transition-shadow flex items-start`}
+      className="bg-[#FFFDFA] rounded-xl p-5 border border-[#EAE3D6] hover:border-[#C2492B] transition-colors flex items-start"
     >
-      <div className={`${styles.iconBg} p-3 rounded-full mr-4 flex-shrink-0`}>
-        <span className={styles.iconText}>{icon}</span>
+      <div className="bg-[#EFE9DD] p-3 rounded-full mr-4 flex-shrink-0 text-[#C2492B]">
+        {icon}
       </div>
       <div>
-        <h3 className="font-medium text-gray-800">{title}</h3>
-        <p className="text-sm text-gray-500 mt-1">{description}</p>
+        <h3 className="font-medium text-[#1B1917]">{title}</h3>
+        <p className="text-sm text-[#8A8177] mt-1">{description}</p>
       </div>
     </Link>
   );
