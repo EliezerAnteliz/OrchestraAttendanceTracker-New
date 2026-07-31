@@ -6,7 +6,7 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useProgram } from "@/contexts/ProgramContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
-import { MdAdd, MdEdit, MdDelete, MdWarning, MdRefresh, MdToggleOn, MdToggleOff, MdClose, MdPeople, MdCancel, MdSave } from 'react-icons/md';
+import { MdAdd, MdEdit, MdDelete, MdWarning, MdRefresh, MdToggleOn, MdToggleOff, MdClose, MdCancel, MdSave } from 'react-icons/md';
 
 function escapeHtml(value: string): string {
   return value
@@ -681,10 +681,10 @@ export default function AdminUsersPage() {
 
   if (loading || programsLoading || roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-[#FAF7F2]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando programas...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#EAE3D6] border-t-[#C2492B] mx-auto mb-4"></div>
+          <p className="text-[#8A8177] text-sm">Cargando programas...</p>
         </div>
       </div>
     );
@@ -692,221 +692,190 @@ export default function AdminUsersPage() {
 
   if (!programs?.length) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-[#FAF7F2]">
         <div className="text-center">
-          <MdWarning size={48} className="text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('no_programs_available')}</h2>
-          <p className="text-gray-600">{t('contact_admin_programs')}</p>
+          <MdWarning size={40} className="text-[#8A6A22] mx-auto mb-4" />
+          <h2 className="text-lg font-medium text-[#1B1917] mb-2">{t('no_programs_available')}</h2>
+          <p className="text-[#8A8177] text-sm">{t('contact_admin_programs')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-[#C2492B] rounded-lg flex items-center justify-center">
-              <MdPeople size={20} className="text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-800">{t('admin_users_title')}</h1>
-              <p className="text-gray-500 text-sm mt-0.5">{t('admin_users_subtitle')}</p>
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <div className="flex items-center">
-              <MdWarning className="text-red-500 mr-2" size={16} />
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-            <div className="flex items-center">
-              <MdSave className="text-green-500 mr-2" size={16} />
-              <p className="text-sm text-green-600">{success}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Botón principal */}
-        <div className="mb-6">
-          <button
-            onClick={() => {
-              setShowCreateModal(true);
-              if (organizations.length === 0) {
-                loadOrganizations();
-              }
-            }}
-            className="inline-flex items-center space-x-3 px-6 py-3 bg-[#C2492B] hover:bg-[#A83A20] text-white rounded-lg transition-colors duration-200 shadow-sm"
+    <div className="h-full p-4 md:p-7 bg-[#FAF7F2]">
+    <div className="max-w-[1420px] mx-auto">
+      {/* Header — mismo patrón que el resto de la app (Students, Inventario):
+          h1 en Newsreader + subtítulo, botón principal terracota a la derecha. */}
+      <div className="flex flex-col sm:flex-row justify-between items-end sm:items-end gap-4 pb-5 border-b border-[#E3DDD1]">
+        <div>
+          <h1
+            className="text-[28px] sm:text-[40px] text-[#1B1917] leading-[1.05]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
           >
-            <MdAdd size={18} className="text-white" />
-            <span className="font-medium">{t('add_new_user')}</span>
+            {t('admin_users_title')}
+          </h1>
+          <p className="text-[13px] sm:text-[14px] text-[#8A8177] mt-1.5">{t('admin_users_subtitle')}</p>
+        </div>
+        <button
+          onClick={() => {
+            setShowCreateModal(true);
+            if (organizations.length === 0) {
+              loadOrganizations();
+            }
+          }}
+          className="flex items-center justify-center gap-2 bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+        >
+          <MdAdd size={18} />
+          {t('add_new_user')}
+        </button>
+      </div>
+
+      {error && (
+        <div className="mt-5 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4 flex items-start gap-3">
+          <MdWarning className="text-[#8f3421] shrink-0 mt-0.5" size={18} />
+          <p className="text-sm text-[#8f3421]">{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="mt-5 bg-[#EDF1E9] border border-[#CFDCC7] rounded-xl p-4 flex items-start gap-3">
+          <MdSave className="text-[#4F6748] shrink-0 mt-0.5" size={18} />
+          <p className="text-sm text-[#4F6748]">{success}</p>
+        </div>
+      )}
+
+      {/* Tabla de usuarios — mismo patrón CSS-grid en filas que el resto de
+          listas del módulo (Import/Inventario), fiel al mockup del panel
+          de Admin: tarjeta clara con encabezado eyebrow y filas separadas
+          por líneas finas, sin "cebra" ni sombras internas. */}
+      <div className="mt-6 bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl overflow-hidden">
+        <div className="px-5 sm:px-6 py-4 border-b border-[#EAE3D6] flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-[15.5px] font-medium text-[#1B1917]">{t('registered_users')}</h2>
+            <p className="text-[#8A8177] text-[13px] mt-0.5">{t('manage_all_users')} · {allUsers.length} {t('users_count')}</p>
+          </div>
+          <button
+            onClick={() => loadAllUsers()}
+            disabled={busy}
+            className="p-2 text-[#8A8177] hover:text-[#C2492B] rounded-lg disabled:opacity-50 transition-colors"
+          >
+            <MdRefresh size={17} className={busy ? 'animate-spin' : ''} />
           </button>
         </div>
 
-        {/* Monday.com Style Table Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#C2492B] rounded-md flex items-center justify-center">
-                  <MdPeople size={16} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800">{t('registered_users')}</h2>
-                  <p className="text-gray-500 text-sm">{t('manage_all_users')} • {allUsers.length} {t('users_count')}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => loadAllUsers()}
-                  disabled={busy}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-50 transition-colors"
-                >
-                  <MdRefresh size={16} className={busy ? 'animate-spin' : ''} />
-                </button>
-              </div>
-            </div>
-          </div>
-
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-52">{t('name_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-60">{t('email_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-28">{t('organization_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-56">{t('program_site_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-20">{t('role_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-20">{t('status_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-24">{t('registration_date_column')}</th>
-                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-28">{t('actions_column')}</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {allUsers.map((user, index) => (
-                  <tr key={user.user_id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-[#C2492B] rounded-full flex items-center justify-center text-white font-medium text-xs">
-                          {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
-                        </div>
-                        <div className="text-sm font-medium text-gray-900 truncate max-w-36">{user.full_name}</div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600 truncate max-w-52">{user.email}</div>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-center">
-                      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">
-                        CMI
-                      </span>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      {user.programs?.length ? (
-                        <div className="flex flex-wrap gap-1">
-                          {user.programs.slice(0, 3).map((program) => (
-                            <span key={program.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                              {program.name.length > 12 ? program.name.substring(0, 12) + '...' : program.name}
-                            </span>
-                          ))}
-                          {user.programs.length > 3 && (
-                            <span className="text-xs text-gray-500">+{user.programs.length - 3}</span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400 italic">{t('no_program')}</span>
-                      )}
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-center">
-                      {/* Mismos colores por rol que el RoleSwitcher (Admin/Staff/Viewer)
-                          usado en Inventario y el resto de la app — antes esta tabla
-                          usaba morado para Admin y azul para Staff, un esquema distinto. */}
-                      <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
-                        user.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                        user.role === 'staff' ? 'bg-emerald-100 text-emerald-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.role === 'admin' ? t('admin_role') : user.role === 'staff' ? t('staff_role') : t('viewer_role_short')}
-                      </span>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-center">
-                      <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
-                        user.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                      }`}>
-                        {user.is_active ? t('active_status') : t('inactive_status')}
-                      </span>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-center">
-                      <div className="text-xs text-gray-500">
-                        {new Date(user.created_at).toLocaleDateString('es-ES', { 
-                          day: '2-digit',
-                          month: 'short'
-                        })}
-                      </div>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center justify-center space-x-1">
-                        <button
-                          onClick={() => {
-                            setEditingUser(user);
-                          }}
-                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors duration-150"
-                          title={t('edit_tooltip')}
-                        >
-                          <MdEdit size={16} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeletingUser(user);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors duration-150"
-                          title={t('delete_tooltip')}
-                        >
-                          <MdDelete size={16} />
-                        </button>
-                        <button
-                          onClick={() => toggleUserStatus(user)}
-                          className={`p-2 rounded transition-colors duration-150 ${
-                            user.is_active 
-                              ? 'text-gray-500 hover:text-orange-600 hover:bg-orange-50' 
-                              : 'text-gray-500 hover:text-green-600 hover:bg-green-50'
-                          }`}
-                          title={user.is_active ? t('deactivate_user') : t('activate_user')}
-                        >
-                          {user.is_active ? <MdToggleOff size={16} /> : <MdToggleOn size={16} />}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="min-w-[1120px]">
+              {/* Encabezado — mismo estilo eyebrow (uppercase, tracking amplio,
+                  color muted) que el resto de encabezados de sección de la app. */}
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_70px_minmax(0,1.1fr)_90px_90px_90px_110px] gap-[14px] px-5 sm:px-6 py-3 border-b border-[#EFE9DD] text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
+                <span>{t('name_column')}</span>
+                <span>{t('email_column')}</span>
+                <span>{t('organization_column')}</span>
+                <span>{t('program_site_column')}</span>
+                <span>{t('role_column')}</span>
+                <span>{t('status_column')}</span>
+                <span className="text-right">{t('registration_date_column')}</span>
+                <span className="text-right">{t('actions_column')}</span>
+              </div>
+
+              {allUsers.map((user) => (
+                <div
+                  key={user.user_id}
+                  className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_70px_minmax(0,1.1fr)_90px_90px_90px_110px] gap-[14px] px-5 sm:px-6 py-3.5 border-b border-[#F2ECE1] text-[13.5px] items-center hover:bg-[#FBF9F5] transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-[26px] h-[26px] rounded-full bg-[#EFE9DD] flex items-center justify-center text-[11.5px] text-[#6E675E] shrink-0">
+                      {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                    <span className="text-[#1B1917] font-medium truncate">{user.full_name}</span>
+                  </div>
+                  <div className="text-[#56504A] truncate">{user.email}</div>
+                  <div className="text-[#8A8177]">CMI</div>
+                  <div className="text-[#56504A] truncate">
+                    {user.programs?.length ? (
+                      <>
+                        {user.programs.slice(0, 3).map(p => p.name).join(' · ')}
+                        {user.programs.length > 3 && (
+                          <span className="text-[#A29889]"> +{user.programs.length - 3}</span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-[#A29889] italic">{t('no_program')}</span>
+                    )}
+                  </div>
+                  {/* Mismos colores por rol que el RoleSwitcher (Admin/Staff/Viewer)
+                      usado en Inventario y el resto de la app — antes esta tabla
+                      usaba morado para Admin y azul para Staff, un esquema distinto. */}
+                  <div
+                    className={
+                      user.role === 'admin' ? 'text-[#C2492B]' :
+                      user.role === 'staff' ? 'text-[#56504A]' :
+                      'text-[#8A8177]'
+                    }
+                  >
+                    {user.role === 'admin' ? t('admin_role') : user.role === 'staff' ? t('staff_role') : t('viewer_role_short')}
+                  </div>
+                  <div className={user.is_active ? 'text-[#5F7A57]' : 'text-[#A8402A]'}>
+                    {user.is_active ? t('active_status') : t('inactive_status')}
+                  </div>
+                  <div className="text-right text-[#8A8177]">
+                    {new Date(user.created_at).toLocaleDateString('es-ES', {
+                      day: '2-digit',
+                      month: 'short'
+                    })}
+                  </div>
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() => {
+                        setEditingUser(user);
+                      }}
+                      className="p-1.5 text-[#A29889] hover:text-[#C2492B] rounded transition-colors"
+                      title={t('edit_tooltip')}
+                    >
+                      <MdEdit size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setDeletingUser(user);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="p-1.5 text-[#A29889] hover:text-[#A8402A] rounded transition-colors"
+                      title={t('delete_tooltip')}
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                    <button
+                      onClick={() => toggleUserStatus(user)}
+                      className={`p-1.5 rounded transition-colors ${
+                        user.is_active
+                          ? 'text-[#A29889] hover:text-[#8A6A22]'
+                          : 'text-[#A29889] hover:text-[#5F7A57]'
+                      }`}
+                      title={user.is_active ? t('deactivate_user') : t('activate_user')}
+                    >
+                      {user.is_active ? <MdToggleOff size={16} /> : <MdToggleOn size={16} />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Create User Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <MdAdd className="text-blue-600" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{t('create_new_user')}</h3>
-                    <p className="text-sm text-gray-600">{t('grant_system_access')}</p>
-                  </div>
+            <div className="bg-[#FAF7F2] rounded-2xl shadow-xl max-w-lg w-full border border-[#E3DDD1] max-h-[90vh] overflow-y-auto">
+              <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-6 pt-[26px] pb-[22px]">
+                <div>
+                  <h3
+                    className="text-2xl text-[#1B1917]"
+                    style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                  >
+                    {t('create_new_user')}
+                  </h3>
+                  <p className="text-sm text-[#8A8177] mt-1">{t('grant_system_access')}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -917,49 +886,49 @@ export default function AdminUsersPage() {
                     setSelectedOrganizationId('');
                     setSelectedProgramIds([]);
                   }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#DED7C9] text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors shrink-0"
                 >
-                  <MdClose size={20} />
+                  <MdClose size={18} />
                 </button>
               </div>
-              
+
               <form onSubmit={(e) => {
                 e.preventDefault();
                 handleGrant(e);
-              }} className="space-y-4">
+              }} className="px-6 py-5 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('user_full_name')}</label>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('user_full_name')}</label>
                     <input
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
+                      className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                       placeholder={t('user_full_name_placeholder')}
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('user_email_address')}</label>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('user_email_address')}</label>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
+                      className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                       placeholder={t('user_email_placeholder')}
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('select_organization_label')}</label>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('select_organization_label')}</label>
                     <select
                       value={selectedOrganizationId}
                       onChange={(e) => setSelectedOrganizationId(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
+                      className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                       required
                     >
                       <option value="">{t('select_organization_placeholder')}</option>
@@ -974,13 +943,13 @@ export default function AdminUsersPage() {
                       )}
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('select_user_role')}</label>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('select_user_role')}</label>
                     <select
                       value={role}
                       onChange={(e) => setRole(e.target.value as any)}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-colors"
+                      className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                     >
                       <option value="admin">{t('admin_role')} - {t('admin_role_desc')}</option>
                       <option value="staff">{t('staff_role')} - {t('staff_role_desc')}</option>
@@ -988,15 +957,15 @@ export default function AdminUsersPage() {
                     </select>
                   </div>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('select_programs_label')}</label>
-                  <p className="text-xs text-gray-500 mb-2">{t('select_programs_help')}</p>
-                  <div className="border border-gray-300 rounded-lg p-3 max-h-32 overflow-y-auto bg-white">
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('select_programs_label')}</label>
+                  <p className="text-xs text-[#8A8177] mb-2">{t('select_programs_help')}</p>
+                  <div className="border border-[#E3DDD1] rounded-[9px] p-3 max-h-32 overflow-y-auto bg-[#FFFDFA]">
                     {programs
                       .filter(program => !selectedOrganizationId || program.organization_id === selectedOrganizationId)
                       .map((program) => (
-                      <label key={program.id} className="flex items-center space-x-2 py-1">
+                      <label key={program.id} className="flex items-center gap-2 py-1 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={selectedProgramIds.includes(program.id)}
@@ -1007,20 +976,20 @@ export default function AdminUsersPage() {
                               setSelectedProgramIds(selectedProgramIds.filter(id => id !== program.id));
                             }
                           }}
-                          className="rounded border-gray-300 text-[#C2492B] focus:ring-[#C2492B]"
+                          className="rounded border-[#DED7C9] text-[#C2492B] focus:ring-[#C2492B]"
                         />
-                        <span className="text-sm text-gray-700">{program.name}</span>
+                        <span className="text-sm text-[#1B1917]">{program.name}</span>
                       </label>
                     ))}
                     {programs.filter(program => !selectedOrganizationId || program.organization_id === selectedOrganizationId).length === 0 && (
-                      <p className="text-sm text-gray-500 py-2">
+                      <p className="text-sm text-[#8A8177] py-2">
                         {selectedOrganizationId ? t('no_programs_organization') : t('select_organization_placeholder')}
                       </p>
                     )}
                   </div>
                 </div>
-                
-                <div className="flex justify-end space-x-3 pt-4">
+
+                <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -1031,14 +1000,14 @@ export default function AdminUsersPage() {
                       setSelectedOrganizationId('');
                       setSelectedProgramIds([]);
                     }}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2.5 text-[#56504A] border border-[#DED7C9] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
                   >
                     {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] disabled:opacity-50 transition-colors flex items-center space-x-2"
+                    className="px-6 py-2.5 bg-[#C2492B] text-[#FAF7F2] rounded-lg font-medium hover:bg-[#A83A20] disabled:opacity-50 transition-colors flex items-center gap-2"
                   >
                     <MdAdd size={16} />
                     <span>{busy ? t('creating_user') : t('create_user_button')}</span>
@@ -1052,15 +1021,18 @@ export default function AdminUsersPage() {
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && deletingUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-100">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <MdWarning className="text-red-600" size={20} />
-                </div>
-                <h3 className="text-lg font-semibold text-black">{t('confirm_deletion')}</h3>
+            <div className="bg-[#FAF7F2] rounded-2xl shadow-xl max-w-md w-full border border-[#E3DDD1] p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <MdWarning className="text-[#8f3421]" size={24} />
+                <h3
+                  className="text-xl text-[#1B1917]"
+                  style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                >
+                  {t('confirm_deletion')}
+                </h3>
               </div>
               <div
-                className="text-black mb-6"
+                className="text-[#56504A] text-sm mb-6"
                 dangerouslySetInnerHTML={{
                   // El email se escapa antes de interpolarse en el string de
                   // traducción (que trae <strong> literal para resaltarlo) —
@@ -1070,20 +1042,20 @@ export default function AdminUsersPage() {
                   __html: t('delete_user_confirmation', { email: escapeHtml(deletingUser.email) }),
                 }}
               />
-              <div className="flex justify-end space-x-3">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowDeleteConfirm(false);
                     setDeletingUser(null);
                   }}
-                  className="px-4 py-2 text-black border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2.5 text-[#56504A] border border-[#DED7C9] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
                 >
                   {t('cancel')}
                 </button>
                 <button
                   onClick={() => deleteUserCompletely(deletingUser)}
                   disabled={busy}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2.5 bg-[#A8402A] text-white rounded-lg font-medium hover:bg-[#8f3421] disabled:opacity-50 transition-colors"
                 >
                   {busy ? t('deleting') : t('delete_user_button')}
                 </button>
@@ -1095,55 +1067,54 @@ export default function AdminUsersPage() {
         {/* Edit User Modal */}
         {editingUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto border border-gray-100">
-              <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-[#C2492B] rounded-lg flex items-center justify-center shadow-md">
-                    <MdEdit className="text-white" size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{t('edit_user')}</h3>
-                    <p className="text-xs text-gray-500">{t('update_user_info_permissions')}</p>
-                  </div>
+            <div className="bg-[#FAF7F2] rounded-2xl shadow-xl max-w-lg w-full border border-[#E3DDD1] max-h-[90vh] overflow-y-auto">
+              <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-6 pt-[26px] pb-[22px]">
+                <div>
+                  <h3
+                    className="text-2xl text-[#1B1917]"
+                    style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                  >
+                    {t('edit_user')}
+                  </h3>
+                  <p className="text-sm text-[#8A8177] mt-1">{t('update_user_info_permissions')}</p>
                 </div>
                 <button
                   onClick={() => setEditingUser(null)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all duration-200"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#DED7C9] text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors shrink-0"
                 >
                   <MdCancel size={18} />
                 </button>
               </div>
 
-              <form onSubmit={handleUpdateUser} className="space-y-5">
+              <form onSubmit={handleUpdateUser} className="px-6 py-5 space-y-5">
                 {/* Información Personal */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <div>
+                  <p className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177] pb-2.5 border-b border-[#E3DDD1] mb-4">
                     {t('personal_info_section')}
-                  </h4>
+                  </p>
                   <div className="space-y-4">
                     {/* Nombre */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">{t('full_name_label')}</label>
+                      <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('full_name_label')}</label>
                       <input
                         type="text"
                         required
                         value={editingUser.full_name || ''}
                         onChange={(e) => setEditingUser({...editingUser, full_name: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
+                        className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                         placeholder={t('full_name_placeholder')}
                       />
                     </div>
 
                     {/* Email */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-2">{t('email_address_label')}</label>
+                      <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('email_address_label')}</label>
                       <input
                         type="email"
                         required
                         value={editingUser.email || ''}
                         onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
-                        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
+                        className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                         placeholder={t('email_placeholder_user')}
                       />
                     </div>
@@ -1151,19 +1122,18 @@ export default function AdminUsersPage() {
                 </div>
 
                 {/* Permisos y Acceso */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                <div>
+                  <p className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177] pb-2.5 border-b border-[#E3DDD1] mb-4">
                     {t('permissions_access_section')}
-                  </h4>
-                  
+                  </p>
+
                   {/* Rol */}
                   <div className="mb-4">
-                    <label className="block text-xs font-medium text-gray-700 mb-2">{t('user_role_label')}</label>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('user_role_label')}</label>
                     <select
                       value={editingUser.role}
                       onChange={(e) => setEditingUser({...editingUser, role: e.target.value as any})}
-                      className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] transition-all duration-200"
+                      className="w-full appearance-none px-[14px] py-3 rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] transition-colors"
                     >
                       <option value="admin">{t('administrator')}</option>
                       <option value="staff">{t('staff_member')}</option>
@@ -1173,23 +1143,23 @@ export default function AdminUsersPage() {
 
                   {/* Sedes/Programas */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">{t('assigned_sites_programs')}</label>
-                    <p className="text-xs text-gray-600 mb-3 bg-white rounded-md p-2 border border-gray-200">
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('assigned_sites_programs')}</label>
+                    <p className="text-xs text-[#8A8177] mb-3 bg-[#F4F0E8] rounded-md p-2 border border-[#E7E0D2]">
                       {t('sites_selection_help')}
                     </p>
-                    <div className="bg-white rounded-md border border-gray-200 p-3 max-h-32 overflow-y-auto">
+                    <div className="bg-[#FFFDFA] rounded-[9px] border border-[#E3DDD1] p-3 max-h-32 overflow-y-auto">
                       <div className="space-y-2">
                         {programs.map((program) => {
                           const isAssigned = editingUser.programs?.some(p => p.id === program.id);
                           return (
-                            <label key={program.id} className="flex items-center space-x-2 cursor-pointer p-1 rounded hover:bg-gray-50 transition-colors">
+                            <label key={program.id} className="flex items-center gap-2 cursor-pointer p-1 rounded hover:bg-[#F4F0E8] transition-colors">
                               <input
                                 type="checkbox"
                                 checked={isAssigned}
                                 onChange={(e) => handleProgramToggle({...program, organization_id: program.organization_id || ''}, e.target.checked)}
-                                className="w-4 h-4 text-[#C2492B] border-gray-300 rounded focus:ring-[#C2492B]"
+                                className="w-4 h-4 text-[#C2492B] border-[#DED7C9] rounded focus:ring-[#C2492B]"
                               />
-                              <span className="text-sm text-gray-900">{program.name}</span>
+                              <span className="text-sm text-[#1B1917]">{program.name}</span>
                             </label>
                           );
                         })}
@@ -1199,18 +1169,18 @@ export default function AdminUsersPage() {
                 </div>
 
                 {/* Botones */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 pt-4 border-t border-[#E3DDD1]">
                   <button
                     type="button"
                     onClick={() => setEditingUser(null)}
-                    className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-200 text-sm font-medium"
+                    className="px-4 py-2.5 text-[#56504A] border border-[#DED7C9] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors text-sm font-medium"
                   >
                     {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={busy}
-                    className="px-6 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] disabled:opacity-50 transition-all duration-200 flex items-center space-x-2 text-sm font-medium"
+                    className="px-6 py-2.5 bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] disabled:opacity-50 transition-colors flex items-center gap-2 text-sm font-medium"
                   >
                     {busy ? (
                       <>
