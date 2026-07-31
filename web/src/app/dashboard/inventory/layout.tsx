@@ -1,19 +1,41 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect, createContext, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProgram } from '@/contexts/ProgramContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
-import { MdAdd } from 'react-icons/md';
+
+// Slot para que cada sub-pestaña (Dashboard/Listado/Auditoría/...) registre
+// su propio botón de acción principal en el encabezado compartido, junto al
+// selector de rol. No se puede resolver por ruta desde el layout porque la
+// acción correcta cambia según la pestaña — Dashboard/Listado quieren
+// "Nuevo activo" (navegación simple), Listado además "Exportar a Excel"
+// (depende de los filtros activos, estado local de esa página), y
+// Auditoría quiere "Nueva auditoría" (abre un modal con estado local de esa
+// página, no navega a ningún lado). Cada página registra lo que le
+// corresponde al montarse y lo limpia al desmontarse.
+const InventoryHeaderActionsContext = createContext<{
+  setActions: (node: ReactNode | null) => void;
+} | null>(null);
+
+export function useInventoryHeaderActions(node: ReactNode | null) {
+  const ctx = useContext(InventoryHeaderActionsContext);
+  useEffect(() => {
+    ctx?.setActions(node);
+    return () => ctx?.setActions(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [node]);
+}
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const { isAdmin } = useUserRole();
   const { activeProgram } = useProgram();
   const pathname = usePathname();
+  const [headerActions, setHeaderActions] = useState<ReactNode>(null);
 
   // Importar y Auditoría son operaciones exclusivas de Admin (RLS ya lo
   // exige: solo Admin escribe assets/mantenimiento y solo Admin audita) —
@@ -29,6 +51,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
+    <InventoryHeaderActionsContext.Provider value={{ setActions: setHeaderActions }}>
     <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
     <div className="max-w-[1420px] mx-auto">
       {/* Encabezado compartido del módulo — se mantiene igual entre las 4
@@ -47,20 +70,12 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
             {t('inv_module_subtitle', { site: activeProgram?.name || '' })}
           </p>
         </div>
-        {/* Acción global "Nuevo activo" (solo Admin) junto al selector de
-            rol — así el resto de cada sub-pestaña arranca a ras, sin una
-            fila de acciones propia debajo de las pestañas (como pedía
-            Eliezer, comparando con cómo ya se ve Importar). */}
+        {/* Acción(es) de la sub-pestaña activa (registradas por cada
+            página vía useInventoryHeaderActions) junto al selector de rol
+            — así cada pestaña arranca a ras, sin una fila de acciones
+            propia debajo de las pestañas. */}
         <div className="flex-shrink-0 flex items-center gap-3">
-          {isAdmin && (
-            <Link
-              href="/dashboard/inventory/assets/new"
-              className="flex items-center justify-center gap-2 bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
-            >
-              <MdAdd size={18} />
-              {t('inv_new_asset_button')}
-            </Link>
-          )}
+          {headerActions}
           {/* Mismo selector "Ver como Admin/Staff/Viewer" que ya existe en
               el resto de la app — solo se renderiza si el usuario real es
               Admin (RoleSwitcher se auto-oculta si no). Sirve para
@@ -98,5 +113,6 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
       </div>
     </div>
     </div>
+    </InventoryHeaderActionsContext.Provider>
   );
 }
