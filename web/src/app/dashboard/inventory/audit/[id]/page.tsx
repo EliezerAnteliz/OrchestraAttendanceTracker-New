@@ -457,18 +457,18 @@ export default function AuditSessionPage() {
 
   if (roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
 
   if (loading && !session) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_loading_audit')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_loading_audit')}</p>
         </div>
       </div>
     );
@@ -476,12 +476,12 @@ export default function AuditSessionPage() {
 
   if (!session) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <p className="text-gray-600">{t('inv_session_not_found')}</p>
+          <p className="text-[#6E675E]">{t('inv_session_not_found')}</p>
           <button
             onClick={() => router.push('/dashboard/inventory/audit')}
-            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
           >
             {t('inv_go_back')}
           </button>
@@ -496,10 +496,10 @@ export default function AuditSessionPage() {
   // activa de una sesión que ya no lo está.
   if (session.status === 'closed' || session.status === 'cancelled') {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">
             {session.status === 'closed' ? t('inv_redirecting_to_report') : t('inv_cancelling')}
           </p>
         </div>
@@ -524,53 +524,76 @@ export default function AuditSessionPage() {
   const missingCount = totalExpected !== null ? Math.max(0, totalExpected - auditedAssetIds.size) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="pb-8">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="p-4 max-w-7xl mx-auto">
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl sticky top-2 z-10 shadow-sm">
+        <div className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <button
               onClick={() => router.push('/dashboard/inventory/audit')}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 text-[#8A8177] hover:text-[#C2492B] hover:bg-[#F4F0E8] rounded-lg transition-colors"
             >
-              <MdArrowBack size={24} />
+              <MdArrowBack size={20} />
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1
+                className="text-xl text-[#1B1917]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+              >
                 {Array.isArray(session.programs) ? session.programs[0]?.name : session.programs?.name}
               </h1>
-              <p className="text-sm text-gray-600">{t('inv_audit_in_progress')}</p>
+              <p className="text-[13px] text-[#C2492B] mt-0.5">{t('inv_audit_in_progress')}</p>
             </div>
           </div>
 
           {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-            <div className="mb-3 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-              <MdWarning className="mr-2" />
+            <div className="mb-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+              <MdWarning className="mr-2" size={14} />
               {t('inv_test_env_banner')}
             </div>
           )}
 
           {/* Stats */}
           <div className="grid grid-cols-4 gap-2 mb-1">
-            <div className="bg-green-50 rounded-lg p-2 text-center">
-              <div className="text-2xl font-bold text-green-700">{foundCount}</div>
-              <div className="text-xs text-green-600">{t('inv_stat_found')}</div>
+            <div className="bg-[#FAF7F2] border border-[#EFE9DD] rounded-lg p-2 text-center">
+              <div
+                className="text-2xl text-[#4F6748]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {foundCount}
+              </div>
+              <div className="text-[10.5px] uppercase tracking-[0.06em] text-[#8A8177]">{t('inv_stat_found')}</div>
             </div>
-            <div className="bg-orange-50 rounded-lg p-2 text-center">
-              <div className="text-2xl font-bold text-orange-700">{missingCount ?? '–'}</div>
-              <div className="text-xs text-orange-600">{t('inv_stat_missing')}</div>
+            <div className="bg-[#FAF7F2] border border-[#EFE9DD] rounded-lg p-2 text-center">
+              <div
+                className="text-2xl text-[#C2492B]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {missingCount ?? '–'}
+              </div>
+              <div className="text-[10.5px] uppercase tracking-[0.06em] text-[#8A8177]">{t('inv_stat_missing')}</div>
             </div>
-            <div className="bg-yellow-50 rounded-lg p-2 text-center">
-              <div className="text-2xl font-bold text-yellow-700">{mismatchCount}</div>
-              <div className="text-xs text-yellow-600">{t('inv_stat_other_site')}</div>
+            <div className="bg-[#FAF7F2] border border-[#EFE9DD] rounded-lg p-2 text-center">
+              <div
+                className="text-2xl text-[#8A6A22]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {mismatchCount}
+              </div>
+              <div className="text-[10.5px] uppercase tracking-[0.06em] text-[#8A8177]">{t('inv_stat_other_site')}</div>
             </div>
-            <div className="bg-red-50 rounded-lg p-2 text-center">
-              <div className="text-2xl font-bold text-red-700">{unknownCount}</div>
-              <div className="text-xs text-red-600">{t('inv_stat_not_found')}</div>
+            <div className="bg-[#FAF7F2] border border-[#EFE9DD] rounded-lg p-2 text-center">
+              <div
+                className="text-2xl text-[#A8402A]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {unknownCount}
+              </div>
+              <div className="text-[10.5px] uppercase tracking-[0.06em] text-[#8A8177]">{t('inv_stat_not_found')}</div>
             </div>
           </div>
           {totalExpected !== null && (
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-[12px] text-[#8A8177] mb-3">
               {t('inv_expected_progress', { found: auditedAssetIds.size, total: totalExpected })}
             </p>
           )}
@@ -582,22 +605,22 @@ export default function AuditSessionPage() {
                 onClick={() => setActiveMode('scan')}
                 className="flex flex-col items-center gap-1 px-3 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
               >
-                <MdQrCodeScanner size={24} />
-                <span className="text-xs font-medium">{t('inv_action_scan')}</span>
+                <MdQrCodeScanner size={22} />
+                <span className="text-[12px] font-medium">{t('inv_action_scan')}</span>
               </button>
               <button
                 onClick={() => setActiveMode('manual')}
-                className="flex flex-col items-center gap-1 px-3 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                className="flex flex-col items-center gap-1 px-3 py-3 bg-[#56504A] text-white rounded-lg hover:bg-[#3F3A35] transition-colors"
               >
-                <MdSearch size={24} />
-                <span className="text-xs font-medium">{t('inv_action_manual')}</span>
+                <MdSearch size={22} />
+                <span className="text-[12px] font-medium">{t('inv_action_manual')}</span>
               </button>
               <button
                 onClick={() => setActiveMode('photo')}
-                className="flex flex-col items-center gap-1 px-3 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex flex-col items-center gap-1 px-3 py-3 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
-                <MdCameraAlt size={24} />
-                <span className="text-xs font-medium">{t('inv_action_photo_ocr')}</span>
+                <MdCameraAlt size={22} />
+                <span className="text-[12px] font-medium">{t('inv_action_photo_ocr')}</span>
               </button>
             </div>
           )}
@@ -606,8 +629,8 @@ export default function AuditSessionPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="mx-4 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg max-w-7xl sm:mx-auto">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="mt-4 p-3 bg-[#F8E9E4] border border-[#EAC7BB] rounded-lg">
+          <p className="text-[13px] text-[#8f3421]">{error}</p>
         </div>
       )}
 
@@ -641,10 +664,10 @@ export default function AuditSessionPage() {
 
       {/* Events List */}
       {!activeMode && (
-        <div className="p-4 space-y-2 max-w-7xl mx-auto">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">{t('inv_audited_assets_count', { n: events.length })}</h2>
+        <div className="mt-4 space-y-2.5">
+          <h2 className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_audited_assets_count', { n: events.length })}</h2>
           {events.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-10 text-[#A29889] text-[13.5px]">
               {t('inv_no_audited_yet')}
             </div>
           ) : (
@@ -653,35 +676,35 @@ export default function AuditSessionPage() {
               return (
               <div
                 key={event.id}
-                className="bg-white rounded-lg border border-gray-200 p-3"
+                className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-3.5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-medium text-[#1B1917]">
                         {asset?.description || event.scanned_code || t('inv_unknown_code')}
                       </span>
                       {asset?.size && (
-                        <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[11px] font-medium text-[#56504A] bg-[#F4F0E8] px-1.5 py-0.5 rounded">
                           {asset.size}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500 mt-0.5">
+                    <div className="text-[12.5px] text-[#8A8177] mt-0.5">
                       {asset?.full_code}
                       {asset?.brand && (asset?.full_code ? ` · ${asset.brand}` : asset.brand)}
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-1.5">
                       <div className="flex items-center gap-1 min-w-0">
-                        <MdPerson size={14} className={asset?.assigned_to_text ? 'text-gray-400 flex-shrink-0' : 'text-gray-300 flex-shrink-0'} />
-                        <span className={`text-sm truncate ${asset?.assigned_to_text ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                        <MdPerson size={13} className={asset?.assigned_to_text ? 'text-[#A29889] flex-shrink-0' : 'text-[#DED7C9] flex-shrink-0'} />
+                        <span className={`text-[12.5px] truncate ${asset?.assigned_to_text ? 'text-[#56504A]' : 'text-[#A29889] italic'}`}>
                           {asset?.assigned_to_text || t('inv_unassigned')}
                         </span>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
-                        event.source === 'scan' ? 'bg-blue-100 text-blue-700' :
-                        event.source === 'manual' ? 'bg-gray-100 text-gray-700' :
-                        'bg-purple-100 text-purple-700'
+                      <span className={`text-[10.5px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
+                        event.source === 'scan' ? 'bg-[#EFE9DD] text-[#56504A]' :
+                        event.source === 'manual' ? 'bg-[#F4F0E8] text-[#6E675E]' :
+                        'bg-[#F4F0E8] text-[#6E675E]'
                       }`}>
                         {event.source === 'scan' ? t('inv_source_scan') : event.source === 'manual' ? t('inv_action_manual') : t('inv_action_photo_ocr')}
                       </span>
@@ -689,43 +712,43 @@ export default function AuditSessionPage() {
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {event.result === 'found' && (
-                      <MdCheckCircle className="text-green-600" size={20} />
+                      <MdCheckCircle className="text-[#4F6748]" size={18} />
                     )}
                     {event.result === 'mismatch_site' && (
-                      <span className="text-xs text-yellow-700">⚠️</span>
+                      <MdWarning className="text-[#8A6A22]" size={18} />
                     )}
                     {event.result === 'unknown_code' && (
-                      <MdClose className="text-red-600" size={20} />
+                      <MdClose className="text-[#A8402A]" size={18} />
                     )}
                     {/* Deshacer — por si se seleccionó el instrumento equivocado */}
                     <button
                       onClick={() => setConfirmUndoId(event.id)}
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-1 text-[#A29889] hover:text-[#A8402A] hover:bg-[#F8E9E4] rounded transition-colors"
                       title={t('inv_remove_from_audited_title')}
                     >
-                      <MdUndo size={18} />
+                      <MdUndo size={17} />
                     </button>
                   </div>
                 </div>
 
                 {/* Confirmación inline de "deshacer" */}
                 {confirmUndoId === event.id && (
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                    <p className="text-xs text-gray-600">
+                  <div className="mt-3 pt-3 border-t border-[#EFE9DD] flex items-center justify-between gap-2">
+                    <p className="text-[11.5px] text-[#6E675E]">
                       {t('inv_confirm_remove_audited')}
                       {previousAssetStates[event.id] && ` ${t('inv_will_also_revert')}`}
                     </p>
                     <div className="flex gap-2 flex-shrink-0">
                       <button
                         onClick={() => setConfirmUndoId(null)}
-                        className="px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                        className="px-3 py-1 text-[11.5px] text-[#56504A] hover:bg-[#F4F0E8] rounded transition-colors"
                       >
                         {t('cancel')}
                       </button>
                       <button
                         onClick={() => handleUndoAudit(event.id)}
                         disabled={undoingId === event.id}
-                        className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50"
+                        className="px-3 py-1 text-[11.5px] bg-[#A8402A] text-white rounded hover:bg-[#8f3421] transition-colors disabled:opacity-50"
                       >
                         {undoingId === event.id ? t('inv_removing') : t('inv_yes_remove')}
                       </button>
@@ -741,21 +764,21 @@ export default function AuditSessionPage() {
 
       {/* Close/Cancel Session Buttons - Fixed at bottom */}
       {!activeMode && (
-        <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200">
-          <div className="max-w-7xl mx-auto flex gap-2">
+        <div className="sticky bottom-0 mt-4 p-3 bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl shadow-sm">
+          <div className="flex gap-2">
             {/* Cancelar: para cuando la auditoría se inició por error o no
                 se va a completar — no genera reporte. Botón secundario
                 (ghost) para que no compita visualmente con "Finalizar",
                 que es la acción esperada la mayoría de las veces. */}
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium border border-gray-300"
+              className="px-4 py-2.5 text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium border border-[#DED7C9]"
             >
               {t('inv_cancel_audit')}
             </button>
             <button
               onClick={() => setShowCloseConfirm(true)}
-              className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
             >
               {t('inv_finalize_audit')}
             </button>
@@ -766,22 +789,27 @@ export default function AuditSessionPage() {
       {/* Close Confirmation Modal */}
       {showCloseConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white w-full sm:max-w-md sm:rounded-lg rounded-t-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('inv_finalize_audit_question')}</h2>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 shadow-xl">
+            <h2
+              className="text-xl text-[#1B1917] mb-2"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_finalize_audit_question')}
+            </h2>
+            <p className="text-[13.5px] text-[#6E675E] mb-6">
               {t('inv_finalize_audit_desc', { n: foundCount })}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCloseConfirm(false)}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={closeSession}
                 disabled={loading}
-                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
               >
                 {loading ? t('inv_finalizing') : t('inv_finalize')}
               </button>
@@ -793,23 +821,28 @@ export default function AuditSessionPage() {
       {/* Cancel Confirmation Modal */}
       {showCancelConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white w-full sm:max-w-md sm:rounded-lg rounded-t-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t('inv_cancel_audit_question')}</h2>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 shadow-xl">
+            <h2
+              className="text-xl text-[#1B1917] mb-2"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_cancel_audit_question')}
+            </h2>
+            <p className="text-[13.5px] text-[#6E675E] mb-6">
               {t('inv_cancel_audit_desc', { n: foundCount })}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
                 disabled={cancelling}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium disabled:opacity-50"
               >
                 {t('inv_keep_going')}
               </button>
               <button
                 onClick={cancelSession}
                 disabled={cancelling}
-                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-[#A8402A] text-white rounded-lg hover:bg-[#8f3421] transition-colors font-medium disabled:opacity-50"
               >
                 {cancelling ? t('inv_cancelling') : t('inv_yes_cancel_audit')}
               </button>
