@@ -163,39 +163,53 @@ export default function AssetDetailPage() {
       setLoading(true);
       setError(null);
 
-      // Cargar activo con todas las relaciones
-      const { data: assetData, error: assetError} = await inventorySupabase
-        .from('assets')
-        .select(`
-          *,
-          asset_locations:location_id(code, name),
-          asset_work_areas:work_area_id(code, name),
-          asset_sources:source_id(code, name),
-          asset_groups:group_id(code, name),
-          asset_classes:class_id(code, name),
-          asset_characteristics:characteristic_id(code, description),
-          current_program:current_program_id(name)
-        `)
-        .eq('id', assetId)
-        .single();
+      // Detalle del activo, catálogo de programas y bitácora de
+      // mantenimiento son independientes entre sí — se piden en paralelo
+      // en vez de uno tras otro como antes.
+      const [
+        { data: assetData, error: assetError },
+        { data: programsData, error: programsError },
+        { data: maintenanceData, error: maintenanceError },
+      ] = await Promise.all([
+        inventorySupabase
+          .from('assets')
+          .select(`
+            *,
+            asset_locations:location_id(code, name),
+            asset_work_areas:work_area_id(code, name),
+            asset_sources:source_id(code, name),
+            asset_groups:group_id(code, name),
+            asset_classes:class_id(code, name),
+            asset_characteristics:characteristic_id(code, description),
+            current_program:current_program_id(name)
+          `)
+          .eq('id', assetId)
+          .single(),
+        inventorySupabase
+          .from('programs')
+          .select('id, name')
+          .eq('is_active', true)
+          .order('name'),
+        inventorySupabase
+          .from('asset_maintenance_log')
+          .select('*')
+          .eq('asset_id', assetId)
+          .order('event_date', { ascending: false }),
+      ]);
 
       if (assetError) throw assetError;
       if (!assetData) throw new Error(t('inv_asset_not_found'));
 
       setAsset(assetData);
 
-      // Cargar programas
-      const { data: programsData, error: programsError } = await inventorySupabase
-        .from('programs')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name');
-
       if (programsError) throw programsError;
       setPrograms(programsData || []);
 
-      // Cargar eventos de mantenimiento
-      await loadMaintenanceEvents();
+      if (maintenanceError) {
+        console.error('Error loading maintenance events:', maintenanceError);
+      } else {
+        setMaintenanceEvents(maintenanceData || []);
+      }
 
       // Inicializar formulario
       setFormData({
