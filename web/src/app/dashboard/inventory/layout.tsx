@@ -62,8 +62,11 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
         {/* Acción(es) de la sub-pestaña activa (registradas por cada
             página vía useInventoryHeaderActions) junto al selector de rol
             — así cada pestaña arranca a ras, sin una fila de acciones
-            propia debajo de las pestañas. */}
-        <div className="flex-shrink-0 flex items-center gap-3">
+            propia debajo de las pestañas. flex-wrap: en Listado este slot
+            recibe 2 botones con texto ("Exportar a Excel" + "Nuevo
+            activo") más el selector de rol, que no caben en una sola fila
+            en mobile (~375px) — sin wrap se salían de la pantalla. */}
+        <div className="flex-shrink-0 flex items-center gap-3 flex-wrap justify-end">
           {headerActions}
           {/* Mismo selector "Ver como Admin/Staff/Viewer" que ya existe en
               el resto de la app — solo se renderiza si el usuario real es
