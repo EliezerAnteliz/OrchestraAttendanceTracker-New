@@ -573,6 +573,7 @@ export default function StudentsPage() {
       last_name: '',
       age: '',
       current_grade: '',
+      asset_id: '',
       instrument: '',
       instrument_size: '',
       orchestra_position: '',
