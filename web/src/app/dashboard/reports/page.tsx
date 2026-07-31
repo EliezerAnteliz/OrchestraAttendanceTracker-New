@@ -1520,51 +1520,49 @@ ${dateTableEN}`;
 
         {/* Dialog */}
         <div
-          className="relative bg-[#FAF7F2] rounded-lg sm:rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden border border-[#E3DDD1]"
+          className="relative bg-[#FAF7F2] rounded-lg sm:rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden border border-[#E3DDD1]"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="px-6 py-4 bg-[#FAF7F2] border-b border-[#EAE3D6]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-[#EFE9DD] rounded-lg">
-                  <MdPerson size={20} className="text-[#C2492B]" />
-                </div>
-                <div>
-                  <h2 id="student-modal-title" className="text-xl font-semibold text-[#1B1917]">
-                    {t('select_student_title')}
-                  </h2>
-                  <p className="text-sm text-[#8A8177]">
-                    {lang === 'es' ? 'Selecciona un estudiante para ver su reporte individual' : 'Select a student to view their individual report'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 text-[#A29889] hover:text-[#6E675E] hover:bg-[#F4F0E8] rounded-lg transition-colors"
-                aria-label={t('close')}
+          {/* Header — mismo patrón que el resto de los modales (título
+              Newsreader sin caja de ícono, botón de cerrar cuadrado). */}
+          <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px]">
+            <div>
+              <h2
+                id="student-modal-title"
+                className="text-2xl leading-none text-[#1B1917]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
               >
-                <MdClose size={20} />
-              </button>
+                {t('select_student_title')}
+              </h2>
+              <p className="text-[12.5px] text-[#8A8177] mt-1.5">
+                {lang === 'es' ? 'Selecciona un estudiante para ver su reporte individual' : 'Select a student to view their individual report'}
+              </p>
             </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
+              aria-label={t('close')}
+            >
+              <MdClose size={18} />
+            </button>
           </div>
 
           {/* Search */}
-          <div className="px-6 pt-4">
+          <div className="px-4 sm:px-[30px] pt-4">
             <div className="relative">
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={lang === 'es' ? 'Buscar por nombre o instrumento...' : 'Search by name or instrument...'}
-                className="w-full rounded-md border border-[#DED7C9] px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B]"
+                className="w-full rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] px-3 py-2.5 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B]"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A29889] bg-[#F4F0E8] px-2 py-1 rounded">ESC</span>
             </div>
           </div>
 
           {/* List */}
-          <div className="px-6 pb-4 pt-2 max-h-[60vh] overflow-y-auto">
+          <div className="px-4 sm:px-[30px] pb-4 pt-2 max-h-[60vh] overflow-y-auto">
             {filtered.length === 0 ? (
               <div className="py-10 text-center text-[#8A8177] text-sm">
                 {lang === 'es' ? 'No se encontraron estudiantes' : 'No students found'}
@@ -1604,7 +1602,7 @@ ${dateTableEN}`;
               patrón que el Cancelar del modal de Nuevo Estudiante; antes
               tenía un gris sólido distinto (bg-[#EAE3D6]) que no coincidía
               con el resto de la app. */}
-          <div className="px-6 py-4 border-t border-[#EAE3D6] bg-[#FAF7F2] flex justify-end">
+          <div className="px-4 sm:px-[30px] py-4 border-t border-[#E3DDD1] bg-[#FAF7F2] flex justify-end">
             <button
               onClick={onClose}
               className="px-4 py-2 text-[#56504A] hover:bg-[#EAE3D6] rounded-lg transition-colors font-medium"
@@ -2070,18 +2068,21 @@ ${dateTableEN}`;
               </div>
 
               {/* Attendance by Instrument / Top 5 / Attendance by Position
-                  (solo reporte grupal) — tarjetas independientes en grilla de
-                  2 columnas (como el mockup) para ahorrar espacio vertical.
-                  El de Instrumento solo aparece si el filtro está en "Todos"
-                  y si hay más de una categoría real con datos. Top 5 pide al
-                  menos 2 registros por estudiante para que el % no sea un
-                  solo día suelto. */}
+                  (solo reporte grupal) — tarjetas independientes en 2
+                  columnas (como el mockup): Instrumento y Posición apiladas
+                  del lado izquierdo, Top 5 sola del lado derecho, para
+                  ahorrar espacio vertical sin dejar huecos entre tarjetas de
+                  distinta altura. El de Instrumento solo aparece si el
+                  filtro está en "Todos" y si hay más de una categoría real
+                  con datos. Top 5 pide al menos 2 registros por estudiante
+                  para que el % no sea un solo día suelto. */}
               {reportType === 'group' && (
                 topAttendance.length > 0 ||
                 (instrumentFilter === 'all' && instrumentBreakdown.length > 1) ||
                 positionBreakdown.length > 1
               ) && (
-                <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                  <div className="flex flex-col gap-5">
                   {instrumentFilter === 'all' && instrumentBreakdown.length > 1 && (
                     <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
                       <h3 className="font-medium text-[#1B1917] mb-3">
@@ -2102,6 +2103,28 @@ ${dateTableEN}`;
                       </div>
                     </div>
                   )}
+
+                  {positionBreakdown.length > 1 && (
+                    <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
+                      <h3 className="font-medium text-[#1B1917] mb-3">
+                        {lang === 'es' ? 'Asistencia por Posición' : 'Attendance by Position'}
+                      </h3>
+                      <div className="space-y-2">
+                        {positionBreakdown.map((b) => (
+                          <div key={b.label}>
+                            <div className="flex justify-between text-xs text-[#6E675E] mb-0.5">
+                              <span className="truncate">{b.label}</span>
+                              <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-[#F4F0E8] overflow-hidden">
+                              <div className="h-full bg-[#7A8B6F] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  </div>
 
                   {topAttendance.length > 0 && (
                     <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
@@ -2151,27 +2174,6 @@ ${dateTableEN}`;
                             : `+${topAttendanceMoreTied.count} more student(s) also at ${Math.round(topAttendanceMoreTied.percentage)}%.`}
                         </p>
                       )}
-                    </div>
-                  )}
-
-                  {positionBreakdown.length > 1 && (
-                    <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
-                      <h3 className="font-medium text-[#1B1917] mb-3">
-                        {lang === 'es' ? 'Asistencia por Posición' : 'Attendance by Position'}
-                      </h3>
-                      <div className="space-y-2">
-                        {positionBreakdown.map((b) => (
-                          <div key={b.label}>
-                            <div className="flex justify-between text-xs text-[#6E675E] mb-0.5">
-                              <span className="truncate">{b.label}</span>
-                              <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
-                            </div>
-                            <div className="w-full h-2 rounded-full bg-[#F4F0E8] overflow-hidden">
-                              <div className="h-full bg-[#7A8B6F] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   )}
                 </div>
