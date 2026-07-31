@@ -975,7 +975,8 @@ export default function ReportsPage() {
               name: `${student.first_name} ${student.last_name}`,
               first_name: student.first_name,
               last_name: student.last_name,
-              instrument: student.instrument || 'N/A'
+              instrument: student.instrument || 'N/A',
+              orchestra_position: student.orchestra_position || ''
             },
             absences: studentData?.count || 0,
             dates: studentData?.dates || [],
