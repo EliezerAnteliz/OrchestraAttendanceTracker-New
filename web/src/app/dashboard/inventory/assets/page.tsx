@@ -650,7 +650,7 @@ export default function AssetsListPage() {
                     {asset.description}
                     {isLoanedOwner(asset.owner) && (
                       <span className="px-1.5 py-0.5 text-[11px] font-medium rounded bg-[#F6EFDF] text-[#8A6A22] whitespace-nowrap">
-                        {t('inv_loaned_badge', { owner: asset.owner })}
+                        {t('inv_loaned_badge', { owner: asset.owner || '' })}
                       </span>
                     )}
                   </div>
