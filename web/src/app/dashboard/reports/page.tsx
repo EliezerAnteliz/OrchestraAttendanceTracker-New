@@ -45,7 +45,7 @@ const LoadingIndicator = ({ message }: { message?: string }) => {
   return (
     <div className="flex flex-col items-center justify-center p-8">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B] mb-4"></div>
-      <p className="text-gray-600">{msg}</p>
+      <p className="text-[#6E675E]">{msg}</p>
     </div>
   );
 };
@@ -63,8 +63,8 @@ const NoDataDisplay = ({ message }: { message?: string }) => {
   const { t } = useI18n();
   const msg = message ?? t('no_data_available');
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-md">
-      <p className="text-gray-500">{msg}</p>
+    <div className="flex flex-col items-center justify-center p-8 bg-[#FAF7F2] rounded-md">
+      <p className="text-[#8A8177]">{msg}</p>
     </div>
   );
 };
@@ -1172,9 +1172,9 @@ ${dateTableEN}`;
     // pálidos que las barras y que los cuadritos de la leyenda, por eso se
     // veían "menos vivos" al lado del gráfico de Barras.
     const pieData = [
-      { name: t('total_attendances'), value: data.total_attendance, color: '#22c55e' },
-      { name: t('total_excused_absences'), value: data.total_excused_absences, color: '#eab308' },
-      { name: t('total_unexcused_absences'), value: data.total_unexcused_absences, color: '#ef4444' },
+      { name: t('total_attendances'), value: data.total_attendance, color: '#5F7A57' },
+      { name: t('total_excused_absences'), value: data.total_excused_absences, color: '#8A6A22' },
+      { name: t('total_unexcused_absences'), value: data.total_unexcused_absences, color: '#A8402A' },
     ];
 
     // Detectar casos de 100% en una sola categoría
@@ -1314,12 +1314,12 @@ ${dateTableEN}`;
               Barras, que también llegan hasta el borde de su contenedor. */}
           <svg viewBox="0 0 300 300" className="w-full h-full">
             {/* Capa de fondo */}
-            <circle cx={centerX} cy={centerY} r={radius} fill="#f0f0f0" />
+            <circle cx={centerX} cy={centerY} r={radius} fill="#F1EDE4" />
 
             {/* Si 100% pertenece a una categoría, pintar círculo completo con su color */}
             {isAllAttendance || isAllExcused || isAllUnexcused ? (
               <>
-                <circle cx={centerX} cy={centerY} r={radius} fill={isAllAttendance ? '#4ade80' : isAllExcused ? '#fbbf24' : '#f87171'} />
+                <circle cx={centerX} cy={centerY} r={radius} fill={isAllAttendance ? '#5F7A57' : isAllExcused ? '#8A6A22' : '#A8402A'} />
                 <text
                   x={centerX} y={centerY} textAnchor="middle" dominantBaseline="middle"
                   fill="#ffffff" fontSize="28" fontWeight="bold" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
@@ -1344,17 +1344,17 @@ ${dateTableEN}`;
 
         {/* Leyenda unificada (mt-4 para calzar con la del gráfico de Barras) */}
         <div className="mt-4 grid grid-cols-3 gap-2 px-4">
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-green-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('total_attendances')}: {data.total_attendance} ({presentPercentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#5F7A57] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('total_attendances')}: {data.total_attendance} ({presentPercentage.toFixed(1)}%)</span>
           </div>
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-yellow-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('total_excused_absences')}: {data.total_excused_absences} ({excusedPercentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#8A6A22] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('total_excused_absences')}: {data.total_excused_absences} ({excusedPercentage.toFixed(1)}%)</span>
           </div>
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-red-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('total_unexcused_absences')}: {data.total_unexcused_absences} ({unexcusedPercentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#A8402A] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('total_unexcused_absences')}: {data.total_unexcused_absences} ({unexcusedPercentage.toFixed(1)}%)</span>
           </div>
         </div>
       </div>
@@ -1369,25 +1369,25 @@ ${dateTableEN}`;
 
     // Datos para las barras
     const bars = [
-      { 
-        value: data.total_attendance, 
-        label: t('attendance_label'), 
-        color: 'bg-green-500',
-        percentage: data.total_attendance > 0 ? 
+      {
+        value: data.total_attendance,
+        label: t('attendance_label'),
+        color: 'bg-[#5F7A57]',
+        percentage: data.total_attendance > 0 ?
           Math.round((data.total_attendance / (data.total_attendance + data.total_excused_absences + data.total_unexcused_absences)) * 100) : 0
       },
-      { 
-        value: data.total_excused_absences, 
-        label: t('excused_absences_short'), 
-        color: 'bg-yellow-500',
-        percentage: data.total_excused_absences > 0 ? 
+      {
+        value: data.total_excused_absences,
+        label: t('excused_absences_short'),
+        color: 'bg-[#8A6A22]',
+        percentage: data.total_excused_absences > 0 ?
           Math.round((data.total_excused_absences / (data.total_attendance + data.total_excused_absences + data.total_unexcused_absences)) * 100) : 0
       },
-      { 
-        value: data.total_unexcused_absences, 
-        label: t('unexcused_absences_short'), 
-        color: 'bg-red-500',
-        percentage: data.total_unexcused_absences > 0 ? 
+      {
+        value: data.total_unexcused_absences,
+        label: t('unexcused_absences_short'),
+        color: 'bg-[#A8402A]',
+        percentage: data.total_unexcused_absences > 0 ?
           Math.round((data.total_unexcused_absences / (data.total_attendance + data.total_excused_absences + data.total_unexcused_absences)) * 100) : 0
       }
     ];
@@ -1408,7 +1408,7 @@ ${dateTableEN}`;
               <div key={bar.label} className="flex flex-col items-center justify-end h-full w-16 sm:w-20">
                 {/* Valor numérico */}
                 <div
-                  className="text-sm font-semibold text-gray-800 mb-2 whitespace-nowrap opacity-0"
+                  className="text-sm font-semibold text-[#1B1917] mb-2 whitespace-nowrap opacity-0"
                   style={{
                     animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.4}s forwards`,
                     textShadow: '0 1px 2px rgba(255,255,255,0.8)'
@@ -1446,7 +1446,7 @@ ${dateTableEN}`;
           {bars.map((bar, index) => (
             <div
               key={bar.label}
-              className="w-16 sm:w-20 text-sm font-medium text-gray-800 text-center opacity-0"
+              className="w-16 sm:w-20 text-sm font-medium text-[#1B1917] text-center opacity-0"
               style={{ animation: `fadeIn 0.5s ease-out ${index * 0.15 + 0.3}s forwards` }}
             >
               {bar.label}
@@ -1455,17 +1455,17 @@ ${dateTableEN}`;
         </div>
         {/* Leyenda unificada (mismo formato que el gráfico circular) */}
         <div className="mt-4 grid grid-cols-3 gap-2 px-4">
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-green-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('attendance_label')}: {data.total_attendance} ({data.attendance_percentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#5F7A57] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('attendance_label')}: {data.total_attendance} ({data.attendance_percentage.toFixed(1)}%)</span>
           </div>
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-yellow-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('excused_absences_short')}: {data.total_excused_absences} ({data.excused_percentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#8A6A22] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('excused_absences_short')}: {data.total_excused_absences} ({data.excused_percentage.toFixed(1)}%)</span>
           </div>
-          <div className="flex items-center bg-white p-2 rounded-md shadow-sm border border-gray-200">
-            <div className="w-4 h-4 bg-red-500 mr-2 rounded-sm"></div>
-            <span className="text-xs text-gray-800">{t('unexcused_absences_short')}: {data.total_unexcused_absences} ({data.unexcused_percentage.toFixed(1)}%)</span>
+          <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
+            <div className="w-4 h-4 bg-[#A8402A] mr-2 rounded-sm"></div>
+            <span className="text-xs text-[#1B1917]">{t('unexcused_absences_short')}: {data.total_unexcused_absences} ({data.unexcused_percentage.toFixed(1)}%)</span>
           </div>
         </div>
       </div>
@@ -1520,28 +1520,28 @@ ${dateTableEN}`;
 
         {/* Dialog */}
         <div
-          className="relative bg-white rounded-lg sm:rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
+          className="relative bg-[#FAF7F2] rounded-lg sm:rounded-xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden border border-[#E3DDD1]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-6 py-4 bg-white border-b border-gray-200">
+          <div className="px-6 py-4 bg-[#FAF7F2] border-b border-[#EAE3D6]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-[#EFE9DD] rounded-lg">
                   <MdPerson size={20} className="text-[#C2492B]" />
                 </div>
                 <div>
-                  <h2 id="student-modal-title" className="text-xl font-semibold text-gray-900">
+                  <h2 id="student-modal-title" className="text-xl font-semibold text-[#1B1917]">
                     {t('select_student_title')}
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[#8A8177]">
                     {lang === 'es' ? 'Selecciona un estudiante para ver su reporte individual' : 'Select a student to view their individual report'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-[#A29889] hover:text-[#6E675E] hover:bg-[#F4F0E8] rounded-lg transition-colors"
                 aria-label={t('close')}
               >
                 <MdClose size={20} />
@@ -1557,25 +1557,25 @@ ${dateTableEN}`;
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={lang === 'es' ? 'Buscar por nombre o instrumento...' : 'Search by name or instrument...'}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B]"
+                className="w-full rounded-md border border-[#DED7C9] px-3 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B]"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">ESC</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A29889] bg-[#F4F0E8] px-2 py-1 rounded">ESC</span>
             </div>
           </div>
 
           {/* List */}
           <div className="px-6 pb-4 pt-2 max-h-[60vh] overflow-y-auto">
             {filtered.length === 0 ? (
-              <div className="py-10 text-center text-gray-500 text-sm">
+              <div className="py-10 text-center text-[#8A8177] text-sm">
                 {lang === 'es' ? 'No se encontraron estudiantes' : 'No students found'}
               </div>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-[#EFE9DD]">
                 {filtered.map((student) => (
                   <li key={student.id}>
                     <button
                       onClick={() => onSelect(student)}
-                      className="w-full text-left flex items-center gap-3 px-3 py-3 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none rounded-md transition-colors"
+                      className="w-full text-left flex items-center gap-3 px-3 py-3 hover:bg-[#F4F0E8] focus:bg-[#F4F0E8] focus:outline-none rounded-md transition-colors"
                     >
                       {/* Avatar iniciales — antes usaba bg-opacity-10, una
                           utilidad que no aplica sobre colores arbitrarios
@@ -1587,8 +1587,8 @@ ${dateTableEN}`;
                         {student.first_name?.[0]}{student.last_name?.[0]}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800 leading-tight">{student.first_name} {student.last_name}</p>
-                        <p className="text-xs text-gray-500">{student.instrument}</p>
+                        <p className="font-medium text-[#1B1917] leading-tight">{student.first_name} {student.last_name}</p>
+                        <p className="text-xs text-[#8A8177]">{student.instrument}</p>
                       </div>
                       <span className="text-xs text-white bg-gradient-to-r from-[#C2492B] to-[#A83A20] px-3 py-1 rounded-md font-medium hover:shadow-md transform hover:scale-[1.03] transition-all duration-200">
                         {t('select')}
@@ -1602,12 +1602,12 @@ ${dateTableEN}`;
 
           {/* Footer — botón "fantasma" (sin fondo, solo hover), mismo
               patrón que el Cancelar del modal de Nuevo Estudiante; antes
-              tenía un gris sólido distinto (bg-gray-200) que no coincidía
+              tenía un gris sólido distinto (bg-[#EAE3D6]) que no coincidía
               con el resto de la app. */}
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+          <div className="px-6 py-4 border-t border-[#EAE3D6] bg-[#FAF7F2] flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+              className="px-4 py-2 text-[#56504A] hover:bg-[#EAE3D6] rounded-lg transition-colors font-medium"
             >
               {lang === 'es' ? 'Cancelar' : 'Cancel'}
             </button>
@@ -1619,7 +1619,7 @@ ${dateTableEN}`;
 
   if (loading) {
     return (
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
         <LoadingIndicator message="Cargando datos de reportes..." />
       </div>
     );
@@ -1627,40 +1627,41 @@ ${dateTableEN}`;
 
   if (error) {
     return (
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
         <ErrorDisplay message={error} />
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 p-4 md:p-6">
-      <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-        <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-          <MdInsertChart className="text-blue-600" size={20} />
-        </span>
-        {lang === 'es' ? 'Reportes' : 'Reports'}
-      </h1>
+    <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
+    <div className="max-w-[1420px] mx-auto">
+      <div className="pb-5 sm:pb-[22px] border-b border-[#E3DDD1]">
+        <h1
+          className="text-[28px] sm:text-[40px] text-[#1B1917] leading-[1.05]"
+          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+        >
+          {lang === 'es' ? 'Reportes' : 'Reports'}
+        </h1>
+        <p className="text-[13px] sm:text-[14px] text-[#8A8177] mt-1.5">
+          {lang === 'es' ? 'Genera estadísticas y análisis de asistencia' : 'Generate attendance statistics and analysis'}
+        </p>
+      </div>
 
-      {/* Sección de Reportes de Asistencia */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md w-full">
-        <div className="flex items-center mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg mr-3">
-            <MdPieChart className="text-blue-600" size={24} />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800">
-              {lang === 'es' ? 'Reportes de Asistencia' : 'Attendance Reports'}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {lang === 'es' ? 'Genera estadísticas y análisis de asistencia' : 'Generate attendance statistics and analysis'}
-            </p>
-          </div>
+      {/* Layout de 2 columnas: filtros a la izquierda, resultados a la derecha */}
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] gap-5 mt-6 items-start">
+
+      {/* Panel de filtros (izquierda) */}
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 flex flex-col gap-5 lg:sticky lg:top-4">
+        <div>
+          <h2 className="text-[15px] font-semibold text-[#1B1917]">
+            {lang === 'es' ? 'Reportes de Asistencia' : 'Attendance Reports'}
+          </h2>
         </div>
 
         {/* Selector de tipo de reporte */}
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">{t('report_type_title')}</h3>
+        <div>
+          <h3 className="text-[11.5px] uppercase tracking-[0.09em] font-medium text-[#8A8177] mb-2">{t('report_type_title')}</h3>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => {
@@ -1671,7 +1672,7 @@ ${dateTableEN}`;
               className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
                 reportType === 'group'
                   ? 'bg-[#C2492B] text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  : 'bg-[#FFFDFA] text-[#56504A] hover:bg-[#F4F0E8] border border-[#EAE3D6]'
               }`}
             >
               <MdGroups className="mr-2" /> {t('group')}
@@ -1685,7 +1686,7 @@ ${dateTableEN}`;
               className={`flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium ${
                 reportType === 'individual'
                   ? 'bg-[#C2492B] text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  : 'bg-[#FFFDFA] text-[#56504A] hover:bg-[#F4F0E8] border border-[#EAE3D6]'
               }`}
             >
               <MdPerson className="mr-2" /> {t('individual')}
@@ -1694,17 +1695,17 @@ ${dateTableEN}`;
         </div>
 
         {/* Información del período */}
-        <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-        <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4">
-          <h2 className="text-base sm:text-xl font-medium text-gray-800 flex items-center">
-            <MdCalendarMonth className="mr-2" /> {t('period')} {granularity === 'monthly' ? t('monthly') : granularity === 'weekly' ? t('weekly') : t('annual')}
-          </h2>
-          
+        <div>
+        <div className="flex flex-col gap-3">
+          <h3 className="text-[11.5px] uppercase tracking-[0.09em] font-medium text-[#8A8177] flex items-center gap-1.5">
+            <MdCalendarMonth size={13} /> {t('period')} {granularity === 'monthly' ? t('monthly') : granularity === 'weekly' ? t('weekly') : t('annual')}
+          </h3>
+
           {/* Toggle granularidad - Mobile first */}
-          <div className="grid grid-cols-3 gap-1 bg-gray-100 rounded-md overflow-hidden p-1">
+          <div className="grid grid-cols-3 gap-1 bg-[#F4F0E8] rounded-md overflow-hidden p-1">
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'monthly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'monthly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-[#56504A] hover:bg-[#EAE3D6]'
               }`}
               onClick={() => { setGranularity('monthly'); setReportData(null); }}
             >
@@ -1712,7 +1713,7 @@ ${dateTableEN}`;
             </button>
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'weekly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'weekly' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-[#56504A] hover:bg-[#EAE3D6]'
               }`}
               onClick={() => { setGranularity('weekly'); setReportData(null); }}
             >
@@ -1720,7 +1721,7 @@ ${dateTableEN}`;
             </button>
             <button
               className={`px-2 py-2 text-sm font-medium rounded transition-colors ${
-                granularity === 'annual' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-gray-700 hover:bg-gray-200'
+                granularity === 'annual' ? 'bg-[#C2492B] text-white shadow-sm' : 'text-[#56504A] hover:bg-[#EAE3D6]'
               }`}
               onClick={() => { setGranularity('annual'); setReportData(null); }}
             >
@@ -1735,7 +1736,7 @@ ${dateTableEN}`;
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="monthPicker"
-                  className="text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  className="text-[12.5px] text-[#8A8177] cursor-pointer select-none"
                 >
                   {t('month')}
                 </label>
@@ -1756,12 +1757,12 @@ ${dateTableEN}`;
                   dateFormat="MMMM yyyy"
                   showMonthYearPicker
                   locale={lang === 'en' ? 'en-mon' : 'es-mon'}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-black bg-white font-normal"
+                  className="w-full px-[14px] py-3 text-sm border border-[#E3DDD1] rounded-[9px] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917] bg-[#FFFDFA] font-normal"
                 />
               </div>
             ) : granularity === 'weekly' ? (
               <div className="flex flex-col gap-2">
-                <label htmlFor="weekPicker" className="text-sm font-medium text-gray-700">{t('week')}</label>
+                <label htmlFor="weekPicker" className="text-[12.5px] text-[#8A8177]">{t('week')}</label>
                 <DatePicker
                   id="weekPicker"
                   selected={(() => {
@@ -1784,18 +1785,18 @@ ${dateTableEN}`;
                     setReportData(null);
                   }}
                   ariaLabelledBy="weekPicker"
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-black bg-white font-normal"
+                  className="w-full px-[14px] py-3 text-sm border border-[#E3DDD1] rounded-[9px] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917] bg-[#FFFDFA] font-normal"
                 />
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <label htmlFor="academicYear" className="text-sm font-medium text-gray-700">{t('academic_year')}</label>
+                <label htmlFor="academicYear" className="text-[12.5px] text-[#8A8177]">{t('academic_year')}</label>
                 <select
                   id="academicYear"
                   value={academicYear}
                   onChange={(e) => { setAcademicYear(parseInt(e.target.value, 10)); setReportData(null); }}
                   aria-label={t('academic_year')}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-800 bg-white"
+                  className="w-full appearance-none px-[14px] py-3 text-sm border border-[#E3DDD1] rounded-[9px] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917] bg-[#FFFDFA]"
                 >
                   {Array.from({ length: 7 }).map((_, idx) => {
                     const y = defaultAcademicYear - 3 + idx;
@@ -1810,12 +1811,12 @@ ${dateTableEN}`;
             {/* Filtro por instrumento (solo para reporte grupal) */}
             {reportType === 'group' && (
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700" htmlFor="instrumentFilter">{t('instrument_label')}</label>
+                <label className="text-[12.5px] text-[#8A8177]" htmlFor="instrumentFilter">{t('instrument_label')}</label>
                 <select
                   id="instrumentFilter"
                   value={instrumentFilter}
                   onChange={(e) => { setInstrumentFilter(e.target.value); setReportData(null); }}
-                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-800 bg-white"
+                  className="w-full appearance-none px-[14px] py-3 text-sm border border-[#E3DDD1] rounded-[9px] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917] bg-[#FFFDFA]"
                 >
                   <option value="all">{t('all')}</option>
                   {instruments.map(inst => (
@@ -1826,7 +1827,7 @@ ${dateTableEN}`;
             )}
           </div>
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-[12px] text-[#8A8177] mt-3">
           {t('showing_data_of', {
             label: (granularity === 'monthly'
               ? formatMonthLabel(period, customMonth)
@@ -1839,17 +1840,17 @@ ${dateTableEN}`;
 
         {/* Selección de estudiante (solo para reporte individual) */}
         {reportType === 'individual' && (
-          <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">{t('selected_student')}</h3>
+          <div>
+            <h3 className="text-[11.5px] uppercase tracking-[0.09em] font-medium text-[#8A8177] mb-2">{t('selected_student')}</h3>
             {selectedStudent ? (
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                <div className="flex-1">
-                  <p className="text-base font-semibold text-gray-800 leading-snug">{selectedStudent.name}</p>
-                  <p className="text-sm text-gray-600">{selectedStudent.instrument}</p>
+              <div className="flex flex-col gap-2">
+                <div className="border border-[#EAE3D6] rounded-lg px-3.5 py-2.5">
+                  <p className="text-sm font-semibold text-[#1B1917] leading-snug">{selectedStudent.name}</p>
+                  <p className="text-[12.5px] text-[#8A8177]">{selectedStudent.instrument}</p>
                 </div>
                 <button
                   onClick={() => setStudentModalVisible(true)}
-                  className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium w-full sm:w-auto"
+                  className="px-3.5 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] text-sm font-medium w-full transition-colors"
                 >
                   {t('change')}
                 </button>
@@ -1857,7 +1858,7 @@ ${dateTableEN}`;
             ) : (
               <button
                 onClick={() => setStudentModalVisible(true)}
-                className="w-full px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-[#56504A] border border-[#DED7C9] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
                 {t('select_student_title')}
               </button>
@@ -1866,14 +1867,13 @@ ${dateTableEN}`;
         )}
 
         {/* Botón para generar reporte */}
-        <div className="flex justify-center">
         <button
           onClick={handleGenerateReport}
           disabled={generating || (reportType === 'individual' && !selectedStudent)}
-          className={`w-full sm:w-auto px-6 py-3 rounded-lg flex items-center justify-center font-medium transition-all duration-200 ${
+          className={`w-full px-6 py-3 rounded-lg flex items-center justify-center font-medium transition-all duration-200 ${
             generating || (reportType === 'individual' && !selectedStudent)
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white hover:shadow-md transform hover:scale-[1.01]'
+              ? 'bg-[#DED7C9] text-[#8A8177] cursor-not-allowed'
+              : 'bg-[#C2492B] text-white hover:bg-[#A83A20]'
           }`}
         >
           {generating ? (
@@ -1887,31 +1887,28 @@ ${dateTableEN}`;
             </>
           )}
         </button>
-        </div>
       </div>
-        
+
+      {/* Resultados (columna derecha) */}
+      <div className="flex flex-col gap-5 min-w-0">
+
       {/* Sección separada para notificaciones de faltas (solo admin) — apagada
           este ciclo (SHOW_ABSENCE_NOTIFICATIONS, ver arriba), código intacto
           para retomarla más adelante */}
       {SHOW_ABSENCE_NOTIFICATIONS && isAdmin && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-md w-full">
-            <div className="flex items-center mb-4">
-              <div className="p-2 bg-red-100 rounded-lg mr-3">
-                <MdEmail className="text-red-600" size={24} />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {lang === 'es' ? 'Notificaciones de Inasistencias' : 'Absence Notifications'}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {lang === 'es' ? 'Enviar correos a padres sobre faltas injustificadas' : 'Send emails to parents about unexcused absences'}
-                </p>
-              </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-6 w-full">
+            <div className="mb-4">
+              <h3 className="text-[15px] font-semibold text-[#1B1917]">
+                {lang === 'es' ? 'Notificaciones de Inasistencias' : 'Absence Notifications'}
+              </h3>
+              <p className="text-sm text-[#8A8177]">
+                {lang === 'es' ? 'Enviar correos a padres sobre faltas injustificadas' : 'Send emails to parents about unexcused absences'}
+              </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 items-end">
               <div className="flex-1">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-[12.5px] text-[#8A8177] mb-2 block">
                   {lang === 'es' ? 'Seleccione el día para ver las faltas injustificadas:' : 'Select the day to view unexcused absences:'}
                 </label>
                 <DatePicker
@@ -1920,7 +1917,7 @@ ${dateTableEN}`;
                   dateFormat="dd/MM/yyyy"
                   locale={lang === 'es' ? 'es-mon' : 'en-mon'}
                   maxDate={new Date()}
-                  className="px-4 py-2.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 font-medium w-full text-center"
+                  className="px-4 py-2.5 border border-[#E3DDD1] rounded-[9px] focus:outline-none focus:ring-2 focus:ring-red-500/30 text-[#1B1917] font-medium w-full text-center bg-[#FFFDFA]"
                   placeholderText={lang === 'es' ? 'Seleccionar fecha' : 'Select date'}
                   wrapperClassName="w-full"
                 />
@@ -1928,7 +1925,7 @@ ${dateTableEN}`;
               <button
                 onClick={handleShowUnexcusedAbsences}
                 disabled={loadingUnexcused}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-md flex items-center justify-center font-medium bg-red-600 text-white hover:bg-red-700 shadow-sm whitespace-nowrap"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg flex items-center justify-center font-medium bg-[#A8402A] text-white hover:bg-[#8f3421] shadow-sm whitespace-nowrap"
               >
                 {loadingUnexcused ? (
                   <>
@@ -1950,16 +1947,19 @@ ${dateTableEN}`;
 
       {/* Resultados del reporte */}
       {reportData && (
-        <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+        <div className="bg-[#FFFDFA] p-5 rounded-xl border border-[#EAE3D6]">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-            <h2 className="text-lg sm:text-xl font-medium text-gray-800">
+            <h2
+              className="text-xl sm:text-2xl text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400 }}
+            >
               {reportType === 'individual' && selectedStudent
                 ? t('report_for_name', { name: selectedStudent.name })
                 : t('group_report_title')}
             </h2>
             <button
               onClick={exportReportToCSV}
-              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#C2492B] rounded-md hover:bg-[#A83A20] transition-colors flex items-center justify-center"
+              className="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-[#C2492B] rounded-lg hover:bg-[#A83A20] transition-colors flex items-center justify-center"
             >
               <MdDownload className="mr-2" /> {t('export_csv')}
             </button>
@@ -1969,7 +1969,7 @@ ${dateTableEN}`;
             {/* Estadísticas */}
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h3 className="font-medium text-gray-700 text-lg">{t('statistics')}</h3>
+                <h3 className="text-[11.5px] uppercase tracking-[0.09em] font-medium text-[#8A8177]">{t('statistics')}</h3>
                 {/* Comparación vs. el período anterior (Mensual/Anual — Semanal
                     ya tiene su propia tendencia de 4 semanas más abajo). Solo
                     aparece si hay datos del período anterior para comparar. */}
@@ -1977,13 +1977,13 @@ ${dateTableEN}`;
                   <span className="flex items-center gap-1.5 text-sm">
                     <span
                       className={`font-semibold ${
-                        periodComparison.deltaPct > 0.5 ? 'text-green-600' : periodComparison.deltaPct < -0.5 ? 'text-red-600' : 'text-gray-500'
+                        periodComparison.deltaPct > 0.5 ? 'text-green-600' : periodComparison.deltaPct < -0.5 ? 'text-red-600' : 'text-[#8A8177]'
                       }`}
                     >
                       {periodComparison.deltaPct > 0.5 ? '▲' : periodComparison.deltaPct < -0.5 ? '▼' : '▬'}{' '}
                       {periodComparison.deltaPct >= 0 ? '+' : ''}{periodComparison.deltaPct.toFixed(1)} pp
                     </span>
-                    <span className="text-gray-500">
+                    <span className="text-[#8A8177]">
                       {lang === 'es'
                         ? `vs. ${periodComparison.previousLabel} (${periodComparison.previousPercentage.toFixed(1)}%)`
                         : `vs. ${periodComparison.previousLabel} (${periodComparison.previousPercentage.toFixed(1)}%)`}
@@ -1993,60 +1993,60 @@ ${dateTableEN}`;
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-green-500">
+                <div className="bg-[#FFFDFA] rounded-xl p-3 sm:p-4 border border-[#EAE3D6] border-l-4 border-l-[#5F7A57]">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('attendance_label')}</p>
-                    <div className="bg-green-100 p-1.5 rounded-full flex-shrink-0">
-                      <MdCheckCircle className="text-green-600" size={16} />
+                    <p className="text-xs sm:text-sm text-[#6E675E] font-medium">{t('attendance_label')}</p>
+                    <div className="bg-[#EDF1E9] p-1.5 rounded-full flex-shrink-0">
+                      <MdCheckCircle className="text-[#5F7A57]" size={16} />
                     </div>
                   </div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_attendance}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{reportData.attendance_percentage.toFixed(1)}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[#1B1917]">{reportData.total_attendance}</p>
+                  <p className="text-xs sm:text-sm text-[#8A8177]">{reportData.attendance_percentage.toFixed(1)}%</p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-yellow-500">
+                <div className="bg-[#FFFDFA] rounded-xl p-3 sm:p-4 border border-[#EAE3D6] border-l-4 border-l-[#8A6A22]">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('excused_absences_short')}</p>
-                    <div className="bg-yellow-100 p-1.5 rounded-full flex-shrink-0">
-                      <MdEventBusy className="text-yellow-600" size={16} />
+                    <p className="text-xs sm:text-sm text-[#6E675E] font-medium">{t('excused_absences_short')}</p>
+                    <div className="bg-[#F6EFDF] p-1.5 rounded-full flex-shrink-0">
+                      <MdEventBusy className="text-[#8A6A22]" size={16} />
                     </div>
                   </div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_excused_absences}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{reportData.excused_percentage.toFixed(1)}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[#1B1917]">{reportData.total_excused_absences}</p>
+                  <p className="text-xs sm:text-sm text-[#8A8177]">{reportData.excused_percentage.toFixed(1)}%</p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-red-500">
+                <div className="bg-[#FFFDFA] rounded-xl p-3 sm:p-4 border border-[#EAE3D6] border-l-4 border-l-[#A8402A]">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('unexcused_absences_short')}</p>
-                    <div className="bg-red-100 p-1.5 rounded-full flex-shrink-0">
-                      <MdWarning className="text-red-600" size={16} />
+                    <p className="text-xs sm:text-sm text-[#6E675E] font-medium">{t('unexcused_absences_short')}</p>
+                    <div className="bg-[#F8E9E4] p-1.5 rounded-full flex-shrink-0">
+                      <MdWarning className="text-[#A8402A]" size={16} />
                     </div>
                   </div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total_unexcused_absences}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{reportData.unexcused_percentage.toFixed(1)}%</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[#1B1917]">{reportData.total_unexcused_absences}</p>
+                  <p className="text-xs sm:text-sm text-[#8A8177]">{reportData.unexcused_percentage.toFixed(1)}%</p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 border-l-4 border-blue-500">
+                <div className="bg-[#FFFDFA] rounded-xl p-3 sm:p-4 border border-[#EAE3D6] border-l-4 border-l-[#DED7C9]">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-xs sm:text-sm text-gray-600 font-medium">{t('total_records')}</p>
-                    <div className="bg-blue-100 p-1.5 rounded-full flex-shrink-0">
-                      <MdAssessment className="text-blue-600" size={16} />
+                    <p className="text-xs sm:text-sm text-[#6E675E] font-medium">{t('total_records')}</p>
+                    <div className="bg-[#F4F0E8] p-1.5 rounded-full flex-shrink-0">
+                      <MdAssessment className="text-[#56504A]" size={16} />
                     </div>
                   </div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{reportData.total}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[#1B1917]">{reportData.total}</p>
                 </div>
               </div>
             </div>
             
             {/* Gráfico */}
-            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-100">
+            <div className="bg-[#FFFDFA] p-3 sm:p-4 rounded-xl border border-[#EAE3D6]">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <h3 className="font-medium text-gray-700 text-base sm:text-lg">{t('attendance_distribution')}</h3>
+                <h3 className="font-medium text-[#1B1917] text-base sm:text-lg">{t('attendance_distribution')}</h3>
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
                   <button 
                     onClick={() => setChartType('pie')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'pie' ? 'bg-[#C2492B] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'pie' ? 'bg-[#C2492B] text-white' : 'bg-[#EAE3D6] hover:bg-[#DED7C9]'
                     }`}
                   >
                     {t('pie')}
@@ -2054,7 +2054,7 @@ ${dateTableEN}`;
                   <button 
                     onClick={() => setChartType('bar')}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      chartType === 'bar' ? 'bg-[#C2492B] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                      chartType === 'bar' ? 'bg-[#C2492B] text-white' : 'bg-[#EAE3D6] hover:bg-[#DED7C9]'
                     }`}
                   >
                     {t('bars')}
@@ -2075,7 +2075,7 @@ ${dateTableEN}`;
                   que el % no sea un solo día suelto. */}
               {reportType === 'group' && topAttendance.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="font-medium text-gray-700 mb-2">
+                  <h3 className="font-medium text-[#1B1917] mb-2">
                     {lang === 'es' ? 'Top 5 — Mejor Asistencia' : 'Top 5 — Best Attendance'}
                   </h3>
                   <div className="space-y-2">
@@ -2088,7 +2088,7 @@ ${dateTableEN}`;
                       return topAttendance.map((s) => {
                         const isTied = (rankCounts.get(s.rank) || 0) > 1;
                         return (
-                          <div key={s.id} className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3 py-2">
+                          <div key={s.id} className="flex items-center gap-3 bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg px-3 py-2">
                             <span
                               className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                                 s.rank === 1 ? 'bg-yellow-500' : s.rank === 2 ? 'bg-gray-400' : s.rank === 3 ? 'bg-amber-700' : 'bg-[#C2492B]'
@@ -2098,13 +2098,13 @@ ${dateTableEN}`;
                               {s.rank}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-800 truncate">{s.name}</p>
-                              <p className="text-xs text-gray-500 truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
+                              <p className="text-sm font-medium text-[#1B1917] truncate">{s.name}</p>
+                              <p className="text-xs text-[#8A8177] truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
                             </div>
                             <span className="text-right flex-shrink-0">
-                              <span className="text-sm font-semibold text-emerald-600">{Math.round(s.percentage)}%</span>
+                              <span className="text-sm font-semibold text-[#5F7A57]">{Math.round(s.percentage)}%</span>
                               {isTied && (
-                                <span className="block text-[10px] text-gray-400 leading-tight">
+                                <span className="block text-[10px] text-[#A29889] leading-tight">
                                   {lang === 'es' ? 'empate' : 'tied'}
                                 </span>
                               )}
@@ -2115,7 +2115,7 @@ ${dateTableEN}`;
                     })()}
                   </div>
                   {topAttendanceMoreTied && (
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-[#8A8177] mt-2">
                       {lang === 'es'
                         ? `+${topAttendanceMoreTied.count} estudiante(s) más también con ${Math.round(topAttendanceMoreTied.percentage)}%.`
                         : `+${topAttendanceMoreTied.count} more student(s) also at ${Math.round(topAttendanceMoreTied.percentage)}%.`}
@@ -2135,17 +2135,17 @@ ${dateTableEN}`;
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {instrumentFilter === 'all' && instrumentBreakdown.length > 1 && (
                     <div>
-                      <h3 className="font-medium text-gray-700 mb-2">
+                      <h3 className="font-medium text-[#1B1917] mb-2">
                         {lang === 'es' ? 'Asistencia por Instrumento' : 'Attendance by Instrument'}
                       </h3>
                       <div className="space-y-2">
                         {instrumentBreakdown.map((b) => (
                           <div key={b.label}>
-                            <div className="flex justify-between text-xs text-gray-600 mb-0.5">
+                            <div className="flex justify-between text-xs text-[#6E675E] mb-0.5">
                               <span className="truncate">{b.label}</span>
                               <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                            <div className="w-full h-2 rounded-full bg-[#F4F0E8] overflow-hidden">
                               <div className="h-full bg-[#C2492B] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
                             </div>
                           </div>
@@ -2155,18 +2155,18 @@ ${dateTableEN}`;
                   )}
                   {positionBreakdown.length > 1 && (
                     <div>
-                      <h3 className="font-medium text-gray-700 mb-2">
+                      <h3 className="font-medium text-[#1B1917] mb-2">
                         {lang === 'es' ? 'Asistencia por Posición' : 'Attendance by Position'}
                       </h3>
                       <div className="space-y-2">
                         {positionBreakdown.map((b) => (
                           <div key={b.label}>
-                            <div className="flex justify-between text-xs text-gray-600 mb-0.5">
+                            <div className="flex justify-between text-xs text-[#6E675E] mb-0.5">
                               <span className="truncate">{b.label}</span>
                               <span className="font-medium flex-shrink-0 ml-2">{Math.round(b.percentage)}%</span>
                             </div>
-                            <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
+                            <div className="w-full h-2 rounded-full bg-[#F4F0E8] overflow-hidden">
+                              <div className="h-full bg-[#7A8B6F] rounded-full" style={{ width: `${Math.max(2, Math.round(b.percentage))}%` }} />
                             </div>
                           </div>
                         ))}
@@ -2181,13 +2181,13 @@ ${dateTableEN}`;
                 <div className="mt-20 sm:mt-6">
                   <div className="flex items-center justify-between mb-1">
                     <div>
-                      <h3 className="font-medium text-gray-700">{t('weekly_trend_title')}</h3>
-                      <p className="text-[11px] text-gray-500">
+                      <h3 className="font-medium text-[#1B1917]">{t('weekly_trend_title')}</h3>
+                      <p className="text-[11px] text-[#8A8177]">
                         {lang === 'es' ? 'Según la pendiente de las 4 semanas, no solo la última' : 'Based on the 4-week slope, not just the latest week'}
                       </p>
                     </div>
                     <span
-                      className={`${trendDirection === 'up' ? 'text-green-600' : trendDirection === 'down' ? 'text-red-600' : 'text-gray-600'} text-sm font-medium whitespace-nowrap`}
+                      className={`${trendDirection === 'up' ? 'text-[#5F7A57]' : trendDirection === 'down' ? 'text-[#A8402A]' : 'text-[#6E675E]'} text-sm font-medium whitespace-nowrap`}
                       title={
                         lang === 'es'
                           ? `Pendiente promedio: ${trendSlope >= 0 ? '+' : ''}${trendSlope.toFixed(1)} pp por semana (calculada con las 4 semanas)`
@@ -2224,32 +2224,32 @@ ${dateTableEN}`;
                     const xPos = (i: number) => padX + i * ((vbW - 2 * padX) / 3);
                     const yPos = (v: number) => (vbH - padY) - v * ((vbH - 2 * padY) / 100);
                     return (
-                      <div className="mb-3 p-3 bg-white border border-gray-200 rounded-md max-w-md mx-auto">
+                      <div className="mb-3 p-3 bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg max-w-md mx-auto">
                         <svg viewBox={`0 0 ${vbW} ${vbH}`} className="w-full h-24" preserveAspectRatio="none">
                           <polyline
                             points={trendVals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')}
                             fill="none"
-                            stroke="#9ca3af"
+                            stroke="#A29889"
                             strokeWidth="2"
                             strokeDasharray="5,4"
                           />
                           <polyline
                             points={yVals.map((v, i) => `${xPos(i)},${yPos(v)}`).join(' ')}
                             fill="none"
-                            stroke="#4f46e5"
+                            stroke="#C2492B"
                             strokeWidth="2"
                           />
                           {yVals.map((v, i) => (
-                            <circle key={weeklyTrend[i].week} cx={xPos(i)} cy={yPos(v)} r="3" fill="#4f46e5" />
+                            <circle key={weeklyTrend[i].week} cx={xPos(i)} cy={yPos(v)} r="3" fill="#C2492B" />
                           ))}
                         </svg>
-                        <div className="flex items-center gap-4 mt-1 text-[10px] text-gray-500">
+                        <div className="flex items-center gap-4 mt-1 text-[10px] text-[#8A8177]">
                           <span className="flex items-center gap-1">
-                            <span className="inline-block w-3 h-0.5 bg-indigo-600" />
+                            <span className="inline-block w-3 h-0.5 bg-[#C2492B]" />
                             {lang === 'es' ? 'Real' : 'Actual'}
                           </span>
                           <span className="flex items-center gap-1">
-                            <span className="inline-block w-3 border-t-2 border-dashed border-gray-400" />
+                            <span className="inline-block w-3 border-t-2 border-dashed border-[#A29889]" />
                             {lang === 'es' ? 'Tendencia (4 semanas)' : 'Trend (4 weeks)'}
                           </span>
                         </div>
@@ -2261,18 +2261,18 @@ ${dateTableEN}`;
                     {weeklyTrend.map((w) => {
                     const isCurrent = w.week === customWeek;
                     return (
-                      <div key={w.week} className={`p-2 sm:p-3 rounded-md border flex flex-col items-center ${isCurrent ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200'}`}>
+                      <div key={w.week} className={`p-2 sm:p-3 rounded-lg border flex flex-col items-center ${isCurrent ? 'bg-[#FBF2ED] border-[#C2492B]' : 'bg-[#FAF7F2] border-[#EAE3D6]'}`}>
                         <div className="w-full h-20 sm:h-24 flex items-end">
                           <div
-                            className={`w-full rounded-t-md ${isCurrent ? 'bg-indigo-600 ring-2 ring-indigo-300' : 'bg-blue-500'}`}
+                            className={`w-full rounded-t-md ${isCurrent ? 'bg-[#C2492B]' : 'bg-[#D9CBB8]'}`}
                             style={{ height: `${Math.max(4, Math.min(100, Math.round(w.percentage)))}%` }}
                             title={`${w.percentage.toFixed(1)}%`}
                           />
                         </div>
-                        <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-800 font-medium">{Math.round(w.percentage)}%</div>
-                        <div className="text-[10px] sm:text-xs text-gray-600 text-center leading-tight">{w.label}</div>
+                        <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-[#1B1917] font-medium">{Math.round(w.percentage)}%</div>
+                        <div className="text-[10px] sm:text-xs text-[#6E675E] text-center leading-tight">{w.label}</div>
                         {isCurrent && (
-                          <span className="mt-1 text-[8px] sm:text-[10px] px-1 sm:px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-medium">Actual</span>
+                          <span className="mt-1 text-[8px] sm:text-[10px] px-1 sm:px-2 py-0.5 rounded-full bg-[#EFE9DD] text-[#A83A20] font-medium">Actual</span>
                         )}
                       </div>
                     );
@@ -2292,10 +2292,10 @@ ${dateTableEN}`;
                         const b = Math.round(weeklyTrend[i + 1].percentage);
                         const diff = b - a;
                         const sign = diff > 0 ? '+' : '';
-                        const color = diff > 0 ? 'text-green-600' : diff < 0 ? 'text-red-600' : 'text-gray-600';
+                        const color = diff > 0 ? 'text-[#5F7A57]' : diff < 0 ? 'text-[#A8402A]' : 'text-[#6E675E]';
                         const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '▬';
                         return (
-                          <div key={`delta-${i}`} className="text-sm font-medium text-center bg-white border border-gray-200 rounded-md py-2">
+                          <div key={`delta-${i}`} className="text-sm font-medium text-center bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg py-2">
                             <span className={`${color}`}>{arrow} {sign}{diff} pp</span>
                           </div>
                         );
@@ -2308,11 +2308,11 @@ ${dateTableEN}`;
               {granularity === 'annual' && annualBreakdown.length > 0 && (
                 <div className="mt-20 sm:mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-700">{t('monthly_breakdown_title')}</h3>
-                    <div className="hidden sm:flex items-center gap-3 text-xs text-gray-700">
-                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-emerald-500" /> {t('attendance_label')}</span>
-                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-yellow-400" /> {t('excused_absences_short')}</span>
-                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-red-500" /> {t('unexcused_absences_short')}</span>
+                    <h3 className="font-medium text-[#1B1917]">{t('monthly_breakdown_title')}</h3>
+                    <div className="hidden sm:flex items-center gap-3 text-xs text-[#56504A]">
+                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#5F7A57]" /> {t('attendance_label')}</span>
+                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#8A6A22]" /> {t('excused_absences_short')}</span>
+                      <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#A8402A]" /> {t('unexcused_absences_short')}</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
@@ -2323,35 +2323,35 @@ ${dateTableEN}`;
                       const uaW = total ? (m.ua / total) * 100 : 0;
                       const hasData = total > 0;
                       return (
-                        <div key={m.key} className="group p-3 rounded-lg border border-gray-200 bg-white hover:shadow transition-all">
+                        <div key={m.key} className="group p-3 rounded-lg border border-[#EAE3D6] bg-[#FFFDFA] hover:shadow transition-all">
                           <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-900">{m.label}</div>
-                            <div className="text-[10px] text-gray-500 group-hover:opacity-100 opacity-70 transition-opacity">{total} reg.</div>
+                            <div className="text-sm font-medium text-[#1B1917]">{m.label}</div>
+                            <div className="text-[10px] text-[#8A8177] group-hover:opacity-100 opacity-70 transition-opacity">{total} reg.</div>
                           </div>
-                          <div className="w-full h-4 rounded-full bg-gray-100 overflow-hidden">
+                          <div className="w-full h-4 rounded-full bg-[#F4F0E8] overflow-hidden">
                             {hasData ? (
                               <div className="w-full h-full flex">
-                                {aW > 0 && <div className="h-full bg-emerald-500" style={{ width: `${aW}%` }} title={`${t('attendance_label')}: ${m.a} (${Math.round(aW)}%)`} />}
-                                {eaW > 0 && <div className="h-full bg-yellow-400" style={{ width: `${eaW}%` }} title={`${t('excused_absences_short')}: ${m.ea} (${Math.round(eaW)}%)`} />}
-                                {uaW > 0 && <div className="h-full bg-red-500" style={{ width: `${uaW}%` }} title={`${t('unexcused_absences_short')}: ${m.ua} (${Math.round(uaW)}%)`} />}
+                                {aW > 0 && <div className="h-full bg-[#5F7A57]" style={{ width: `${aW}%` }} title={`${t('attendance_label')}: ${m.a} (${Math.round(aW)}%)`} />}
+                                {eaW > 0 && <div className="h-full bg-[#8A6A22]" style={{ width: `${eaW}%` }} title={`${t('excused_absences_short')}: ${m.ea} (${Math.round(eaW)}%)`} />}
+                                {uaW > 0 && <div className="h-full bg-[#A8402A]" style={{ width: `${uaW}%` }} title={`${t('unexcused_absences_short')}: ${m.ua} (${Math.round(uaW)}%)`} />}
                               </div>
                             ) : (
-                              <div className="w-full h-full bg-gray-200" title={t('no_data_available')} />
+                              <div className="w-full h-full bg-[#EAE3D6]" title={t('no_data_available')} />
                             )}
                           </div>
-                          <div className="mt-2 flex items-center justify-between text-[11px] text-gray-600">
-                            <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">A:{m.a}</span>
-                            <span className="px-1.5 py-0.5 rounded bg-yellow-50 text-yellow-700">EA:{m.ea}</span>
-                            <span className="px-1.5 py-0.5 rounded bg-red-50 text-red-700">UA:{m.ua}</span>
+                          <div className="mt-2 flex items-center justify-between text-[11px] text-[#6E675E]">
+                            <span className="px-1.5 py-0.5 rounded bg-[#EDF1E9] text-[#5F7A57]">A:{m.a}</span>
+                            <span className="px-1.5 py-0.5 rounded bg-[#F6EFDF] text-[#8A6A22]">EA:{m.ea}</span>
+                            <span className="px-1.5 py-0.5 rounded bg-[#F8E9E4] text-[#A8402A]">UA:{m.ua}</span>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                  <div className="mt-2 sm:hidden flex items-center gap-3 text-xs text-gray-700">
-                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-emerald-500" /> A</span>
-                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-yellow-400" /> EA</span>
-                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-red-500" /> UA</span>
+                  <div className="mt-2 sm:hidden flex items-center gap-3 text-xs text-[#56504A]">
+                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#5F7A57]" /> A</span>
+                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#8A6A22]" /> EA</span>
+                    <span className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded-sm bg-[#A8402A]" /> UA</span>
                   </div>
                 </div>
               )}
@@ -2359,6 +2359,13 @@ ${dateTableEN}`;
           </div>
         </div>
       )}
+
+      </div>
+      {/* fin columna de resultados */}
+      </div>
+      {/* fin grid de 2 columnas */}
+      </div>
+      {/* fin max-w-[1420px] mx-auto */}
 
       {/* Modal de selección de estudiante */}
       <StudentModal
@@ -2371,21 +2378,21 @@ ${dateTableEN}`;
       {/* Modal de previsualización de email */}
       {emailPreviewVisible && emailPreviewData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-[#FAF7F2] rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <div className="bg-[#FAF7F2] border-b border-[#EAE3D6] px-6 py-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <MdEmail className="text-blue-600" size={20} />
+                <div className="p-2 bg-[#EFE9DD] rounded-lg">
+                  <MdEmail className="text-[#C2492B]" size={20} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">{t('email_preview')}</h2>
+                <h2 className="text-xl font-bold text-[#1B1917]">{t('email_preview')}</h2>
               </div>
               <button
                 onClick={() => {
                   setEmailPreviewVisible(false);
                   setEmailPreviewData(null);
                 }}
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
+                className="text-[#A29889] hover:text-[#6E675E] hover:bg-[#F4F0E8] rounded-full p-2 transition-colors"
               >
                 <MdClose size={24} />
               </button>
@@ -2395,20 +2402,20 @@ ${dateTableEN}`;
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-4">
                 {/* Email headers */}
-                <div className="border-b border-gray-200 pb-4 space-y-2">
+                <div className="border-b border-[#EAE3D6] pb-4 space-y-2">
                   <div className="flex items-start">
-                    <span className="font-semibold text-gray-700 min-w-[80px]">{t('email_to')}</span>
-                    <span className="text-gray-600">{emailPreviewData.to}</span>
+                    <span className="font-semibold text-[#56504A] min-w-[80px]">{t('email_to')}</span>
+                    <span className="text-[#6E675E]">{emailPreviewData.to}</span>
                   </div>
                   <div className="flex items-start">
-                    <span className="font-semibold text-gray-700 min-w-[80px]">{t('email_subject')}</span>
-                    <span className="text-gray-600">{emailPreviewData.subject}</span>
+                    <span className="font-semibold text-[#56504A] min-w-[80px]">{t('email_subject')}</span>
+                    <span className="text-[#6E675E]">{emailPreviewData.subject}</span>
                   </div>
                 </div>
 
                 {/* Email body */}
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800 leading-relaxed">
+                <div className="bg-[#FAF7F2] rounded-lg p-4 border border-[#EAE3D6]">
+                  <pre className="whitespace-pre-wrap font-sans text-sm text-[#1B1917] leading-relaxed">
                     {emailPreviewData.body}
                   </pre>
                 </div>
@@ -2416,10 +2423,10 @@ ${dateTableEN}`;
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+            <div className="bg-[#FAF7F2] px-6 py-4 border-t border-[#EAE3D6]">
               {/* Selector de proveedor de email */}
               <div className="mb-4">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-sm font-medium text-[#56504A] mb-2 block">
                   {lang === 'es' ? 'Enviar desde:' : 'Send from:'}
                 </label>
                 <div className="flex gap-3">
@@ -2427,8 +2434,8 @@ ${dateTableEN}`;
                     onClick={() => setEmailProvider('gmail')}
                     className={`flex-1 px-4 py-2 rounded-md border-2 transition-all font-medium ${
                       emailProvider === 'gmail'
-                        ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                        ? 'border-red-500 bg-[#F8E9E4] text-[#8f3421]'
+                        : 'border-[#DED7C9] bg-[#FAF7F2] text-[#56504A] hover:border-[#C2492B]'
                     }`}
                   >
                     <div className="flex items-center justify-center">
@@ -2441,7 +2448,7 @@ ${dateTableEN}`;
                     className={`flex-1 px-4 py-2 rounded-md border-2 transition-all font-medium ${
                       emailProvider === 'outlook'
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                        : 'border-[#DED7C9] bg-[#FAF7F2] text-[#56504A] hover:border-[#C2492B]'
                     }`}
                   >
                     <div className="flex items-center justify-center">
@@ -2459,7 +2466,7 @@ ${dateTableEN}`;
                     setEmailPreviewVisible(false);
                     setEmailPreviewData(null);
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                  className="px-4 py-2 bg-[#EAE3D6] text-[#56504A] rounded-md hover:bg-[#DED7C9] transition-colors font-medium"
                 >
                   {t('cancel')}
                 </button>
@@ -2479,20 +2486,20 @@ ${dateTableEN}`;
       {/* Modal de faltas injustificadas */}
       {unexcusedAbsencesModalVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-[#FAF7F2] rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+            <div className="bg-[#FAF7F2] border-b border-[#EAE3D6] px-6 py-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <MdWarning className="text-red-600" size={20} />
+                <div className="p-2 bg-[#F8E9E4] rounded-lg">
+                  <MdWarning className="text-[#A8402A]" size={20} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-[#1B1917]">
                   {lang === 'es' ? 'Faltas Injustificadas' : 'Unexcused Absences'} - {selectedReportDate.toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </h2>
               </div>
               <button
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
-                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
+                className="text-[#A29889] hover:text-[#6E675E] hover:bg-[#F4F0E8] rounded-full p-2 transition-colors"
               >
                 <MdClose size={24} />
               </button>
@@ -2501,32 +2508,32 @@ ${dateTableEN}`;
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6">
               {unexcusedStudents.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-[#8A8177]">
                   {t('no_students_unexcused_this_week')}
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="text-sm text-gray-600 mb-4">
-                    {t('total_students_with_unexcused')} <span className="font-bold text-red-600">{unexcusedStudents.length}</span>
+                  <div className="text-sm text-[#6E675E] mb-4">
+                    {t('total_students_with_unexcused')} <span className="font-bold text-[#A8402A]">{unexcusedStudents.length}</span>
                   </div>
                   
                   {unexcusedStudents.map((item, index) => (
-                    <div key={item.student.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={item.student.id} className="border border-[#EAE3D6] rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         {/* Información del estudiante */}
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">
+                            <span className="bg-[#F8E9E4] text-[#8f3421] text-xs font-bold px-2 py-1 rounded">
                               #{index + 1}
                             </span>
-                            <h3 className="text-lg font-semibold text-gray-800">
+                            <h3 className="text-lg font-semibold text-[#1B1917]">
                               {item.student.name}
                             </h3>
                           </div>
-                          <div className="text-sm text-gray-600 space-y-1">
+                          <div className="text-sm text-[#6E675E] space-y-1">
                             <p><span className="font-medium">{t('instrument_label')}:</span> {item.student.instrument}</p>
                             <p><span className="font-medium">{t('unexcused_count')}</span> 
-                              <span className="ml-2 bg-red-600 text-white px-2 py-0.5 rounded font-bold">
+                              <span className="ml-2 bg-[#A8402A] text-white px-2 py-0.5 rounded font-bold">
                                 {item.absences}
                               </span>
                             </p>
@@ -2534,11 +2541,11 @@ ${dateTableEN}`;
                         </div>
 
                         {/* Información del padre/madre */}
-                        <div className="bg-gray-50 rounded-lg p-3 sm:w-64">
-                          <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('parent_contact_label')}</h4>
+                        <div className="bg-[#FAF7F2] rounded-lg p-3 sm:w-64">
+                          <h4 className="text-sm font-semibold text-[#56504A] mb-2">{t('parent_contact_label')}</h4>
                           {item.parentInfo ? (
                             <>
-                              <div className="text-sm text-gray-600 space-y-1 mb-3">
+                              <div className="text-sm text-[#6E675E] space-y-1 mb-3">
                                 <p><span className="font-medium">{t('parent_name')}:</span> {item.parentInfo.full_name || 'N/A'}</p>
                                 <p><span className="font-medium">{t('parent_phone')}:</span> {item.parentInfo.phone_number || 'N/A'}</p>
                                 <p><span className="font-medium">{t('parent_email')}:</span> {item.parentInfo.email || 'N/A'}</p>
@@ -2556,7 +2563,7 @@ ${dateTableEN}`;
                               )}
                             </>
                           ) : (
-                            <p className="text-sm text-gray-500 italic">{t('no_contact_info')}</p>
+                            <p className="text-sm text-[#8A8177] italic">{t('no_contact_info')}</p>
                           )}
                         </div>
                       </div>
@@ -2567,10 +2574,10 @@ ${dateTableEN}`;
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-200">
+            <div className="bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3 border-t border-[#EAE3D6]">
               <button
                 onClick={() => setUnexcusedAbsencesModalVisible(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                className="px-4 py-2 bg-[#EAE3D6] text-[#56504A] rounded-md hover:bg-[#DED7C9] transition-colors font-medium"
               >
                 {t('close_button')}
               </button>
