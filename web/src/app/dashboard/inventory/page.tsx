@@ -326,34 +326,28 @@ export default function InventoryDashboard() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="pb-5 sm:pb-[22px] border-b border-[#E3DDD1] flex items-end justify-between gap-6 flex-wrap">
-        <div>
-          <h1
-            className="text-[28px] sm:text-[40px] text-[#1B1917] leading-[1.05]"
-            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
-          >
-            {t('inv_dashboard_title')}
-          </h1>
-          <p className="text-[13px] sm:text-[14px] text-[#8A8177] mt-1.5">
-            {t('inv_dashboard_subtitle')}
-          </p>
-          {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-            <div className="mt-2.5 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+      {/* Ambiente de prueba + acción "Nuevo activo" — el título "Inventory"
+          y el subtítulo con la sede ya viven en el encabezado compartido
+          de layout.tsx (arriba de las pestañas), así que aquí solo va lo
+          específico de esta sub-pestaña. */}
+      {(INVENTORY_SUPABASE_CONFIG.environment === 'test' || isAdmin) && (
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          {INVENTORY_SUPABASE_CONFIG.environment === 'test' ? (
+            <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
               <MdWarning className="mr-2" size={14} />
               {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
             </div>
+          ) : <span />}
+          {isAdmin && (
+            <Link
+              href="/dashboard/inventory/assets/new"
+              className="bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+            >
+              {t('inv_new_asset_button')}
+            </Link>
           )}
         </div>
-        {isAdmin && (
-          <Link
-            href="/dashboard/inventory/assets/new"
-            className="bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
-          >
-            {t('inv_new_asset_button')}
-          </Link>
-        )}
-      </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 mt-6">
