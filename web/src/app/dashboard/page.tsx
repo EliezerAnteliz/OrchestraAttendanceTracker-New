@@ -8,14 +8,17 @@ import { useProgram } from '@/contexts/ProgramContext';
 import { useAuth } from '@/contexts/AuthContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
 
-// Saludo + fecha/hora en vivo del encabezado — nombre viene de
-// user_metadata.full_name (lo mismo que ya guarda la invitación de
-// usuarios, ver api/admin/users/invite-user/route.ts), sin ninguna
-// consulta nueva a Supabase. Si no hay full_name, cae al usuario del correo.
+// Saludo + fecha/hora en vivo del encabezado — el nombre "bonito" (con
+// mayúscula y espacios) vive en user_profiles.full_name, la misma columna
+// que ya usa la tabla de Admin/Usuarios; user_metadata.full_name puede no
+// existir (cuentas creadas antes del flujo de invitación), así que primero
+// se intenta la consulta a user_profiles y solo si falla se cae a
+// user_metadata y, en último caso, al usuario del correo tal cual.
 function useGreeting() {
   const { user } = useAuth();
   const { lang } = useI18n();
   const [now, setNow] = useState<Date | null>(null);
+  const [profileFullName, setProfileFullName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setNow(new Date());
@@ -23,7 +26,21 @@ function useGreeting() {
     return () => clearInterval(id);
   }, []);
 
-  const fullName = (user?.user_metadata as any)?.full_name as string | undefined;
+  useEffect(() => {
+    if (!user?.id) return;
+    let mounted = true;
+    supabase
+      .from('user_profiles')
+      .select('full_name')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (mounted && data?.full_name) setProfileFullName(data.full_name);
+      });
+    return () => { mounted = false; };
+  }, [user?.id]);
+
+  const fullName = profileFullName || ((user?.user_metadata as any)?.full_name as string | undefined);
   const name = (fullName?.trim().split(/\s+/)[0]) || user?.email?.split('@')[0] || '';
 
   const hour = now ? now.getHours() : 12;
