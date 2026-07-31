@@ -14,12 +14,12 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { UserRoleProvider } from '@/contexts/UserRoleContext';
 
 const sidebarItems = [
-  { key: 'menu_dashboard', href: '/dashboard', icon: <MdDashboard size={24} /> },
-  { key: 'menu_students', href: '/dashboard/students', icon: <MdPeople size={24} /> },
-  { key: 'menu_attendance', href: '/dashboard/attendance', icon: <MdAssignment size={24} /> },
-  { key: 'menu_orchestras', href: '/dashboard/orchestras', icon: <MdMusicNote size={24} /> },
-  { key: 'menu_reports', href: '/dashboard/reports', icon: <MdInsertChart size={24} /> },
-  { key: 'menu_inventory', href: '/dashboard/inventory', icon: <MdInventory size={24} /> },
+  { key: 'menu_dashboard', href: '/dashboard', icon: <MdDashboard size={20} /> },
+  { key: 'menu_students', href: '/dashboard/students', icon: <MdPeople size={20} /> },
+  { key: 'menu_attendance', href: '/dashboard/attendance', icon: <MdAssignment size={20} /> },
+  { key: 'menu_orchestras', href: '/dashboard/orchestras', icon: <MdMusicNote size={20} /> },
+  { key: 'menu_reports', href: '/dashboard/reports', icon: <MdInsertChart size={20} /> },
+  { key: 'menu_inventory', href: '/dashboard/inventory', icon: <MdInventory size={20} /> },
 ];
 
 function ProgramSwitcher() {
@@ -211,7 +211,7 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (isOpen: b
               >
                 <span className={`mr-3 transition-transform duration-200 ${
                   pathname.startsWith('/dashboard/admin') ? 'scale-110' : 'group-hover:scale-105'
-                }`}><MdPeople size={24} /></span>
+                }`}><MdPeople size={20} /></span>
                 <span className="font-medium">{t('admin_label')}</span>
               </Link>
             </li>
