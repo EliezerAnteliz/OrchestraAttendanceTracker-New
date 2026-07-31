@@ -36,6 +36,18 @@ function useGreeting() {
   return { name, greetingKey, dateTimeLabel };
 }
 
+// Caché en memoria del último resultado por sede (vive mientras dure la
+// pestaña del navegador, se pierde al recargar — no usa localStorage).
+// El componente se desmonta y se vuelve a montar cada vez que se navega
+// a esta pestaña desde el menú, así que sin esto siempre arrancaba desde
+// stats en cero y mostraba el skeleton de nuevo. Con la caché, si ya se
+// visitó esa sede en esta sesión, se muestran las últimas cifras al
+// instante y se refrescan en segundo plano (sin skeleton); el skeleton
+// solo aparece la primera vez que se abre esa sede.
+type DashboardStats = { totalStudents: number; activeStudents: number; attendanceToday: number; attendanceRate: number; totalOrchestras: number };
+type DashboardCacheEntry = { stats: DashboardStats; orchestraStats: Array<{ name: string; studentCount: number }> };
+const dashboardStatsCache: Record<string, DashboardCacheEntry> = {};
+
 export default function DashboardPage() {
   const { t, lang } = useI18n();
   const { activeProgram } = useProgram();
@@ -54,6 +66,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchDashboardData() {
+      const programId = activeProgram?.id;
+      const cached = programId ? dashboardStatsCache[programId] : undefined;
+
+      // Ya visitamos esta sede en esta sesión: mostrar lo último conocido
+      // de inmediato (sin skeleton) y refrescar en segundo plano más abajo.
+      if (cached) {
+        setStats(cached.stats);
+        setOrchestraStats(cached.orchestraStats);
+        setInitialLoad(false);
+      }
+
       try {
         setLoading(true);
         if (!activeProgram?.id) {
@@ -163,14 +186,18 @@ export default function DashboardPage() {
         // Ordenar por cantidad de estudiantes descendente
         orchestraStatsData.sort((a, b) => b.studentCount - a.studentCount);
         
-        setStats({
+        const freshStats: DashboardStats = {
           totalStudents: totalStudents || 0,
           activeStudents: activeStudents || 0,
           attendanceToday,
           attendanceRate,
           totalOrchestras: orchestrasData?.length || 0,
-        });
+        };
+        setStats(freshStats);
         setOrchestraStats(orchestraStatsData);
+        if (programId) {
+          dashboardStatsCache[programId] = { stats: freshStats, orchestraStats: orchestraStatsData };
+        }
       } catch (err: any) {
         const msg = err?.message || err?.hint || err?.details || 'No fue posible cargar los datos del dashboard.';
         console.error('Error al cargar datos del dashboard:', msg, err);
