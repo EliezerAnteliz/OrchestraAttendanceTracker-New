@@ -78,7 +78,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
 
       {/* Pestañas — texto simple con subrayado en la activa, como el
           mockup (nada de pastillas ni íconos). */}
-      <nav className="flex gap-6 border-b border-[#E3DDD1] overflow-x-auto">
+      <nav className="flex gap-6 border-b border-[#E3DDD1] overflow-x-auto overflow-y-hidden">
         {inventoryMenuItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/dashboard/inventory' && pathname.startsWith(`${item.href}/`));
           return (
