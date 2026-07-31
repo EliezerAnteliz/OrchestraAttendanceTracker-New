@@ -66,9 +66,11 @@ interface Asset {
   status_code: string;
   assigned_to_text: string | null;
   created_at: string;
-  asset_status?: {
-    description: string;
-  };
+  // El join de Supabase (`asset_status:status_code(description)`) a veces
+  // lo tipa como array y a veces como objeto según pueda inferir la
+  // relación 1-a-1 — se normaliza de forma defensiva al usarlo (ver
+  // getStatusLabel más abajo), esto solo corrige el tipo para que coincida.
+  asset_status?: { description: string } | { description: string }[];
 }
 
 // Traduce el estado de un activo a partir de su status_code (catálogo fijo),
@@ -528,7 +530,7 @@ export default function InventoryDashboard() {
                 <span className="tabular-nums text-[#56504A]">{asset.full_code || t('inv_no_code')}</span>
                 <span className="text-[#1B1917] truncate">{asset.description}</span>
                 <span className="text-[#56504A] truncate">{asset.brand || 'N/A'} {asset.size && `- ${asset.size}`}</span>
-                <span className="text-[#56504A]">{getStatusLabel(asset.status_code, asset.asset_status?.description, t)}</span>
+                <span className="text-[#56504A]">{getStatusLabel(asset.status_code, Array.isArray(asset.asset_status) ? asset.asset_status[0]?.description : asset.asset_status?.description, t)}</span>
                 <span className="text-[#8A8177] truncate">{asset.assigned_to_text || '-'}</span>
               </div>
             ))}
