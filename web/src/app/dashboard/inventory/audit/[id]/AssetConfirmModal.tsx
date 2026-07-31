@@ -66,21 +66,21 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[60]">
-      <div className="bg-white w-full sm:max-w-md sm:rounded-lg rounded-t-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Resultado */}
-        <div className={`p-4 flex items-center justify-between gap-2 ${result === 'found' ? 'bg-green-50' : 'bg-yellow-50'}`}>
+        <div className={`p-4 flex items-center justify-between gap-2 rounded-t-2xl ${result === 'found' ? 'bg-[#EDF1E9]' : 'bg-[#F6EFDF]'}`}>
           <div className="flex items-center gap-2">
             {result === 'found' ? (
-              <MdCheckCircle className="text-green-600" size={24} />
+              <MdCheckCircle className="text-[#4F6748]" size={22} />
             ) : (
-              <MdWarning className="text-yellow-600" size={24} />
+              <MdWarning className="text-[#8A6A22]" size={22} />
             )}
             <div>
-              <div className={`font-semibold ${result === 'found' ? 'text-green-800' : 'text-yellow-800'}`}>
+              <div className={`font-medium ${result === 'found' ? 'text-[#4F6748]' : 'text-[#8A6A22]'}`}>
                 {result === 'found' ? t('inv_confirm_found_same_site') : t('inv_confirm_found_other_site')}
               </div>
               {result === 'mismatch_site' && mismatchProgramName && (
-                <div className="text-xs text-yellow-700">{t('inv_confirm_belongs_to')} {mismatchProgramName}</div>
+                <div className="text-[11.5px] text-[#8A6A22]">{t('inv_confirm_belongs_to')} {mismatchProgramName}</div>
               )}
             </div>
           </div>
@@ -88,32 +88,37 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="p-1 text-gray-500 hover:bg-black/5 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+            className="p-1 text-[#6E675E] hover:bg-black/5 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
             aria-label={t('inv_close_without_confirming')}
           >
-            <MdClose size={22} />
+            <MdClose size={20} />
           </button>
         </div>
 
         <div className="p-4 space-y-4">
           {/* Info del activo */}
           <div>
-            <div className="font-bold text-lg text-gray-900">{asset.description}</div>
-            <div className="text-sm text-gray-600">
-              {asset.full_code || 'Sin código'}
-              {asset.brand && ` • ${asset.brand}`}
+            <div
+              className="text-lg text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {asset.description}
+            </div>
+            <div className="text-[12.5px] text-[#8A8177] mt-0.5">
+              {asset.full_code || t('inv_no_code')}
+              {asset.brand && ` · ${asset.brand}`}
             </div>
           </div>
 
           {/* Asignación — editable */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium text-gray-700">{t('inv_assigned_to')}</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-[13px] font-medium text-[#56504A]">{t('inv_assigned_to')}</label>
               {(asset.assigned_to_text) && (
                 <button
                   type="button"
                   onClick={handleClearAssignment}
-                  className="text-xs text-red-600 hover:text-red-800 font-medium"
+                  className="text-[11.5px] text-[#A8402A] hover:text-[#8f3421] font-medium"
                 >
                   {t('inv_mark_unassigned')}
                 </button>
@@ -124,28 +129,28 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
               placeholder={t('inv_assigned_to_placeholder')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-[11.5px] text-[#8A8177] mt-1.5">
               {t('inv_system_said')} {asset.assigned_to_text || t('inv_unassigned')}
-              {assignmentChanged && <span className="text-blue-600 font-medium"> — {t('inv_will_update_inline')}</span>}
+              {assignmentChanged && <span className="text-[#C2492B] font-medium"> — {t('inv_will_update_inline')}</span>}
             </p>
           </div>
 
           {/* Estado — editable */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('status')}</label>
+            <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('status')}</label>
             <select
               value={statusCode}
               onChange={(e) => setStatusCode(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             >
               {STATUS_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
             {statusChanged && (
-              <p className="text-xs text-blue-600 font-medium mt-1">{t('inv_will_update')}</p>
+              <p className="text-[11.5px] text-[#C2492B] font-medium mt-1.5">{t('inv_will_update')}</p>
             )}
           </div>
 
@@ -153,19 +158,19 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
             <button
               onClick={onCancel}
               disabled={saving}
-              className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium disabled:opacity-50"
             >
               {t('cancel')}
             </button>
             <button
               onClick={handleConfirm}
               disabled={saving}
-              className="flex-[2] px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
+              className="flex-[2] px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
             >
               {saving ? t('saving') : (assignmentChanged || statusChanged) ? t('inv_save_and_confirm') : t('inv_confirm_audit')}
             </button>
           </div>
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-[11.5px] text-[#A29889] text-center">
             {t('inv_wrong_instrument_hint')}
           </p>
         </div>
