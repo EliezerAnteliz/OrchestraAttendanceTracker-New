@@ -497,21 +497,26 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[#FAF7F2] z-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-[#FFFDFA] border-b border-[#EAE3D6] p-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-900">{t('inv_photo_ocr_title')}</h2>
+            <h2
+              className="text-lg text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_photo_ocr_title')}
+            </h2>
             <button
               onClick={() => { stopCamera(); onClose(); }}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-[#6E675E] hover:bg-[#F4F0E8] rounded-lg transition-colors"
             >
-              <MdClose size={24} />
+              <MdClose size={22} />
             </button>
           </div>
 
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-[13px] text-[#8A8177] mb-3">
             {t('inv_photo_ocr_desc')}
           </p>
 
@@ -520,22 +525,22 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
             <div className="space-y-2">
               <button
                 onClick={startCamera}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
               >
-                <MdCameraAlt size={24} />
+                <MdCameraAlt size={22} />
                 {t('inv_open_camera')}
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
                 {t('inv_select_from_gallery')}
               </button>
               <button
                 onClick={() => setShowManualSearch(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
-                <MdSearch size={20} />
+                <MdSearch size={18} />
                 {t('inv_manual_search')}
               </button>
             </div>
@@ -579,7 +584,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
             <div className="flex gap-3 justify-center">
               <button
                 onClick={stopCamera}
-                className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+                className="px-6 py-3 bg-[#56504A] text-white rounded-lg hover:bg-[#3F3A35] transition-colors font-medium"
               >
                 {t('cancel')}
               </button>
@@ -599,27 +604,27 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
       {processing && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-            <p className="mt-4 text-gray-600">{t('inv_processing_image')}</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+            <p className="mt-4 text-[#8A8177]">{t('inv_processing_image')}</p>
           </div>
         </div>
       )}
 
       {/* OCR Result */}
       {ocrText && !processing && (
-        <div className="p-4 bg-blue-50 border-b border-blue-200">
+        <div className="p-4 bg-[#F4F0E8] border-b border-[#E7E0D2]">
           <div className="max-w-7xl mx-auto">
-            <div className="text-sm font-medium text-blue-900 mb-1">{t('inv_text_detected')}</div>
-            <div className="text-sm text-blue-800">{ocrText}</div>
+            <div className="text-[13px] font-medium text-[#56504A] mb-1">{t('inv_text_detected')}</div>
+            <div className="text-[13px] text-[#6E675E]">{ocrText}</div>
           </div>
         </div>
       )}
 
       {/* Manual Search */}
       {showManualSearch && !processing && (
-        <div className="p-4 bg-gray-50 border-b border-gray-200">
+        <div className="p-4 bg-[#FAF7F2] border-b border-[#EFE9DD]">
           <div className="max-w-7xl mx-auto">
-            <div className="text-sm text-gray-700 mb-2">
+            <div className="text-[13px] text-[#56504A] mb-2">
               {ocrText ? t('inv_no_matches_search_manually') : t('inv_search_manually')}
             </div>
             <div className="flex gap-2">
@@ -629,12 +634,12 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
                 value={manualSearchTerm}
                 onChange={(e) => setManualSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleManualSearch()}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                className="flex-1 px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 autoFocus
               />
               <button
                 onClick={handleManualSearch}
-                className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
+                className="px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
               >
                 {t('inv_search_button')}
               </button>
@@ -647,34 +652,34 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
       {candidates.length > 0 && !processing && (
         <div className="flex-1 overflow-y-auto p-4">
           <div className="max-w-7xl mx-auto space-y-2">
-            <div className="text-sm font-medium text-gray-700 mb-2">
+            <div className="text-[13px] font-medium text-[#56504A] mb-2">
               {t('inv_select_correct_asset', { n: candidates.length })}
             </div>
             {candidates.map((asset) => (
               <button
                 key={asset.id}
                 onClick={() => handleSelectAsset(asset)}
-                className="w-full bg-white border border-gray-200 rounded-lg p-3 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                className="w-full bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg p-3.5 text-left hover:border-[#C2492B]/40 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <div className="font-medium text-gray-900">{asset.description}</div>
+                  <div className="font-medium text-[#1B1917]">{asset.description}</div>
                   {asset.current_program_id && asset.current_program_id !== programId && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 font-medium flex-shrink-0">
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#F6EFDF] text-[#8A6A22] font-medium flex-shrink-0">
                       {t('inv_other_site_badge')}
                     </span>
                   )}
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="text-[12.5px] text-[#8A8177] mt-1">
                   {highlightMatch(asset.full_code, candidateHighlightTerms) || t('inv_no_code')}
-                  {asset.brand && <> • {highlightMatch(asset.brand, candidateHighlightTerms)}</>}
+                  {asset.brand && <> · {highlightMatch(asset.brand, candidateHighlightTerms)}</>}
                 </div>
                 {asset.serial_number && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-[11.5px] text-[#8A8177] mt-1">
                     {t('inv_serial_colon')} {highlightMatch(asset.serial_number, candidateHighlightTerms)}
                   </div>
                 )}
                 {asset.assigned_to_text && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-[11.5px] text-[#8A8177]">
                     {t('inv_assigned_to_colon')} {highlightMatch(asset.assigned_to_text, candidateHighlightTerms)}
                   </div>
                 )}
@@ -688,7 +693,7 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
                 setOcrText('');
                 setShowManualSearch(true);
               }}
-              className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+              className="w-full px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors text-[13px]"
             >
               {t('inv_none_of_these_search_again')}
             </button>
