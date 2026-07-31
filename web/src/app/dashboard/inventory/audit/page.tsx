@@ -15,7 +15,7 @@ import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useInventoryHeaderActions } from '../layout';
+import { useInventoryHeaderActions } from '../InventoryHeaderActions';
 
 
 interface Program {
