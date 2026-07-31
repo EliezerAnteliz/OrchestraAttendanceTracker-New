@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdEdit, MdDelete, MdUpload, MdClose, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -1040,7 +1040,10 @@ export default function StudentsPage() {
                           <div className="space-y-3">
                             {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
                               isEditMode ? (
-                                <div key={index} className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6] space-y-3">
+                                <div
+                                  key={index}
+                                  className={index > 0 ? 'pt-3 mt-3 border-t border-[#EFE9DD] space-y-3' : 'space-y-3'}
+                                >
                                   <div>
                                     <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                                       {t('parent_name')}
@@ -1052,27 +1055,29 @@ export default function StudentsPage() {
                                       className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
                                     />
                                   </div>
-                                  <div>
-                                    <label className="text-[12.5px] text-[#8A8177] mb-1 block">
-                                      {t('phone')}
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={parent.phone_number || ''}
-                                      onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="text-[12.5px] text-[#8A8177] mb-1 block">
-                                      {t('email')}
-                                    </label>
-                                    <input
-                                      type="email"
-                                      value={parent.email || ''}
-                                      onChange={(e) => handleParentChange(index, 'email', e.target.value)}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
-                                    />
+                                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                    <div>
+                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                        {t('phone')}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={parent.phone_number || ''}
+                                        onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                        {t('email')}
+                                      </label>
+                                      <input
+                                        type="email"
+                                        value={parent.email || ''}
+                                        onChange={(e) => handleParentChange(index, 'email', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                      />
+                                    </div>
                                   </div>
                                 </div>
                               ) : (
@@ -1170,23 +1175,18 @@ export default function StudentsPage() {
             <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl border border-[#E3DDD1] shadow-xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[90vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-7 py-4 sm:py-5 border-b border-[#E3DDD1]">
+                <div className="px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px] border-b border-[#E3DDD1]">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="p-1.5 sm:p-2 bg-[#EFE9DD] rounded-lg">
-                        <MdAdd size={20} className="sm:w-6 sm:h-6 text-[#C2492B]" />
-                      </div>
-                      <div>
-                        <h2
-                          className="text-xl sm:text-2xl text-[#1B1917]"
-                          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
-                        >
-                          {t('new_student')}
-                        </h2>
-                        <p className="text-xs sm:text-sm text-[#8A8177]">
-                          {t('complete_student_info')}
-                        </p>
-                      </div>
+                    <div>
+                      <h2
+                        className="text-2xl sm:text-[32px] leading-none text-[#1B1917]"
+                        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                      >
+                        {t('new_student')}
+                      </h2>
+                      <p className="text-[12.5px] text-[#8A8177] mt-1.5">
+                        {t('complete_student_info')}
+                      </p>
                     </div>
                     <button
                       onClick={closeNewStudentModal}
@@ -1197,16 +1197,18 @@ export default function StudentsPage() {
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-7">
+                {/* Content — mismo patrón sin caja/borde por sección que el modal
+                    de ficha de estudiante: solo etiqueta en mayúsculas + línea
+                    divisoria, para que ambos modales se vean como el mismo modelo. */}
+                <div className="flex-1 overflow-y-auto p-4 sm:px-[30px] sm:py-[26px]">
                   <div className="space-y-4 sm:space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-[26px]">
                     {/* Información Personal */}
-                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
-                        <MdPerson className="mr-2 text-[#C2492B]" size={14} />
+                    <div>
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                         {t('personal_info')}
                       </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('first_name')} <span className="text-red-500">*</span>
@@ -1231,6 +1233,8 @@ export default function StudentsPage() {
                             placeholder={t('last_name_placeholder')}
                           />
                         </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
                         <div>
                           <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('age') || 'Edad'}
@@ -1275,9 +1279,8 @@ export default function StudentsPage() {
                     </div>
 
                     {/* Información de Orquesta */}
-                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
-                        <MdMusicNote className="mr-2 text-[#C2492B]" size={14} />
+                    <div>
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                         {t('orchestra_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -1347,11 +1350,11 @@ export default function StudentsPage() {
                         </div>
                       </div>
                     </div>
+                    </div>
 
                     {/* Información de Padres */}
-                    <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
-                        <MdContacts className="mr-2 text-[#C2492B]" size={14} />
+                    <div>
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                         {t('parent_contact_info')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -1397,7 +1400,7 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-4 sm:px-7 py-3 sm:py-5 border-t border-[#E3DDD1]">
+                <div className="px-4 sm:px-[30px] py-3 sm:pt-[18px] sm:pb-[24px] border-t border-[#E3DDD1]">
                   <div className="flex justify-end items-center gap-2">
                     <button
                       onClick={closeNewStudentModal}
