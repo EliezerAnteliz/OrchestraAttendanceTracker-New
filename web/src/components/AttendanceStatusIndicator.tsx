@@ -1,49 +1,49 @@
 import React from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface AttendanceStatusIndicatorProps {
   statusCode: string | null | undefined;
 }
 
+// Paleta de badges tomada del sistema de diseño cálido (SiteTrack App.dc.html,
+// método badge(kind)): pastilla lisa con texto/fondo por estado, sin punto de color.
 const AttendanceStatusIndicator: React.FC<AttendanceStatusIndicatorProps> = ({ statusCode }) => {
-  if (!statusCode || (typeof statusCode === 'string' && statusCode.trim() === '')) {
-    return <span className="text-sm font-medium text-gray-900">No registrado</span>;
-  }
+  const { t } = useI18n();
 
-  let displayName = "";
-  let bgColor = "";
-  let dotColor = "";
-  let textColor = "text-sm font-medium text-gray-900";
+  let label = t('not_recorded');
+  let color = '#8A8177';
+  let bg = '#F1EDE4';
 
-  switch (statusCode.toUpperCase()) {
-    case "A":
-      displayName = "Asistió";
-      bgColor = "bg-green-100";
-      dotColor = "bg-green-500";
-      textColor = "text-sm font-medium text-green-800";
-      break;
-    case "EA":
-      displayName = "Excusa";
-      bgColor = "bg-yellow-100";
-      dotColor = "bg-yellow-500";
-      textColor = "text-sm font-medium text-yellow-800";
-      break;
-    case "UA":
-      displayName = "Falta";
-      bgColor = "bg-red-100";
-      dotColor = "bg-red-500";
-      textColor = "text-sm font-medium text-red-800";
-      break;
-    default:
-      displayName = statusCode;
-      bgColor = "bg-gray-100";
-      dotColor = "bg-gray-500";
-      textColor = "text-sm font-medium text-gray-900";
+  if (statusCode && typeof statusCode === 'string' && statusCode.trim() !== '') {
+    switch (statusCode.toUpperCase()) {
+      case 'A':
+        label = t('status_present');
+        color = '#5F7A57';
+        bg = '#EDF1E9';
+        break;
+      case 'EA':
+        label = t('status_excused');
+        color = '#8A6A22';
+        bg = '#F6EFDF';
+        break;
+      case 'UA':
+        label = t('status_unexcused');
+        color = '#A8402A';
+        bg = '#F8E9E4';
+        break;
+      default:
+        label = statusCode;
+        color = '#8A8177';
+        bg = '#F1EDE4';
+    }
   }
 
   return (
-    <span className={`inline-flex items-center space-x-2 px-2 py-1 rounded ${bgColor}`}>
-      <span className={`inline-block w-3 h-3 rounded-full ${dotColor}`}></span>
-      <span className={`${textColor}`}>{displayName}</span>
+    <span
+      className="inline-flex items-center text-[12px] font-medium"
+      style={{ borderRadius: 20, padding: '5px 11px', background: bg, color }}
+    >
+      {label}
     </span>
   );
 };
