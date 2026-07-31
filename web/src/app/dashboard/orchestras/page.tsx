@@ -3,7 +3,7 @@
 // Sistema de gestión de orquestas - Versión 1.0
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { MdAdd, MdEdit, MdDelete, MdMusicNote, MdSearch, MdPeople, MdPersonAdd, MdClose, MdCheckBox, MdCheckBoxOutlineBlank, MdVisibility, MdSwapHoriz, MdRemoveCircle } from 'react-icons/md';
+import { MdMusicNote, MdSearch, MdPeople, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -396,206 +396,211 @@ export default function OrchestrasPage() {
     );
   }
 
+  const totalAssigned = orchestras.reduce((sum, o) => sum + (o.student_count || 0), 0);
+
   return (
-    <div className="p-4 md:p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {lang === 'es' ? 'Gestión de Orquestas' : 'Orchestra Management'}
-        </h1>
-        
-        {isAdmin && (
-          <button
-            onClick={() => {
-              setEditingOrchestra(null);
-              setFormData({ name: '', description: '', is_active: true });
-              setShowModal(true);
-            }}
-            className="bg-[#C2492B] text-white px-4 py-2 rounded-md flex items-center hover:bg-[#A83A20] transition-colors"
-          >
-            <MdAdd className="mr-2" size={20} />
-            {lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra'}
-          </button>
-        )}
-      </div>
+    <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
+      <div className="max-w-[1420px] mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-7 pb-5 sm:pb-[22px] border-b border-[#E3DDD1]">
+          <div>
+            <h1
+              className="text-[28px] sm:text-[40px] leading-[1.05] text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {lang === 'es' ? 'Orquestas' : 'Orchestras'}
+            </h1>
+            <p className="text-[#8A8177] mt-2 text-sm">
+              {orchestras.length} {lang === 'es' ? 'orquestas' : 'ensembles'} · {totalAssigned} {lang === 'es' ? 'estudiantes asignados' : 'students assigned'}
+              {activeProgram?.name ? ` · ${activeProgram.name}` : ''}
+            </p>
+          </div>
 
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative">
-          <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder={lang === 'es' ? 'Buscar orquesta...' : 'Search orchestra...'}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-          />
-        </div>
-      </div>
-
-      {/* Orchestras Grid */}
-      {filteredOrchestras.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <MdMusicNote className="mx-auto text-gray-400 mb-4" size={48} />
-          <p className="text-gray-600">
-            {searchTerm 
-              ? (lang === 'es' ? 'No se encontraron orquestas' : 'No orchestras found')
-              : (lang === 'es' ? 'No hay orquestas creadas' : 'No orchestras created yet')
-            }
-          </p>
-          {isAdmin && !searchTerm && (
+          {isAdmin && (
             <button
               onClick={() => {
                 setEditingOrchestra(null);
                 setFormData({ name: '', description: '', is_active: true });
                 setShowModal(true);
               }}
-              className="mt-4 bg-[#C2492B] text-white px-6 py-2 rounded-md hover:bg-[#A83A20] transition-colors"
+              className="bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors w-full sm:w-auto"
             >
-              {lang === 'es' ? 'Crear Primera Orquesta' : 'Create First Orchestra'}
+              {lang === 'es' ? 'Nueva Orquesta' : 'New orchestra'}
             </button>
           )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredOrchestras.map((orchestra) => (
-            <div
-              key={orchestra.id}
-              className={`bg-white rounded-lg shadow-md p-6 border-l-4 transition-shadow hover:shadow-lg ${
-                orchestra.is_active ? 'border-blue-500' : 'border-gray-300 opacity-60'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {orchestra.name}
-                  </h3>
-                  {!orchestra.is_active && (
-                    <span className="text-xs text-red-600 font-medium">
-                      {lang === 'es' ? 'Inactiva' : 'Inactive'}
-                    </span>
+
+        {/* Search */}
+        <div className="relative mt-[22px]">
+          <input
+            type="text"
+            placeholder={lang === 'es' ? 'Buscar orquesta…' : 'Search orchestra…'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-[14px] py-3 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium"
+          />
+          <MdSearch className="absolute left-3 top-3.5 text-[#A29889]" size={18} />
+        </div>
+
+        {/* Orchestras Grid */}
+        {filteredOrchestras.length === 0 ? (
+          <div className="text-center py-12 mt-[18px]">
+            <MdMusicNote className="mx-auto text-[#A29889] mb-3" size={40} />
+            <p className="text-[#8A8177] font-medium">
+              {searchTerm
+                ? (lang === 'es' ? 'No se encontraron orquestas' : 'No orchestras found')
+                : (lang === 'es' ? 'No hay orquestas creadas' : 'No orchestras created yet')
+              }
+            </p>
+            {isAdmin && !searchTerm && (
+              <button
+                onClick={() => {
+                  setEditingOrchestra(null);
+                  setFormData({ name: '', description: '', is_active: true });
+                  setShowModal(true);
+                }}
+                className="mt-4 bg-[#C2492B] text-[#FAF7F2] px-6 py-2.5 rounded-lg font-medium hover:bg-[#A83A20] transition-colors"
+              >
+                {lang === 'es' ? 'Crear Primera Orquesta' : 'Create First Orchestra'}
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-4 mt-[18px]">
+            {filteredOrchestras.map((orchestra) => (
+              <div
+                key={orchestra.id}
+                className={`bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-6 pt-[22px] pb-5 flex flex-col gap-[18px] ${!orchestra.is_active ? 'opacity-70' : ''}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div
+                      className="text-[26px] text-[#1B1917] leading-tight"
+                      style={{ fontFamily: 'var(--font-newsreader), serif', letterSpacing: '-0.015em' }}
+                    >
+                      {orchestra.name}
+                    </div>
+                    {/* Nota: aquí el mockup muestra un texto de horario/nivel ficticio
+                        (ej. "Intermediate strings · Tue / Thu") que no manejamos en
+                        nuestros datos — mostramos la descripción real o el estado. */}
+                    {orchestra.description ? (
+                      <div className="text-[12.5px] text-[#8A8177] mt-1">{orchestra.description}</div>
+                    ) : !orchestra.is_active ? (
+                      <div className="text-[12.5px] text-[#A8402A] mt-1">{lang === 'es' ? 'Inactiva' : 'Inactive'}</div>
+                    ) : null}
+                  </div>
+
+                  {isAdmin && (
+                    <div className="flex gap-3.5 text-[12.5px] flex-shrink-0">
+                      <button
+                        onClick={() => handleEdit(orchestra)}
+                        className="text-[#8A8177] hover:text-[#C2492B] transition-colors"
+                      >
+                        {lang === 'es' ? 'Editar' : 'Edit'}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(orchestra)}
+                        className="text-[#8A8177] hover:text-[#A8402A] transition-colors"
+                      >
+                        {lang === 'es' ? 'Eliminar' : 'Delete'}
+                      </button>
+                    </div>
                   )}
                 </div>
-                
-                {isAdmin && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(orchestra)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                      title={lang === 'es' ? 'Editar' : 'Edit'}
-                    >
-                      <MdEdit size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(orchestra)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                      title={lang === 'es' ? 'Eliminar' : 'Delete'}
-                    >
-                      <MdDelete size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
 
-              {orchestra.description && (
-                <p className="text-gray-600 text-sm mb-4">{orchestra.description}</p>
-              )}
-
-              <div className="flex items-center text-gray-700 bg-gray-50 rounded-md p-3 mb-3">
-                <div className="bg-blue-100 p-2 rounded-full mr-2 flex-shrink-0">
-                  <MdPeople className="text-blue-600" size={18} />
-                </div>
-                <span className="font-medium">
-                  {orchestra.student_count || 0} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <button
-                  onClick={() => handleViewStudents(orchestra)}
-                  className="w-full px-4 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors flex items-center justify-center font-medium"
-                >
-                  <MdVisibility className="mr-2" size={18} />
-                  {lang === 'es' ? 'Ver Estudiantes' : 'View Students'}
-                </button>
-                
-                {isAdmin && (
-                  <button
-                    onClick={() => handleAssignStudents(orchestra)}
-                    className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center font-medium"
+                <div className="flex items-baseline gap-2.5">
+                  <span
+                    className="text-[40px] leading-none text-[#1B1917]"
+                    style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
                   >
-                    <MdPersonAdd className="mr-2" size={18} />
-                    {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
+                    {orchestra.student_count || 0}
+                  </span>
+                  <span className="text-[13px] text-[#8A8177]">
+                    {lang === 'es' ? 'estudiantes' : 'students'}
+                  </span>
+                </div>
+
+                <div className="flex gap-2.5 border-t border-[#EFE9DD] pt-4">
+                  <button
+                    onClick={() => handleViewStudents(orchestra)}
+                    className="flex-1 border border-[#DED7C9] rounded-lg py-2.5 text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium"
+                  >
+                    {lang === 'es' ? 'Ver Estudiantes' : 'View students'}
                   </button>
-                )}
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleAssignStudents(orchestra)}
+                      className="flex-1 bg-[#C2492B] text-[#FAF7F2] rounded-lg py-2.5 font-medium hover:bg-[#A83A20] transition-colors"
+                    >
+                      {lang === 'es' ? 'Asignar Estudiantes' : 'Assign students'}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full overflow-hidden">
+          <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-[#E3DDD1]">
             {/* Header */}
-            <div className="px-6 py-4 bg-white border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    {editingOrchestra ? <MdEdit size={20} className="text-blue-600" /> : <MdAdd size={20} className="text-blue-600" />}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {editingOrchestra
-                        ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
-                        : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
-                      }
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {lang === 'es' ? 'Completa la información de la orquesta' : 'Complete orchestra information'}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setEditingOrchestra(null);
-                    setFormData({ name: '', description: '', is_active: true });
-                  }}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px]">
+              <div>
+                <h2
+                  className="text-2xl leading-none text-[#1B1917]"
+                  style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
                 >
-                  <MdClose size={20} />
-                </button>
+                  {editingOrchestra
+                    ? (lang === 'es' ? 'Editar Orquesta' : 'Edit Orchestra')
+                    : (lang === 'es' ? 'Nueva Orquesta' : 'New Orchestra')
+                  }
+                </h2>
+                <p className="text-[12.5px] text-[#8A8177] mt-1.5">
+                  {lang === 'es' ? 'Completa la información de la orquesta' : 'Complete orchestra information'}
+                </p>
               </div>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingOrchestra(null);
+                  setFormData({ name: '', description: '', is_active: true });
+                }}
+                className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
+              >
+                <MdClose size={18} />
+              </button>
             </div>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="px-4 sm:px-[30px] py-[26px]">
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[12.5px] text-[#8A8177] mb-1">
                       {lang === 'es' ? 'Nombre' : 'Name'} *
                     </label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                       placeholder={lang === 'es' ? 'Ej: Mozart, Beethoven' : 'Ex: Mozart, Beethoven'}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-[12.5px] text-[#8A8177] mb-1">
                       {lang === 'es' ? 'Descripción' : 'Description'}
                     </label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                       rows={3}
                       placeholder={lang === 'es' ? 'Descripción opcional' : 'Optional description'}
                     />
@@ -609,13 +614,13 @@ export default function OrchestrasPage() {
                       onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                       className="w-4 h-4 text-[#C2492B] border-gray-300 rounded focus:ring-[#C2492B]"
                     />
-                    <label htmlFor="is_active" className="ml-2 text-sm text-gray-700">
+                    <label htmlFor="is_active" className="ml-2 text-sm text-[#56504A]">
                       {lang === 'es' ? 'Orquesta activa' : 'Active orchestra'}
                     </label>
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 mt-6">
+                <div className="flex justify-end gap-2 mt-6">
                   <button
                     type="button"
                     onClick={() => {
@@ -623,16 +628,15 @@ export default function OrchestrasPage() {
                       setEditingOrchestra(null);
                       setFormData({ name: '', description: '', is_active: true });
                     }}
-                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                    className="px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                   >
                     {lang === 'es' ? 'Cancelar' : 'Cancel'}
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#C2492B] text-white rounded-md hover:bg-[#A83A20] transition-colors flex items-center"
+                    className="px-4 py-2.5 text-sm bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
                   >
-                    {editingOrchestra ? <MdEdit className="mr-2" size={18} /> : <MdAdd className="mr-2" size={18} />}
-                    {editingOrchestra 
+                    {editingOrchestra
                       ? (lang === 'es' ? 'Actualizar' : 'Update')
                       : (lang === 'es' ? 'Crear' : 'Create')
                     }
@@ -647,80 +651,69 @@ export default function OrchestrasPage() {
       {/* Modal de Asignación de Estudiantes */}
       {showAssignModal && assigningOrchestra && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-[#E3DDD1]">
             {/* Header */}
-            <div className="px-6 py-4 bg-white border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <MdPersonAdd size={20} className="text-green-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
-                      <span className="font-semibold">{assigningOrchestra.name}</span>
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowAssignModal(false);
-                    setAssigningOrchestra(null);
-                    setSelectedStudents(new Set());
-                  }}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px]">
+              <div>
+                <h2
+                  className="text-2xl leading-none text-[#1B1917]"
+                  style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
                 >
-                  <MdClose size={20} />
-                </button>
+                  {lang === 'es' ? 'Asignar Estudiantes' : 'Assign Students'}
+                </h2>
+                <p className="text-[12.5px] text-[#8A8177] mt-1.5">
+                  {lang === 'es' ? 'Orquesta: ' : 'Orchestra: '}
+                  <span className="font-medium text-[#C2492B]">{assigningOrchestra.name}</span>
+                </p>
               </div>
+              <button
+                onClick={() => {
+                  setShowAssignModal(false);
+                  setAssigningOrchestra(null);
+                  setSelectedStudents(new Set());
+                }}
+                className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
+              >
+                <MdClose size={18} />
+              </button>
             </div>
 
             {/* Search and Select All */}
-            <div className="p-4 border-b border-gray-200 space-y-3">
+            <div className="px-4 sm:px-[30px] py-4 border-b border-[#E3DDD1] space-y-3">
               <div className="relative">
-                <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#A29889]" size={18} />
                 <input
                   type="text"
                   placeholder={lang === 'es' ? 'Buscar estudiante...' : 'Search student...'}
                   value={studentSearchTerm}
                   onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] text-gray-900"
+                  className="w-full pl-10 pr-[14px] py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <button
                   onClick={toggleSelectAll}
-                  className="flex items-center text-sm text-green-600 hover:text-green-700 font-medium"
+                  className="text-[13px] text-[#8A8177] hover:text-[#C2492B] font-medium transition-colors"
                 >
-                  {selectedStudents.size === filteredAvailableStudents.length && filteredAvailableStudents.length > 0 ? (
-                    <>
-                      <MdCheckBox className="mr-1" size={20} />
-                      {lang === 'es' ? 'Deseleccionar todos' : 'Deselect all'}
-                    </>
-                  ) : (
-                    <>
-                      <MdCheckBoxOutlineBlank className="mr-1" size={20} />
-                      {lang === 'es' ? 'Seleccionar todos' : 'Select all'}
-                    </>
-                  )}
+                  {selectedStudents.size === filteredAvailableStudents.length && filteredAvailableStudents.length > 0
+                    ? (lang === 'es' ? 'Deseleccionar todos' : 'Deselect all')
+                    : (lang === 'es' ? 'Seleccionar todos' : 'Select all')
+                  }
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-[13px] text-[#6E675E]">
                   {selectedStudents.size} {lang === 'es' ? 'seleccionado(s)' : 'selected'}
                 </span>
               </div>
             </div>
 
             {/* Students List */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-[30px] py-4">
               {filteredAvailableStudents.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <MdPeople className="mx-auto mb-3 text-gray-400" size={48} />
+                <div className="text-center py-12 text-[#8A8177]">
+                  <MdPeople className="mx-auto mb-3 text-[#A29889]" size={40} />
                   <p>
-                    {studentSearchTerm 
+                    {studentSearchTerm
                       ? (lang === 'es' ? 'No se encontraron estudiantes' : 'No students found')
                       : (lang === 'es' ? 'No hay estudiantes disponibles sin orquesta' : 'No students available without orchestra')
                     }
@@ -732,29 +725,18 @@ export default function OrchestrasPage() {
                     <div
                       key={student.id}
                       onClick={() => toggleStudentSelection(student.id)}
-                      className={`p-3 border-2 rounded-md cursor-pointer transition-all ${
+                      className={`px-4 py-3 border rounded-lg cursor-pointer transition-colors ${
                         selectedStudents.has(student.id)
-                          ? 'border-green-500 bg-green-50'
-                          : 'border-gray-200 hover:border-green-300 hover:bg-gray-50'
+                          ? 'border-[#C2492B] bg-[#FBF2ED]'
+                          : 'border-[#EAE3D6] bg-[#FFFDFA] hover:border-[#D6C9BB]'
                       }`}
                     >
-                      <div className="flex items-center">
-                        <div className="mr-3">
-                          {selectedStudents.has(student.id) ? (
-                            <MdCheckBox className="text-green-600" size={24} />
-                          ) : (
-                            <MdCheckBoxOutlineBlank className="text-gray-400" size={24} />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">
-                            {student.first_name} {student.last_name}
-                          </p>
-                          {student.instrument && (
-                            <p className="text-sm text-gray-600">{student.instrument}</p>
-                          )}
-                        </div>
-                      </div>
+                      <p className="text-[14.5px] font-medium text-[#1B1917]">
+                        {student.first_name} {student.last_name}
+                      </p>
+                      {student.instrument && (
+                        <p className="text-[12.5px] text-[#8A8177] mt-0.5">{student.instrument}</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -762,15 +744,15 @@ export default function OrchestrasPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-end gap-3">
+            <div className="px-4 sm:px-[30px] py-3 sm:pt-[18px] sm:pb-[24px] border-t border-[#E3DDD1]">
+              <div className="flex justify-end gap-2">
                 <button
                   onClick={() => {
                     setShowAssignModal(false);
                     setAssigningOrchestra(null);
                     setSelectedStudents(new Set());
                   }}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                   disabled={assigningStudents}
                 >
                   {lang === 'es' ? 'Cancelar' : 'Cancel'}
@@ -778,7 +760,7 @@ export default function OrchestrasPage() {
                 <button
                   onClick={handleConfirmAssignment}
                   disabled={assigningStudents || selectedStudents.size === 0}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+                  className="px-4 py-2.5 text-sm bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:bg-[#DED7C9] disabled:text-[#A29889] disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {assigningStudents ? (
                     <>
@@ -786,10 +768,7 @@ export default function OrchestrasPage() {
                       {lang === 'es' ? 'Asignando...' : 'Assigning...'}
                     </>
                   ) : (
-                    <>
-                      <MdPersonAdd className="mr-2" size={18} />
-                      {lang === 'es' ? `Asignar ${selectedStudents.size} estudiante(s)` : `Assign ${selectedStudents.size} student(s)`}
-                    </>
+                    lang === 'es' ? `Asignar ${selectedStudents.size} estudiante(s)` : `Assign ${selectedStudents.size} student(s)`
                   )}
                 </button>
               </div>
@@ -801,86 +780,79 @@ export default function OrchestrasPage() {
       {/* Modal para Ver Estudiantes de la Orquesta */}
       {showStudentsModal && viewingOrchestra && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-[#E3DDD1]">
             {/* Header */}
-            <div className="px-6 py-4 bg-white border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <MdVisibility size={20} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {viewingOrchestra.name}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {orchestraStudents.length} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowStudentsModal(false);
-                    setViewingOrchestra(null);
-                    setOrchestraStudents([]);
-                  }}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px]">
+              <div>
+                <h2
+                  className="text-2xl leading-none text-[#1B1917]"
+                  style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
                 >
-                  <MdClose size={20} />
-                </button>
+                  {viewingOrchestra.name}
+                </h2>
+                <p className="text-[12.5px] text-[#8A8177] mt-1.5">
+                  {orchestraStudents.length} {lang === 'es' ? 'estudiante(s)' : 'student(s)'}
+                </p>
               </div>
+              <button
+                onClick={() => {
+                  setShowStudentsModal(false);
+                  setViewingOrchestra(null);
+                  setOrchestraStudents([]);
+                }}
+                className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
+              >
+                <MdClose size={18} />
+              </button>
             </div>
 
             {/* Students List */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-[30px] py-[26px]">
               {loadingStudents ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
                 </div>
               ) : orchestraStudents.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <MdPeople className="mx-auto mb-3 text-gray-400" size={48} />
+                <div className="text-center py-12 text-[#8A8177]">
+                  <MdPeople className="mx-auto mb-3 text-[#A29889]" size={40} />
                   <p>{lang === 'es' ? 'No hay estudiantes en esta orquesta' : 'No students in this orchestra'}</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {orchestraStudents.map((student) => (
                     <div
                       key={student.id}
-                      className="p-4 rounded-lg shadow-sm hover:shadow-md border-l-4 border-blue-400 transition-all bg-white"
+                      className="px-4 py-3.5 rounded-lg border border-[#EAE3D6] bg-[#FFFDFA]"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-800 text-lg">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[15px] font-medium text-[#1B1917] truncate">
                             {student.first_name} {student.last_name}
                           </p>
                           {student.instrument && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {lang === 'es' ? 'Instrumento: ' : 'Instrument: '}
-                              <span className="font-medium">{student.instrument}</span>
+                            <p className="text-[12.5px] text-[#8A8177] mt-0.5">
+                              {student.instrument}
                             </p>
                           )}
                         </div>
-                        
+
                         {isAdmin && (
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <button
                               onClick={() => {
                                 setStudentToMove(student);
                                 setTargetOrchestra('');
                               }}
-                              className="px-3 py-2 bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
+                              className="px-3 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors text-[13px]"
                               title={lang === 'es' ? 'Cambiar de orquesta' : 'Change orchestra'}
                             >
-                              <MdSwapHoriz size={18} className="mr-1" />
                               {lang === 'es' ? 'Cambiar' : 'Move'}
                             </button>
                             <button
                               onClick={() => handleRemoveStudent(student)}
-                              className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:shadow-md transform hover:scale-[1.01] transition-all duration-200 flex items-center text-sm"
+                              className="px-3 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#A8402A] hover:text-[#A8402A] transition-colors text-[13px]"
                               title={lang === 'es' ? 'Remover de orquesta' : 'Remove from orchestra'}
                             >
-                              <MdRemoveCircle size={18} className="mr-1" />
                               {lang === 'es' ? 'Remover' : 'Remove'}
                             </button>
                           </div>
@@ -889,15 +861,15 @@ export default function OrchestrasPage() {
 
                       {/* Mini modal para cambiar de orquesta */}
                       {studentToMove?.id === student.id && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <p className="text-sm font-medium text-gray-700 mb-2">
+                        <div className="mt-3 pt-3 border-t border-[#EFE9DD]">
+                          <p className="text-[12.5px] text-[#8A8177] mb-2">
                             {lang === 'es' ? 'Mover a:' : 'Move to:'}
                           </p>
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <select
                               value={targetOrchestra}
                               onChange={(e) => setTargetOrchestra(e.target.value)}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                              className="flex-1 appearance-none px-[14px] py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] text-[#1B1917] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
                             >
                               <option value="">{lang === 'es' ? 'Seleccionar orquesta...' : 'Select orchestra...'}</option>
                               <option value="none">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</option>
@@ -911,7 +883,7 @@ export default function OrchestrasPage() {
                             <button
                               onClick={handleMoveStudent}
                               disabled={!targetOrchestra}
-                              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              className="px-4 py-2.5 text-sm bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:bg-[#DED7C9] disabled:text-[#A29889] disabled:cursor-not-allowed"
                             >
                               {lang === 'es' ? 'Confirmar' : 'Confirm'}
                             </button>
@@ -920,7 +892,7 @@ export default function OrchestrasPage() {
                                 setStudentToMove(null);
                                 setTargetOrchestra('');
                               }}
-                              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                              className="px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
                             >
                               {lang === 'es' ? 'Cancelar' : 'Cancel'}
                             </button>
@@ -934,14 +906,14 @@ export default function OrchestrasPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="px-4 sm:px-[30px] py-3 sm:pt-[18px] sm:pb-[24px] border-t border-[#E3DDD1]">
               <button
                 onClick={() => {
                   setShowStudentsModal(false);
                   setViewingOrchestra(null);
                   setOrchestraStudents([]);
                 }}
-                className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                className="w-full px-4 py-2.5 text-sm border border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] rounded-lg transition-colors font-medium"
               >
                 {lang === 'es' ? 'Cerrar' : 'Close'}
               </button>
