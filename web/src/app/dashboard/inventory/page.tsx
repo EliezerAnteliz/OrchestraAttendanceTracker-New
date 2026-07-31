@@ -10,9 +10,10 @@
 import { useEffect, useState } from 'react';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdInventory, MdCheckCircle, MdBuild, MdWarning, MdTrendingUp, MdSwapHoriz, MdArchive } from 'react-icons/md';
+import { MdWarning, MdSwapHoriz, MdArchive } from 'react-icons/md';
 import Link from 'next/link';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -97,6 +98,7 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function InventoryDashboard() {
   const { t, lang } = useI18n();
+  const { isAdmin } = useUserRole();
   const [stats, setStats] = useState<DashboardStats>({
     total: 0,
     available: 0,
@@ -299,10 +301,10 @@ export default function InventoryDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_loading_dashboard')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_loading_dashboard')}</p>
         </div>
       </div>
     );
@@ -310,117 +312,83 @@ export default function InventoryDashboard() {
 
   if (error) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">❌ Error: {error}</p>
-          <button
-            onClick={loadDashboardData}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            {t('inv_retry')}
-          </button>
-        </div>
+      <div className="bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4">
+        <p className="text-[#8f3421]">{error}</p>
+        <button
+          onClick={loadDashboardData}
+          className="mt-3 px-4 py-2 bg-[#A8402A] text-white rounded-lg hover:bg-[#8f3421] transition-colors text-sm font-medium"
+        >
+          {t('inv_retry')}
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <MdInventory className="text-[#C2492B]" />
-          {t('inv_dashboard_title')}
-        </h1>
-        <p className="text-gray-600 mt-1">
-          {t('inv_dashboard_subtitle')}
-        </p>
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-          <div className="mt-2 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-            <MdWarning className="mr-2" />
-            {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-          </div>
+      <div className="pb-5 sm:pb-[22px] border-b border-[#E3DDD1] flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <h1
+            className="text-[28px] sm:text-[40px] text-[#1B1917] leading-[1.05]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          >
+            {t('inv_dashboard_title')}
+          </h1>
+          <p className="text-[13px] sm:text-[14px] text-[#8A8177] mt-1.5">
+            {t('inv_dashboard_subtitle')}
+          </p>
+          {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+            <div className="mt-2.5 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+              <MdWarning className="mr-2" size={14} />
+              {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
+            </div>
+          )}
+        </div>
+        {isAdmin && (
+          <Link
+            href="/dashboard/inventory/assets/new"
+            className="bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+          >
+            {t('inv_new_asset_button')}
+          </Link>
         )}
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-3">
-        {/* Total Assets */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">{t('inv_total_assets')}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total}</p>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-full">
-              <MdInventory className="text-blue-600" size={24} />
-            </div>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 mt-6">
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-[18px]">
+          <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_total_assets')}</div>
+          <div className="text-[42px] leading-[1.05] mt-3 text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{stats.total}</div>
         </div>
-
-        {/* Available */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">{t('inv_available_plural')}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.available}</p>
-            </div>
-            <div className="bg-green-100 p-3 rounded-full">
-              <MdCheckCircle className="text-green-600" size={24} />
-            </div>
-          </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-[18px]">
+          <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_available_plural')}</div>
+          <div className="text-[42px] leading-[1.05] mt-3 text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{stats.available}</div>
         </div>
-
-        {/* Assigned */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">{t('inv_assigned_plural')}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.assigned}</p>
-            </div>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <MdTrendingUp className="text-purple-600" size={24} />
-            </div>
-          </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-[18px]">
+          <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_assigned_plural')}</div>
+          <div className="text-[42px] leading-[1.05] mt-3 text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{stats.assigned}</div>
         </div>
-
-        {/* In Repair */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">{t('inv_in_repair_label')}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.repair}</p>
-            </div>
-            <div className="bg-orange-100 p-3 rounded-full">
-              <MdBuild className="text-orange-600" size={24} />
-            </div>
-          </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-[18px]">
+          <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_in_repair_label')}</div>
+          <div className="text-[42px] leading-[1.05] mt-3 text-[#C2492B]" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{stats.repair}</div>
         </div>
-
-        {/* On Loan */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-teal-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 font-medium">{t('inv_on_loan_plural')}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.onLoan}</p>
-            </div>
-            <div className="bg-teal-100 p-3 rounded-full">
-              <MdSwapHoriz className="text-teal-600" size={24} />
-            </div>
-          </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-[18px]">
+          <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_on_loan_plural')}</div>
+          <div className="text-[42px] leading-[1.05] mt-3 text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{stats.onLoan}</div>
         </div>
       </div>
 
       {/* Dados de baja — no se cuentan en las tarjetas de arriba (son
           inventario activo); se deja un indicador discreto en vez de
           otra tarjeta grande, ya que no es un estado "en uso". */}
-      <div className="mb-1">
+      <div className="mt-3">
         {stats.retired > 0 && (
           <Link
             href="/dashboard/inventory/assets?filter=retired"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-[#8A8177] hover:text-[#C2492B] transition-colors"
           >
-            <MdArchive size={16} />
+            <MdArchive size={14} />
             {t('inv_retired_count', { n: stats.retired, suffix: stats.retired === 1 ? '' : 's' })}
           </Link>
         )}
@@ -429,10 +397,10 @@ export default function InventoryDashboard() {
       {/* Prestados (Stafford/Academy) — no son propiedad de TOSA, se
           excluyen del "Total de Activos" de arriba y se muestran aparte,
           igual que "dados de baja". */}
-      <div className="mb-8">
+      <div className="mt-1">
         {stats.loaned > 0 && (
-          <p className="inline-flex items-center gap-1.5 text-sm text-gray-500">
-            <MdSwapHoriz size={16} />
+          <p className="inline-flex items-center gap-1.5 text-[12.5px] text-[#A29889]">
+            <MdSwapHoriz size={14} />
             {t('inv_loaned_footnote_breakdown', {
               stafford: stats.staffordCount,
               academy: stats.academyCount,
@@ -446,13 +414,13 @@ export default function InventoryDashboard() {
       {/* Por Sede — el total global no dice mucho en una app pensada
           para auditar sede por sede; aquí se ve de un vistazo cómo está
           cada una. Tarjetas (no tabla) para que combine visualmente con
-          las 4 tarjetas de resumen de arriba, y escale bien si se agregan
-          más sedes (grid en vez de columnas de tabla que se quedan vacías
-          con pocas filas). */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">{t('inv_by_site')}</h2>
+          las de resumen de arriba, y escale bien si se agregan más sedes
+          (grid en vez de columnas de tabla que se quedan vacías con pocas
+          filas). */}
+      <div className="mt-7">
+        <h2 className="text-[11.5px] uppercase tracking-[0.09em] font-medium text-[#8A8177] mb-3">{t('inv_by_site')}</h2>
         {stats.byProgram.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-8 text-center text-[#8A8177]">
             {t('inv_no_assets_registered_yet')}
           </div>
         ) : (
@@ -460,44 +428,42 @@ export default function InventoryDashboard() {
             {stats.byProgram.map((p) => {
               const content = (
                 <>
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900">{p.programName}</h3>
-                    <div className="text-right leading-none">
-                      <span className="text-2xl font-bold text-gray-900">{p.total}</span>
-                      <div className="text-[10px] uppercase tracking-wide text-gray-400 mt-1">{t('inv_own_label')}</div>
-                    </div>
+                  <div className="flex items-baseline justify-between gap-4">
+                    <span className="text-2xl text-[#1B1917]" style={{ fontFamily: 'var(--font-newsreader), serif' }}>{p.programName}</span>
+                    <span className="text-[34px] text-[#1B1917] leading-none" style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}>{p.total}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                  <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#A29889] mt-0.5">{t('inv_own_label')}</div>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <span className="border border-[#E3DDD1] rounded-full px-[11px] py-[5px] text-[12.5px] text-[#56504A]">
                       {p.available} {t('inv_available_plural')}
                     </span>
-                    <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                    <span className="border border-[#E3DDD1] rounded-full px-[11px] py-[5px] text-[12.5px] text-[#56504A]">
                       {p.assigned} {t('inv_assigned_plural')}
                     </span>
-                    <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
+                    <span className="border border-[#E3DDD1] rounded-full px-[11px] py-[5px] text-[12.5px] text-[#56504A]">
                       {p.repair} {t('inv_repair_label')}
                     </span>
                     {p.onLoan > 0 && (
-                      <span className="px-2 py-1 bg-teal-100 text-teal-800 rounded-full text-xs font-medium">
+                      <span className="border border-[#E3DDD1] rounded-full px-[11px] py-[5px] text-[12.5px] text-[#56504A]">
                         {p.onLoan} {t('inv_on_loan_plural')}
                       </span>
                     )}
                   </div>
                   {p.operational > p.total && (
                     <div className="mt-2">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 border border-indigo-200 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 border border-[#E3DDD1] rounded-full px-[11px] py-[5px] text-[12.5px] text-[#56504A]">
                         <MdSwapHoriz size={13} />
                         {t('inv_operational_breakdown', { total: p.total, academy: p.academy, operational: p.operational })}
                       </span>
                     </div>
                   )}
                   {p.programId !== 'none' && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                    <div className="border-t border-[#EFE9DD] mt-[18px] pt-[14px] text-[12.5px] text-[#8A8177]">
                       {p.lastAuditDate ? (
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                           <span>{t('inv_last_audit_colon')} {formatDate(p.lastAuditDate)}</span>
                           {p.lastAuditMissing !== null && p.lastAuditMissing > 0 && (
-                            <span className="px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-medium whitespace-nowrap">
+                            <span className="text-[#A8402A] whitespace-nowrap">
                               {t('inv_missing_of_expected', { missing: p.lastAuditMissing, total: p.operational, suffix: p.lastAuditMissing === 1 ? '' : 's' })}
                             </span>
                           )}
@@ -513,7 +479,7 @@ export default function InventoryDashboard() {
               return p.programId === 'none' ? (
                 <div
                   key={p.programId}
-                  className="bg-white rounded-lg shadow-sm p-5 border-l-4 border-dashed border-gray-300 opacity-75"
+                  className="bg-[#FFFDFA] border border-dashed border-[#DED7C9] rounded-xl px-5 py-[18px] opacity-70"
                 >
                   {content}
                 </div>
@@ -521,7 +487,7 @@ export default function InventoryDashboard() {
                 <Link
                   key={p.programId}
                   href={`/dashboard/inventory/assets?program=${p.programId}`}
-                  className="block bg-white rounded-lg shadow-md p-5 border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+                  className="block bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-5 py-[18px] hover:border-[#C2492B]/40 transition-colors"
                 >
                   {content}
                 </Link>
@@ -531,76 +497,40 @@ export default function InventoryDashboard() {
         )}
       </div>
 
-      {/* Recent Assets Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{t('inv_latest_assets_registered')}</h2>
+      {/* Recent Assets */}
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-[22px] pt-5 pb-2 mt-[18px] overflow-x-auto">
+        <div className="flex items-baseline justify-between gap-5">
+          <h2 className="text-[14.5px] font-medium text-[#1B1917]">{t('inv_latest_assets_registered')}</h2>
           <Link
             href="/dashboard/inventory/assets"
-            className="text-sm text-[#C2492B] hover:text-[#A83A20] font-medium"
+            className="text-[13px] text-[#C2492B] hover:text-[#A83A20] font-medium whitespace-nowrap"
           >
             {t('inv_view_all_arrow')}
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inv_code_column')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inv_description_column')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inv_brand_size_column')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('status')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inv_assigned_to')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {stats.recentAssets.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    {t('inv_no_assets_registered_yet')}
-                  </td>
-                </tr>
-              ) : (
-                stats.recentAssets.map((asset) => (
-                  <tr key={asset.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                      {asset.full_code || t('inv_no_code')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {asset.description}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {asset.brand || 'N/A'} {asset.size && `- ${asset.size}`}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        asset.status_code === 'available' ? 'bg-green-100 text-green-800' :
-                        asset.status_code === 'assigned' ? 'bg-purple-100 text-purple-800' :
-                        asset.status_code === 'repair' ? 'bg-orange-100 text-orange-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {getStatusLabel(asset.status_code, asset.asset_status?.description, t)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {asset.assigned_to_text || '-'}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+
+        {stats.recentAssets.length === 0 ? (
+          <p className="py-10 text-center text-[13.5px] text-[#A29889]">{t('inv_no_assets_registered_yet')}</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-[200px_minmax(0,1fr)_150px_170px_120px] min-w-[900px] gap-4 py-3 mt-2.5 border-b border-[#EFE9DD] text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
+              <span>{t('inv_code_column')}</span>
+              <span>{t('inv_description_column')}</span>
+              <span>{t('inv_brand_size_column')}</span>
+              <span>{t('status')}</span>
+              <span>{t('inv_assigned_to')}</span>
+            </div>
+            {stats.recentAssets.map((asset) => (
+              <div key={asset.id} className="grid grid-cols-[200px_minmax(0,1fr)_150px_170px_120px] min-w-[900px] gap-4 py-3.5 border-b border-[#F2ECE1] text-[13.5px] items-center">
+                <span className="tabular-nums text-[#56504A]">{asset.full_code || t('inv_no_code')}</span>
+                <span className="text-[#1B1917] truncate">{asset.description}</span>
+                <span className="text-[#56504A] truncate">{asset.brand || 'N/A'} {asset.size && `- ${asset.size}`}</span>
+                <span className="text-[#56504A]">{getStatusLabel(asset.status_code, asset.asset_status?.description, t)}</span>
+                <span className="text-[#8A8177] truncate">{asset.assigned_to_text || '-'}</span>
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
     </div>
