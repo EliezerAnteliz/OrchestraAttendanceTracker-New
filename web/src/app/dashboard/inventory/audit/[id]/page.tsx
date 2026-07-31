@@ -23,9 +23,11 @@ interface AuditSession {
   program_id: string;
   started_at: string;
   status: 'open' | 'closed' | 'cancelled';
-  programs?: {
-    name: string;
-  };
+  // El join de Supabase (`programs:program_id(name)`) a veces lo tipa como
+  // array y a veces como objeto según pueda inferir la relación 1-a-1 — el
+  // código ya lo maneja en tiempo de ejecución con Array.isArray() más
+  // abajo, esto solo corrige el tipo para que coincida.
+  programs?: { name: string } | { name: string }[];
 }
 
 interface AuditEvent {
