@@ -62,42 +62,36 @@ export default function StudentDetail() {
           setError(null);
           return;
         }
-        console.log('Consultando estudiante con ID:', params.id);
-        const { data: studentData, error: studentError } = await supabase
-          .from('students')
-          .select('*')
-          .eq('id', params.id)
-          .eq('program_id', activeProgram.id)
-          .single();
+        // Datos del estudiante y sus relaciones en student_parents son
+        // independientes entre sí — se piden en paralelo en vez de uno
+        // tras otro. También se quitó una consulta de depuración que solo
+        // traía 1 fila de "parents" para inspeccionar su estructura en
+        // consola y no se usaba para nada más (un viaje de red entero
+        // desperdiciado en cada carga de la ficha del estudiante).
+        const [
+          { data: studentData, error: studentError },
+          { data: studentParentsData, error: studentParentsError },
+        ] = await Promise.all([
+          supabase
+            .from('students')
+            .select('*')
+            .eq('id', params.id)
+            .eq('program_id', activeProgram.id)
+            .single(),
+          supabase
+            .from('student_parents')
+            .select('parent_id')
+            .eq('student_id', params.id),
+        ]);
 
-        console.log('Resultado de la consulta de estudiante:', studentData, studentError);
-        
         if (studentError) throw studentError;
         if (!studentData) throw new Error('Estudiante no encontrado');
 
         setStudent(studentData);
         setEditedStudent(studentData);
 
-        // Fetch parents associated with this student - consulta directa a la tabla parents
+        // Padres asociados a este estudiante
         try {
-          console.log('Buscando padres para el estudiante ID:', params.id);
-          
-          // Consulta directa para verificar la estructura de la tabla parents
-          const { data: parentsSample, error: parentsSampleError } = await supabase
-            .from('parents')
-            .select('*')
-            .limit(1);
-            
-          console.log('Muestra de la tabla parents (estructura):', parentsSample, parentsSampleError);
-          
-          // Primero obtenemos los IDs de padres asociados con este estudiante
-          const { data: studentParentsData, error: studentParentsError } = await supabase
-            .from('student_parents')
-            .select('parent_id')
-            .eq('student_id', params.id);
-
-          console.log('Resultado de student_parents:', studentParentsData, studentParentsError);
-          
           if (studentParentsError) throw studentParentsError;
 
           if (studentParentsData && studentParentsData.length > 0) {
