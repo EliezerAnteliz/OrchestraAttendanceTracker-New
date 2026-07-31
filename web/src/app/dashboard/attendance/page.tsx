@@ -6,9 +6,6 @@ import { MdSearch, MdClose, MdGroup } from 'react-icons/md';
 import AttendanceStatusIndicator from '@/components/AttendanceStatusIndicator';
 import { supabase } from '../../../lib/supabase';
 import { format, parseISO } from 'date-fns';
-import { es, enUS } from 'date-fns/locale';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -1145,49 +1142,17 @@ export default function AttendancePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center w-full sm:w-auto">
-            <div className="relative">
-              <DatePicker
-                selected={selectedDate}
-                onChange={handleDateChange}
-                dateFormat="dd/MM/yyyy"
-                className="border border-[#E3DDD1] rounded-lg p-2.5 pl-10 bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium w-full sm:w-44 text-sm"
-                wrapperClassName="date-picker-wrapper w-full sm:w-44"
-                locale={lang === 'es' ? es : enUS}
-                showMonthYearPicker={false}
-                showMonthDropdown={false}
-                showYearDropdown={false}
-                renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
-                  <div className="flex justify-between items-center px-2 py-2">
-                    <button
-                      onClick={decreaseMonth}
-                      className="p-1 hover:bg-[#F4F0E8] rounded-full"
-                      aria-label={t('prev_month')}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6E675E]" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                    <h2 className="text-base font-semibold text-[#1B1917]">
-                      {date.toLocaleString(lang, { month: 'long', year: 'numeric' })}
-                    </h2>
-                    <button
-                      onClick={increaseMonth}
-                      className="p-1 hover:bg-[#F4F0E8] rounded-full"
-                      aria-label={t('next_month')}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6E675E]" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              />
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C2492B]">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </span>
-            </div>
+            {/* Input de fecha nativo — igual al mockup (sin panel emergente,
+                sin ícono propio; el navegador aporta su propio selector). */}
+            <input
+              type="date"
+              value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
+              onChange={(e) => {
+                if (!e.target.value) return;
+                handleDateChange(parseISO(e.target.value));
+              }}
+              className="bg-[#FFFDFA] border border-[#E3DDD1] rounded-lg px-3 py-2.5 text-[#56504A] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] w-full sm:w-44 text-sm"
+            />
 
             {canEditStudents && (
               <button
@@ -1226,7 +1191,7 @@ export default function AttendancePage() {
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium"
+              className="w-full pl-10 pr-[14px] py-3 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium"
             />
             <MdSearch className="absolute left-3 top-3.5 text-[#A29889]" size={18} />
           </div>
@@ -1234,7 +1199,7 @@ export default function AttendancePage() {
           <select
             value={selectedOrchestra}
             onChange={(e) => handleOrchestraChange(e.target.value)}
-            className="px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+            className="appearance-none px-[14px] py-3 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
             aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
           >
             <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
@@ -1249,7 +1214,7 @@ export default function AttendancePage() {
           <select
             value={selectedInstrument}
             onChange={(e) => handleInstrumentChange(e.target.value)}
-            className="px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+            className="appearance-none px-[14px] py-3 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
             aria-label={t('filter_by_instrument')}
           >
             <option value="all">{t('all_instruments')}</option>
@@ -1267,13 +1232,13 @@ export default function AttendancePage() {
             <div className="flex flex-wrap items-center gap-2.5 text-[13px] text-[#6E675E]">
               <button
                 onClick={selectAllStudents}
-                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-2 hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-[9px] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
                 {t('select_all')}
               </button>
               <button
                 onClick={deselectAllStudents}
-                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-2 hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-[9px] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
                 {t('deselect_all')}
               </button>
