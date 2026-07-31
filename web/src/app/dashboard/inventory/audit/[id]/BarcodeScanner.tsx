@@ -441,11 +441,11 @@ export default function BarcodeScanner({ sessionId, programId, onAssetScanned, o
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-900 text-white p-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{t('inv_scanner_title')}</h2>
+      <div className="bg-[#1B1917] text-white p-4 flex items-center justify-between">
+        <h2 className="text-lg font-medium">{t('inv_scanner_title')}</h2>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
         >
           <MdClose size={24} />
         </button>
