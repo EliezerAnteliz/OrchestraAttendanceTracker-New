@@ -423,10 +423,10 @@ export default function AssetDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_loading_asset')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_loading_asset')}</p>
         </div>
       </div>
     );
@@ -434,156 +434,155 @@ export default function AssetDetailPage() {
 
   if (error && !asset) {
     return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">❌ {error}</p>
-          <button
-            onClick={() => router.back()}
-            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-          >
-            {t('inv_go_back')}
-          </button>
-        </div>
+      <div className="bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4">
+        <p className="text-[#8f3421]">{error}</p>
+        <button
+          onClick={() => router.back()}
+          className="mt-3 px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors text-sm font-medium"
+        >
+          {t('inv_go_back')}
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <MdArrowBack size={20} />
-          {t('inv_back_to_list')}
-        </button>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
-              {t('inv_asset_detail_title')}
-              {isLoanedOwner(asset?.owner) && (
-                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
-                  {t('inv_loaned_badge', { owner: asset?.owner })}
-                </span>
-              )}
-            </h1>
-            {asset?.full_code && (
-              <p className="text-xl font-mono text-[#C2492B] mt-1">{asset.full_code}</p>
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-[13px] text-[#8A8177] hover:text-[#C2492B] transition-colors mb-4"
+      >
+        <MdArrowBack size={16} />
+        {t('inv_back_to_list')}
+      </button>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1
+            className="text-[26px] sm:text-[32px] text-[#1B1917] leading-[1.05] flex items-center gap-2.5 flex-wrap"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          >
+            {t('inv_asset_detail_title')}
+            {isLoanedOwner(asset?.owner) && (
+              <span className="px-2 py-0.5 text-[11px] font-medium rounded-full bg-[#F6EFDF] text-[#8A6A22]">
+                {t('inv_loaned_badge', { owner: asset?.owner })}
+              </span>
             )}
-          </div>
-          {isAdmin && (asset?.is_active && asset?.status_code !== 'retired' ? (
-            <button
-              onClick={() => setShowRetireModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              <MdDelete size={20} />
-              {t('inv_retire_button')}
-            </button>
-          ) : (!asset?.is_active || asset?.status_code === 'retired') && (
-            <button
-              onClick={() => setShowReactivateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <MdHistory size={20} />
-              {t('inv_reactivate_button')}
-            </button>
-          ))}
+          </h1>
+          {asset?.full_code && (
+            <p className="text-[15px] font-mono text-[#C2492B] mt-1">{asset.full_code}</p>
+          )}
         </div>
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-          <div className="mt-2 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-            <MdWarning className="mr-2" />
-            {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-          </div>
-        )}
+        {isAdmin && (asset?.is_active && asset?.status_code !== 'retired' ? (
+          <button
+            onClick={() => setShowRetireModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#A8402A] text-white rounded-lg hover:bg-[#8f3421] transition-colors font-medium whitespace-nowrap"
+          >
+            <MdDelete size={18} />
+            {t('inv_retire_button')}
+          </button>
+        ) : (!asset?.is_active || asset?.status_code === 'retired') && (
+          <button
+            onClick={() => setShowReactivateModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#5F7A57] text-white rounded-lg hover:bg-[#4F6748] transition-colors font-medium whitespace-nowrap"
+          >
+            <MdHistory size={18} />
+            {t('inv_reactivate_button')}
+          </button>
+        ))}
       </div>
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
+        </div>
+      )}
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">❌ {error}</p>
+        <div className="mt-5 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4">
+          <p className="text-[#8f3421]">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-green-800">✅ {success}</p>
+        <div className="mt-5 bg-[#EDF1E9] border border-[#CFDCC7] rounded-xl p-4">
+          <p className="text-[#4F6748]">{success}</p>
         </div>
       )}
 
       {/* Información No Editable */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-6">
+        <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
           {t('inv_coding_info_header')}
-        </h2>
+        </div>
 
         {/* Código Completo */}
-        <div className="mb-6 pb-4 border-b border-gray-300">
-          <span className="text-gray-600 font-medium text-sm">{t('inv_full_code_colon')}</span>
-          <p className="font-mono font-bold text-2xl text-[#C2492B] mt-1">{asset?.full_code || t('inv_no_code')}</p>
+        <div className="mt-4 pb-4 border-b border-[#EFE9DD]">
+          <span className="text-[12.5px] text-[#8A8177]">{t('inv_full_code_colon')}</span>
+          <p className="font-mono font-semibold text-2xl text-[#C2492B] mt-1">{asset?.full_code || t('inv_no_code')}</p>
         </div>
 
         {/* Segmentos del Código Decodificados */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pb-4 border-b border-[#EFE9DD]">
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_location_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_location_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_locations?.code || '-'} - {(asset as any)?.asset_locations?.name || t('inv_no_location')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_work_area_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_work_area_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_work_areas?.code || '-'} - {(asset as any)?.asset_work_areas?.name || t('inv_no_area')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_source_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_source_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_sources?.code || '-'} - {(asset as any)?.asset_sources?.name || t('inv_no_source')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_group_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_group_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_groups?.code || '-'} - {(asset as any)?.asset_groups?.name || t('inv_no_group')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_class_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_class_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_classes?.code || '-'} - {(asset as any)?.asset_classes?.name || t('inv_no_class')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_characteristic_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_characteristic_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {(asset as any)?.asset_characteristics?.code || '-'} - {(asset as any)?.asset_characteristics?.description || t('inv_no_characteristic')}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_sequence_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_sequence_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {asset?.sequence_number?.toString().padStart(4, '0') || '0000'}
             </p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium text-sm">{t('inv_owner_label')}</span>
-            <p className="text-gray-900 font-semibold">
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_owner_label')}</span>
+            <p className="text-[#1B1917] font-medium mt-0.5">
               {asset?.owner || t('inv_not_specified')}
             </p>
           </div>
         </div>
 
         {/* Fechas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-300 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-[13px]">
           <div>
-            <span className="text-gray-600 font-medium">{t('inv_created_date_label')}</span>
-            <p className="text-gray-900">{asset?.created_at ? new Date(asset.created_at).toLocaleString(lang === 'en' ? 'en-US' : 'es-ES') : '-'}</p>
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_created_date_label')}</span>
+            <p className="text-[#56504A] mt-0.5">{asset?.created_at ? new Date(asset.created_at).toLocaleString(lang === 'en' ? 'en-US' : 'es-ES') : '-'}</p>
           </div>
           <div>
-            <span className="text-gray-600 font-medium">{t('inv_updated_date_label')}</span>
-            <p className="text-gray-900">{asset?.updated_at ? new Date(asset.updated_at).toLocaleString(lang === 'en' ? 'en-US' : 'es-ES') : '-'}</p>
+            <span className="text-[12.5px] text-[#8A8177]">{t('inv_updated_date_label')}</span>
+            <p className="text-[#56504A] mt-0.5">{asset?.updated_at ? new Date(asset.updated_at).toLocaleString(lang === 'en' ? 'en-US' : 'es-ES') : '-'}</p>
           </div>
         </div>
       </div>
@@ -592,101 +591,101 @@ export default function AssetDetailPage() {
           disabled deshabilita todos los campos/controles de adentro de una
           vez), consistente con el RLS real: solo Admin puede escribir en
           `assets`. */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      <form onSubmit={handleSubmit} className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-5">
       <fieldset disabled={!isAdmin} className="contents">
         {/* Información del Activo */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div className="mb-7">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_asset_info_header')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Descripción */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_description_column')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_description_column')} <span className="text-[#A8402A]">*</span>
               </label>
               <input
                 type="text"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
                 required
               />
             </div>
 
             {/* Marca */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_brand_label')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_brand_label')}</label>
               <input
                 type="text"
                 value={formData.brand}
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               />
             </div>
 
             {/* Modelo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_model_label')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_model_label')}</label>
               <input
                 type="text"
                 value={formData.model}
                 onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               />
             </div>
 
             {/* Tamaño */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_col_size')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_col_size')}</label>
               <input
                 type="text"
                 value={formData.size}
                 onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               />
             </div>
 
             {/* Número de serie */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_serial_number_label')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_serial_number_label')}</label>
               <input
                 type="text"
                 value={formData.serial_number}
                 onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               />
             </div>
 
             {/* Costo estimado */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_estimated_cost_label')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_estimated_cost_label')}</label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.estimated_cost}
                 onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               />
             </div>
           </div>
         </div>
 
         {/* Estado y Asignación */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div className="mb-7">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_status_assignment_header')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Estado */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('status')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('status')} <span className="text-[#A8402A]">*</span>
               </label>
               <select
                 value={formData.status_code}
                 onChange={(e) => setFormData({ ...formData, status_code: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
                 required
                 disabled={!asset?.is_active}
               >
@@ -700,11 +699,11 @@ export default function AssetDetailPage() {
 
             {/* Programa/Sede */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_program_site_label')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_program_site_label')}</label>
               <select
                 value={formData.current_program_id}
                 onChange={(e) => setFormData({ ...formData, current_program_id: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               >
                 <option value="">{t('inv_unassigned')}</option>
                 {programs.map(prog => (
@@ -715,11 +714,11 @@ export default function AssetDetailPage() {
 
             {/* Dueño/Owner */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_owner_label_form')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_owner_label_form')}</label>
               <select
                 value={formData.owner}
                 onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
               >
                 <option value="">{t('inv_select_owner_placeholder')}</option>
                 <option value="TOSA">TOSA</option>
@@ -731,7 +730,7 @@ export default function AssetDetailPage() {
 
             {/* Asignado a */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_assigned_to')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_assigned_to')}</label>
               <select
                 value={assignToOther ? '__other__' : (formData.assigned_student_id || '')}
                 onChange={(e) => {
@@ -747,7 +746,7 @@ export default function AssetDetailPage() {
                     setFormData({ ...formData, assigned_student_id: val, assigned_to_text: '' });
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
                 disabled={!formData.current_program_id}
               >
                 <option value="">{t('inv_unassigned')}</option>
@@ -757,14 +756,14 @@ export default function AssetDetailPage() {
                 <option value="__other__">{t('inv_assigned_other_option')}</option>
               </select>
               {!formData.current_program_id && (
-                <p className="text-xs text-gray-500 mt-1">{t('inv_assigned_to_needs_site')}</p>
+                <p className="text-[11.5px] text-[#8A8177] mt-1.5">{t('inv_assigned_to_needs_site')}</p>
               )}
               {assignToOther && (
                 <input
                   type="text"
                   value={formData.assigned_to_text}
                   onChange={(e) => setFormData({ ...formData, assigned_to_text: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 mt-2"
+                  className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] mt-2"
                   placeholder={t('inv_assigned_to_placeholder_short')}
                 />
               )}
@@ -773,14 +772,14 @@ export default function AssetDetailPage() {
         </div>
 
         {/* Notas */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div>
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_notes_header')}
           </h2>
           <textarea
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
             rows={6}
             placeholder={t('inv_notes_placeholder')}
           />
@@ -788,11 +787,11 @@ export default function AssetDetailPage() {
       </fieldset>
 
         {/* Botones */}
-        <div className="flex gap-4 justify-end flex-wrap pt-4 border-t">
+        <div className="flex gap-3 justify-end flex-wrap pt-5 mt-7 border-t border-[#EFE9DD]">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-5 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
             disabled={saving}
           >
             {t('cancel')}
@@ -801,9 +800,9 @@ export default function AssetDetailPage() {
             <button
               type="submit"
               disabled={saving || !asset?.is_active}
-              className="flex items-center gap-2 px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:bg-gray-400"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              <MdSave size={20} />
+              <MdSave size={18} />
               {saving ? t('saving') : t('inv_save_changes_button')}
             </button>
           )}
@@ -811,36 +810,36 @@ export default function AssetDetailPage() {
       </form>
 
       {/* Historial de Mantenimiento */}
-      <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 pb-2 border-b">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-            <MdHistory size={24} />
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-[#EFE9DD]">
+          <h2 className="text-[15px] font-medium text-[#1B1917] flex items-center gap-2">
+            <MdHistory size={18} className="text-[#8A8177]" />
             {t('inv_maintenance_history_header')}
           </h2>
           {isAdmin && (
             <button
               onClick={() => setShowMaintenanceModal(true)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
+              className="flex items-center justify-center gap-2 px-3.5 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors text-[13px] font-medium"
             >
-              <MdAdd size={20} />
+              <MdAdd size={16} />
               {t('inv_add_event_button')}
             </button>
           )}
         </div>
 
         {maintenanceEvents.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">{t('inv_no_maintenance_events')}</p>
+          <p className="text-[#A29889] text-center py-8 text-[13.5px]">{t('inv_no_maintenance_events')}</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {maintenanceEvents.map((event) => (
-              <div key={event.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between">
+              <div key={event.id} className="border border-[#EAE3D6] rounded-lg p-4 hover:border-[#DED7C9] transition-colors">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <div className="flex items-center gap-2.5 mb-2 flex-wrap">
+                      <span className="px-2.5 py-1 bg-[#F4F0E8] text-[#56504A] rounded-full text-[12px] font-medium">
                         {event.event_type}
                       </span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-[12.5px] text-[#8A8177]">
                         {new Date(event.event_date).toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', {
                           year: 'numeric',
                           month: 'long',
@@ -849,19 +848,19 @@ export default function AssetDetailPage() {
                       </span>
                     </div>
                     {event.vendor && (
-                      <p className="text-sm text-gray-700 mb-1">
-                        <span className="font-medium">{t('inv_vendor_colon')}</span> {event.vendor}
+                      <p className="text-[13px] text-[#56504A] mb-1">
+                        <span className="font-medium text-[#1B1917]">{t('inv_vendor_colon')}</span> {event.vendor}
                       </p>
                     )}
                     {event.description && (
-                      <p className="text-sm text-gray-700 mb-1">
-                        <span className="font-medium">{t('inv_description_colon')}</span> {event.description}
+                      <p className="text-[13px] text-[#56504A] mb-1">
+                        <span className="font-medium text-[#1B1917]">{t('inv_description_colon')}</span> {event.description}
                       </p>
                     )}
                   </div>
                   {event.cost && (
                     <div className="text-right">
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-[15px] font-semibold text-[#1B1917] whitespace-nowrap">
                         ${event.cost.toFixed(2)}
                       </p>
                     </div>
@@ -875,32 +874,37 @@ export default function AssetDetailPage() {
 
       {/* Modal Dar de Baja */}
       {showRetireModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{t('inv_retire_modal_title')}</h3>
-            <p className="text-gray-600 mb-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3
+              className="text-xl text-[#1B1917] mb-3"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_retire_modal_title')}
+            </h3>
+            <p className="text-[13.5px] text-[#6E675E] mb-4">
               {t('inv_retire_modal_text')}
             </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_reason_label')} <span className="text-red-500">*</span>
+            <div className="mb-5">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_reason_label')} <span className="text-[#A8402A]">*</span>
               </label>
               <textarea
                 value={retireReason}
                 onChange={(e) => setRetireReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 rows={3}
                 placeholder={t('inv_retire_reason_placeholder')}
                 required
               />
             </div>
-            <div className="flex gap-4 justify-end flex-wrap">
+            <div className="flex gap-3 justify-end flex-wrap">
               <button
                 onClick={() => {
                   setShowRetireModal(false);
                   setRetireReason('');
                 }}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
                 disabled={saving}
               >
                 {t('cancel')}
@@ -908,7 +912,7 @@ export default function AssetDetailPage() {
               <button
                 onClick={handleRetire}
                 disabled={saving || !retireReason.trim()}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
+                className="px-4 py-2 bg-[#A8402A] text-white rounded-lg hover:bg-[#8f3421] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {saving ? t('inv_processing') : t('inv_confirm_retire')}
               </button>
@@ -919,32 +923,37 @@ export default function AssetDetailPage() {
 
       {/* Modal Reactivar */}
       {showReactivateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{t('inv_reactivate_modal_title')}</h3>
-            <p className="text-gray-600 mb-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3
+              className="text-xl text-[#1B1917] mb-3"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_reactivate_modal_title')}
+            </h3>
+            <p className="text-[13.5px] text-[#6E675E] mb-4">
               {t('inv_reactivate_modal_text')}
             </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_reason_label')} <span className="text-red-500">*</span>
+            <div className="mb-5">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_reason_label')} <span className="text-[#A8402A]">*</span>
               </label>
               <textarea
                 value={reactivateReason}
                 onChange={(e) => setReactivateReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 rows={3}
                 placeholder={t('inv_reactivate_reason_placeholder')}
                 required
               />
             </div>
-            <div className="flex gap-4 justify-end flex-wrap">
+            <div className="flex gap-3 justify-end flex-wrap">
               <button
                 onClick={() => {
                   setShowReactivateModal(false);
                   setReactivateReason('');
                 }}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
                 disabled={saving}
               >
                 {t('cancel')}
@@ -952,7 +961,7 @@ export default function AssetDetailPage() {
               <button
                 onClick={handleReactivate}
                 disabled={saving || !reactivateReason.trim()}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+                className="px-4 py-2 bg-[#5F7A57] text-white rounded-lg hover:bg-[#4F6748] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {saving ? t('inv_processing') : t('inv_confirm_reactivate')}
               </button>
@@ -963,34 +972,39 @@ export default function AssetDetailPage() {
 
       {/* Modal Agregar Evento de Mantenimiento */}
       {showMaintenanceModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{t('inv_add_maintenance_modal_title')}</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-2xl p-6 max-w-lg w-full shadow-xl">
+            <h3
+              className="text-xl text-[#1B1917] mb-4"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_add_maintenance_modal_title')}
+            </h3>
             <form onSubmit={handleAddMaintenanceEvent}>
               <div className="space-y-4">
                 {/* Fecha */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('inv_date_label')} <span className="text-red-500">*</span>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                    {t('inv_date_label')} <span className="text-[#A8402A]">*</span>
                   </label>
                   <input
                     type="date"
                     value={maintenanceForm.event_date}
                     onChange={(e) => setMaintenanceForm({ ...maintenanceForm, event_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     required
                   />
                 </div>
 
                 {/* Tipo de evento */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('inv_event_type_label')} <span className="text-red-500">*</span>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                    {t('inv_event_type_label')} <span className="text-[#A8402A]">*</span>
                   </label>
                   <select
                     value={maintenanceForm.event_type}
                     onChange={(e) => setMaintenanceForm({ ...maintenanceForm, event_type: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     required
                   >
                     <option value="">{t('inv_select_type_placeholder')}</option>
@@ -1003,23 +1017,23 @@ export default function AssetDetailPage() {
 
                 {/* Proveedor */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_vendor_label')}</label>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_vendor_label')}</label>
                   <input
                     type="text"
                     value={maintenanceForm.vendor}
                     onChange={(e) => setMaintenanceForm({ ...maintenanceForm, vendor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     placeholder={t('inv_vendor_placeholder')}
                   />
                 </div>
 
                 {/* Descripción */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_description_column')}</label>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_description_column')}</label>
                   <textarea
                     value={maintenanceForm.description}
                     onChange={(e) => setMaintenanceForm({ ...maintenanceForm, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     rows={3}
                     placeholder={t('inv_maintenance_desc_placeholder')}
                   />
@@ -1027,19 +1041,19 @@ export default function AssetDetailPage() {
 
                 {/* Costo */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_cost_label')}</label>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_cost_label')}</label>
                   <input
                     type="number"
                     step="0.01"
                     value={maintenanceForm.cost}
                     onChange={(e) => setMaintenanceForm({ ...maintenanceForm, cost: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     placeholder="0.00"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-4 justify-end flex-wrap mt-6">
+              <div className="flex gap-3 justify-end flex-wrap mt-6">
                 <button
                   type="button"
                   onClick={() => {
@@ -1052,7 +1066,7 @@ export default function AssetDetailPage() {
                       cost: '',
                     });
                   }}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
                   disabled={saving}
                 >
                   {t('cancel')}
@@ -1060,7 +1074,7 @@ export default function AssetDetailPage() {
                 <button
                   type="submit"
                   disabled={saving || !maintenanceForm.event_date || !maintenanceForm.event_type}
-                  className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] disabled:bg-gray-400"
+                  className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   {saving ? t('saving') : t('inv_add_event_button')}
                 </button>
