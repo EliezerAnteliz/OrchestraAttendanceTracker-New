@@ -860,7 +860,11 @@ export default function StudentsPage() {
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
+                        {/* grid-cols-2 en mobile: 3 columnas a secas dejaba
+                            cada <select> (ej. "Grade") en ~100px, muy
+                            apretado en 375px — con 2 columnas el 3er campo
+                            (Estado) cae solo a su propia fila. */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
                           <div>
                             <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('age') || 'Edad'}
@@ -1235,7 +1239,7 @@ export default function StudentsPage() {
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
                         <div>
                           <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('age') || 'Edad'}
