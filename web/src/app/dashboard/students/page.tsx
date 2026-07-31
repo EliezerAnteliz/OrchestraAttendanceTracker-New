@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdFilterList, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -18,6 +18,7 @@ type Student = {
   current_grade: string;
   age?: number;
   orchestra_position?: string;
+  orchestra_id?: string;
 };
 
 // Listas fijas para estandarizar "Grado" y "Posición" — antes eran texto
@@ -64,6 +65,11 @@ export default function StudentsPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editFormData, setEditFormData] = useState<any>(null);
   const [orchestras, setOrchestras] = useState<any[]>([]);
+  // Nombre de orquesta por id, solo para pintar "{instrumento} · {orquesta}"
+  // en la segunda línea de cada tarjeta de la lista — fetch aparte y liviano
+  // (no toca la query de fetchStudents) para no arriesgar esa consulta ya
+  // probada en producción.
+  const [orchestraNamesById, setOrchestraNamesById] = useState<Record<string, string>>({});
   // Activos de Inventario enlazados a este estudiante (assigned_student_id) —
   // instrumento físico real, no el texto declarado en el propio estudiante.
   const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
@@ -164,6 +170,32 @@ export default function StudentsPage() {
 
   useEffect(() => {
     fetchStudents();
+  }, [activeProgram?.id]);
+
+  useEffect(() => {
+    const fetchOrchestraNames = async () => {
+      if (!activeProgram?.id) {
+        setOrchestraNamesById({});
+        return;
+      }
+      try {
+        const { data, error: orchestrasError } = await supabase
+          .from('orchestras')
+          .select('id, name')
+          .eq('program_id', activeProgram.id);
+
+        if (orchestrasError) throw orchestrasError;
+
+        const map: Record<string, string> = {};
+        (data || []).forEach((o: any) => { map[o.id] = o.name; });
+        setOrchestraNamesById(map);
+      } catch (err) {
+        console.error('Error al cargar nombres de orquestas:', err);
+        setOrchestraNamesById({});
+      }
+    };
+
+    fetchOrchestraNames();
   }, [activeProgram?.id]);
 
   // Filtrar estudiantes cuando cambia la búsqueda, filtro de activos o instrumento
@@ -583,13 +615,14 @@ export default function StudentsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-end sm:items-end gap-4 pb-5 border-b border-[#E3DDD1]">
         <div>
           <h1
-            className="text-[32px] leading-tight text-[#1B1917]"
+            className="text-[40px] leading-[1.05] text-[#1B1917]"
             style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
           >
             {t('students_title')}
           </h1>
           <p className="text-[#8A8177] mt-2 text-sm">
             {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
+            {activeProgram?.name ? ` · ${activeProgram.name}` : ''}
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
@@ -643,7 +676,6 @@ export default function StudentsPage() {
             onClick={() => setShowActiveOnly(!showActiveOnly)}
             className="flex items-center justify-center px-4 py-3 bg-[#FFFDFA] border border-[#E3DDD1] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] text-[#56504A] font-medium whitespace-nowrap transition-colors"
           >
-            <MdFilterList className="mr-2" size={18} />
             {showActiveOnly ? t('show_all') : t('only_active')}
           </button>
         </div>
@@ -652,28 +684,36 @@ export default function StudentsPage() {
             grid-cols con auto-fill/minmax (no un número fijo de columnas)
             para que el ancho de cada tarjeta se mantenga ~310px como en el
             mockup, en vez de estirarse al ancho disponible. */}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(310px,1fr))] gap-3 mt-5">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(310px,1fr))] gap-3 mt-[18px]">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student) => (
               <button
                 key={student.id}
                 onClick={() => handleStudentClick(student)}
-                className="text-left bg-[#FFFDFA] border border-[#EAE3D6] hover:border-[#D6C9BB] rounded-xl p-4 cursor-pointer transition-colors flex flex-col gap-2.5"
+                className="text-left bg-[#FFFDFA] border border-[#EAE3D6] hover:border-[#D6C9BB] rounded-[11px] px-[18px] py-4 cursor-pointer transition-colors flex flex-col gap-2.5"
               >
                 <div className="flex justify-between items-baseline gap-2">
                   <h3 className="text-[15.5px] font-medium text-[#1B1917] truncate">
                     {student.first_name} {student.last_name}
                   </h3>
-                  <span className={`shrink-0 text-[11.5px] tracking-wide uppercase ${
-                    student.is_active !== false ? 'text-[#6E7F63]' : 'text-[#A8402A]'
-                  }`}>
+                  <span
+                    className={`shrink-0 text-[11.5px] uppercase ${
+                      student.is_active !== false ? 'text-[#6E7F63]' : 'text-[#A8402A]'
+                    }`}
+                    style={{ letterSpacing: '0.06em' }}
+                  >
                     {student.is_active !== false ? t('active') : t('inactive')}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-baseline gap-2 text-[13px] text-[#8A8177]">
-                  <span>{student.instrument || t('not_assigned')}</span>
-                  <span>{student.current_grade ? `${t('grade')} ${student.current_grade}` : t('not_assigned')}</span>
+                  <span className="truncate">
+                    {student.instrument || t('not_assigned')}
+                    {student.orchestra_id && orchestraNamesById[student.orchestra_id]
+                      ? ` · ${orchestraNamesById[student.orchestra_id]}`
+                      : ''}
+                  </span>
+                  <span className="shrink-0">{student.current_grade ? `${t('grade')} ${student.current_grade}` : t('not_assigned')}</span>
                 </div>
               </button>
             ))
@@ -741,7 +781,7 @@ export default function StudentsPage() {
             <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl border border-[#E3DDD1] shadow-xl overflow-hidden">
               <div className="flex flex-col max-h-[80vh] sm:max-h-[86vh]">
                 {/* Header */}
-                <div className="px-4 sm:px-7 py-4 sm:py-5 border-b border-[#E3DDD1]">
+                <div className="px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px] border-b border-[#E3DDD1]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2
@@ -752,7 +792,7 @@ export default function StudentsPage() {
                       </h2>
                       <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
                         {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
-                          <span className="inline-flex items-center gap-1 text-[12.5px] tracking-wide uppercase text-[#C2492B]">
+                          <span className="inline-flex items-center gap-1 text-[12.5px] tracking-[0.09em] uppercase text-[#C2492B]">
                             {linkedAssets[0]?.description || selectedStudent.instrument}
                           </span>
                         )}
@@ -768,25 +808,25 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-7">
+                <div className="flex-1 overflow-y-auto p-4 sm:px-[30px] sm:py-[26px]">
                   {loadingDetails ? (
                     <div className="flex items-center justify-center h-64">
                       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C2492B]"></div>
                     </div>
                   ) : studentDetails && editFormData ? (
                     <div className="space-y-4 sm:space-y-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-[26px]">
                       {/* Información Personal — sin caja/borde alrededor,
                           solo la etiqueta en mayúsculas + línea divisoria,
                           igual que el mockup (no "una sección = una tarjeta"). */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdPerson className="text-[#C2492B]" size={14} />
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('first_name')}
                             </p>
                             {isEditMode ? (
@@ -794,16 +834,16 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.first_name}
                                 onChange={(e) => handleInputChange('first_name', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               />
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.first_name}
                               </p>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('last_name')}
                             </p>
                             {isEditMode ? (
@@ -811,10 +851,10 @@ export default function StudentsPage() {
                                 type="text"
                                 value={editFormData.last_name}
                                 onChange={(e) => handleInputChange('last_name', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               />
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.last_name}
                               </p>
                             )}
@@ -822,7 +862,7 @@ export default function StudentsPage() {
                         </div>
                         <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-4">
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('age') || 'Edad'}
                             </p>
                             {isEditMode ? (
@@ -830,23 +870,23 @@ export default function StudentsPage() {
                                 type="number"
                                 value={editFormData.age || ''}
                                 onChange={(e) => handleInputChange('age', parseInt(e.target.value) || null)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               />
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.age ? `${studentDetails.age} años` : t('not_specified')}
                               </p>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('grade')}
                             </p>
                             {isEditMode ? (
                               <select
                                 value={editFormData.current_grade || ''}
                                 onChange={(e) => handleInputChange('current_grade', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               >
                                 <option value="">{t('not_specified')}</option>
                                 {GRADE_OPTIONS.map((g) => (
@@ -854,20 +894,20 @@ export default function StudentsPage() {
                                 ))}
                               </select>
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.current_grade || t('not_specified')}
                               </p>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('status')}
                             </p>
                             {isEditMode ? (
                               <select
                                 value={editFormData.is_active !== false ? 'true' : 'false'}
                                 onChange={(e) => handleInputChange('is_active', e.target.value === 'true')}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               >
                                 <option value="true">{t('active')}</option>
                                 <option value="false">{t('inactive')}</option>
@@ -885,14 +925,14 @@ export default function StudentsPage() {
 
                       {/* Información de Orquesta — sin caja/borde, mismo patrón. */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdMusicNote className="text-[#C2492B]" size={14} />
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                           {linkedAssets.length > 0 ? (
                             <div className="col-span-2">
-                              <p className="text-sm font-medium text-gray-700 mb-1">
+                              <p className="text-[12.5px] text-[#8A8177] mb-1">
                                 {t('instrument')}
                               </p>
                               <div className="space-y-2">
@@ -916,7 +956,7 @@ export default function StudentsPage() {
                           ) : (
                             <>
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">
+                                <p className="text-[12.5px] text-[#8A8177] mb-1">
                                   {t('instrument')}
                                 </p>
                                 {isEditMode ? (
@@ -924,16 +964,16 @@ export default function StudentsPage() {
                                     type="text"
                                     value={editFormData.instrument || ''}
                                     onChange={(e) => handleInputChange('instrument', e.target.value)}
-                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                                   />
                                 ) : (
-                                  <p className="text-sm font-semibold text-gray-900">
+                                  <p className="text-[14px] text-[#1B1917]">
                                     {studentDetails.instrument || t('not_assigned')}
                                   </p>
                                 )}
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">
+                                <p className="text-[12.5px] text-[#8A8177] mb-1">
                                   {t('instrument_size') || 'Tamaño'}
                                 </p>
                                 {isEditMode ? (
@@ -941,11 +981,11 @@ export default function StudentsPage() {
                                     type="text"
                                     value={editFormData.instrument_size || ''}
                                     onChange={(e) => handleInputChange('instrument_size', e.target.value)}
-                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                                     placeholder="3/4, 4/4"
                                   />
                                 ) : (
-                                  <p className="text-sm font-semibold text-gray-900">
+                                  <p className="text-[14px] text-[#1B1917]">
                                     {studentDetails.instrument_size || t('not_specified')}
                                   </p>
                                 )}
@@ -953,14 +993,14 @@ export default function StudentsPage() {
                             </>
                           )}
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('orchestra')}
                             </p>
                             {isEditMode ? (
                               <select
                                 value={editFormData.orchestra_id || ''}
                                 onChange={(e) => handleInputChange('orchestra_id', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               >
                                 <option value="">{t('not_assigned')}</option>
                                 {orchestras.map((orch) => (
@@ -968,20 +1008,20 @@ export default function StudentsPage() {
                                 ))}
                               </select>
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.orchestra_name || t('not_assigned')}
                               </p>
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-700 mb-1">
+                            <p className="text-[12.5px] text-[#8A8177] mb-1">
                               {t('orchestra_position') || 'Posición'}
                             </p>
                             {isEditMode ? (
                               <select
                                 value={editFormData.orchestra_position || ''}
                                 onChange={(e) => handleInputChange('orchestra_position', e.target.value)}
-                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-sm font-semibold text-gray-900"
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
                               >
                                 <option value="">{t('not_assigned')}</option>
                                 {POSITION_OPTIONS.map((p) => (
@@ -989,7 +1029,7 @@ export default function StudentsPage() {
                                 ))}
                               </select>
                             ) : (
-                              <p className="text-sm font-semibold text-gray-900">
+                              <p className="text-[14px] text-[#1B1917]">
                                 {studentDetails.orchestra_position || t('not_specified')}
                               </p>
                             )}
@@ -1000,7 +1040,7 @@ export default function StudentsPage() {
 
                       {/* Información de Padres — sin caja/borde, mismo patrón. */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
                           <MdContacts className="text-[#C2492B]" size={14} />
                           {t('parents_info')}
                         </h3>
@@ -1011,7 +1051,7 @@ export default function StudentsPage() {
                                 {isEditMode ? (
                                   <div className="space-y-3">
                                     <div>
-                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                                         {t('parent_name')}
                                       </label>
                                       <input
@@ -1022,7 +1062,7 @@ export default function StudentsPage() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                                         {t('phone')}
                                       </label>
                                       <input
@@ -1033,7 +1073,7 @@ export default function StudentsPage() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                                         {t('email')}
                                       </label>
                                       <input
@@ -1091,7 +1131,7 @@ export default function StudentsPage() {
                 </div>
 
                 {/* Footer con acciones */}
-                <div className="px-4 sm:px-7 py-3 sm:py-5 border-t border-[#E3DDD1]">
+                <div className="px-4 sm:px-[30px] py-3 sm:pt-[18px] sm:pb-[24px] border-t border-[#E3DDD1]">
                   <div className="flex justify-end items-center gap-2">
                     {isEditMode ? (
                       <>
@@ -1182,13 +1222,13 @@ export default function StudentsPage() {
                   <div className="space-y-4 sm:space-y-6">
                     {/* Información Personal */}
                     <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
                         <MdPerson className="mr-2 text-[#C2492B]" size={14} />
                         {t('personal_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('first_name')} <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1200,7 +1240,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('last_name')} <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1212,7 +1252,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('age') || 'Edad'}
                           </label>
                           <input
@@ -1224,7 +1264,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('grade')}
                           </label>
                           <select
@@ -1239,7 +1279,7 @@ export default function StudentsPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('status')}
                           </label>
                           <select
@@ -1256,13 +1296,13 @@ export default function StudentsPage() {
 
                     {/* Información de Orquesta */}
                     <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
                         <MdMusicNote className="mr-2 text-[#C2492B]" size={14} />
                         {t('orchestra_info')}
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         <div className="col-span-2">
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('instrument')}
                           </label>
                           <select
@@ -1311,7 +1351,7 @@ export default function StudentsPage() {
                           )}
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('orchestra_position') || 'Posición'}
                           </label>
                           <select
@@ -1330,13 +1370,13 @@ export default function StudentsPage() {
 
                     {/* Información de Padres */}
                     <div className="bg-[#F4F0E8] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-[#E7E0D2]">
-                      <h3 className="text-[11.5px] tracking-wide uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
+                      <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center">
                         <MdContacts className="mr-2 text-[#C2492B]" size={14} />
                         {t('parent_contact_info')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('parent_name')}
                           </label>
                           <input
@@ -1348,7 +1388,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('parent_phone') || 'Teléfono'}
                           </label>
                           <input
@@ -1360,7 +1400,7 @@ export default function StudentsPage() {
                           />
                         </div>
                         <div className="md:col-span-2">
-                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                          <label className="text-[12.5px] text-[#8A8177] mb-1 block">
                             {t('parent_email') || 'Email'}
                           </label>
                           <input
