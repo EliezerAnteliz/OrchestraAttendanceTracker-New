@@ -85,13 +85,15 @@ html, body {
   }
 }
 
-/* Estilos para el calendario */
+/* Estilos para el calendario — paleta cálida (misma paga que el resto de
+   la app: crema #FAF7F2/#FFFDFA, tinta #1B1917, muted #6E675E/#8A8177,
+   acento terracota #C2492B), reemplazando el azul de marca antiguo. */
 .react-datepicker {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Instrument Sans', Arial, Helvetica, sans-serif;
   font-weight: 500;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E3DDD1;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(27, 25, 23, 0.08), 0 2px 4px -1px rgba(27, 25, 23, 0.05);
 }
 
 .react-datepicker__triangle {
@@ -99,28 +101,28 @@ html, body {
 }
 
 .react-datepicker__month-container {
-  background-color: white;
-  border-radius: 0.5rem;
+  background-color: #FAF7F2;
+  border-radius: 0.75rem;
   padding: 0.5rem;
 }
 
 .react-datepicker__header {
-  background-color: white;
-  border-bottom: 1px solid #f3f4f6;
+  background-color: #FAF7F2;
+  border-bottom: 1px solid #E3DDD1;
   padding-top: 0.75rem;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
 }
 
 .react-datepicker__current-month {
-  color: #111827;
+  color: #1B1917;
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .react-datepicker__day-name {
-  color: #6b7280;
+  color: #8A8177;
   font-weight: 500;
   width: 2.25rem;
   margin: 0.2rem;
@@ -129,7 +131,7 @@ html, body {
 /* Celdas de día un poco más grandes que el default de la librería (2rem):
    mejor lectura y objetivo de toque más cómodo en móvil/tablet. */
 .react-datepicker__day {
-  color: #374151;
+  color: #56504A;
   font-weight: 500;
   width: 2.25rem;
   height: 2.25rem;
@@ -140,7 +142,7 @@ html, body {
 
 .react-datepicker__month-text,
 .react-datepicker__year-text {
-  color: #374151;
+  color: #56504A;
   font-weight: 500;
 }
 
@@ -157,57 +159,54 @@ html, body {
 .react-datepicker__day:hover,
 .react-datepicker__month-text:hover,
 .react-datepicker__year-text:hover {
-  background-color: #e6f7ff;
+  background-color: #F4F0E8;
   border-radius: 9999px;
 }
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #0073ea;
-  color: white;
+  background-color: #C2492B;
+  color: #FAF7F2;
   font-weight: bold;
   border-radius: 9999px;
 }
 
-/* Selector de mes (showMonthYearPicker, usado en Reportes > Mensual): sin
-   esta regla, react-datepicker pinta el mes elegido con su azul por
-   defecto (#216ba5), que no coincide con el azul de marca de la app. */
+/* Selector de mes (showMonthYearPicker, usado en Reportes > Mensual). */
 .react-datepicker__month-text--selected,
 .react-datepicker__month-text--keyboard-selected {
-  background-color: #0073ea;
-  color: white;
+  background-color: #C2492B;
+  color: #FAF7F2;
   font-weight: bold;
   border-radius: 0.375rem;
 }
 
 .react-datepicker__month-text--selected:hover,
 .react-datepicker__month-text--keyboard-selected:hover {
-  background-color: #0060c0;
+  background-color: #A83A20;
 }
 
 /* Selector de semana (Reportes > Semanal, showWeekPicker + showWeekNumbers):
    el número de semana a la izquierda y el resaltado de toda la fila al
-   pasar el mouse usan las mismas clases de "rango" que el default de la
-   librería pinta en su azul (#216ba5) — sin esto se veía un azul distinto
-   al del resto de la app. */
+   pasar el mouse usan las mismas clases de "rango" del default de la
+   librería. */
 .react-datepicker__week-number--selected {
-  background-color: #0073ea;
-  color: white;
+  background-color: #C2492B;
+  color: #FAF7F2;
   font-weight: bold;
 }
 
 .react-datepicker__week-number--selected:hover {
-  background-color: #0060c0;
+  background-color: #A83A20;
 }
 
 .react-datepicker__day--in-range,
 .react-datepicker__day--in-selecting-range {
-  background-color: #e6f7ff;
-  color: #0073ea;
+  background-color: #F4F0E8;
+  color: #C2492B;
 }
 
 .react-datepicker__day--outside-month {
-  color: #9ca3af;
+  color: #A29889;
 }
 
 .react-datepicker__navigation {
@@ -228,26 +227,26 @@ html, body {
 
 .react-datepicker__month-dropdown,
 .react-datepicker__year-dropdown {
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  background-color: #FAF7F2;
+  border: 1px solid #E3DDD1;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(27, 25, 23, 0.08);
 }
 
 .react-datepicker__month-option,
 .react-datepicker__year-option {
   padding: 0.5rem;
-  color: #374151;
+  color: #56504A;
 }
 
 .react-datepicker__month-option:hover,
 .react-datepicker__year-option:hover {
-  background-color: #f3f4f6;
+  background-color: #F4F0E8;
 }
 
 .react-datepicker__month-option--selected,
 .react-datepicker__year-option--selected {
-  background-color: #e6f7ff;
+  background-color: #F4F0E8;
   font-weight: 600;
 }
 
