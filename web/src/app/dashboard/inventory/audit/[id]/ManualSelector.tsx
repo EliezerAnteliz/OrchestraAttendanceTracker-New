@@ -146,34 +146,39 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
   }
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="fixed inset-0 bg-[#FAF7F2] z-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+      <div className="bg-[#FFFDFA] border-b border-[#EAE3D6] p-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">{t('inv_manual_selection_title')}</h2>
+              <h2
+                className="text-lg text-[#1B1917]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+              >
+                {t('inv_manual_selection_title')}
+              </h2>
               {auditedAssetIds.size > 0 && (
-                <p className="text-xs text-green-700 font-medium">{t('inv_audited_count', { n: auditedAssetIds.size, suffix: auditedAssetIds.size !== 1 ? 's' : '' })}</p>
+                <p className="text-[12px] text-[#4F6748] font-medium">{t('inv_audited_count', { n: auditedAssetIds.size, suffix: auditedAssetIds.size !== 1 ? 's' : '' })}</p>
               )}
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-[#6E675E] hover:bg-[#F4F0E8] rounded-lg transition-colors"
             >
-              <MdClose size={24} />
+              <MdClose size={22} />
             </button>
           </div>
 
           {/* Search */}
           <div className="relative mb-3">
-            <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A29889]" size={18} />
             <input
               type="text"
               placeholder={t('inv_search_placeholder_manual')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full pl-10 pr-4 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               autoFocus
             />
           </div>
@@ -183,7 +188,7 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
             <select
               value={selectedInstrument}
               onChange={(e) => setSelectedInstrument(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             >
               <option value="">{t('inv_all_instruments')}</option>
               {instruments.map(instrument => (
@@ -194,7 +199,7 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             >
               <option value="">{t('inv_all_statuses')}</option>
               <option value="available">{t('inv_status_option_available')}</option>
@@ -210,9 +215,9 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-7xl mx-auto space-y-2">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">{t('inv_searching')}</div>
+            <div className="text-center py-8 text-[#8A8177] text-[13.5px]">{t('inv_searching')}</div>
           ) : assets.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[#A29889] text-[13.5px]">
               {auditedAssetIds.size > 0 ? t('inv_no_pending_with_filter') : t('inv_no_assets_found')}
             </div>
           ) : (
@@ -220,21 +225,21 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
               <button
                 key={asset.id}
                 onClick={() => handleSelectAsset(asset)}
-                className="w-full bg-white border border-gray-200 rounded-lg p-3 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                className="w-full bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg p-3.5 text-left hover:border-[#C2492B]/40 transition-colors"
               >
-                <div className="font-medium text-gray-900">{asset.description}</div>
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="font-medium text-[#1B1917]">{asset.description}</div>
+                <div className="text-[12.5px] text-[#8A8177] mt-1">
                   {asset.full_code || t('inv_no_code')}
-                  {asset.brand && ` • ${asset.brand}`}
-                  {asset.size && ` • ${asset.size}`}
+                  {asset.brand && ` · ${asset.brand}`}
+                  {asset.size && ` · ${asset.size}`}
                 </div>
                 {asset.assigned_to_text && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-[11.5px] text-[#8A8177] mt-1">
                     {t('inv_assigned_to_colon')} {asset.assigned_to_text}
                   </div>
                 )}
                 {asset.serial_number && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-[11.5px] text-[#8A8177]">
                     {t('inv_serial_colon')} {asset.serial_number}
                   </div>
                 )}
@@ -247,7 +252,7 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
       {/* Toast de confirmación */}
       {toast && (
         <div className="fixed bottom-4 left-4 right-4 z-10">
-          <div className="max-w-7xl mx-auto bg-green-600 text-white p-3 rounded-lg shadow-lg text-center text-sm font-medium">
+          <div className="max-w-7xl mx-auto bg-[#4F6748] text-white p-3 rounded-lg shadow-lg text-center text-[13px] font-medium">
             {toast}
           </div>
         </div>
