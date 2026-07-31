@@ -27,9 +27,12 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div>
-      {/* Submenu de Inventario */}
-      <div className="bg-white rounded-lg shadow-sm mb-6 p-2">
+    <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
+    <div className="max-w-[1420px] mx-auto">
+      {/* Submenu de Inventario — mismo patrón de pastilla activa (terracota
+          sólido) que el resto de los controles segmentados de la app
+          (ej. Reportes > Tipo de reporte / Período). */}
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl mb-6 p-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           {/* overflow-x-auto + whitespace-nowrap + flex-shrink-0: en
               celular los tabs (con ícono+texto cada uno) no caben en el
@@ -44,8 +47,8 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
                     isActive
-                      ? 'bg-[#C2492B] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-[#C2492B] text-[#FAF7F2]'
+                      : 'text-[#56504A] hover:bg-[#F4F0E8]'
                   }`}
                 >
                   {item.icon}
@@ -68,6 +71,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
       </div>
 
       {children}
+    </div>
     </div>
   );
 }
