@@ -2069,73 +2069,22 @@ ${dateTableEN}`;
                 )}
               </div>
 
-              {/* Top 5 — mejor % de asistencia individual en el período
-                  (solo reporte grupal; en el individual ya se ve un solo
-                  estudiante). Pide al menos 2 registros por estudiante para
-                  que el % no sea un solo día suelto. */}
-              {reportType === 'group' && topAttendance.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="font-medium text-[#1B1917] mb-2">
-                    {lang === 'es' ? 'Top 5 — Mejor Asistencia' : 'Top 5 — Best Attendance'}
-                  </h3>
-                  <div className="space-y-2">
-                    {(() => {
-                      // Cuántas filas comparten cada "rank" (empate real, no
-                      // solo posición en la lista) — para mostrar "(empate)"
-                      // junto al % cuando aplica.
-                      const rankCounts = new Map<number, number>();
-                      topAttendance.forEach(s => rankCounts.set(s.rank, (rankCounts.get(s.rank) || 0) + 1));
-                      return topAttendance.map((s) => {
-                        const isTied = (rankCounts.get(s.rank) || 0) > 1;
-                        return (
-                          <div key={s.id} className="flex items-center gap-3 bg-[#FFFDFA] border border-[#EAE3D6] rounded-lg px-3 py-2">
-                            <span
-                              className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                                s.rank === 1 ? 'bg-yellow-500' : s.rank === 2 ? 'bg-gray-400' : s.rank === 3 ? 'bg-amber-700' : 'bg-[#C2492B]'
-                              }`}
-                              title={isTied ? (lang === 'es' ? `Empatado en el lugar ${s.rank}` : `Tied for place ${s.rank}`) : undefined}
-                            >
-                              {s.rank}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-[#1B1917] truncate">{s.name}</p>
-                              <p className="text-xs text-[#8A8177] truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
-                            </div>
-                            <span className="text-right flex-shrink-0">
-                              <span className="text-sm font-semibold text-[#5F7A57]">{Math.round(s.percentage)}%</span>
-                              {isTied && (
-                                <span className="block text-[10px] text-[#A29889] leading-tight">
-                                  {lang === 'es' ? 'empate' : 'tied'}
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                  {topAttendanceMoreTied && (
-                    <p className="text-xs text-[#8A8177] mt-2">
-                      {lang === 'es'
-                        ? `+${topAttendanceMoreTied.count} estudiante(s) más también con ${Math.round(topAttendanceMoreTied.percentage)}%.`
-                        : `+${topAttendanceMoreTied.count} more student(s) also at ${Math.round(topAttendanceMoreTied.percentage)}%.`}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Desglose de % de asistencia por Instrumento y por Posición
-                  (solo reporte grupal). El de Instrumento solo aparece si el
-                  filtro está en "Todos" (con un instrumento ya filtrado,
-                  comparar contra sí mismo no aporta nada) y si hay más de
-                  una categoría real con datos. */}
+              {/* Attendance by Instrument / Top 5 / Attendance by Position
+                  (solo reporte grupal) — tarjetas independientes en grilla de
+                  2 columnas (como el mockup) para ahorrar espacio vertical.
+                  El de Instrumento solo aparece si el filtro está en "Todos"
+                  y si hay más de una categoría real con datos. Top 5 pide al
+                  menos 2 registros por estudiante para que el % no sea un
+                  solo día suelto. */}
               {reportType === 'group' && (
-                (instrumentFilter === 'all' && instrumentBreakdown.length > 1) || positionBreakdown.length > 1
+                topAttendance.length > 0 ||
+                (instrumentFilter === 'all' && instrumentBreakdown.length > 1) ||
+                positionBreakdown.length > 1
               ) && (
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
                   {instrumentFilter === 'all' && instrumentBreakdown.length > 1 && (
-                    <div>
-                      <h3 className="font-medium text-[#1B1917] mb-2">
+                    <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
+                      <h3 className="font-medium text-[#1B1917] mb-3">
                         {lang === 'es' ? 'Asistencia por Instrumento' : 'Attendance by Instrument'}
                       </h3>
                       <div className="space-y-2">
@@ -2153,9 +2102,61 @@ ${dateTableEN}`;
                       </div>
                     </div>
                   )}
+
+                  {topAttendance.length > 0 && (
+                    <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
+                      <h3 className="font-medium text-[#C2492B] mb-3">
+                        {lang === 'es' ? 'Top 5 — Mejor Asistencia' : 'Top 5 — Best Attendance'}
+                      </h3>
+                      <div className="space-y-2">
+                        {(() => {
+                          // Cuántas filas comparten cada "rank" (empate real, no
+                          // solo posición en la lista) — para mostrar "(empate)"
+                          // junto al % cuando aplica.
+                          const rankCounts = new Map<number, number>();
+                          topAttendance.forEach(s => rankCounts.set(s.rank, (rankCounts.get(s.rank) || 0) + 1));
+                          return topAttendance.map((s) => {
+                            const isTied = (rankCounts.get(s.rank) || 0) > 1;
+                            return (
+                              <div key={s.id} className="flex items-center gap-3 border-b border-[#EFE9DD] last:border-b-0 pb-2 last:pb-0">
+                                <span
+                                  className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    s.rank === 1 ? 'text-[#8A6A22]' : s.rank === 2 ? 'text-[#8A8177]' : s.rank === 3 ? 'text-[#A83A20]' : 'text-[#A29889]'
+                                  }`}
+                                  title={isTied ? (lang === 'es' ? `Empatado en el lugar ${s.rank}` : `Tied for place ${s.rank}`) : undefined}
+                                >
+                                  {s.rank}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-[#1B1917] truncate">{s.name}</p>
+                                  <p className="text-xs text-[#8A8177] truncate">{s.instrument || (lang === 'es' ? 'Sin instrumento' : 'No instrument')}</p>
+                                </div>
+                                <span className="text-right flex-shrink-0">
+                                  <span className="text-sm font-semibold text-[#1B1917]">{Math.round(s.percentage)}%</span>
+                                  {isTied && (
+                                    <span className="block text-[10px] text-[#A29889] leading-tight">
+                                      {lang === 'es' ? 'empate' : 'tied'}
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                      {topAttendanceMoreTied && (
+                        <p className="text-xs text-[#8A8177] mt-2">
+                          {lang === 'es'
+                            ? `+${topAttendanceMoreTied.count} estudiante(s) más también con ${Math.round(topAttendanceMoreTied.percentage)}%.`
+                            : `+${topAttendanceMoreTied.count} more student(s) also at ${Math.round(topAttendanceMoreTied.percentage)}%.`}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {positionBreakdown.length > 1 && (
-                    <div>
-                      <h3 className="font-medium text-[#1B1917] mb-2">
+                    <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 sm:p-5">
+                      <h3 className="font-medium text-[#1B1917] mb-3">
                         {lang === 'es' ? 'Asistencia por Posición' : 'Attendance by Position'}
                       </h3>
                       <div className="space-y-2">
