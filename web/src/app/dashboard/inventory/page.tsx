@@ -10,9 +10,11 @@
 import { useEffect, useState } from 'react';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdWarning, MdSwapHoriz, MdArchive } from 'react-icons/md';
+import { MdWarning, MdSwapHoriz, MdArchive, MdAdd } from 'react-icons/md';
 import Link from 'next/link';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useInventoryHeaderActions } from '../layout';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -97,6 +99,22 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function InventoryDashboard() {
   const { t, lang } = useI18n();
+  const { isAdmin } = useUserRole();
+
+  // Botón "Nuevo activo" en el encabezado compartido del módulo (junto al
+  // selector de rol), solo para Admin.
+  useInventoryHeaderActions(
+    isAdmin ? (
+      <Link
+        href="/dashboard/inventory/assets/new"
+        className="flex items-center justify-center gap-2 bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+      >
+        <MdAdd size={18} />
+        {t('inv_new_asset_button')}
+      </Link>
+    ) : null
+  );
+
   const [stats, setStats] = useState<DashboardStats>({
     total: 0,
     available: 0,
