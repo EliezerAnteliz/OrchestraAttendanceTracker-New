@@ -73,7 +73,7 @@ export default function Home() {
 
             {/* Right Content - Features Grid */}
             <div className="lg:w-1/2">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FeatureCard
                   icon={<MdPeople size={26} />}
                   title={t("student_management")}
