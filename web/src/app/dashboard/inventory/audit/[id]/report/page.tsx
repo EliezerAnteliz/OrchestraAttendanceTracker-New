@@ -90,18 +90,22 @@ export default function AuditReportPage() {
     try {
       setLoading(true);
 
-      // Cargar sesión
-      const { data: sessionData, error: sessionError } = await inventorySupabase
-        .from('audit_sessions')
-        .select('id, program_id, started_at, ended_at, programs:program_id(name)')
-        .eq('id', sessionId)
-        .single();
+      // Sesión y eventos son independientes entre sí — se piden en paralelo
+      // en vez de uno tras otro (el fetch de eventos está paginado y puede
+      // tardar en sesiones largas, así que se solapa con la consulta de
+      // sesión en vez de esperarla primero).
+      const [sessionResult, events] = await Promise.all([
+        inventorySupabase
+          .from('audit_sessions')
+          .select('id, program_id, started_at, ended_at, programs:program_id(name)')
+          .eq('id', sessionId)
+          .single(),
+        fetchAllAuditEvents(sessionId),
+      ]);
 
+      const { data: sessionData, error: sessionError } = sessionResult;
       if (sessionError) throw sessionError;
       setSession(sessionData);
-
-      // Cargar eventos de la sesión (paginado, ver fetchAllAuditEvents)
-      const events = await fetchAllAuditEvents(sessionId);
 
       // Separar por resultado
       const found = events?.filter(e => e.result === 'found') || [];
