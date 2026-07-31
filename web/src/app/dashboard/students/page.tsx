@@ -725,15 +725,16 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      {/* Modal de carga masiva */}
+      {/* Modal de carga masiva — mismo modelo (fondo, bordes, tipografía)
+          que los otros dos modales de Estudiantes. */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-300">
-            <div className="flex justify-between items-center border-b border-gray-200 p-6 bg-white rounded-t-xl">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-gray-900">
-                <div className="p-2 bg-[#EFE9DD] rounded-lg">
-                  <MdUpload className="w-5 h-5 text-[#C2492B]" />
-                </div>
+          <div className="bg-[#FAF7F2] rounded-lg sm:rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-[#E3DDD1]">
+            <div className="flex items-start justify-between gap-3 border-b border-[#E3DDD1] px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px]">
+              <h2
+                className="text-2xl sm:text-[32px] leading-none text-[#1B1917]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+              >
                 {t('bulk_upload_title')}
               </h2>
               <button
@@ -744,14 +745,14 @@ export default function StudentsPage() {
                     setUploadResults(null);
                   }
                 }}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+                className="w-8 h-8 sm:w-[34px] sm:h-[34px] flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors flex-shrink-0"
                 aria-label="Close"
               >
-                <MdClose size={20} />
+                <MdClose size={18} />
               </button>
             </div>
             <div className="p-0">
-              <ExcelUploader 
+              <ExcelUploader
                 onComplete={(results) => {
                   setUploadResults(results);
                   if (results.added > 0 || results.updated > 0) {
