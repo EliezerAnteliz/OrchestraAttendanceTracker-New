@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState, useEffect, createContext, useContext } from 'react';
+import { ReactNode, useState, useEffect, useMemo, createContext, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
@@ -36,6 +36,16 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
   const { activeProgram } = useProgram();
   const pathname = usePathname();
   const [headerActions, setHeaderActions] = useState<ReactNode>(null);
+  // El valor del Provider debe ser referencialmente estable entre renders:
+  // React propaga cambios de contexto a TODOS los consumidores (salta el
+  // "bailout" normal por props/children sin cambios) cada vez que el valor
+  // cambia de identidad. Sin este useMemo, cada `{ setActions: ... }` nuevo
+  // forzaba a re-renderizar a cada página que llama
+  // useInventoryHeaderActions, cuyo efecto volvía a llamar setActions con
+  // un nodo JSX nuevo (siempre una referencia distinta) → nuevo render del
+  // layout → nuevo objeto de contexto → bucle infinito ("Application error"
+  // / pantalla en blanco al entrar a Inventario).
+  const headerActionsContextValue = useMemo(() => ({ setActions: setHeaderActions }), []);
 
   // Importar y Auditoría son operaciones exclusivas de Admin (RLS ya lo
   // exige: solo Admin escribe assets/mantenimiento y solo Admin audita) —
@@ -51,7 +61,7 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <InventoryHeaderActionsContext.Provider value={{ setActions: setHeaderActions }}>
+    <InventoryHeaderActionsContext.Provider value={headerActionsContextValue}>
     <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
     <div className="max-w-[1420px] mx-auto">
       {/* Encabezado compartido del módulo — se mantiene igual entre las 4
