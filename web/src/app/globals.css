@@ -101,13 +101,13 @@ html, body {
 }
 
 .react-datepicker__month-container {
-  background-color: #FAF7F2;
+  background-color: #FAF7F2 !important;
   border-radius: 0.75rem;
   padding: 0.5rem;
 }
 
 .react-datepicker__header {
-  background-color: #FAF7F2;
+  background-color: #FAF7F2 !important;
   border-bottom: 1px solid #E3DDD1;
   padding-top: 0.75rem;
   border-top-left-radius: 0.75rem;
@@ -115,14 +115,14 @@ html, body {
 }
 
 .react-datepicker__current-month {
-  color: #1B1917;
+  color: #1B1917 !important;
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .react-datepicker__day-name {
-  color: #8A8177;
+  color: #8A8177 !important;
   font-weight: 500;
   width: 2.25rem;
   margin: 0.2rem;
@@ -131,7 +131,7 @@ html, body {
 /* Celdas de día un poco más grandes que el default de la librería (2rem):
    mejor lectura y objetivo de toque más cómodo en móvil/tablet. */
 .react-datepicker__day {
-  color: #56504A;
+  color: #56504A !important;
   font-weight: 500;
   width: 2.25rem;
   height: 2.25rem;
@@ -142,7 +142,7 @@ html, body {
 
 .react-datepicker__month-text,
 .react-datepicker__year-text {
-  color: #56504A;
+  color: #56504A !important;
   font-weight: 500;
 }
 
@@ -159,30 +159,37 @@ html, body {
 .react-datepicker__day:hover,
 .react-datepicker__month-text:hover,
 .react-datepicker__year-text:hover {
-  background-color: #F4F0E8;
+  background-color: #F4F0E8 !important;
   border-radius: 9999px;
 }
 
+/* !important en esta sección: react-datepicker/dist/react-datepicker.css
+   se importa dentro de cada página (no en el layout raíz), así que en el
+   bundle final puede terminar cargando DESPUÉS de este globals.css — con
+   selectores de la misma especificidad (una sola clase), gana el que
+   carga último. Sin !important, el azul #216ba5 por defecto de la
+   librería reaparecía en el picker de mes (Reportes > Mensual) y en toda
+   la fila resaltada del picker de semana (Reportes > Semanal). */
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #C2492B;
-  color: #FAF7F2;
+  background-color: #C2492B !important;
+  color: #FAF7F2 !important;
   font-weight: bold;
-  border-radius: 9999px;
+  border-radius: 9999px !important;
 }
 
 /* Selector de mes (showMonthYearPicker, usado en Reportes > Mensual). */
 .react-datepicker__month-text--selected,
 .react-datepicker__month-text--keyboard-selected {
-  background-color: #C2492B;
-  color: #FAF7F2;
+  background-color: #C2492B !important;
+  color: #FAF7F2 !important;
   font-weight: bold;
-  border-radius: 0.375rem;
+  border-radius: 0.375rem !important;
 }
 
 .react-datepicker__month-text--selected:hover,
 .react-datepicker__month-text--keyboard-selected:hover {
-  background-color: #A83A20;
+  background-color: #A83A20 !important;
 }
 
 /* Selector de semana (Reportes > Semanal, showWeekPicker + showWeekNumbers):
@@ -190,19 +197,25 @@ html, body {
    pasar el mouse usan las mismas clases de "rango" del default de la
    librería. */
 .react-datepicker__week-number--selected {
-  background-color: #C2492B;
-  color: #FAF7F2;
+  background-color: #C2492B !important;
+  color: #FAF7F2 !important;
   font-weight: bold;
 }
 
 .react-datepicker__week-number--selected:hover {
-  background-color: #A83A20;
+  background-color: #A83A20 !important;
 }
 
+/* Toda la fila de días de la semana seleccionada (showWeekPicker) usa
+   estas dos clases de "rango" de la librería — antes solo tenían un tinte
+   suave (#F4F0E8) mientras el default en negrita azul opaco ganaba por
+   orden de carga; ahora quedan igual de sólidas que el resto de las
+   celdas "seleccionadas" (terracota, texto claro, círculo). */
 .react-datepicker__day--in-range,
 .react-datepicker__day--in-selecting-range {
-  background-color: #F4F0E8;
-  color: #C2492B;
+  background-color: #C2492B !important;
+  color: #FAF7F2 !important;
+  border-radius: 9999px !important;
 }
 
 .react-datepicker__day--outside-month {
