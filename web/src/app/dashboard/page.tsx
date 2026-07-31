@@ -184,51 +184,54 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, [activeProgram?.id]);
 
-  // Solo mostrar skeleton en la primera carga inicial
+  // Solo mostrar skeleton en la primera carga inicial — mismos colores/
+  // estructura que el Dashboard real (bg-[#FFFDFA] + borde [#EAE3D6], sin
+  // íconos) para que la transición no salte al modelo gris/azul viejo
+  // mientras carga.
   if (loading && initialLoad) {
     return (
-      <div className="p-4 md:p-6 space-y-6 animate-fadeIn">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+      <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full animate-fadeIn">
+      <div className="max-w-[1420px] mx-auto space-y-6">
+        <div className="flex flex-col gap-4 pb-5 border-b border-[#E3DDD1]">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
             <div className="flex-1">
-              <div className="h-8 bg-gray-200 rounded w-64 animate-pulse mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96 animate-pulse"></div>
+              <div className="h-8 bg-[#EFE9DD] rounded w-64 animate-pulse mb-2"></div>
+              <div className="h-4 bg-[#EFE9DD] rounded w-96 animate-pulse"></div>
             </div>
           </div>
         </div>
 
-        {/* Skeleton para tarjetas de estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        {/* Skeleton para tarjetas de estadísticas — mismo formato que StatCard */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow p-6 border border-gray-200">
-              <div className="flex items-center">
-                <div className="bg-gray-200 p-3 rounded-full mr-4 animate-pulse w-12 h-12"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-20 animate-pulse mb-2"></div>
-                  <div className="h-6 bg-gray-200 rounded w-12 animate-pulse"></div>
-                </div>
-              </div>
+            <div key={i} className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-4">
+              <div className="h-3 bg-[#EFE9DD] rounded w-20 animate-pulse"></div>
+              <div className="h-7 bg-[#EFE9DD] rounded w-12 animate-pulse mt-2.5"></div>
+              <div className="h-3 bg-[#EFE9DD] rounded w-24 animate-pulse mt-2"></div>
             </div>
           ))}
         </div>
 
-        {/* Skeleton para sección de orquestas */}
-        <div className="mt-8">
-          <div className="h-6 bg-gray-200 rounded w-64 animate-pulse mb-4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-200">
-                <div className="flex items-center">
-                  <div className="bg-gray-200 p-3 rounded-full mr-4 animate-pulse w-12 h-12"></div>
-                  <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-20 animate-pulse mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded w-12 animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* Skeleton para orquestas + acceso rápido */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-4 mt-4">
+          <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-5">
+            <div className="h-4 bg-[#EFE9DD] rounded w-48 animate-pulse mb-5"></div>
+            <div className="flex flex-col gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-2 bg-[#EFE9DD] rounded-full animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-[#FFFDFA] rounded-xl border border-[#EAE3D6] p-5">
+            <div className="h-4 bg-[#EFE9DD] rounded w-32 animate-pulse mb-4"></div>
+            <div className="flex flex-col gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-3 bg-[#EFE9DD] rounded w-full animate-pulse"></div>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
       </div>
     );
   }
