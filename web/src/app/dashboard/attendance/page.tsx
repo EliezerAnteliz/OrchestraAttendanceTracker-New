@@ -2,7 +2,7 @@
 
 // Página de Asistencia con filtrado por Orquesta - v1.0
 import React, { useState, useEffect } from 'react';
-import { MdSearch, MdClose, MdAssignmentTurnedIn, MdGroup } from 'react-icons/md';
+import { MdSearch, MdClose, MdGroup } from 'react-icons/md';
 import AttendanceStatusIndicator from '@/components/AttendanceStatusIndicator';
 import { supabase } from '../../../lib/supabase';
 import { format, parseISO } from 'date-fns';
@@ -1128,66 +1128,73 @@ export default function AttendancePage() {
   };
 
   return (
-    <div className="h-full p-4 md:p-6">
-      <div className="flex flex-col gap-2 sm:gap-4 mb-3 sm:mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <span className="bg-blue-100 p-1.5 rounded-full flex items-center justify-center flex-shrink-0">
-              <MdAssignmentTurnedIn className="text-blue-600" size={20} />
-            </span>
-            {t('attendance_title')}
-          </h1>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+    <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
+      <div className="max-w-[1420px] mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-7 pb-5 sm:pb-[22px] border-b border-[#E3DDD1]">
+          <div>
+            <h1
+              className="text-[28px] sm:text-[40px] leading-[1.05] text-[#1B1917]"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('attendance_title')}
+            </h1>
+            <p className="text-[#8A8177] mt-2 text-sm">
+              {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
+              {activeProgram?.name ? ` · ${activeProgram.name}` : ''}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center w-full sm:w-auto">
             <div className="relative">
               <DatePicker
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat="dd/MM/yyyy"
-                className="border border-gray-300 rounded-md p-2 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-[#C2492B] text-black font-medium shadow-sm w-full sm:w-44 text-sm"
+                className="border border-[#E3DDD1] rounded-lg p-2.5 pl-10 bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium w-full sm:w-44 text-sm"
                 wrapperClassName="date-picker-wrapper w-full sm:w-44"
                 locale={lang === 'es' ? es : enUS}
                 showMonthYearPicker={false}
                 showMonthDropdown={false}
                 showYearDropdown={false}
-              renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
-                <div className="flex justify-between items-center px-2 py-2">
-                  <button
-                    onClick={decreaseMonth}
-                    className="p-1 hover:bg-gray-100 rounded-full"
-                    aria-label={t('prev_month')}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                  <h2 className="text-base font-semibold text-gray-800">
-                    {date.toLocaleString(lang, { month: 'long', year: 'numeric' })}
-                  </h2>
-                  <button
-                    onClick={increaseMonth}
-                    className="p-1 hover:bg-gray-100 rounded-full"
-                    aria-label={t('next_month')}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-            />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C2492B]">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </span>
-          </div>
-            
+                renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
+                  <div className="flex justify-between items-center px-2 py-2">
+                    <button
+                      onClick={decreaseMonth}
+                      className="p-1 hover:bg-[#F4F0E8] rounded-full"
+                      aria-label={t('prev_month')}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6E675E]" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    <h2 className="text-base font-semibold text-[#1B1917]">
+                      {date.toLocaleString(lang, { month: 'long', year: 'numeric' })}
+                    </h2>
+                    <button
+                      onClick={increaseMonth}
+                      className="p-1 hover:bg-[#F4F0E8] rounded-full"
+                      aria-label={t('next_month')}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#6E675E]" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              />
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C2492B]">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </span>
+            </div>
+
             {canEditStudents && (
               <button
                 onClick={toggleAttendanceMode}
-                className={`px-3 py-2 rounded-md flex items-center justify-center text-xs sm:text-sm font-medium w-full sm:w-auto ${
-                  attendanceMode 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
+                className={`px-4 py-2.5 rounded-lg flex items-center justify-center text-sm font-medium w-full sm:w-auto transition-colors ${
+                  attendanceMode
+                    ? 'bg-transparent border border-[#A8402A] text-[#A8402A] hover:bg-[#F8E9E4]'
                     : 'bg-[#C2492B] hover:bg-[#A83A20] text-white'
                 }`}
               >
@@ -1196,146 +1203,124 @@ export default function AttendancePage() {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Mensaje de éxito */}
-      {showSuccessMessage && successMessage && (
-        <div className="mb-2 sm:mb-4 p-2 sm:p-3 bg-green-100 border border-green-400 text-green-700 rounded-md relative text-sm">
-          <span className="block sm:inline pr-6">{successMessage}</span>
-          <button
-            onClick={() => setShowSuccessMessage(false)}
-            className="absolute top-1/2 right-2 -translate-y-1/2 p-1 text-green-600 hover:text-green-800 hover:bg-green-200 rounded-full transition-colors"
-            aria-label={t('close')}
-          >
-            <MdClose size={16} />
-          </button>
-        </div>
-      )}
-      
-      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm mb-4">
-        <div className="flex flex-col gap-2 sm:gap-3 mb-3">
+        {/* Mensaje de éxito */}
+        {showSuccessMessage && successMessage && (
+          <div className="mt-4 p-3 bg-[#EDF1E9] border border-[#CFE0C6] text-[#5F7A57] rounded-lg relative text-sm">
+            <span className="block sm:inline pr-6">{successMessage}</span>
+            <button
+              onClick={() => setShowSuccessMessage(false)}
+              className="absolute top-1/2 right-2 -translate-y-1/2 p-1 text-[#5F7A57] hover:text-[#3F5A3A] hover:bg-[#DCE7D3] rounded-full transition-colors"
+              aria-label={t('close')}
+            >
+              <MdClose size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* Filtros — misma grilla que el mockup: búsqueda + orquesta + instrumento */}
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_220px_220px] gap-3 mt-[22px]">
           <div className="relative">
             <input
               type="text"
               placeholder={t('search_name_or_instrument')}
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 sm:py-2.5 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
+              className="w-full pl-10 pr-4 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] font-medium"
             />
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <MdSearch className="absolute left-3 top-3.5 text-[#A29889]" size={18} />
           </div>
-          
-          <div className="grid grid-cols-2 gap-2">
-            <select
-              value={selectedOrchestra}
-              onChange={(e) => handleOrchestraChange(e.target.value)}
-              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
-              aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
-            >
-              <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
-              <option value="none">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</option>
-              {availableOrchestras.map((orchestra) => (
-                <option key={orchestra.id} value={orchestra.id}>
-                  {orchestra.name}
-                </option>
-              ))}
-            </select>
-            
-            <select
-              value={selectedInstrument}
-              onChange={(e) => handleInstrumentChange(e.target.value)}
-              className="px-2 sm:px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:border-transparent text-black font-medium text-sm"
-              aria-label={t('filter_by_instrument')}
-            >
-              <option value="all">{t('all_instruments')}</option>
-              {availableInstruments.map((instrument) => (
-                <option key={instrument} value={instrument}>
-                  {instrument}
-                </option>
-              ))}
-            </select>
-          </div>
+
+          <select
+            value={selectedOrchestra}
+            onChange={(e) => handleOrchestraChange(e.target.value)}
+            className="px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+            aria-label={lang === 'es' ? 'Filtrar por orquesta' : 'Filter by orchestra'}
+          >
+            <option value="all">{lang === 'es' ? 'Todas las orquestas' : 'All orchestras'}</option>
+            <option value="none">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</option>
+            {availableOrchestras.map((orchestra) => (
+              <option key={orchestra.id} value={orchestra.id}>
+                {orchestra.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedInstrument}
+            onChange={(e) => handleInstrumentChange(e.target.value)}
+            className="px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+            aria-label={t('filter_by_instrument')}
+          >
+            <option value="all">{t('all_instruments')}</option>
+            {availableInstruments.map((instrument) => (
+              <option key={instrument} value={instrument}>
+                {instrument}
+              </option>
+            ))}
+          </select>
         </div>
-        
-        <div className="text-xs sm:text-sm text-gray-600 font-medium mb-2 sm:mb-3">
-          {t('showing_n_of_total', { n: filteredStudents.length, total: students.length })}
-        </div>
-        
+
+        {/* Barra de modo asistencia */}
         {attendanceMode && (
-          <div className="mb-3 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="bg-[#F4F0E8] border border-[#E7E0D2] rounded-[11px] px-[18px] py-4 mt-4 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2.5 text-[13px] text-[#6E675E]">
               <button
                 onClick={selectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#C2492B] to-[#A83A20] text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-2 hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
-                <span className="mr-1">☑</span>
                 {t('select_all')}
               </button>
               <button
                 onClick={deselectAllStudents}
-                className="px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs sm:text-sm font-medium hover:shadow-md transform hover:scale-[1.01] transition-all duration-200"
+                className="bg-[#FFFDFA] border border-[#DED7C9] rounded-lg px-3.5 py-2 hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
               >
-                <span className="mr-1">☐</span>
                 {t('deselect_all')}
               </button>
+              <span>{t('n_students_selected', { n: selectedStudentCount })}</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => markAttendance('A')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
+                className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                   selectedStudentCount > 0
-                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-md transform hover:scale-[1.01]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-[#C2492B] text-white hover:bg-[#A83A20]'
+                    : 'bg-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
-                <span className="mr-1">✓</span>
-                <span className="hidden sm:inline">{t('mark_present')}</span>
-                <span className="sm:hidden">{lang === 'es' ? 'Presente' : 'Present'}</span>
+                {t('mark_present')}
               </button>
               <button
                 onClick={() => markAttendance('EA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
+                className={`rounded-lg px-4 py-2.5 text-sm border transition-colors ${
                   selectedStudentCount > 0
-                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:shadow-md transform hover:scale-[1.01]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'border-[#DED7C9] text-[#56504A] hover:border-[#B08A3C] hover:text-[#8A6A22]'
+                    : 'border-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
-                <span className="mr-1">!</span>
-                <span className="hidden sm:inline">{t('mark_excused_absence')}</span>
-                <span className="sm:hidden">{lang === 'es' ? 'Justif.' : 'Excused'}</span>
+                {t('mark_excused_absence')}
               </button>
               <button
                 onClick={() => markAttendance('UA')}
                 disabled={selectedStudentCount === 0}
-                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
+                className={`rounded-lg px-4 py-2.5 text-sm border transition-colors ${
                   selectedStudentCount > 0
-                    ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-md transform hover:scale-[1.01]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'border-[#DED7C9] text-[#56504A] hover:border-[#A8402A] hover:text-[#A8402A]'
+                    : 'border-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
-                <span className="mr-1">✗</span>
-                <span className="hidden sm:inline">{t('mark_unexcused_absence')}</span>
-                <span className="sm:hidden">{lang === 'es' ? 'Falta' : 'Absent'}</span>
+                {t('mark_unexcused_absence')}
               </button>
-
               <button
                 onClick={clearAttendanceForDate}
                 disabled={selectedStudentCount === 0 || isLoading}
-                className={`px-2 py-1.5 sm:py-2 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  selectedStudentCount > 0 && !isLoading
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:shadow-md transform hover:scale-[1.01]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
+                className="px-3 py-2.5 text-sm text-[#8A8177] hover:text-[#C2492B] underline decoration-[#DED7C9] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title={selectedStudentCount > 0 ? `Limpiar asistencia de ${selectedStudentCount} estudiante(s) seleccionado(s)` : 'Selecciona estudiantes para limpiar su asistencia'}
               >
-                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                <span className="hidden sm:inline">{t('clear_attendance')}</span>
-                <span className="sm:hidden">{lang === 'es' ? 'Limpiar' : 'Clear'}</span>
+                {t('clear_attendance')}
               </button>
             </div>
           </div>
@@ -1344,73 +1329,45 @@ export default function AttendancePage() {
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-black">{t('loading_students')}</p>
+              <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-[#EAE3D6] border-l-[#EAE3D6] rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-[#1B1917]">{t('loading_students')}</p>
             </div>
           </div>
         ) : (
           <div>
-            {/* Tarjetas de estudiante — mismo componente en móvil y escritorio */}
+            {/* Tarjetas de estudiante — se seleccionan pulsando la ficha completa
+                (nuestro patrón, sin checkbox), pero con el resto del estilo del
+                mockup: grilla auto-fill/minmax(320px), tarjeta y badge de estado. */}
             {filteredStudents.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-3 mt-[18px]">
                 {filteredStudents.map((student) => (
                   <div
                     key={student.id}
-                    className={`bg-white p-3 rounded-lg shadow-sm border-l-4 transition-shadow ${student.selected ? 'border-[#C2492B] bg-blue-50 shadow-md' : 'border-blue-500'} ${attendanceMode ? 'cursor-pointer hover:shadow-md' : ''}`}
+                    className={`text-left rounded-[11px] px-[18px] py-4 flex flex-col gap-3.5 transition-colors border ${
+                      student.selected ? 'border-[#C2492B] bg-[#FBF2ED]' : 'border-[#EAE3D6] bg-[#FFFDFA]'
+                    } ${attendanceMode ? 'cursor-pointer hover:border-[#D6C9BB]' : ''}`}
                     onClick={attendanceMode ? () => toggleStudentSelection(student.id) : undefined}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      {/* Nombre y datos principales */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-base leading-tight truncate mb-1">
-                          {student.first_name} {student.last_name}
-                        </h3>
-                        <div className="text-xs text-gray-600 mb-1">
-                          {t('grade')}: {student.current_grade || t('not_specified')}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1.5">
-                          <span className="font-medium">{student.instrument || t('not_specified')}</span>
-                          {student.orchestra ? (
-                            <>
-                              <span className="text-gray-400">•</span>
-                              <span className="font-medium text-[#C2492B]">{student.orchestra.name}</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-gray-400">•</span>
-                              <span className="text-gray-500">{lang === 'es' ? 'Sin orquesta' : 'No orchestra'}</span>
-                            </>
-                          )}
-                        </div>
-                        <div>
-                          {student.attendance_status ? (
-                            <AttendanceStatusIndicator
-                              key={`${student.id}-${student.attendance_status || 'none'}`}
-                              statusCode={student.attendance_status}
-                            />
-                          ) : (
-                            <span className="inline-block px-2 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded">{t('not_recorded')}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Checkbox */}
-                      {attendanceMode && (
-                        <input
-                          type="checkbox"
-                          checked={student.selected || false}
-                          onChange={() => toggleStudentSelection(student.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 mt-0.5 text-[#C2492B] focus:ring-[#C2492B] border-gray-300 rounded flex-shrink-0"
-                        />
-                      )}
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[15.5px] font-medium text-[#1B1917] truncate">
+                        {student.first_name} {student.last_name}
+                      </span>
+                      <span className="text-[12.5px] text-[#8A8177]">
+                        {t('grade')} {student.current_grade || t('not_specified')} · {student.instrument || t('not_specified')} · {student.orchestra ? student.orchestra.name : (lang === 'es' ? 'Sin orquesta' : 'No orchestra')}
+                      </span>
+                    </div>
+                    <div>
+                      <AttendanceStatusIndicator
+                        key={`${student.id}-${student.attendance_status || 'none'}`}
+                        statusCode={student.attendance_status}
+                      />
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <MdGroup className="mx-auto mb-2 text-gray-400" size={40} />
+              <div className="text-center py-12 text-[#8A8177]">
+                <MdGroup className="mx-auto mb-2 text-[#A29889]" size={40} />
                 <p className="font-medium">{t('no_students_found')}</p>
               </div>
             )}
