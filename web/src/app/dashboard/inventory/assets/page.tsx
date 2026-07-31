@@ -166,76 +166,68 @@ export default function AssetsListPage() {
 
   async function loadCatalogs() {
     try {
-      // Cargar ubicaciones
-      const { data: locationsData, error: locationsError } = await inventorySupabase
-        .from('asset_locations')
-        .select('id, code, name')
-        .eq('is_active', true)
-        .order('name');
+      // Las 6 consultas de catálogo (ubicaciones, grupos, programas, y los
+      // 3 valores dinámicos de filtro: instrumento/marca/tamaño) son
+      // independientes entre sí — antes se pedían 6 veces, una tras otra
+      // (loadDynamicFilters se esperaba al final de loadCatalogs); ahora
+      // van todas en paralelo.
+      const [
+        { data: locationsData, error: locationsError },
+        { data: groupsData, error: groupsError },
+        { data: programsData, error: programsError },
+        { data: instrumentsData },
+        { data: brandsData },
+        { data: sizesData },
+      ] = await Promise.all([
+        inventorySupabase
+          .from('asset_locations')
+          .select('id, code, name')
+          .eq('is_active', true)
+          .order('name'),
+        inventorySupabase
+          .from('asset_groups')
+          .select('id, code, name')
+          .order('name'),
+        inventorySupabase
+          .from('programs')
+          .select('id, name')
+          .eq('is_active', true)
+          .order('name'),
+        inventorySupabase
+          .from('assets')
+          .select('description')
+          .not('description', 'is', null)
+          .order('description'),
+        inventorySupabase
+          .from('assets')
+          .select('brand')
+          .not('brand', 'is', null)
+          .order('brand'),
+        inventorySupabase
+          .from('assets')
+          .select('size')
+          .not('size', 'is', null)
+          .order('size'),
+      ]);
 
       if (locationsError) throw locationsError;
-
-      // Cargar grupos
-      const { data: groupsData, error: groupsError } = await inventorySupabase
-        .from('asset_groups')
-        .select('id, code, name')
-        .order('name');
-
       if (groupsError) throw groupsError;
-
-      // Cargar programas
-      const { data: programsData, error: programsError } = await inventorySupabase
-        .from('programs')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name');
-
       if (programsError) throw programsError;
 
       setLocations(locationsData || []);
       setGroups(groupsData || []);
       setPrograms(programsData || []);
 
-      // Cargar valores dinámicos para filtros (description, brand, size)
-      await loadDynamicFilters();
-    } catch (err: any) {
-      console.error('Error loading catalogs:', err);
-    }
-  }
-
-  async function loadDynamicFilters() {
-    try {
-      // Obtener valores únicos de description (instrumentos)
-      const { data: instrumentsData } = await inventorySupabase
-        .from('assets')
-        .select('description')
-        .not('description', 'is', null)
-        .order('description');
-
       const uniqueInstruments = [...new Set(instrumentsData?.map(a => a.description).filter(Boolean))] as string[];
       setInstruments(uniqueInstruments);
-
-      // Obtener valores únicos de brand
-      const { data: brandsData } = await inventorySupabase
-        .from('assets')
-        .select('brand')
-        .not('brand', 'is', null)
-        .order('brand');
 
       const uniqueBrands = [...new Set(brandsData?.map(a => a.brand).filter(Boolean))] as string[];
       setBrands(uniqueBrands);
 
-      // Obtener valores únicos de size
-      const { data: sizesData } = await inventorySupabase
-        .from('assets')
-        .select('size')
-        .not('size', 'is', null)
-        .order('size');
-
       const uniqueSizes = [...new Set(sizesData?.map(a => a.size).filter(Boolean))] as string[];
       setSizes(uniqueSizes);
     } catch (err: any) {
-      console.error('Error loading dynamic filters:', err);
+      console.error('Error loading catalogs:', err);
     }
   }
 
