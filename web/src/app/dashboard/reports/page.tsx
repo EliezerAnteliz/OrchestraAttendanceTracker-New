@@ -392,6 +392,25 @@ export default function ReportsPage() {
     loadStudents();
   }, [activeProgram?.id]);
 
+  // Al cambiar de sede (programa activo) limpiar cualquier reporte ya
+  // generado — antes se quedaba visible el reporte de la sede anterior
+  // (estadísticas, gráfico, Top 5, desgloses, estudiante seleccionado...)
+  // hasta que el usuario generaba uno nuevo a mano, lo cual se podía
+  // confundir con datos de la sede recién seleccionada.
+  useEffect(() => {
+    setReportData(null);
+    setReportError(null);
+    setSelectedStudent(null);
+    setInstrumentFilter('all');
+    setTopAttendance([]);
+    setTopAttendanceMoreTied(null);
+    setPeriodComparison(null);
+    setInstrumentBreakdown([]);
+    setPositionBreakdown([]);
+    setWeeklyTrend([]);
+    setAnnualBreakdown([]);
+  }, [activeProgram?.id]);
+
   // Generar reporte
   const handleGenerateReport = async () => {
     try {
