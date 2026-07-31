@@ -428,72 +428,61 @@ export default function AssetsListPage() {
     });
   };
 
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
   return (
-    <div className="p-4 lg:p-6 w-full">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('inv_assets_list_title')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('inv_assets_list_subtitle')}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={exportToExcel}
-              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              title={t('inv_export_excel_title')}
-            >
-              <MdFileDownload size={20} />
-              {t('inv_export_excel_button')}
-            </button>
-            {isAdmin && (
-              <button
-                onClick={() => router.push('/dashboard/inventory/assets/new')}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
-              >
-                <MdAdd size={20} />
-                {t('inv_new_asset_button')}
-              </button>
-            )}
-          </div>
-        </div>
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-          <div className="mt-2 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-            <MdWarning className="mr-2" />
-            {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-          </div>
+    <div>
+      {/* Acciones — el título "Inventory" y la sede ya viven en el
+          encabezado compartido de layout.tsx. */}
+      <div className="flex items-center justify-end gap-3 flex-wrap">
+        <button
+          onClick={exportToExcel}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+          title={t('inv_export_excel_title')}
+        >
+          <MdFileDownload size={18} />
+          {t('inv_export_excel_button')}
+        </button>
+        {isAdmin && (
+          <button
+            onClick={() => router.push('/dashboard/inventory/assets/new')}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
+          >
+            <MdAdd size={18} />
+            {t('inv_new_asset_button')}
+          </button>
         )}
       </div>
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
+        </div>
+      )}
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <MdFilterList className="text-gray-600" size={20} />
-          <h2 className="text-lg font-semibold text-gray-900">{t('inv_filters_header')}</h2>
-        </div>
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-5 py-[18px] mt-6">
+        <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_filters_header')}</div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3.5">
           {/* Search */}
           <div className="relative">
-            <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A29889]" size={18} />
             <input
               type="text"
               placeholder={t('inv_search_placeholder_assets')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+              className="w-full pl-10 pr-3 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             />
           </div>
 
-          {/* Status Filter */}
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_statuses')}</option>
+            <option value="">{t('inv_filter_all_statuses')}</option>
             <option value="available">{t('inv_filter_status_available')}</option>
             <option value="assigned">{t('inv_filter_status_assigned')}</option>
             <option value="repair">{t('inv_filter_status_repair')}</option>
@@ -501,297 +490,195 @@ export default function AssetsListPage() {
             <option value="on_loan">{t('inv_filter_status_on_loan')}</option>
           </select>
 
-          {/* Group Filter */}
           <select
             value={selectedGroup}
             onChange={(e) => setSelectedGroup(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_categories')}</option>
+            <option value="">{t('inv_filter_all_categories')}</option>
             {groups.map(group => (
               <option key={group.id} value={group.id}>{group.name}</option>
             ))}
           </select>
 
-          {/* Program/Sede Filter */}
           <select
             value={selectedProgram}
             onChange={(e) => setSelectedProgram(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_sites')}</option>
+            <option value="">{t('inv_filter_all_sites')}</option>
             {programs.map(program => (
               <option key={program.id} value={program.id}>{program.name}</option>
             ))}
           </select>
 
-          {/* Instrument Filter */}
           <select
             value={selectedInstrument}
             onChange={(e) => setSelectedInstrument(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_instruments')}</option>
+            <option value="">{t('inv_filter_all_instruments')}</option>
             {instruments.map(instrument => (
               <option key={instrument} value={instrument}>{instrument}</option>
             ))}
           </select>
 
-          {/* Brand Filter */}
           <select
             value={selectedBrand}
             onChange={(e) => setSelectedBrand(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_brands')}</option>
+            <option value="">{t('inv_filter_all_brands')}</option>
             {brands.map(brand => (
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
 
-          {/* Size Filter */}
           <select
             value={selectedSize}
             onChange={(e) => setSelectedSize(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            className="appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 text-[#1B1917]"
           >
-            <option value="" className="text-gray-500">{t('inv_filter_all_sizes')}</option>
+            <option value="">{t('inv_filter_all_sizes')}</option>
             {sizes.map(size => (
               <option key={size} value={size}>{size}</option>
             ))}
           </select>
 
-          {/* Clear Filters */}
           <button
             onClick={clearFilters}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-3.5 py-2.5 text-[#8A8177] hover:text-[#C2492B] transition-colors text-left sm:text-center"
           >
             {t('inv_clear_filters')}
           </button>
         </div>
+      </div>
 
-        <div className="mt-3 text-sm text-gray-600">
-          {t('inv_showing_range_assets', { from: ((currentPage - 1) * pageSize) + 1, to: Math.min(currentPage * pageSize, totalCount), total: totalCount })}
+      {/* Paginación */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-5 text-[13px] text-[#8A8177]">
+        <span>
+          {t('inv_showing_range_short', { from: assets.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0, to: Math.min(currentPage * pageSize, totalCount), total: totalCount })}
+        </span>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="appearance-none px-3 py-2 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] text-[13px] text-[#56504A] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
+          >
+            <option value={25}>{t('inv_per_page_option', { n: 25 })}</option>
+            <option value={50}>{t('inv_per_page_option', { n: 50 })}</option>
+            <option value={100}>{t('inv_per_page_option', { n: 100 })}</option>
+          </select>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-3.5 py-2 border border-[#E3DDD1] rounded-lg text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[#E3DDD1] disabled:hover:text-[#56504A] transition-colors"
+          >
+            {t('inv_previous')}
+          </button>
+          <span className="text-[#56504A] whitespace-nowrap">
+            {t('inv_page_of', { current: currentPage, total: totalPages })}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage >= totalPages}
+            className="px-3.5 py-2 border border-[#DED7C9] rounded-lg text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[#DED7C9] disabled:hover:text-[#56504A] transition-colors"
+          >
+            {t('inv_next')}
+          </button>
         </div>
       </div>
 
-      {/* Assets Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        {/* Controles de Paginación - Superior */}
-        <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-sm text-gray-700">
-              {t('inv_showing_range_short', { from: assets.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0, to: Math.min(currentPage * pageSize, totalCount), total: totalCount })}
-            </span>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 text-gray-900"
-            >
-              <option value={25}>{t('inv_per_page_option', { n: 25 })}</option>
-              <option value={50}>{t('inv_per_page_option', { n: 50 })}</option>
-              <option value={100}>{t('inv_per_page_option', { n: 100 })}</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('inv_previous')}
-            </button>
-            <span className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
-              {t('inv_page_of', { current: currentPage, total: Math.ceil(totalCount / pageSize) || 1 })}
-            </span>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalCount / pageSize), prev + 1))}
-              disabled={currentPage >= Math.ceil(totalCount / pageSize)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('inv_next')}
-            </button>
-          </div>
+      {/* Error message */}
+      {error && (
+        <div className="mt-4 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4">
+          <p className="text-[#8f3421]">{t('inv_error_prefix', { msg: error })}</p>
+          <button
+            onClick={loadData}
+            className="mt-2 px-4 py-2 bg-[#A8402A] text-white rounded-lg hover:bg-[#8f3421] transition-colors text-sm font-medium"
+          >
+            {t('inv_retry')}
+          </button>
         </div>
+      )}
 
-        {/* Error message */}
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{t('inv_error_prefix', { msg: error })}</p>
-            <button
-              onClick={loadData}
-              className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              {t('inv_retry')}
-            </button>
+      {/* Assets List */}
+      <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-[22px] pt-1 pb-2 mt-3.5 overflow-x-auto relative">
+        {loading && (
+          <div className="absolute inset-0 bg-[#FAF7F2]/80 flex items-center justify-center z-10 rounded-xl">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+              <p className="mt-4 text-[#8A8177]">{t('inv_loading_assets')}</p>
+            </div>
           </div>
         )}
 
-        <div className="overflow-x-auto relative">
-          {/* Loading overlay */}
-          {loading && (
-            <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-                <p className="mt-4 text-gray-600">{t('inv_loading_assets')}</p>
-              </div>
+        {assets.length === 0 ? (
+          <p className="py-10 text-center text-[13.5px] text-[#A29889]">
+            {searchTerm || selectedStatus || selectedGroup || selectedProgram
+              ? t('inv_no_assets_filtered')
+              : t('inv_no_assets_registered_yet')}
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-[170px_minmax(0,1fr)_150px_70px_140px_150px_130px_100px_220px] min-w-[1400px] gap-4 py-3 border-b border-[#EFE9DD] text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
+              <span>{t('inv_code_column')}</span>
+              <span>{t('inv_description_column')}</span>
+              <span>{t('inv_col_brand_model')}</span>
+              <span>{t('inv_col_size')}</span>
+              <span>{t('status')}</span>
+              <span>{t('inv_assigned_to')}</span>
+              <span>{t('inv_col_program')}</span>
+              <span className="text-right">{t('inv_col_est_cost')}</span>
+              <span>{t('inv_col_observations')}</span>
             </div>
-          )}
-          
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '150px'}}>
-                  {t('inv_code_column')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '200px'}}>
-                  {t('inv_description_column')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '160px'}}>
-                  {t('inv_col_brand_model')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '80px'}}>
-                  {t('inv_col_size')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '120px'}}>
-                  {t('status')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '140px'}}>
-                  {t('inv_assigned_to')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '120px'}}>
-                  {t('inv_col_program')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '100px'}}>
-                  {t('inv_col_est_cost')}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '250px'}}>
-                  {t('inv_col_observations')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {assets.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
-                    {searchTerm || selectedStatus || selectedGroup || selectedProgram
-                      ? t('inv_no_assets_filtered')
-                      : t('inv_no_assets_registered_yet')}
-                  </td>
-                </tr>
-              ) : (
-                assets.map((asset: Asset) => (
-                  <tr 
-                    key={asset.id} 
-                    onClick={() => router.push(`/dashboard/inventory/assets/${asset.id}`)}
-                    className="hover:bg-gray-50 cursor-pointer"
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">
-                      {asset.full_code || <span className="text-gray-400">{t('inv_no_code')}</span>}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      <div className="font-medium flex items-center gap-2 flex-wrap">
-                        {asset.description}
-                        {isLoanedOwner(asset.owner) && (
-                          <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800 whitespace-nowrap">
-                            {t('inv_loaned_badge', { owner: asset.owner })}
-                          </span>
-                        )}
-                      </div>
-                      {asset.serial_number && (
-                        <div className="text-xs text-gray-500">S/N: {asset.serial_number}</div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      <div>{asset.brand || 'N/A'}</div>
-                      {asset.model && <div className="text-xs text-gray-500">{asset.model}</div>}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600 text-center">
-                      {asset.size || '-'}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        asset.status_code === 'available' ? 'bg-green-100 text-green-800' :
-                        asset.status_code === 'assigned' ? 'bg-purple-100 text-purple-800' :
-                        asset.status_code === 'repair' ? 'bg-orange-100 text-orange-800' :
-                        asset.status_code === 'retired' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {getStatusLabel(asset.status_code, asset.asset_status?.description, t)}
+            {assets.map((asset: Asset) => (
+              <div
+                key={asset.id}
+                onClick={() => router.push(`/dashboard/inventory/assets/${asset.id}`)}
+                className="grid grid-cols-[170px_minmax(0,1fr)_150px_70px_140px_150px_130px_100px_220px] min-w-[1400px] gap-4 py-3.5 border-b border-[#F2ECE1] text-[13.5px] items-start cursor-pointer hover:bg-[#FAF7F2] transition-colors"
+              >
+                <span className="tabular-nums text-[#56504A] pt-0.5">
+                  {asset.full_code || <span className="text-[#A29889]">{t('inv_no_code')}</span>}
+                </span>
+                <div>
+                  <div className="font-medium text-[#1B1917] flex items-center gap-2 flex-wrap">
+                    {asset.description}
+                    {isLoanedOwner(asset.owner) && (
+                      <span className="px-1.5 py-0.5 text-[11px] font-medium rounded bg-[#F6EFDF] text-[#8A6A22] whitespace-nowrap">
+                        {t('inv_loaned_badge', { owner: asset.owner })}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {getAssignedToDisplay(asset) || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {asset.current_program?.name || '-'}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600 text-right">
-                      {asset.estimated_cost ? `$${asset.estimated_cost.toFixed(2)}` : '-'}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {asset.notes ? (
-                        <div 
-                          className="line-clamp-2" 
-                          title={asset.notes}
-                        >
-                          {formatTimestamp(asset.notes)}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Controles de Paginación */}
-        <div className="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-sm text-gray-700">
-              {t('inv_showing_range_short', { from: assets.length > 0 ? ((currentPage - 1) * pageSize) + 1 : 0, to: Math.min(currentPage * pageSize, totalCount), total: totalCount })}
-            </span>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 text-gray-900"
-            >
-              <option value={25}>{t('inv_per_page_option', { n: 25 })}</option>
-              <option value={50}>{t('inv_per_page_option', { n: 50 })}</option>
-              <option value={100}>{t('inv_per_page_option', { n: 100 })}</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('inv_previous')}
-            </button>
-            <span className="px-4 py-2 text-sm text-gray-700 whitespace-nowrap">
-              {t('inv_page_of', { current: currentPage, total: Math.ceil(totalCount / pageSize) || 1 })}
-            </span>
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalCount / pageSize), prev + 1))}
-              disabled={currentPage >= Math.ceil(totalCount / pageSize)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {t('inv_next')}
-            </button>
-          </div>
-        </div>
+                    )}
+                  </div>
+                  {asset.serial_number && (
+                    <div className="text-[11.5px] text-[#8A8177] mt-0.5">S/N: {asset.serial_number}</div>
+                  )}
+                </div>
+                <div className="text-[#56504A]">
+                  <div>{asset.brand || 'N/A'}</div>
+                  {asset.model && <div className="text-[11.5px] text-[#8A8177]">{asset.model}</div>}
+                </div>
+                <span className="text-[#56504A] pt-0.5">{asset.size || '-'}</span>
+                <span className="text-[#56504A] pt-0.5">{getStatusLabel(asset.status_code, asset.asset_status?.description, t)}</span>
+                <span className="text-[#8A8177] pt-0.5">{getAssignedToDisplay(asset) || '-'}</span>
+                <span className="text-[#8A8177] pt-0.5">{asset.current_program?.name || '-'}</span>
+                <span className="text-[#56504A] tabular-nums text-right pt-0.5">
+                  {asset.estimated_cost ? `$${asset.estimated_cost.toFixed(2)}` : '-'}
+                </span>
+                <div className="text-[#8A8177]">
+                  {asset.notes ? (
+                    <div className="line-clamp-2" title={asset.notes}>
+                      {formatTimestamp(asset.notes)}
+                    </div>
+                  ) : '-'}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
