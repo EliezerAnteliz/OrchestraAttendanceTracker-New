@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdPhone, MdEmail, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdEdit, MdDelete, MdContacts, MdUpload, MdClose, MdPerson, MdMusicNote, MdSchool, MdCalendarToday, MdCheckCircle } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -820,8 +820,7 @@ export default function StudentsPage() {
                           solo la etiqueta en mayúsculas + línea divisoria,
                           igual que el mockup (no "una sección = una tarjeta"). */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
-                          <MdPerson className="text-[#C2492B]" size={14} />
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                           {t('personal_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -913,11 +912,11 @@ export default function StudentsPage() {
                                 <option value="false">{t('inactive')}</option>
                               </select>
                             ) : (
-                              <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
-                                studentDetails.is_active !== false ? 'bg-[#EDF1E9] text-[#5F7A57]' : 'bg-[#F8E9E4] text-[#A8402A]'
+                              <p className={`text-[14px] ${
+                                studentDetails.is_active !== false ? 'text-[#5F7A57]' : 'text-[#A8402A]'
                               }`}>
                                 {studentDetails.is_active !== false ? t('active') : t('inactive')}
-                              </span>
+                              </p>
                             )}
                           </div>
                         </div>
@@ -925,8 +924,7 @@ export default function StudentsPage() {
 
                       {/* Información de Orquesta — sin caja/borde, mismo patrón. */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
-                          <MdMusicNote className="text-[#C2492B]" size={14} />
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
@@ -935,20 +933,15 @@ export default function StudentsPage() {
                               <p className="text-[12.5px] text-[#8A8177] mb-1">
                                 {t('instrument')}
                               </p>
-                              <div className="space-y-2">
+                              <div className="space-y-1.5">
                                 {linkedAssets.map((asset) => (
-                                  <div key={asset.id} className="flex items-center gap-3 bg-[#F4F0E8] rounded-lg p-3 border border-[#E7E0D2]">
-                                    <div className="bg-[#EFE9DD] p-2 rounded-full flex-shrink-0">
-                                      <MdMusicNote className="text-[#C2492B]" size={18} />
-                                    </div>
-                                    <div className="min-w-0">
-                                      <p className="text-sm font-bold text-gray-900">
-                                        {asset.description}{asset.size ? ` · ${asset.size}` : ''}
-                                      </p>
-                                      <p className="text-xs text-gray-500 truncate">
-                                        {[asset.brand, asset.serial_number ? `S/N ${asset.serial_number}` : null, asset.full_code ? `#${asset.full_code}` : null].filter(Boolean).join(' · ')}
-                                      </p>
-                                    </div>
+                                  <div key={asset.id}>
+                                    <p className="text-[14px] text-[#1B1917]">
+                                      {asset.description}{asset.size ? ` · ${asset.size}` : ''}
+                                    </p>
+                                    <p className="text-[12px] text-[#8A8177] truncate">
+                                      {[asset.brand, asset.serial_number ? `S/N ${asset.serial_number}` : null, asset.full_code ? `#${asset.full_code}` : null].filter(Boolean).join(' · ')}
+                                    </p>
                                   </div>
                                 ))}
                               </div>
@@ -1040,90 +1033,77 @@ export default function StudentsPage() {
 
                       {/* Información de Padres — sin caja/borde, mismo patrón. */}
                       <div>
-                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4 flex items-center gap-2">
-                          <MdContacts className="text-[#C2492B]" size={14} />
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
                           {t('parents_info')}
                         </h3>
                         {studentDetails.parents && studentDetails.parents.length > 0 ? (
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             {(isEditMode ? editFormData.parents : studentDetails.parents).map((parent: any, index: number) => (
-                              <div key={index} className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6]">
-                                {isEditMode ? (
-                                  <div className="space-y-3">
-                                    <div>
-                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
-                                        {t('parent_name')}
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={parent.full_name || ''}
-                                        onChange={(e) => handleParentChange(index, 'full_name', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
-                                        {t('phone')}
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={parent.phone_number || ''}
-                                        onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="text-[12.5px] text-[#8A8177] mb-1 block">
-                                        {t('email')}
-                                      </label>
-                                      <input
-                                        type="email"
-                                        value={parent.email || ''}
-                                        onChange={(e) => handleParentChange(index, 'email', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
-                                      />
-                                    </div>
+                              isEditMode ? (
+                                <div key={index} className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6] space-y-3">
+                                  <div>
+                                    <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                      {t('parent_name')}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={parent.full_name || ''}
+                                      onChange={(e) => handleParentChange(index, 'full_name', e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                    />
                                   </div>
-                                ) : (
-                                  <div className="space-y-3">
-                                    <p className="font-semibold text-gray-800 text-base">
-                                      {parent.full_name}
-                                    </p>
-                                    <div className="space-y-2">
-                                      {parent.phone_number && (
-                                        <div className="flex items-center gap-2">
-                                          <MdPhone className="text-[#C2492B] flex-shrink-0" size={18} />
-                                          <a
-                                            href={`tel:${parent.phone_number}`}
-                                            className="text-sm font-medium text-[#1B1917] hover:text-[#C2492B] hover:underline"
-                                          >
-                                            {parent.phone_number}
-                                          </a>
-                                        </div>
-                                      )}
-                                      {parent.email && (
-                                        <div className="flex items-center gap-2">
-                                          <MdEmail className="text-[#C2492B] flex-shrink-0" size={18} />
-                                          <a
-                                            href={`mailto:${parent.email}`}
-                                            className="text-sm font-medium text-[#1B1917] hover:text-[#C2492B] hover:underline break-all"
-                                          >
-                                            {parent.email}
-                                          </a>
-                                        </div>
-                                      )}
-                                    </div>
+                                  <div>
+                                    <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                      {t('phone')}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={parent.phone_number || ''}
+                                      onChange={(e) => handleParentChange(index, 'phone_number', e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                    />
                                   </div>
-                                )}
-                              </div>
+                                  <div>
+                                    <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                      {t('email')}
+                                    </label>
+                                    <input
+                                      type="email"
+                                      value={parent.email || ''}
+                                      onChange={(e) => handleParentChange(index, 'email', e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                    />
+                                  </div>
+                                </div>
+                              ) : (
+                                <div key={index} className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                  <p className="text-[14px] text-[#1B1917]">
+                                    {parent.full_name}
+                                  </p>
+                                  {parent.phone_number && (
+                                    <a
+                                      href={`tel:${parent.phone_number}`}
+                                      className="text-[14px] text-[#1B1917] hover:text-[#C2492B]"
+                                    >
+                                      {parent.phone_number}
+                                    </a>
+                                  )}
+                                  {parent.email && (
+                                    <a
+                                      href={`mailto:${parent.email}`}
+                                      className="text-[14px] text-[#C2492B] hover:underline break-all"
+                                    >
+                                      {parent.email}
+                                    </a>
+                                  )}
+                                </div>
+                              )
                             ))}
                           </div>
                         ) : (
-                          <div className="bg-[#FFFDFA] rounded-lg p-4 border border-[#EAE3D6] text-center">
-                            <p className="text-sm text-[#8A8177]">
-                              {t('no_parent_info') || 'No hay información de padres registrada'}
-                            </p>
-                          </div>
+                          <p className="text-[13px] text-[#8A8177]">
+                            {t('no_parent_info') || 'No hay información de padres registrada'}
+                          </p>
                         )}
                       </div>
                     </div>
