@@ -866,17 +866,17 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#FAF7F2]">
       <div className="p-6">
         {/* Instructions */}
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="mb-6 bg-[#F4F0E8] border border-[#E3DDD1] rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <div className="p-1 bg-blue-100 rounded-full mt-0.5">
-              <FiAlertCircle className="w-4 h-4 text-blue-600" />
+            <div className="p-1 bg-[#EFE9DD] rounded-full mt-0.5">
+              <FiAlertCircle className="w-4 h-4 text-[#C2492B]" />
             </div>
             <div className="flex-1">
-              <h4 className="font-medium text-blue-900 mb-2">{t('usage_instructions')}</h4>
-              <div className="text-sm text-blue-800 space-y-1">
+              <h4 className="font-medium text-[#1B1917] mb-2">{t('usage_instructions')}</h4>
+              <div className="text-sm text-[#56504A] space-y-1">
                 <p><strong>{t('required_fields')}:</strong> {t('bulk_upload_required_fields')}</p>
                 <p><strong>{t('optional_fields')}:</strong> {t('bulk_upload_optional_fields')}</p>
                 <p><strong>{t('parent_data')}:</strong> {t('bulk_upload_parent_fields')}</p>
@@ -889,10 +889,10 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         <div 
           className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
             isDragOver 
-              ? 'border-blue-400 bg-blue-50' 
+              ? 'border-[#C2492B] bg-[#F4F0E8]' 
               : file 
                 ? 'border-green-300 bg-green-50'
-                : 'border-gray-300 bg-gray-50 hover:border-gray-400 hover:bg-gray-100'
+                : 'border-[#DED7C9] bg-[#FAF7F2] hover:border-[#C2492B] hover:bg-[#F4F0E8]'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -901,18 +901,18 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
           {!file ? (
             <div className="space-y-4">
               <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
-                isDragOver ? 'bg-blue-100' : 'bg-gray-200'
+                isDragOver ? 'bg-[#EFE9DD]' : 'bg-[#EAE3D6]'
               }`}>
                 <FiUpload className={`w-8 h-8 ${
-                  isDragOver ? 'text-blue-600' : 'text-gray-500'
+                  isDragOver ? 'text-[#C2492B]' : 'text-[#8A8177]'
                 }`} />
               </div>
               <div>
-                <p className="text-lg font-medium text-gray-900 mb-1">
+                <p className="text-lg font-medium text-[#1B1917] mb-1">
                   {isDragOver ? t('drop_file_here') : t('drag_excel_file_here')}
                 </p>
-                <p className="text-sm text-gray-600 mb-4">{t('or_click_to_select')}</p>
-                <label htmlFor="excel-file-input" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors font-medium">
+                <p className="text-sm text-[#6E675E] mb-4">{t('or_click_to_select')}</p>
+                <label htmlFor="excel-file-input" className="inline-flex items-center gap-2 px-6 py-3 bg-[#C2492B] text-white rounded-lg cursor-pointer hover:bg-[#A83A20] transition-colors font-medium">
                   <FiFile className="w-4 h-4" />
                   {t('select_file')}
                 </label>
@@ -925,7 +925,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   className="hidden"
                 />
               </div>
-              <p className="text-xs text-gray-500">{t('supported_formats')}: .xlsx, .xls</p>
+              <p className="text-xs text-[#8A8177]">{t('supported_formats')}: .xlsx, .xls</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -933,10 +933,10 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                 <FiFile className="w-8 h-8 text-green-600" />
               </div>
               <div>
-                <p className="text-lg font-medium text-gray-900 mb-1">{t('file_selected')}</p>
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                <p className="text-lg font-medium text-[#1B1917] mb-1">{t('file_selected')}</p>
+                <div className="flex items-center justify-center gap-2 text-sm text-[#6E675E]">
                   <span className="font-medium">{file.name}</span>
-                  <span className="text-gray-400">({(file.size / 1024).toFixed(1)} KB)</span>
+                  <span className="text-[#A29889]">({(file.size / 1024).toFixed(1)} KB)</span>
                   {!isUploading && (
                     <button
                       onClick={removeFile}
@@ -948,7 +948,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                 </div>
               </div>
               {isUploading && (
-                <div className="flex items-center justify-center gap-2 text-blue-600">
+                <div className="flex items-center justify-center gap-2 text-[#C2492B]">
                   <FiUpload className="w-4 h-4 animate-pulse" />
                   <span className="text-sm font-medium">{t('processing_file')}...</span>
                 </div>
@@ -959,18 +959,18 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
         {/* Progress Bar */}
         {isUploading && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-6 p-4 bg-[#F4F0E8] border border-[#E3DDD1] rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-[#1B1917]">
                 {t('processing_records', { processed: progress.processed, total: progress.total })}
               </p>
-              <span className="text-sm text-blue-700 font-medium">
+              <span className="text-sm text-[#A83A20] font-medium">
                 {progress.total ? Math.round((progress.processed / progress.total) * 100) : 0}%
               </span>
             </div>
-            <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-[#EAE3D6] rounded-full h-3 overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300 ease-out" 
+                className="bg-gradient-to-r from-[#C2492B] to-[#A83A20] h-3 rounded-full transition-all duration-300 ease-out" 
                 style={{ width: `${progress.total ? (progress.processed / progress.total) * 100 : 0}%` }}
               ></div>
             </div>
@@ -979,7 +979,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
 
         {/* Results Summary */}
         {(results.added > 0 || results.updated > 0 || results.errors > 0) && !isUploading && (
-          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-[#F4F0E8] border border-green-200 rounded-lg">
             <div className="flex items-center gap-3 mb-4">
               {results.errors > 0 ? (
                 <div className="p-2 bg-yellow-100 rounded-lg">
@@ -990,15 +990,15 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   <FiCheckCircle className="w-5 h-5 text-green-600" />
                 </div>
               )}
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-[#1B1917]">
                 {results.errors > 0 ? t('process_completed_with_warnings') : t('process_completed_successfully')}
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
+              <div className="bg-[#FFFDFA] p-4 rounded-lg border border-green-200 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">{t('new_students')}</p>
+                    <p className="text-sm font-medium text-[#6E675E]">{t('new_students')}</p>
                     <p className="text-2xl font-bold text-green-600">{results.added}</p>
                   </div>
                   <div className="p-2 bg-green-100 rounded-lg">
@@ -1006,21 +1006,21 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   </div>
                 </div>
               </div>
-              <div className="bg-white p-4 rounded-lg border border-blue-200 shadow-sm">
+              <div className="bg-[#FFFDFA] p-4 rounded-lg border border-[#E3DDD1] shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">{t('updated_students')}</p>
-                    <p className="text-2xl font-bold text-blue-600">{results.updated}</p>
+                    <p className="text-sm font-medium text-[#6E675E]">{t('updated_students')}</p>
+                    <p className="text-2xl font-bold text-[#C2492B]">{results.updated}</p>
                   </div>
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <FiCheckCircle className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-[#EFE9DD] rounded-lg">
+                    <FiCheckCircle className="w-5 h-5 text-[#C2492B]" />
                   </div>
                 </div>
               </div>
-              <div className="bg-white p-4 rounded-lg border border-red-200 shadow-sm">
+              <div className="bg-[#FFFDFA] p-4 rounded-lg border border-red-200 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">{t('errors')}</p>
+                    <p className="text-sm font-medium text-[#6E675E]">{t('errors')}</p>
                     <p className="text-2xl font-bold text-red-600">{results.errors}</p>
                   </div>
                   <div className="p-2 bg-red-100 rounded-lg">
@@ -1041,7 +1041,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
               </div>
               <h3 className="font-medium text-red-900">{t('errors_found')} ({errorMessages.length})</h3>
             </div>
-            <div className="max-h-48 overflow-y-auto bg-white border border-red-200 rounded-md">
+            <div className="max-h-48 overflow-y-auto bg-[#FFFDFA] border border-red-200 rounded-md">
               <div className="p-3 space-y-2">
                 {errorMessages.map((msg, index) => (
                   <div key={index} className="flex items-start gap-2 text-sm">
@@ -1055,16 +1055,16 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         )}
 
         {/* Download Template */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-[#E3DDD1]">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">{t('need_template')}</h4>
-              <p className="text-sm text-gray-600">{t('download_template_description')}</p>
+              <h4 className="font-medium text-[#1B1917] mb-1">{t('need_template')}</h4>
+              <p className="text-sm text-[#6E675E]">{t('download_template_description')}</p>
             </div>
-            <a 
-              href="/student_template_updated.xlsx" 
-              download 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            <a
+              href="/student_template_updated.xlsx"
+              download
+              className="inline-flex items-center gap-2 px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium"
             >
               <FiDownload className="w-4 h-4" />
               {t('download_excel_template')}
@@ -1076,7 +1076,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       {/* Diálogo de Confirmación de Duplicados */}
       {confirmationDialog.isOpen && confirmationDialog.candidate && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+          <div className="bg-[#FAF7F2] rounded-xl shadow-2xl max-w-md w-full mx-4 border border-[#E3DDD1]">
             <div className="p-6">
               {/* Icono de advertencia */}
               <div className="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full mb-4">
@@ -1084,39 +1084,39 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
               </div>
               
               {/* Título */}
-              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">
+              <h3 className="text-lg font-semibold text-[#1B1917] text-center mb-4">
                 Posible Estudiante Duplicado Detectado
               </h3>
               
               {/* Contenido */}
               <div className="space-y-4">
-                <p className="text-sm text-gray-600 text-center">
+                <p className="text-sm text-[#6E675E] text-center">
                   Encontramos un estudiante similar en la base de datos:
                 </p>
                 
                 {/* Comparación detallada */}
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div className="bg-[#FAF7F2] rounded-lg p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Base de Datos</span>
-                      <div className="mt-1 p-2 bg-blue-100 rounded text-sm font-semibold text-blue-900">
+                      <span className="text-xs font-medium text-[#8A8177] uppercase tracking-wide">Base de Datos</span>
+                      <div className="mt-1 p-2 bg-[#EFE9DD] rounded text-sm font-semibold text-[#1B1917]">
                         {confirmationDialog.candidate.existingStudent.first_name} {confirmationDialog.candidate.existingStudent.last_name}
                       </div>
                     </div>
                     <div className="text-center">
-                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Excel</span>
+                      <span className="text-xs font-medium text-[#8A8177] uppercase tracking-wide">Excel</span>
                       <div className="mt-1 p-2 bg-green-100 rounded text-sm font-semibold text-green-900">
                         {confirmationDialog.candidate.excelRow.first_name} {confirmationDialog.candidate.excelRow.last_name}
                       </div>
                     </div>
                   </div>
                   
-                  <div className="text-center py-2 border-t border-gray-200">
-                    <span className="text-xs font-medium text-gray-700">Similitud Calculada:</span>
+                  <div className="text-center py-2 border-t border-[#E3DDD1]">
+                    <span className="text-xs font-medium text-[#56504A]">Similitud Calculada:</span>
                     <div className={`inline-block ml-2 px-2 py-1 rounded-full text-xs font-bold ${
                       confirmationDialog.candidate.similarity >= 0.9 ? 'bg-red-100 text-red-800' :
                       confirmationDialog.candidate.similarity >= 0.8 ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
+                      'bg-[#EFE9DD] text-[#56504A]'
                     }`}>
                       {Math.round(confirmationDialog.candidate.similarity * 100)}%
                     </div>
@@ -1125,8 +1125,8 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   {/* Información adicional del estudiante existente */}
                   {confirmationDialog.candidate.existingStudent.instrument && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700">Instrumento:</span>
-                      <span className="text-sm text-gray-900">
+                      <span className="text-sm font-medium text-[#56504A]">Instrumento:</span>
+                      <span className="text-sm text-[#1B1917]">
                         {confirmationDialog.candidate.existingStudent.instrument}
                       </span>
                     </div>
@@ -1134,8 +1134,8 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                   
                   {confirmationDialog.candidate.existingStudent.current_grade && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700">Grado:</span>
-                      <span className="text-sm text-gray-900">
+                      <span className="text-sm font-medium text-[#56504A]">Grado:</span>
+                      <span className="text-sm text-[#1B1917]">
                         {confirmationDialog.candidate.existingStudent.current_grade}
                       </span>
                     </div>
@@ -1156,7 +1156,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
               <div className="flex flex-col sm:flex-row gap-3 mt-6">
                 <button
                   onClick={() => confirmationDialog.onConfirm('update')}
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] focus:outline-none focus:ring-2 focus:ring-[#C2492B] focus:ring-offset-2 font-medium transition-colors"
                 >
                   Actualizar Existente
                 </button>
@@ -1168,7 +1168,7 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
                 </button>
                 <button
                   onClick={confirmationDialog.onCancel}
-                  className="flex-1 px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-medium transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#DED7C9] text-[#56504A] rounded-lg hover:bg-[#C9BFAE] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:ring-offset-2 font-medium transition-colors"
                 >
                   Cancelar
                 </button>
