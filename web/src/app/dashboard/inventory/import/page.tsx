@@ -14,7 +14,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdArrowBack, MdUpload, MdWarning, MdCheckCircle, MdError, MdExpandMore, MdDownload } from 'react-icons/md';
+import { MdUpload, MdWarning, MdCheckCircle, MdError, MdExpandMore, MdDownload } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -600,69 +600,58 @@ export default function ImportInventoryPage() {
 
   if (roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 lg:p-6 w-full max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <MdArrowBack size={24} />
-          </button>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('inv_import_title')}</h1>
-            <p className="text-gray-600 mt-1">
-              {t('inv_import_subtitle')}
-            </p>
-          </div>
+    <div>
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22] mb-4">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
         </div>
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-          <div className="inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-            <MdWarning className="mr-2" />
-            {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-          <MdCheckCircle className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
-          <p className="text-green-800">{success}</p>
+        <div className="mb-5 bg-[#EDF1E9] border border-[#CFDCC7] rounded-xl p-4 flex items-start gap-3">
+          <MdCheckCircle className="text-[#4F6748] flex-shrink-0 mt-0.5" size={18} />
+          <p className="text-[#4F6748] text-[13.5px]">{success}</p>
         </div>
       )}
 
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-          <MdError className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
-          <p className="text-red-800">{error}</p>
+        <div className="mb-5 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4 flex items-start gap-3">
+          <MdError className="text-[#8f3421] flex-shrink-0 mt-0.5" size={18} />
+          <p className="text-[#8f3421] text-[13.5px]">{error}</p>
         </div>
       )}
 
-      {/* Configuración del lote */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('inv_batch_config_header')}</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          {t('inv_batch_config_hint')}
-        </p>
+      {/* Configuración del lote + Formato esperado */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+        {/* Configuración del lote */}
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6">
+          <h2
+            className="text-2xl text-[#1B1917]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          >
+            {t('inv_batch_config_header')}
+          </h2>
+          <p className="text-[13px] text-[#8A8177] mt-2 mb-5">
+            {t('inv_batch_config_hint')}
+          </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="flex flex-col gap-2">
+            <label className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
               {t('inv_asset_group_required_label')}
             </label>
             <select
               value={batchConfig.group_id}
               onChange={(e) => setBatchConfig({ ...batchConfig, group_id: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             >
               <option value="">{t('inv_select_group_ellipsis')}</option>
               {groups.map(g => (
@@ -671,207 +660,197 @@ export default function ImportInventoryPage() {
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">
+            <span className="text-[12.5px] text-[#A29889]">
               {t('inv_default_group_hint')}
-            </p>
+            </span>
+          </div>
+
+          {/* Opciones avanzadas */}
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-1.5 text-[13px] text-[#C2492B] hover:text-[#A83A20] transition-colors pt-4"
+          >
+            {t('inv_advanced_options_label')}
+            <MdExpandMore
+              size={18}
+              className={`transform transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {showAdvanced && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#EFE9DD]">
+              <div>
+                <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                  {t('inv_asset_class_simple_label')}
+                </label>
+                <select
+                  value={batchConfig.class_id}
+                  onChange={(e) => setBatchConfig({ ...batchConfig, class_id: e.target.value })}
+                  className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
+                >
+                  <option value="">{t('inv_select_class_ellipsis')}</option>
+                  {classes.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.code} - {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                  {t('inv_characteristic_simple_label')}
+                </label>
+                <select
+                  value={batchConfig.characteristic_id}
+                  onChange={(e) => setBatchConfig({ ...batchConfig, characteristic_id: e.target.value })}
+                  className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
+                >
+                  <option value="">{t('inv_select_characteristic_ellipsis')}</option>
+                  {characteristics.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.code} - {c.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
+          <div className="border-t border-[#EFE9DD] mt-5 pt-5 flex gap-2.5 flex-wrap">
+            <button
+              onClick={downloadTemplate}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+            >
+              <MdDownload size={16} />
+              {t('inv_download_template_button')}
+            </button>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            >
+              <MdUpload size={16} />
+              {loading ? t('inv_processing') : t('inv_upload_file_button')}
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
           </div>
         </div>
 
-        {/* Opciones avanzadas */}
-        <button
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <MdExpandMore
-            size={20}
-            className={`transform transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
-          />
-          {t('inv_advanced_options_label')}
-        </button>
+        {/* Formato esperado */}
+        <div className="bg-[#F4F0E8] border border-[#E7E0D2] rounded-xl p-5 sm:p-6">
+          <h2 className="text-[14.5px] font-medium text-[#1B1917] mb-4">
+            {t('inv_format_instructions_header')}
+          </h2>
 
-        {showAdvanced && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('inv_asset_class_simple_label')}
-              </label>
-              <select
-                value={batchConfig.class_id}
-                onChange={(e) => setBatchConfig({ ...batchConfig, class_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">{t('inv_select_class_ellipsis')}</option>
-                {classes.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.code} - {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('inv_characteristic_simple_label')}
-              </label>
-              <select
-                value={batchConfig.characteristic_id}
-                onChange={(e) => setBatchConfig({ ...batchConfig, characteristic_id: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">{t('inv_select_characteristic_ellipsis')}</option>
-                {characteristics.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.code} - {c.description}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="text-[13px] text-[#56504A] space-y-3">
+            <p><strong className="font-medium">SITE</strong> — {t('inv_site_field_desc')}</p>
+            <p><strong className="font-medium">DESCRIPTION</strong> — {t('inv_description_field_desc')}</p>
+            <p><strong className="font-medium">INVENTORY #</strong> — {t('inv_inventory_field_desc_pre')} <strong className="font-medium">{t('inv_leave_empty')}</strong> {t('inv_inventory_field_desc_post')}</p>
+            <p><strong className="font-medium">OWNER</strong> — {t('inv_owner_field_desc')}</p>
+            <p><strong className="font-medium">STATUS</strong> — {t('inv_status_field_desc')}</p>
+            <p><strong className="font-medium">CONDITION</strong> — {t('inv_condition_field_desc')}</p>
+            <p><strong className="font-medium">IN COMMODATE TO</strong> — {t('inv_in_commodate_field_desc')}</p>
           </div>
-        )}
-      </div>
 
-      {/* Upload section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('inv_upload_file_header')}</h2>
+          <p className="text-[12.5px] text-[#8A8177] mt-5">
+            {t('inv_columns_format_text')}
+          </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-4">
-          <button
-            onClick={downloadTemplate}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <MdDownload size={20} />
-            {t('inv_download_template_button')}
-          </button>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <MdUpload size={20} />
-            {loading ? t('inv_processing') : t('inv_upload_file_button')}
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-        </div>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-3">{t('inv_format_instructions_header')}</h3>
-
-          <div className="text-sm text-blue-800 space-y-3">
-            <p className="font-medium">
-              {t('inv_columns_format_text')}
-            </p>
-
-            <div>
-              <p className="font-medium mb-1">{t('inv_column_descriptions_header')}</p>
-              <ul className="space-y-1 list-disc list-inside ml-2">
-                <li><strong>SITE:</strong> {t('inv_site_field_desc')}</li>
-                <li><strong>DESCRIPTION:</strong> {t('inv_description_field_desc')}</li>
-                <li><strong>INVENTORY #:</strong> {t('inv_inventory_field_desc_pre')} <strong>{t('inv_leave_empty')}</strong> {t('inv_inventory_field_desc_post')}</li>
-                <li><strong>OWNER:</strong> {t('inv_owner_field_desc')}</li>
-                <li><strong>STATUS:</strong> {t('inv_status_field_desc')}</li>
-                <li><strong>CONDITION:</strong> {t('inv_condition_field_desc')}</li>
-                <li><strong>IN COMMODATE TO:</strong> {t('inv_in_commodate_field_desc')}</li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="font-medium mb-1">{t('inv_important_label')}</p>
-              <ul className="space-y-1 list-disc list-inside ml-2">
-                <li>{t('inv_empty_inventory_hint_pre')} <strong>{t('inv_empty_word')}</strong> {t('inv_empty_inventory_hint_post')}</li>
-                <li>{t('inv_full_inventory_hint_pre')} <strong>{t('inv_full_word')}</strong> {t('inv_full_inventory_hint_post')}</li>
-                <li>{t('inv_auto_codes_hint')}</li>
-                <li>{t('inv_status_ignored_hint')}</li>
-                <li>{t('inv_retired_condition_hint')}</li>
-              </ul>
-            </div>
-
-            <p className="font-medium">
-              {t('inv_download_template_tip')}
-            </p>
+          <div className="mt-5 pt-5 border-t border-[#E7E0D2]">
+            <p className="text-[12.5px] font-medium text-[#56504A] mb-2">{t('inv_important_label')}</p>
+            <ul className="text-[12.5px] text-[#6E675E] space-y-1.5 list-disc list-inside">
+              <li>{t('inv_empty_inventory_hint_pre')} <strong className="font-medium">{t('inv_empty_word')}</strong> {t('inv_empty_inventory_hint_post')}</li>
+              <li>{t('inv_full_inventory_hint_pre')} <strong className="font-medium">{t('inv_full_word')}</strong> {t('inv_full_inventory_hint_post')}</li>
+              <li>{t('inv_auto_codes_hint')}</li>
+              <li>{t('inv_status_ignored_hint')}</li>
+              <li>{t('inv_retired_condition_hint')}</li>
+            </ul>
           </div>
+
+          <p className="text-[12.5px] text-[#8A8177] mt-4">
+            {t('inv_download_template_tip')}
+          </p>
         </div>
       </div>
 
       {/* Preview */}
       {showPreview && previewData.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-5">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-1 border-b border-[#EFE9DD]">
             {t('inv_preview_title', { n: previewData.length })}
           </h2>
 
-          <div className="overflow-x-auto mb-4">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('inv_row_column')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('inv_type_column')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('inv_code_column')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('inv_description_column')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('inv_site_label')}</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('status')}</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {previewData.map((row) => (
-                  <tr key={row.rowNumber} className={row.error ? 'bg-red-50' : ''}>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.rowNumber}</td>
-                    <td className="px-4 py-3 text-sm">
-                      {row.willGenerateCode ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
-                          {t('inv_new_code_badge')}
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                          {t('inv_existing_code_badge')}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-mono text-gray-900">
-                      {row.willGenerateCode ? row.generatedCode : row.inventoryCode}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.description}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{row.site}</td>
-                    <td className="px-4 py-3 text-sm">
-                      {row.error ? (
-                        <span className="text-red-600 flex items-center gap-1">
-                          <MdError size={16} />
-                          {row.error}
-                        </span>
-                      ) : (
-                        <span className="text-green-600 flex items-center gap-1">
-                          <MdCheckCircle size={16} />
-                          OK
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-[60px_120px_170px_minmax(0,1fr)_140px_180px] min-w-[900px] gap-4 py-3 border-b border-[#EFE9DD] text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">
+              <span>{t('inv_row_column')}</span>
+              <span>{t('inv_type_column')}</span>
+              <span>{t('inv_code_column')}</span>
+              <span>{t('inv_description_column')}</span>
+              <span>{t('inv_site_label')}</span>
+              <span>{t('status')}</span>
+            </div>
+            {previewData.map((row) => (
+              <div
+                key={row.rowNumber}
+                className={`grid grid-cols-[60px_120px_170px_minmax(0,1fr)_140px_180px] min-w-[900px] gap-4 py-3 border-b border-[#F2ECE1] text-[13.5px] items-center ${row.error ? 'bg-[#F8E9E4]/40' : ''}`}
+              >
+                <span className="text-[#56504A]">{row.rowNumber}</span>
+                <span>
+                  {row.willGenerateCode ? (
+                    <span className="px-2 py-1 bg-[#EDF1E9] text-[#4F6748] rounded text-[11px] font-medium">
+                      {t('inv_new_code_badge')}
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 bg-[#F4F0E8] text-[#56504A] rounded text-[11px] font-medium">
+                      {t('inv_existing_code_badge')}
+                    </span>
+                  )}
+                </span>
+                <span className="font-mono text-[#56504A]">
+                  {row.willGenerateCode ? row.generatedCode : row.inventoryCode}
+                </span>
+                <span className="text-[#1B1917]">{row.description}</span>
+                <span className="text-[#56504A]">{row.site}</span>
+                <span>
+                  {row.error ? (
+                    <span className="text-[#A8402A] flex items-center gap-1">
+                      <MdError size={15} />
+                      {row.error}
+                    </span>
+                  ) : (
+                    <span className="text-[#4F6748] flex items-center gap-1">
+                      <MdCheckCircle size={15} />
+                      OK
+                    </span>
+                  )}
+                </span>
+              </div>
+            ))}
           </div>
 
-          <div className="flex justify-end gap-4 flex-wrap">
+          <div className="flex justify-end gap-3 flex-wrap mt-5 pt-5 border-t border-[#EFE9DD]">
             <button
               onClick={() => {
                 setShowPreview(false);
                 setPreviewData([]);
               }}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
             >
               {t('cancel')}
             </button>
             <button
               onClick={confirmImport}
               disabled={loading || previewData.some(r => r.error)}
-              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {loading ? t('inv_importing') : t('inv_confirm_import_button')}
             </button>
@@ -881,26 +860,38 @@ export default function ImportInventoryPage() {
 
       {/* Import Result */}
       {importResult && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('inv_import_result_header')}</h2>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-5">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
+            {t('inv_import_result_header')}
+          </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-sm text-green-600 mb-1">{t('inv_successful_label')}</p>
-              <p className="text-3xl font-bold text-green-700">{importResult.success}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-[#EDF1E9] border border-[#CFDCC7] rounded-lg p-4">
+              <p className="text-[12.5px] text-[#4F6748] mb-1">{t('inv_successful_label')}</p>
+              <p
+                className="text-[34px] leading-[1.05] text-[#4F6748]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {importResult.success}
+              </p>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600 mb-1">{t('inv_failed_label')}</p>
-              <p className="text-3xl font-bold text-red-700">{importResult.failed}</p>
+            <div className="bg-[#F8E9E4] border border-[#EAC7BB] rounded-lg p-4">
+              <p className="text-[12.5px] text-[#8f3421] mb-1">{t('inv_failed_label')}</p>
+              <p
+                className="text-[34px] leading-[1.05] text-[#8f3421]"
+                style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+              >
+                {importResult.failed}
+              </p>
             </div>
           </div>
 
           {importResult.errors.length > 0 && (
-            <div>
-              <h3 className="font-medium text-gray-900 mb-2">{t('inv_errors_colon')}</h3>
-              <div className="space-y-2">
+            <div className="mt-5 pt-5 border-t border-[#EFE9DD]">
+              <h3 className="text-[13px] font-medium text-[#56504A] mb-2">{t('inv_errors_colon')}</h3>
+              <div className="space-y-1.5">
                 {importResult.errors.map((err, idx) => (
-                  <div key={idx} className="text-sm text-red-600">
+                  <div key={idx} className="text-[12.5px] text-[#A8402A]">
                     {t('inv_row_error_template', { row: err.row, msg: err.message })}
                   </div>
                 ))}
@@ -908,10 +899,10 @@ export default function ImportInventoryPage() {
             </div>
           )}
 
-          <div className="mt-4 flex justify-end gap-4">
+          <div className="mt-5 pt-5 border-t border-[#EFE9DD] flex justify-end">
             <button
               onClick={() => router.push('/dashboard/inventory/assets')}
-              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
+              className="px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
             >
               {t('inv_view_assets_list')}
             </button>
