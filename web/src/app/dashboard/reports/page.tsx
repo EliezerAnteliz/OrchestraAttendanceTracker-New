@@ -1574,9 +1574,8 @@ ${dateTableEN}`;
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={lang === 'es' ? 'Buscar por nombre o instrumento...' : 'Search by name or instrument...'}
-                className="w-full rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] px-3 py-2.5 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B]"
+                className="w-full rounded-[9px] border border-[#E3DDD1] bg-[#FFFDFA] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B]"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A29889] bg-[#F4F0E8] px-2 py-1 rounded">ESC</span>
             </div>
           </div>
 
