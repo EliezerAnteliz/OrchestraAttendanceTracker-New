@@ -18,10 +18,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   // Mostrar un indicador de carga mientras se verifica la autenticación
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF7F2]">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-t-[#6200ee] border-r-[#6200ee] border-b-gray-200 border-l-gray-200 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-[#EAE3D6] border-l-[#EAE3D6] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#8A8177] text-sm">Cargando...</p>
         </div>
       </div>
     );
