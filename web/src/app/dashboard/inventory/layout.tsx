@@ -7,6 +7,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProgram } from '@/contexts/ProgramContext';
 import RoleSwitcher from '@/components/RoleSwitcher';
+import { MdAdd } from 'react-icons/md';
 
 export default function InventoryLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
@@ -46,14 +47,27 @@ export default function InventoryLayout({ children }: { children: ReactNode }) {
             {t('inv_module_subtitle', { site: activeProgram?.name || '' })}
           </p>
         </div>
-        {/* Mismo selector "Ver como Admin/Staff/Viewer" que ya existe en
-            el resto de la app — solo se renderiza si el usuario real es
-            Admin (RoleSwitcher se auto-oculta si no). Sirve para
-            previsualizar la UI de Inventario como la vería Staff/Viewer;
-            no reemplaza probar con una cuenta real para confirmar que el
-            RLS los bloquea (esto solo cambia lo que ve, no el rol real
-            con el que se autentican las llamadas a Supabase). */}
-        <div className="flex-shrink-0">
+        {/* Acción global "Nuevo activo" (solo Admin) junto al selector de
+            rol — así el resto de cada sub-pestaña arranca a ras, sin una
+            fila de acciones propia debajo de las pestañas (como pedía
+            Eliezer, comparando con cómo ya se ve Importar). */}
+        <div className="flex-shrink-0 flex items-center gap-3">
+          {isAdmin && (
+            <Link
+              href="/dashboard/inventory/assets/new"
+              className="flex items-center justify-center gap-2 bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+            >
+              <MdAdd size={18} />
+              {t('inv_new_asset_button')}
+            </Link>
+          )}
+          {/* Mismo selector "Ver como Admin/Staff/Viewer" que ya existe en
+              el resto de la app — solo se renderiza si el usuario real es
+              Admin (RoleSwitcher se auto-oculta si no). Sirve para
+              previsualizar la UI de Inventario como la vería Staff/Viewer;
+              no reemplaza probar con una cuenta real para confirmar que el
+              RLS los bloquea (esto solo cambia lo que ve, no el rol real
+              con el que se autentican las llamadas a Supabase). */}
           <RoleSwitcher />
         </div>
       </div>
