@@ -1568,29 +1568,21 @@ ${dateTableEN}`;
                 {lang === 'es' ? 'No se encontraron estudiantes' : 'No students found'}
               </div>
             ) : (
-              <ul className="divide-y divide-[#EFE9DD]">
+              <ul className="space-y-2">
                 {filtered.map((student) => (
                   <li key={student.id}>
+                    {/* Ficha completa clicable — mismo patrón de tarjeta
+                        plana (bg-[#FFFDFA] border) que el resto de las
+                        listas de estudiantes de la app, sin avatar ni
+                        botón "Select". */}
                     <button
                       onClick={() => onSelect(student)}
-                      className="w-full text-left flex items-center gap-3 px-3 py-3 hover:bg-[#F4F0E8] focus:bg-[#F4F0E8] focus:outline-none rounded-md transition-colors"
+                      className="w-full text-left px-4 py-3 rounded-lg border border-[#EAE3D6] bg-[#FFFDFA] hover:border-[#C2492B] focus:outline-none focus:border-[#C2492B] transition-colors"
                     >
-                      {/* Avatar iniciales — antes usaba bg-opacity-10, una
-                          utilidad que no aplica sobre colores arbitrarios
-                          (bg-[#C2492B]) en esta versión de Tailwind, así que
-                          el círculo salía azul sólido y las iniciales (del
-                          mismo azul) quedaban invisibles. bg-[#C2492B]/10 es
-                          la sintaxis que sí funciona. */}
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C2492B]/10 text-[#C2492B] flex items-center justify-center font-semibold text-sm">
-                        {student.first_name?.[0]}{student.last_name?.[0]}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-[#1B1917] leading-tight">{student.first_name} {student.last_name}</p>
-                        <p className="text-xs text-[#8A8177]">{student.instrument}</p>
-                      </div>
-                      <span className="text-xs text-white bg-gradient-to-r from-[#C2492B] to-[#A83A20] px-3 py-1 rounded-md font-medium hover:shadow-md transform hover:scale-[1.03] transition-all duration-200">
-                        {t('select')}
-                      </span>
+                      <p className="text-[15px] font-medium text-[#1B1917] leading-tight truncate">{student.first_name} {student.last_name}</p>
+                      {student.instrument && (
+                        <p className="text-[12.5px] text-[#8A8177] mt-0.5">{student.instrument}</p>
+                      )}
                     </button>
                   </li>
                 ))}
@@ -1843,7 +1835,7 @@ ${dateTableEN}`;
             {selectedStudent ? (
               <div className="flex flex-col gap-2">
                 <div className="border border-[#EAE3D6] rounded-lg px-3.5 py-2.5">
-                  <p className="text-sm font-semibold text-[#1B1917] leading-snug">{selectedStudent.name}</p>
+                  <p className="text-sm font-medium text-[#1B1917] leading-snug">{selectedStudent.name}</p>
                   <p className="text-[12.5px] text-[#8A8177]">{selectedStudent.instrument}</p>
                 </div>
                 <button
