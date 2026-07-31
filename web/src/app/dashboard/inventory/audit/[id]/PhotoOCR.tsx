@@ -320,10 +320,16 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
         .map((t) => `serial_number.ilike.%${t}%,assigned_to_text.ilike.%${t}%,description.ilike.%${t}%,full_code.ilike.%${t}%,brand.ilike.%${t}%`)
         .join(',');
 
+      // Se excluyen los activos Owner=Stafford (no están físicamente en el
+      // almacén), mismo criterio que el resto de la Auditoría. neq solo no
+      // basta: en SQL, NULL != 'Stafford' no es verdadero, así que un
+      // .not('owner','eq','Stafford') solo escondería también a todos los
+      // activos con owner NULL (la mayoría) — hace falta el .or() explícito.
       const { data, error } = await inventorySupabase
         .from('assets')
         .select('id, full_code, description, brand, serial_number, assigned_to_text')
         .eq('current_program_id', programId)
+        .or('owner.neq.Stafford,owner.is.null')
         .or(orConditions)
         .limit(10);
 
@@ -383,10 +389,13 @@ export default function PhotoOCR({ sessionId, programId, onAssetSelected, onClos
 
       if (isDev) console.log('Manual search started with term:', term);
 
+      // Mismo criterio de Owner=Stafford excluido que el resto de la
+      // Auditoría (ver comentario en la búsqueda por OCR más arriba).
       const { data, error } = await inventorySupabase
         .from('assets')
         .select('id, full_code, description, brand, serial_number, assigned_to_text')
         .eq('current_program_id', programId)
+        .or('owner.neq.Stafford,owner.is.null')
         .or(`description.ilike.%${term}%,brand.ilike.%${term}%,serial_number.ilike.%${term}%,assigned_to_text.ilike.%${term}%,full_code.ilike.%${term}%`)
         .limit(20);
 
