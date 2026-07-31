@@ -722,6 +722,7 @@ const translations: Translations = {
   inv_retry: { es: "Reintentar", en: "Retry" },
   inv_dashboard_title: { es: "Dashboard de Inventario", en: "Inventory Dashboard" },
   inv_dashboard_subtitle: { es: "Vista general del inventario de instrumentos y activos", en: "Overview of instrument and asset inventory" },
+  inv_module_subtitle: { es: "Gestión de instrumentos y activos · {site}", en: "Instrument and asset management · {site}" },
   inv_test_env_with_id: { es: "Ambiente de prueba: {id}", en: "Test environment: {id}" },
   inv_total_assets: { es: "Total de Activos", en: "Total Assets" },
   inv_available_plural: { es: "Disponibles", en: "Available" },
