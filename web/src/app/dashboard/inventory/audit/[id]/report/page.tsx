@@ -152,18 +152,18 @@ export default function AuditReportPage() {
 
   if (roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_generating_report')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_generating_report')}</p>
         </div>
       </div>
     );
@@ -171,12 +171,12 @@ export default function AuditReportPage() {
 
   if (!session || !report) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <p className="text-gray-600">{t('inv_could_not_load_report')}</p>
+          <p className="text-[#6E675E]">{t('inv_could_not_load_report')}</p>
           <button
             onClick={() => router.push('/dashboard/inventory/audit')}
-            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
           >
             {t('inv_go_back')}
           </button>
@@ -188,111 +188,122 @@ export default function AuditReportPage() {
   const currentList = report[activeTab];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="pb-8">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="p-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => router.push('/dashboard/inventory/audit')}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <MdArrowBack size={24} />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900">{t('inv_report_title')}</h1>
-              <p className="text-sm text-gray-600">
-                {Array.isArray(session.programs) ? session.programs[0]?.name : session.programs?.name}
-              </p>
-            </div>
-          </div>
+      <button
+        onClick={() => router.push('/dashboard/inventory/audit')}
+        className="flex items-center gap-2 text-[13px] text-[#8A8177] hover:text-[#C2492B] transition-colors mb-4"
+      >
+        <MdArrowBack size={16} />
+        {t('inv_go_back')}
+      </button>
 
-          <div className="text-xs text-gray-600 mb-3">
-            <div>{t('inv_start_colon')} {formatDate(session.started_at)}</div>
-            <div>{t('inv_end_colon')} {formatDate(session.ended_at)}</div>
-          </div>
+      <h1
+        className="text-[26px] sm:text-[32px] text-[#1B1917] leading-[1.05]"
+        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+      >
+        {t('inv_report_title')}
+      </h1>
+      <p className="text-[13.5px] text-[#8A8177] mt-1.5">
+        {Array.isArray(session.programs) ? session.programs[0]?.name : session.programs?.name}
+      </p>
 
-          {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-            <div className="mb-3 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-              <MdWarning className="mr-2" />
-              {t('inv_test_env_banner')}
-            </div>
-          )}
+      <div className="text-[12.5px] text-[#8A8177] mt-2 space-y-0.5">
+        <div>{t('inv_start_colon')} {formatDate(session.started_at)}</div>
+        <div>{t('inv_end_colon')} {formatDate(session.ended_at)}</div>
+      </div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-green-50 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-green-700">{report.found.length}</div>
-              <div className="text-xs text-green-600">{t('inv_stat_found')}</div>
-            </div>
-            <div className="bg-red-50 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-red-700">{report.missing.length}</div>
-              <div className="text-xs text-red-600">{t('inv_stat_missing')}</div>
-            </div>
-            <div className="bg-yellow-50 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-yellow-700">{report.mismatch.length}</div>
-              <div className="text-xs text-yellow-600">{t('inv_stat_other_site')}</div>
-            </div>
-            <div className="bg-gray-100 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-gray-700">{report.unknown.length}</div>
-              <div className="text-xs text-gray-600">{t('inv_stat_not_found')}</div>
-            </div>
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_banner')}
+        </div>
+      )}
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 text-center">
+          <div
+            className="text-[32px] leading-[1.05] text-[#4F6748]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+          >
+            {report.found.length}
           </div>
+          <div className="text-[11px] uppercase tracking-[0.06em] text-[#8A8177] mt-1">{t('inv_stat_found')}</div>
+        </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 text-center">
+          <div
+            className="text-[32px] leading-[1.05] text-[#A8402A]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+          >
+            {report.missing.length}
+          </div>
+          <div className="text-[11px] uppercase tracking-[0.06em] text-[#8A8177] mt-1">{t('inv_stat_missing')}</div>
+        </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 text-center">
+          <div
+            className="text-[32px] leading-[1.05] text-[#8A6A22]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+          >
+            {report.mismatch.length}
+          </div>
+          <div className="text-[11px] uppercase tracking-[0.06em] text-[#8A8177] mt-1">{t('inv_stat_other_site')}</div>
+        </div>
+        <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 text-center">
+          <div
+            className="text-[32px] leading-[1.05] text-[#56504A]"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 300 }}
+          >
+            {report.unknown.length}
+          </div>
+          <div className="text-[11px] uppercase tracking-[0.06em] text-[#8A8177] mt-1">{t('inv_stat_not_found')}</div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200 px-4 flex gap-2 overflow-x-auto max-w-7xl mx-auto">
+      <nav className="flex gap-6 border-b border-[#E3DDD1] overflow-x-auto mt-6">
         <button
           onClick={() => setActiveTab('found')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'found'
-              ? 'border-green-600 text-green-700'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+          className={`whitespace-nowrap flex-shrink-0 py-3 text-[14px] border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
+            activeTab === 'found' ? 'text-[#C2492B] border-[#C2492B] font-medium' : 'text-[#8A8177] border-transparent hover:text-[#56504A]'
           }`}
         >
-          <MdCheckCircle className="inline mr-1" size={16} />
+          <MdCheckCircle size={16} />
           {t('inv_stat_found')} ({report.found.length})
         </button>
         <button
           onClick={() => setActiveTab('missing')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'missing'
-              ? 'border-red-600 text-red-700'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+          className={`whitespace-nowrap flex-shrink-0 py-3 text-[14px] border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
+            activeTab === 'missing' ? 'text-[#C2492B] border-[#C2492B] font-medium' : 'text-[#8A8177] border-transparent hover:text-[#56504A]'
           }`}
         >
-          <MdRemoveCircle className="inline mr-1" size={16} />
+          <MdRemoveCircle size={16} />
           {t('inv_stat_missing')} ({report.missing.length})
         </button>
         <button
           onClick={() => setActiveTab('mismatch')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'mismatch'
-              ? 'border-yellow-600 text-yellow-700'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+          className={`whitespace-nowrap flex-shrink-0 py-3 text-[14px] border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
+            activeTab === 'mismatch' ? 'text-[#C2492B] border-[#C2492B] font-medium' : 'text-[#8A8177] border-transparent hover:text-[#56504A]'
           }`}
         >
-          <MdWarning className="inline mr-1" size={16} />
+          <MdWarning size={16} />
           {t('inv_stat_other_site')} ({report.mismatch.length})
         </button>
         <button
           onClick={() => setActiveTab('unknown')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'unknown'
-              ? 'border-gray-600 text-gray-700'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
+          className={`whitespace-nowrap flex-shrink-0 py-3 text-[14px] border-b-2 -mb-px transition-colors flex items-center gap-1.5 ${
+            activeTab === 'unknown' ? 'text-[#C2492B] border-[#C2492B] font-medium' : 'text-[#8A8177] border-transparent hover:text-[#56504A]'
           }`}
         >
-          <MdError className="inline mr-1" size={16} />
+          <MdError size={16} />
           {t('inv_stat_not_found')} ({report.unknown.length})
         </button>
-      </div>
+      </nav>
 
       {/* List */}
-      <div className="p-4 space-y-2 max-w-7xl mx-auto">
+      <div className="mt-4 space-y-2.5">
         {currentList.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-sm">
+          <div className="text-center py-10 text-[#A29889] text-[13.5px]">
             {t('inv_no_items_in_category')}
           </div>
         ) : (
@@ -308,26 +319,22 @@ export default function AuditReportPage() {
               : (Array.isArray(item.assets) ? item.assets[0] : item.assets);
 
             return (
-              <div key={index} className="bg-white rounded-lg border border-gray-200 p-3">
-                <div className="font-medium text-gray-900">
+              <div key={index} className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-3.5">
+                <div className="font-medium text-[#1B1917]">
                   {asset?.description || item.scanned_code || t('inv_unknown_masc')}
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="text-[12.5px] text-[#8A8177] mt-0.5">
                   {asset?.full_code || item.scanned_code}
-                  {asset?.brand && ` • ${asset.brand}`}
+                  {asset?.brand && ` · ${asset.brand}`}
                 </div>
                 {asset?.serial_number && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-[11.5px] text-[#8A8177] mt-1">
                     {t('inv_serial_colon')} {asset.serial_number}
                   </div>
                 )}
                 {item.source && (
                   <div className="mt-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      item.source === 'scan' ? 'bg-blue-100 text-blue-700' :
-                      item.source === 'manual' ? 'bg-gray-100 text-gray-700' :
-                      'bg-purple-100 text-purple-700'
-                    }`}>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#F4F0E8] text-[#6E675E]">
                       {item.source === 'scan' ? t('inv_source_scan') : item.source === 'manual' ? t('inv_action_manual') : t('inv_action_photo_ocr')}
                     </span>
                   </div>
