@@ -11,10 +11,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdFilterList, MdSearch, MdWarning, MdAdd, MdFileDownload } from 'react-icons/md';
+import { MdFilterList, MdSearch, MdWarning, MdFileDownload } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
-import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -105,7 +104,6 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function AssetsListPage() {
   const { t } = useI18n();
-  const { isAdmin } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -432,8 +430,9 @@ export default function AssetsListPage() {
 
   return (
     <div>
-      {/* Acciones — el título "Inventory" y la sede ya viven en el
-          encabezado compartido de layout.tsx. */}
+      {/* Acciones — el título "Inventory", la sede y "Nuevo activo" ya
+          viven en el encabezado compartido de layout.tsx; aquí solo va lo
+          específico del Listado. */}
       <div className="flex items-center justify-end gap-3 flex-wrap">
         <button
           onClick={exportToExcel}
@@ -443,15 +442,6 @@ export default function AssetsListPage() {
           <MdFileDownload size={18} />
           {t('inv_export_excel_button')}
         </button>
-        {isAdmin && (
-          <button
-            onClick={() => router.push('/dashboard/inventory/assets/new')}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-[#FAF7F2] rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
-          >
-            <MdAdd size={18} />
-            {t('inv_new_asset_button')}
-          </button>
-        )}
       </div>
       {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
         <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
