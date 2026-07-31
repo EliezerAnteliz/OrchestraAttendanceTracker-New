@@ -85,6 +85,14 @@ export default function AttendancePage() {
       console.log('[fetchAttendanceData] input=', date, 'day=', day, 'tz=', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
       // 1) Intentar con JOIN usando status_code (basado en las memorias)
+      //
+      // IMPORTANTE: el criterio de "éxito" de cada intento es que la consulta
+      // no haya devuelto error — NO que haya filas. Antes se usaba
+      // `data?.length` como señal de éxito, así que un día sin asistencia
+      // registrada todavía (el caso más común: nadie ha pasado lista aún)
+      // se trataba igual que un error de esquema real, y la función caía en
+      // cascada por las 4 consultas de respaldo cada vez, añadiendo hasta
+      // 3 viajes de red innecesarios a cada carga de la pestaña.
       try {
         const withJoin = await supabase
           .from('attendance')
@@ -95,15 +103,11 @@ export default function AttendancePage() {
           .eq('program_id', activeProgram?.id as string)
           .eq('date', day);
 
-        if (!withJoin.error && withJoin.data?.length) {
-          const dates = Array.from(new Set(withJoin.data.map((r: any) => r.date)));
-          console.log('[Attendance] JOIN con status_code OK para date=', day, 'rows=', withJoin.data.length, 'dates_in_rows=', dates);
-          return withJoin.data as any[];
+        if (!withJoin.error) {
+          console.log('[Attendance] JOIN con status_code OK para date=', day, 'rows=', withJoin.data?.length || 0);
+          return (withJoin.data || []) as any[];
         }
-        
-        if (withJoin.error) {
-          console.log('[Attendance] JOIN con status_code error:', withJoin.error.message);
-        }
+        console.log('[Attendance] JOIN con status_code error:', withJoin.error.message);
       } catch (joinError) {
         console.log('[Attendance] JOIN con status_code falló:', joinError);
       }
@@ -119,15 +123,11 @@ export default function AttendancePage() {
           .eq('program_id', activeProgram?.id as string)
           .eq('date', day);
 
-        if (!withStatusJoin.error && withStatusJoin.data?.length) {
-          const dates = Array.from(new Set(withStatusJoin.data.map((r: any) => r.date)));
-          console.log('[Attendance] JOIN con status OK para date=', day, 'rows=', withStatusJoin.data.length, 'dates_in_rows=', dates);
-          return withStatusJoin.data as any[];
+        if (!withStatusJoin.error) {
+          console.log('[Attendance] JOIN con status OK para date=', day, 'rows=', withStatusJoin.data?.length || 0);
+          return (withStatusJoin.data || []) as any[];
         }
-        
-        if (withStatusJoin.error) {
-          console.log('[Attendance] JOIN con status error:', withStatusJoin.error.message);
-        }
+        console.log('[Attendance] JOIN con status error:', withStatusJoin.error.message);
       } catch (joinError) {
         console.log('[Attendance] JOIN con status falló:', joinError);
       }
@@ -139,27 +139,25 @@ export default function AttendancePage() {
         .eq('program_id', activeProgram?.id as string)
         .eq('date', day);
 
-      if (!main.error && main.data?.length) {
-        const dates = Array.from(new Set(main.data.map((r: any) => r.date)));
-        console.log('[Attendance] Filtrado por date=', day, 'rows=', main.data.length, 'dates_in_rows=', dates);
-        return main.data as any[];
+      if (!main.error) {
+        console.log('[Attendance] Filtrado por date=', day, 'rows=', main.data?.length || 0);
+        return (main.data || []) as any[];
       }
 
-      console.log('[Attendance] JOIN error, intentando fallback:', main.error?.message || 'No data');
+      console.log('[Attendance] Consulta plana con error, intentando fallback sin program_id:', main.error?.message);
 
       // 4) Fallback sin program_id
       const fb = await supabase
         .from('attendance')
         .select('*')
         .eq('date', day);
-        
-      if (!fb.error && fb.data?.length) {
-        const dates = Array.from(new Set(fb.data.map((r: any) => r.date)));
-        console.log('[Attendance] Fallback sin program_id OK para date=', day, 'rows=', fb.data.length, 'dates_in_rows=', dates);
-        return fb.data as any[];
+
+      if (!fb.error) {
+        console.log('[Attendance] Fallback sin program_id OK para date=', day, 'rows=', fb.data?.length || 0);
+        return (fb.data || []) as any[];
       }
 
-      if (fb.error) console.error('[Attendance] Fallback error:', fb.error.message);
+      console.error('[Attendance] Fallback error:', fb.error.message);
       return [];
     } catch (error: any) {
       console.error('Error al obtener datos de asistencia:', error?.message || error);
@@ -269,74 +267,57 @@ export default function AttendancePage() {
           return;
         }
         
-        // Cargar estudiantes
-        console.log('Iniciando carga de estudiantes...');
+        // Cargar estudiantes, estados de asistencia y asistencia del día
+        // EN PARALELO (son independientes entre sí) en vez de una consulta
+        // tras otra. Antes también había un "ping" de conexión y un
+        // auth.getUser() puramente de depuración antes de esto — dos
+        // viajes de red más que no aportaban nada funcional (si Supabase
+        // falla, la consulta real de estudiantes de abajo ya lo detecta) —
+        // se quitaron.
+        console.log('Iniciando carga de estudiantes, estados y asistencia...');
         console.log(`Fecha actual seleccionada: ${currentDate}`);
-        
-        // Verificar la conexión a Supabase
-        console.log('Verificando conexión a Supabase...');
-        const { data: connectionTest, error: connectionError } = await supabase
-          .from('students')
-          .select('count')
-          .limit(1);
-          
-        if (connectionError) {
-          console.error('Error de conexión a Supabase:', connectionError);
-          throw new Error(`Error de conexión a Supabase: ${connectionError.message}`);
-        }
-        
-        console.log('Conexión a Supabase exitosa');
-        // Depuración: mostrar usuario autenticado y programa activo
-        const ures = await supabase.auth.getUser();
-        console.log('[Auth] Usuario actual:', {
-          error: ures.error?.message,
-          userId: ures.data?.user?.id,
-          email: ures.data?.user?.email,
-          activeProgramId: activeProgram?.id
-        });
-        
-        // Cargar estudiantes activos con información de orquesta
-        const { data: studentsData, error: studentsError } = await supabase
-          .from('students')
-          .select(`
-            *,
-            orchestra:orchestra_id(id, name)
-          `)
-          .eq('is_active', true)
-          .eq('program_id', activeProgram.id)
-          .order('first_name', { ascending: true })
-          .order('last_name', { ascending: true });
-        
-        console.log('Respuesta de estudiantes:', { 
-          data: studentsData, 
+
+        const [studentsRes, statusesRes, attendanceData] = await Promise.all([
+          supabase
+            .from('students')
+            .select(`
+              *,
+              orchestra:orchestra_id(id, name)
+            `)
+            .eq('is_active', true)
+            .eq('program_id', activeProgram.id)
+            .order('first_name', { ascending: true })
+            .order('last_name', { ascending: true }),
+          supabase
+            .from('attendance_status')
+            .select('*'),
+          fetchAttendanceData(currentDate),
+        ]);
+
+        const { data: studentsData, error: studentsError } = studentsRes;
+        const { data: statusesData, error: structureError } = statusesRes;
+
+        console.log('Respuesta de estudiantes:', {
           cantidad: studentsData?.length || 0,
-          error: studentsError 
+          error: studentsError
         });
-        
+
         if (studentsError) {
           console.error('Error al cargar estudiantes:', studentsError);
           throw studentsError;
         }
-        
+
         if (!studentsData || studentsData.length === 0) {
           console.warn('No se encontraron estudiantes activos en la base de datos');
         }
-        
-        // Cargar estados de asistencia
-        const { data: statusesData, error: structureError } = await supabase
-          .from('attendance_status')
-          .select('*');
-        
+
         console.log('Estados de asistencia cargados:', statusesData);
-        
+
         if (structureError) {
           console.error('Error al cargar estados de asistencia:', structureError);
           throw structureError;
         }
-        
-        // Cargar datos de asistencia para la fecha actual
-        console.log(`Cargando datos de asistencia para la fecha: ${currentDate}`);
-        const attendanceData = await fetchAttendanceData(currentDate);
+
         console.log('[Attendance] student_ids devueltos:', attendanceData?.map(r => r.student_id));
         
         // Mapear los estados de asistencia a los estudiantes
