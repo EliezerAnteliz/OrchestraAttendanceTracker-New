@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdArrowBack, MdClose } from 'react-icons/md';
+import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -215,114 +215,98 @@ export default function AuditPage() {
 
   if (roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B]"></div>
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B]"></div>
       </div>
     );
   }
 
   if (loading && sessions.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_loading_audits')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_loading_audits')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header - Mobile optimized */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="p-4 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-2">
-            <button
-              onClick={() => router.back()}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <MdArrowBack size={24} />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900">{t('inv_audit_title')}</h1>
-              <p className="text-sm text-gray-600">{t('inv_audit_subtitle')}</p>
-            </div>
+    <div>
+      {/* Acciones */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        {INVENTORY_SUPABASE_CONFIG.environment === 'test' ? (
+          <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+            <MdWarning className="mr-2" size={14} />
+            {t('inv_test_env_banner')}
           </div>
-
-          {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-            <div className="mb-3 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-              <MdWarning className="mr-2" />
-              {t('inv_test_env_banner')}
-            </div>
-          )}
-
-          <button
-            onClick={() => setShowNewSessionModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
-          >
-            <MdAdd size={24} />
-            {t('inv_new_audit')}
-          </button>
-        </div>
+        ) : <span />}
+        <button
+          onClick={() => setShowNewSessionModal(true)}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
+        >
+          <MdAdd size={18} />
+          {t('inv_new_audit')}
+        </button>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mx-4 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 max-w-7xl sm:mx-auto">
-          <MdError className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="mt-5 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4 flex items-start gap-3">
+          <MdError className="text-[#8f3421] flex-shrink-0 mt-0.5" size={18} />
+          <p className="text-[13.5px] text-[#8f3421]">{error}</p>
         </div>
       )}
 
       {/* Sessions List */}
-      <div className="p-4 space-y-3 max-w-7xl mx-auto">
+      <div className="mt-5 space-y-3">
         {sessions.length === 0 ? (
-          <div className="text-center py-12">
-            <MdQrCodeScanner size={64} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-600 mb-2">{t('inv_no_audits_registered')}</p>
-            <p className="text-sm text-gray-500">{t('inv_create_new_audit_to_start')}</p>
+          <div className="text-center py-16">
+            <MdQrCodeScanner size={48} className="mx-auto text-[#DED7C9] mb-4" />
+            <p className="text-[#6E675E] text-[14px] mb-1">{t('inv_no_audits_registered')}</p>
+            <p className="text-[12.5px] text-[#A29889]">{t('inv_create_new_audit_to_start')}</p>
           </div>
         ) : (
           sessions.map((session) => (
             <div
               key={session.id}
               onClick={() => router.push(`/dashboard/inventory/audit/${session.id}`)}
-              className="bg-white rounded-lg border border-gray-200 p-4 active:bg-gray-50 transition-colors"
+              className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-4 hover:border-[#C2492B]/40 transition-colors cursor-pointer"
             >
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-start justify-between gap-3 mb-1.5">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="text-[15px] font-medium text-[#1B1917]">
                     {Array.isArray(session.programs) ? session.programs[0]?.name : session.programs?.name || t('inv_unknown_site')}
                   </h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-[12.5px] text-[#8A8177] mt-0.5">
                     {formatDate(session.started_at)}
                   </p>
                 </div>
                 <div>
                   {session.status === 'open' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                      <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#EDF1E9] text-[#4F6748] rounded-full text-[11px] font-medium whitespace-nowrap">
+                      <span className="w-1.5 h-1.5 bg-[#4F6748] rounded-full animate-pulse"></span>
                       {t('inv_open_status')}
                     </span>
                   ) : session.status === 'cancelled' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium">
-                      <MdClose size={14} />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F8E9E4] text-[#8f3421] rounded-full text-[11px] font-medium whitespace-nowrap">
+                      <MdClose size={13} />
                       {t('inv_cancelled_status')}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
-                      <MdCheckCircle size={14} />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F4F0E8] text-[#56504A] rounded-full text-[11px] font-medium whitespace-nowrap">
+                      <MdCheckCircle size={13} />
                       {t('inv_closed_status')}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-3 text-[12.5px] text-[#8A8177]">
                 <span>{t('inv_assets_audited_count', { n: session.event_count || 0 })}</span>
                 {session.ended_at && (
-                  <span>• {t('inv_finished_on', { date: formatDate(session.ended_at) })}</span>
+                  <span>· {t('inv_finished_on', { date: formatDate(session.ended_at) })}</span>
                 )}
               </div>
             </div>
@@ -333,17 +317,22 @@ export default function AuditPage() {
       {/* New Session Modal */}
       {showNewSessionModal && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
-          <div className="bg-white w-full sm:max-w-md sm:rounded-lg rounded-t-2xl p-6 animate-slide-up">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t('inv_new_audit')}</h2>
+          <div className="bg-[#FFFDFA] border border-[#EAE3D6] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 shadow-xl">
+            <h2
+              className="text-xl text-[#1B1917] mb-4"
+              style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+            >
+              {t('inv_new_audit')}
+            </h2>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_select_site_label')}
               </label>
               <select
                 value={selectedProgramId}
                 onChange={(e) => setSelectedProgramId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               >
                 <option value="">{t('inv_select_site_placeholder')}</option>
                 {programs.map((program) => (
@@ -361,14 +350,14 @@ export default function AuditPage() {
                   setSelectedProgramId('');
                   setError(null);
                 }}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={createNewSession}
                 disabled={!selectedProgramId || loading}
-                className="flex-1 px-4 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? t('inv_creating') : t('inv_start')}
               </button>
