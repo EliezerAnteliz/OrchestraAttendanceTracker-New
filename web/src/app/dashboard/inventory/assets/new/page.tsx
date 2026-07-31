@@ -401,10 +401,10 @@ export default function NewAssetPage() {
 
   if (loading || roleLoading || !isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C2492B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('inv_loading_catalogs')}</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#C2492B] mx-auto"></div>
+          <p className="mt-4 text-[#8A8177]">{t('inv_loading_catalogs')}</p>
         </div>
       </div>
     );
@@ -412,25 +412,27 @@ export default function NewAssetPage() {
 
   if (successCode) {
     return (
-      <div className="p-4 sm:p-6 max-w-2xl mx-auto">
-        <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 sm:p-8 text-center">
-          <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-bold text-green-900 mb-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-[#FFFDFA] border border-[#CFDCC7] rounded-xl p-6 sm:p-10 text-center">
+          <h2
+            className="text-2xl text-[#1B1917] mb-5"
+            style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          >
             {t('inv_asset_created_success')}
           </h2>
-          <div className="bg-white border-2 border-green-600 rounded-lg p-4 sm:p-6 mb-6">
-            <p className="text-sm text-gray-600 mb-2">{t('inv_generated_code_colon')}</p>
-            <p className="text-2xl sm:text-4xl font-mono font-bold text-green-700 break-all">
+          <div className="bg-[#EDF1E9] border border-[#CFDCC7] rounded-lg p-4 sm:p-6 mb-6">
+            <p className="text-[12.5px] text-[#8A8177] mb-2">{t('inv_generated_code_colon')}</p>
+            <p className="text-2xl sm:text-4xl font-mono font-semibold text-[#4F6748] break-all">
               {successCode}
             </p>
           </div>
-          <p className="text-gray-700 mb-6">
+          <p className="text-[13.5px] text-[#6E675E] mb-6">
             {t('inv_use_code_for_barcode')}
           </p>
-          <div className="flex gap-4 justify-center flex-wrap">
+          <div className="flex gap-3 justify-center flex-wrap">
             <button
               onClick={() => router.push('/dashboard/inventory/assets')}
-              className="px-6 py-3 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors"
+              className="px-5 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
             >
               {t('inv_view_assets_list')}
             </button>
@@ -463,7 +465,7 @@ export default function NewAssetPage() {
                 setShowAdvanced(false);
                 // Los valores por defecto se reasignarán automáticamente por el useEffect
               }}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-5 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium"
             >
               {t('inv_create_another_asset')}
             </button>
@@ -474,45 +476,48 @@ export default function NewAssetPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <MdArrowBack size={20} />
-          {t('inv_go_back')}
-        </button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('inv_new_asset_button')}</h1>
-        <p className="text-gray-600 mt-1">
-          {t('inv_new_asset_subtitle')}
-        </p>
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-          <div className="mt-2 inline-flex items-center px-3 py-1 bg-yellow-100 border border-yellow-300 rounded-md text-sm text-yellow-800">
-            <MdWarning className="mr-2" />
-            {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-          </div>
-        )}
-      </div>
-
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">❌ {error}</p>
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-[13px] text-[#8A8177] hover:text-[#C2492B] transition-colors mb-4"
+      >
+        <MdArrowBack size={16} />
+        {t('inv_go_back')}
+      </button>
+      <h1
+        className="text-[26px] sm:text-[32px] text-[#1B1917] leading-[1.05]"
+        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+      >
+        {t('inv_new_asset_button')}
+      </h1>
+      <p className="text-[13.5px] text-[#8A8177] mt-1.5">
+        {t('inv_new_asset_subtitle')}
+      </p>
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+      {error && (
+        <div className="mt-5 bg-[#F8E9E4] border border-[#EAC7BB] rounded-xl p-4">
+          <p className="text-[#8f3421]">{error}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl p-5 sm:p-6 mt-5">
         {/* Sección 1: Codificación */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div className="mb-7">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_coding_section_header')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tipo de Activo */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_asset_purpose_question')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_asset_purpose_question')} <span className="text-[#A8402A]">*</span>
               </label>
               <select
                 value={assetType}
@@ -520,7 +525,7 @@ export default function NewAssetPage() {
                   setAssetType(e.target.value as 'sede' | 'admin' | '');
                   setFormData({ ...formData, location_id: '', work_area_id: '', program_id: '' });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 required
               >
                 <option value="">{t('inv_select_type_placeholder')}</option>
@@ -532,13 +537,13 @@ export default function NewAssetPage() {
             {/* Si es Sede: selector de programa */}
             {assetType === 'sede' && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('inv_site_label')} <span className="text-red-500">*</span>
+                <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                  {t('inv_site_label')} <span className="text-[#A8402A]">*</span>
                 </label>
                 <select
                   value={formData.program_id}
                   onChange={(e) => setFormData({ ...formData, program_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                   required
                 >
                   <option value="">{t('inv_select_site_placeholder2')}</option>
@@ -546,7 +551,7 @@ export default function NewAssetPage() {
                     <option key={prog.id} value={prog.id}>{prog.name}</option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                   {t('inv_location_auto_hint')}
                 </p>
               </div>
@@ -556,13 +561,13 @@ export default function NewAssetPage() {
             {assetType === 'admin' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('inv_location_simple_label')} <span className="text-red-500">*</span>
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                    {t('inv_location_simple_label')} <span className="text-[#A8402A]">*</span>
                   </label>
                   <select
                     value={formData.location_id}
                     onChange={(e) => setFormData({ ...formData, location_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     required
                   >
                     <option value="">{t('inv_select_location_placeholder')}</option>
@@ -573,13 +578,13 @@ export default function NewAssetPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                     {t('inv_work_area_simple_label')}
                   </label>
                   <select
                     value={formData.work_area_id}
                     onChange={(e) => setFormData({ ...formData, work_area_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                   >
                     <option value="">{t('inv_no_specific_area')}</option>
                     {workAreas
@@ -594,13 +599,13 @@ export default function NewAssetPage() {
 
             {/* Procedencia */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_source_simple_label')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_source_simple_label')} <span className="text-[#A8402A]">*</span>
               </label>
               <select
                 value={formData.source_id}
                 onChange={(e) => setFormData({ ...formData, source_id: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 required
               >
                 <option value="">{t('inv_select_source_placeholder')}</option>
@@ -612,13 +617,13 @@ export default function NewAssetPage() {
 
             {/* Grupo */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_asset_group_label')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_asset_group_label')} <span className="text-[#A8402A]">*</span>
               </label>
               <select
                 value={formData.group_id}
                 onChange={(e) => setFormData({ ...formData, group_id: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 required
               >
                 <option value="">{t('inv_select_group_placeholder')}</option>
@@ -629,50 +634,50 @@ export default function NewAssetPage() {
             </div>
 
             {/* Opciones Avanzadas de Clasificación */}
-            <div className="md:col-span-2 border-t pt-4">
+            <div className="md:col-span-2 border-t border-[#EFE9DD] pt-4">
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center gap-2 text-sm text-[#C2492B] hover:text-[#A83A20] font-medium"
+                className="flex items-center gap-2 text-[13px] text-[#C2492B] hover:text-[#A83A20] font-medium"
               >
                 <span>{showAdvanced ? '▼' : '▶'}</span>
                 {t('inv_advanced_options_toggle')}
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                 {t('inv_advanced_options_hint')}
               </p>
 
               {showAdvanced && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-[#FAF7F2] border border-[#EFE9DD] rounded-lg">
                   {/* Clase */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('inv_asset_class_label')} <span className="text-red-500">*</span>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                      {t('inv_asset_class_label')} <span className="text-[#A8402A]">*</span>
                     </label>
                     <select
                       value={formData.class_id}
                       onChange={(e) => setFormData({ ...formData, class_id: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     >
                       <option value="">{t('inv_select_class_placeholder')}</option>
                       {classes.map(cls => (
                         <option key={cls.id} value={cls.id}>{cls.name}</option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                       {t('inv_class_hint')}
                     </p>
                   </div>
 
                   {/* Característica */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('inv_characteristic_simple_label')} <span className="text-red-500">*</span>
+                    <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                      {t('inv_characteristic_simple_label')} <span className="text-[#A8402A]">*</span>
                     </label>
                     <select
                       value={formData.characteristic_id}
                       onChange={(e) => setFormData({ ...formData, characteristic_id: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                     >
                       <option value="">{t('inv_select_characteristic_placeholder')}</option>
                       {characteristics.map(char => (
@@ -681,7 +686,7 @@ export default function NewAssetPage() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                       {t('inv_characteristic_hint')}
                     </p>
                   </div>
@@ -692,21 +697,21 @@ export default function NewAssetPage() {
         </div>
 
         {/* Sección 2: Información del Activo */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div className="mb-7">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_asset_info_header')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Descripción */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('inv_description_column')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('inv_description_column')} <span className="text-[#A8402A]">*</span>
               </label>
               <input
                 type="text"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 placeholder={t('inv_description_placeholder_example')}
                 required
               />
@@ -714,61 +719,61 @@ export default function NewAssetPage() {
 
             {/* Marca */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_brand_label')}
               </label>
               <input
                 type="text"
                 value={formData.brand}
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 placeholder={t('inv_brand_placeholder_example')}
               />
             </div>
 
             {/* Modelo */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_model_label')}
               </label>
               <input
                 type="text"
                 value={formData.model}
                 onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               />
             </div>
 
             {/* Tamaño */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_col_size')}
               </label>
               <input
                 type="text"
                 value={formData.size}
                 onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 placeholder={t('inv_size_placeholder_example')}
               />
             </div>
 
             {/* Número de serie */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_serial_number_label')}
               </label>
               <input
                 type="text"
                 value={formData.serial_number}
                 onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               />
             </div>
 
             {/* Costo estimado */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_estimated_cost_label')}
               </label>
               <input
@@ -776,7 +781,7 @@ export default function NewAssetPage() {
                 step="0.01"
                 value={formData.estimated_cost}
                 onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 placeholder="0.00"
               />
             </div>
@@ -784,20 +789,20 @@ export default function NewAssetPage() {
         </div>
 
         {/* Sección 3: Estado y Asignación */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div className="mb-7">
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_status_assignment_header')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Estado */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('status')} <span className="text-red-500">*</span>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
+                {t('status')} <span className="text-[#A8402A]">*</span>
               </label>
               <select
                 value={formData.status_code}
                 onChange={(e) => setFormData({ ...formData, status_code: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
                 required
               >
                 <option value="available">{t('inv_status_available')}</option>
@@ -809,13 +814,13 @@ export default function NewAssetPage() {
 
             {/* Programa/Sede */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_program_site_label')}
               </label>
               <select
                 value={formData.current_program_id}
                 onChange={(e) => setFormData({ ...formData, current_program_id: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               >
                 <option value="">{t('inv_unassigned')}</option>
                 {programs.map(prog => (
@@ -826,11 +831,11 @@ export default function NewAssetPage() {
 
             {/* Dueño/Owner */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('inv_owner_label_form')}</label>
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_owner_label_form')}</label>
               <select
                 value={formData.owner}
                 onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
               >
                 <option value="">{t('inv_select_owner_placeholder')}</option>
                 <option value="TOSA">TOSA</option>
@@ -838,14 +843,14 @@ export default function NewAssetPage() {
                 <option value="Academy">Academy</option>
                 <option value="Otro">{t('inv_other')}</option>
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                 {t('inv_owner_entity_hint')}
               </p>
             </div>
 
             {/* Asignado a */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">
                 {t('inv_assigned_to_freetext_label')}
               </label>
               <select
@@ -863,7 +868,7 @@ export default function NewAssetPage() {
                     setFormData({ ...formData, assigned_student_id: val, assigned_to_text: '' });
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] disabled:bg-[#F4F0E8] disabled:text-[#8A8177]"
                 disabled={!formData.current_program_id}
               >
                 <option value="">{t('inv_unassigned')}</option>
@@ -873,18 +878,18 @@ export default function NewAssetPage() {
                 <option value="__other__">{t('inv_assigned_other_option')}</option>
               </select>
               {!formData.current_program_id && (
-                <p className="text-xs text-gray-500 mt-1">{t('inv_assigned_to_needs_site')}</p>
+                <p className="text-[11.5px] text-[#8A8177] mt-1.5">{t('inv_assigned_to_needs_site')}</p>
               )}
               {assignToOther && (
                 <input
                   type="text"
                   value={formData.assigned_to_text}
                   onChange={(e) => setFormData({ ...formData, assigned_to_text: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900 mt-2"
+                  className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] mt-2"
                   placeholder={t('inv_assigned_to_placeholder_short')}
                 />
               )}
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-[11.5px] text-[#8A8177] mt-1.5">
                 {t('inv_assigned_to_hint')}
               </p>
             </div>
@@ -892,25 +897,25 @@ export default function NewAssetPage() {
         </div>
 
         {/* Sección 4: Notas */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
+        <div>
+          <h2 className="text-[15px] font-medium text-[#1B1917] pb-3 mb-4 border-b border-[#EFE9DD]">
             {t('inv_notes_header')}
           </h2>
           <textarea
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
             rows={4}
             placeholder={t('inv_notes_placeholder')}
           />
         </div>
 
         {/* Botones */}
-        <div className="flex gap-4 justify-end flex-wrap pt-4 border-t">
+        <div className="flex gap-3 justify-end flex-wrap pt-5 mt-7 border-t border-[#EFE9DD]">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-5 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
             disabled={saving}
           >
             {t('cancel')}
@@ -918,9 +923,9 @@ export default function NewAssetPage() {
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:bg-gray-400"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
-            <MdSave size={20} />
+            <MdSave size={18} />
             {saving ? t('saving') : t('inv_create_asset_button')}
           </button>
         </div>
