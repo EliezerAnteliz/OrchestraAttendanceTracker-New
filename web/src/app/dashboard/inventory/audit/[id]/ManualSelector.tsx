@@ -76,10 +76,15 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
   // que no existen aquí.
   async function loadInstrumentOptions() {
     try {
+      // Se excluyen los activos con Owner = Stafford (propiedad del colegio,
+      // uso de emergencia — físicamente no están en el almacén, no se
+      // esperan encontrar en el recorrido), mismo criterio que el contador
+      // "esperados" y el reporte final.
       const { data } = await inventorySupabase
         .from('assets')
         .select('description')
         .eq('current_program_id', programId)
+        .or('owner.neq.Stafford,owner.is.null')
         .not('description', 'is', null)
         .order('description');
 
@@ -94,10 +99,13 @@ export default function ManualSelector({ sessionId, programId, onAssetSelected, 
     try {
       setLoading(true);
 
+      // Mismo criterio que loadInstrumentOptions: los activos Owner=Stafford
+      // no se muestran para seleccionar, no están físicamente en el almacén.
       let query = inventorySupabase
         .from('assets')
         .select('id, full_code, description, brand, size, serial_number, assigned_to_text, status_code, current_program_id')
         .eq('current_program_id', programId)
+        .or('owner.neq.Stafford,owner.is.null')
         .order('description');
 
       if (searchTerm) {
