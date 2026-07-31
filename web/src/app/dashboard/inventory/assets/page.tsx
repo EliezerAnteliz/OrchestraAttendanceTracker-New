@@ -11,9 +11,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdFilterList, MdSearch, MdWarning, MdFileDownload } from 'react-icons/md';
+import { MdFilterList, MdSearch, MdWarning, MdFileDownload, MdAdd } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useInventoryHeaderActions } from '../layout';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -104,6 +106,7 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function AssetsListPage() {
   const { t } = useI18n();
+  const { isAdmin } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -428,23 +431,39 @@ export default function AssetsListPage() {
 
   const totalPages = Math.ceil(totalCount / pageSize) || 1;
 
+  // Acciones en el encabezado compartido del módulo (junto al selector de
+  // rol): exportar el listado filtrado a Excel (cualquier rol con acceso a
+  // esta pestaña), y "Nuevo activo" solo Admin.
+  useInventoryHeaderActions(
+    <>
+      <button
+        onClick={exportToExcel}
+        className="flex items-center justify-center gap-2 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+        title={t('inv_export_excel_title')}
+      >
+        <MdFileDownload size={18} />
+        {t('inv_export_excel_button')}
+      </button>
+      {isAdmin && (
+        <button
+          onClick={() => router.push('/dashboard/inventory/assets/new')}
+          className="flex items-center justify-center gap-2 bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
+        >
+          <MdAdd size={18} />
+          {t('inv_new_asset_button')}
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div>
-      {/* Acciones — el título "Inventory", la sede y "Nuevo activo" ya
-          viven en el encabezado compartido de layout.tsx; aquí solo va lo
-          específico del Listado. */}
-      <div className="flex items-center justify-end gap-3 flex-wrap">
-        <button
-          onClick={exportToExcel}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
-          title={t('inv_export_excel_title')}
-        >
-          <MdFileDownload size={18} />
-          {t('inv_export_excel_button')}
-        </button>
-      </div>
+      {/* Título "Inventory", sede, "Exportar a Excel" y "Nuevo activo" ya
+          viven en el encabezado compartido de layout.tsx (ver
+          useInventoryHeaderActions más arriba); aquí solo va lo específico
+          del Listado. */}
       {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
-        <div className="mt-3 inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+        <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
           <MdWarning className="mr-2" size={14} />
           {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
         </div>
