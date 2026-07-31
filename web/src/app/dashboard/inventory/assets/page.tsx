@@ -15,7 +15,7 @@ import { MdFilterList, MdSearch, MdWarning, MdFileDownload, MdAdd } from 'react-
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useInventoryHeaderActions } from '../layout';
+import { useInventoryHeaderActions } from '../InventoryHeaderActions';
 
 // Cliente de Supabase para ambiente de prueba
 
