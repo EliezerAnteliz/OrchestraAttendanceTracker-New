@@ -1367,7 +1367,7 @@ ${dateTableEN}`;
         </div>
 
         {/* Leyenda unificada (mt-4 para calzar con la del gráfico de Barras) */}
-        <div className="mt-4 grid grid-cols-3 gap-2 px-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 px-4">
           <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
             <div className="w-4 h-4 bg-[#5F7A57] mr-2 rounded-sm"></div>
             <span className="text-xs text-[#1B1917]">{t('total_attendances')}: {data.total_attendance} ({presentPercentage.toFixed(1)}%)</span>
@@ -1478,7 +1478,7 @@ ${dateTableEN}`;
           ))}
         </div>
         {/* Leyenda unificada (mismo formato que el gráfico circular) */}
-        <div className="mt-4 grid grid-cols-3 gap-2 px-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2 px-4">
           <div className="flex items-center bg-[#FFFDFA] p-2 rounded-md border border-[#EAE3D6]">
             <div className="w-4 h-4 bg-[#5F7A57] mr-2 rounded-sm"></div>
             <span className="text-xs text-[#1B1917]">{t('attendance_label')}: {data.total_attendance} ({data.attendance_percentage.toFixed(1)}%)</span>
