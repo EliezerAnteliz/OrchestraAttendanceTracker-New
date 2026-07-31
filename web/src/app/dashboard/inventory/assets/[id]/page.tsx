@@ -519,7 +519,7 @@ export default function AssetDetailPage() {
         {/* Código Completo */}
         <div className="mt-4 pb-4 border-b border-[#EFE9DD]">
           <span className="text-[12.5px] text-[#8A8177]">{t('inv_full_code_colon')}</span>
-          <p className="font-mono font-semibold text-2xl text-[#C2492B] mt-1">{asset?.full_code || t('inv_no_code')}</p>
+          <p className="font-mono font-normal text-2xl text-[#C2492B] mt-1">{asset?.full_code || t('inv_no_code')}</p>
         </div>
 
         {/* Segmentos del Código Decodificados */}
