@@ -344,11 +344,23 @@ export default function ReportsPage() {
           setLoading(false);
           return;
         }
-        const { data, error } = await supabase
-          .from('students')
-          .select('id, first_name, last_name, instrument, orchestra_position')
-          .eq('is_active', true)
-          .eq('program_id', activeProgram.id);
+        // Activos y directorio completo (activos + inactivos, para resolver
+        // nombres en reportes de rango largo como el Anual) son consultas
+        // independientes — se piden en paralelo en vez de una tras otra.
+        const [activeRes, allRes] = await Promise.all([
+          supabase
+            .from('students')
+            .select('id, first_name, last_name, instrument, orchestra_position')
+            .eq('is_active', true)
+            .eq('program_id', activeProgram.id),
+          supabase
+            .from('students')
+            .select('id, first_name, last_name, instrument, orchestra_position')
+            .eq('program_id', activeProgram.id),
+        ]);
+
+        const { data, error } = activeRes;
+        const { data: allData, error: allError } = allRes;
 
         if (error) throw error;
 
@@ -362,13 +374,6 @@ export default function ReportsPage() {
         }));
 
         setStudents(formattedStudents);
-
-        // Directorio completo (activos + inactivos) para resolver nombres
-        // en reportes que cubren un rango largo (ej. Anual).
-        const { data: allData, error: allError } = await supabase
-          .from('students')
-          .select('id, first_name, last_name, instrument, orchestra_position')
-          .eq('program_id', activeProgram.id);
 
         if (!allError && allData) {
           const dir = new Map(
