@@ -600,25 +600,21 @@ export default function AdminUsersPage() {
     if (programs.length > 0) {
       loadAllUsers();
     }
-    loadOrganizations(); // Load organizations independently
   }, [programs]);
 
-  // Also load organizations on component mount
+  // Organizaciones se cargan UNA sola vez, al montar — antes también se
+  // disparaban desde el efecto de arriba cada vez que cambiaba `programs`
+  // (que además se re-ejecuta apenas el contexto termina de poblar la
+  // lista), así que cada visita a esta pestaña lanzaba 2-3 consultas
+  // duplicadas a "organizations" en vez de una sola.
   useEffect(() => {
     loadOrganizations();
   }, []);
 
   const loadOrganizations = async () => {
     try {
-      console.log('Loading organizations...');
-      
-      // Check current user and session
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      console.log('Current user:', user?.id, user?.email);
-      
-      // Try to get organizations with RLS bypass using service role
       console.log('Attempting to load organizations...');
-      
+
       // First try with active filter
       const { data: activeOrgs, error: activeError } = await supabase
         .from('organizations')
