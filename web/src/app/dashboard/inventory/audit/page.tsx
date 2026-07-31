@@ -81,29 +81,33 @@ export default function AuditPage() {
       setLoading(true);
       setError(null);
 
-      // Cargar programas activos
-      const { data: programsData, error: programsError } = await inventorySupabase
-        .from('programs')
-        .select('id, name')
-        .eq('is_active', true)
-        .order('name');
+      // Programas activos y sesiones de auditoría son independientes entre
+      // sí — se piden en paralelo en vez de uno tras otro.
+      const [
+        { data: programsData, error: programsError },
+        { data: sessionsData, error: sessionsError },
+      ] = await Promise.all([
+        inventorySupabase
+          .from('programs')
+          .select('id, name')
+          .eq('is_active', true)
+          .order('name'),
+        inventorySupabase
+          .from('audit_sessions')
+          .select(`
+            id,
+            program_id,
+            started_at,
+            ended_at,
+            status,
+            programs:program_id(name)
+          `)
+          .order('started_at', { ascending: false })
+          .limit(20),
+      ]);
 
       if (programsError) throw programsError;
       setPrograms(programsData || []);
-
-      // Cargar sesiones de auditoría (últimas 20)
-      const { data: sessionsData, error: sessionsError } = await inventorySupabase
-        .from('audit_sessions')
-        .select(`
-          id,
-          program_id,
-          started_at,
-          ended_at,
-          status,
-          programs:program_id(name)
-        `)
-        .order('started_at', { ascending: false })
-        .limit(20);
 
       if (sessionsError) throw sessionsError;
 
