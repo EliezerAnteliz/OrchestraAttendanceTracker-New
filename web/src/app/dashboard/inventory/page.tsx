@@ -13,7 +13,6 @@ import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdWarning, MdSwapHoriz, MdArchive } from 'react-icons/md';
 import Link from 'next/link';
 import { useI18n } from '@/contexts/I18nContext';
-import { useUserRole } from '@/hooks/useUserRole';
 
 // Cliente de Supabase para ambiente de prueba
 
@@ -98,7 +97,6 @@ function isLoanedOwner(owner: string | null | undefined): boolean {
 
 export default function InventoryDashboard() {
   const { t, lang } = useI18n();
-  const { isAdmin } = useUserRole();
   const [stats, setStats] = useState<DashboardStats>({
     total: 0,
     available: 0,
@@ -326,26 +324,13 @@ export default function InventoryDashboard() {
 
   return (
     <div>
-      {/* Ambiente de prueba + acción "Nuevo activo" — el título "Inventory"
-          y el subtítulo con la sede ya viven en el encabezado compartido
-          de layout.tsx (arriba de las pestañas), así que aquí solo va lo
-          específico de esta sub-pestaña. */}
-      {(INVENTORY_SUPABASE_CONFIG.environment === 'test' || isAdmin) && (
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          {INVENTORY_SUPABASE_CONFIG.environment === 'test' ? (
-            <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
-              <MdWarning className="mr-2" size={14} />
-              {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
-            </div>
-          ) : <span />}
-          {isAdmin && (
-            <Link
-              href="/dashboard/inventory/assets/new"
-              className="bg-[#C2492B] text-[#FAF7F2] rounded-lg px-[18px] py-2.5 font-medium hover:bg-[#A83A20] transition-colors whitespace-nowrap"
-            >
-              {t('inv_new_asset_button')}
-            </Link>
-          )}
+      {/* Ambiente de prueba — el título "Inventory", el subtítulo con la
+          sede, y la acción "Nuevo activo" ya viven en el encabezado
+          compartido de layout.tsx (arriba de las pestañas). */}
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_with_id', { id: INVENTORY_SUPABASE_CONFIG.projectId })}
         </div>
       )}
 
