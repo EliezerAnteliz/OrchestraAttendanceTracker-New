@@ -140,14 +140,57 @@ export default function InventoryDashboard() {
       setLoading(true);
       setError(null);
 
-      // Obtener estadísticas (incluye sede actual para el desglose por sede,
-      // y owner para poder separar los activos prestados de Stafford/Academy)
-      const { data: allActiveAssets, error: assetsError } = await inventorySupabase
-        .from('assets')
-        .select('id, status_code, full_code, description, brand, size, assigned_to_text, created_at, current_program_id, owner, current_program:current_program_id(name)')
-        .eq('is_active', true);
+      // Las 4 consultas de arranque son independientes entre sí (ninguna
+      // depende del resultado de otra) — se piden en paralelo en vez de
+      // una tras otra, que era como estaban antes.
+      const [
+        { data: allActiveAssets, error: assetsError },
+        { count: retiredCount, error: retiredError },
+        { data: closedSessions, error: sessionsError },
+        { data: recent, error: recentError },
+      ] = await Promise.all([
+        // Estadísticas (incluye sede actual para el desglose por sede,
+        // y owner para poder separar los activos prestados de Stafford/Academy)
+        inventorySupabase
+          .from('assets')
+          .select('id, status_code, full_code, description, brand, size, assigned_to_text, created_at, current_program_id, owner, current_program:current_program_id(name)')
+          .eq('is_active', true),
+        // Dados de baja: quedan fuera del conteo activo de arriba (is_active=false),
+        // así que se cuentan aparte con una consulta liviana (solo el total, sin traer filas).
+        inventorySupabase
+          .from('assets')
+          .select('id', { count: 'exact', head: true })
+          .eq('status_code', 'retired'),
+        // Última auditoría cerrada por sede — conecta el Dashboard con el
+        // módulo de Auditoría (antes no había ninguna relación entre ambos).
+        inventorySupabase
+          .from('audit_sessions')
+          .select('id, program_id, ended_at')
+          .eq('status', 'closed')
+          .order('ended_at', { ascending: false }),
+        // Últimos 5 activos registrados
+        inventorySupabase
+          .from('assets')
+          .select(`
+            id,
+            full_code,
+            description,
+            brand,
+            size,
+            status_code,
+            assigned_to_text,
+            created_at,
+            asset_status:status_code(description)
+          `)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ]);
 
       if (assetsError) throw assetsError;
+      if (retiredError) throw retiredError;
+      if (sessionsError) throw sessionsError;
+      if (recentError) throw recentError;
 
       // Los activos prestados (Stafford/Academy) no son propiedad de TOSA —
       // se excluyen del "Total de Activos" y del desglose por sede, y se
@@ -165,15 +208,6 @@ export default function InventoryDashboard() {
       const assigned = assets?.filter(a => a.status_code === 'assigned').length || 0;
       const repair = assets?.filter(a => a.status_code === 'repair').length || 0;
       const onLoan = assets?.filter(a => a.status_code === 'on_loan').length || 0;
-
-      // Dados de baja: quedan fuera del conteo activo de arriba (is_active=false),
-      // así que se cuentan aparte con una consulta liviana (solo el total, sin traer filas).
-      const { count: retiredCount, error: retiredError } = await inventorySupabase
-        .from('assets')
-        .select('id', { count: 'exact', head: true })
-        .eq('status_code', 'retired');
-
-      if (retiredError) throw retiredError;
       const retired = retiredCount || 0;
 
       // Desglose por sede — el total global no dice mucho en una app
@@ -219,20 +253,11 @@ export default function InventoryDashboard() {
         return a.programName.localeCompare(b.programName);
       });
 
-      // Última auditoría cerrada por sede — conecta el Dashboard con el
-      // módulo de Auditoría (antes no había ninguna relación entre ambos).
       // "Faltantes" aquí es una aproximación rápida para el Dashboard
       // (activos activos de la sede menos los auditados como found/mismatch
       // en esa sesión); el conteo exacto y detallado sigue siendo el
       // Reporte de Auditoría, al que este indicador enlaza directo.
-      const { data: closedSessions, error: sessionsError } = await inventorySupabase
-        .from('audit_sessions')
-        .select('id, program_id, ended_at')
-        .eq('status', 'closed')
-        .order('ended_at', { ascending: false });
-
-      if (sessionsError) throw sessionsError;
-
+      // (closedSessions ya se trajo arriba, en el Promise.all de inicio.)
       const latestSessionByProgram: Record<string, { id: string; ended_at: string }> = {};
       (closedSessions || []).forEach((s: any) => {
         if (!latestSessionByProgram[s.program_id]) {
@@ -264,26 +289,7 @@ export default function InventoryDashboard() {
         })
       );
 
-      // Obtener últimos 5 activos registrados
-      const { data: recent, error: recentError } = await inventorySupabase
-        .from('assets')
-        .select(`
-          id,
-          full_code,
-          description,
-          brand,
-          size,
-          status_code,
-          assigned_to_text,
-          created_at,
-          asset_status:status_code(description)
-        `)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (recentError) throw recentError;
-
+      // (recent ya se trajo arriba, en el Promise.all de inicio.)
       setStats({
         total,
         available,
