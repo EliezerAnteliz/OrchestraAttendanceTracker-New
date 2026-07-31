@@ -15,6 +15,7 @@ import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 import { MdQrCodeScanner, MdAdd, MdCheckCircle, MdError, MdWarning, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useInventoryHeaderActions } from '../layout';
 
 
 interface Program {
@@ -46,6 +47,22 @@ export default function AuditPage() {
   const [error, setError] = useState<string | null>(null);
   const [showNewSessionModal, setShowNewSessionModal] = useState(false);
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
+
+  // Botón "Nueva auditoría" en el encabezado compartido del módulo (junto
+  // al selector de rol) — reemplaza a "Nuevo activo" en esta sub-pestaña,
+  // ya que esa acción no aplica aquí. Abre el modal de selección de sede
+  // definido más abajo en esta misma página (estado local). Se registra
+  // antes de cualquier `return` condicional para no violar las reglas de
+  // hooks (deben llamarse en el mismo orden en todos los renders).
+  useInventoryHeaderActions(
+    <button
+      onClick={() => setShowNewSessionModal(true)}
+      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
+    >
+      <MdAdd size={18} />
+      {t('inv_new_audit')}
+    </button>
+  );
 
   useEffect(() => {
     loadData();
@@ -234,22 +251,15 @@ export default function AuditPage() {
 
   return (
     <div>
-      {/* Acciones */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        {INVENTORY_SUPABASE_CONFIG.environment === 'test' ? (
-          <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
-            <MdWarning className="mr-2" size={14} />
-            {t('inv_test_env_banner')}
-          </div>
-        ) : <span />}
-        <button
-          onClick={() => setShowNewSessionModal(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
-        >
-          <MdAdd size={18} />
-          {t('inv_new_audit')}
-        </button>
-      </div>
+      {/* "Nueva auditoría" ya vive en el encabezado compartido de
+          layout.tsx (ver useInventoryHeaderActions más arriba) — no
+          "Nuevo activo", que no aplica en esta sub-pestaña. */}
+      {INVENTORY_SUPABASE_CONFIG.environment === 'test' && (
+        <div className="inline-flex items-center px-3 py-1 bg-[#F6EFDF] border border-[#E3D3A8] rounded-lg text-[12.5px] text-[#8A6A22]">
+          <MdWarning className="mr-2" size={14} />
+          {t('inv_test_env_banner')}
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
