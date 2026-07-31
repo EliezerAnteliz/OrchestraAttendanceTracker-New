@@ -14,7 +14,7 @@ import { MdWarning, MdSwapHoriz, MdArchive, MdAdd } from 'react-icons/md';
 import Link from 'next/link';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useInventoryHeaderActions } from '../layout';
+import { useInventoryHeaderActions } from './InventoryHeaderActions';
 
 // Cliente de Supabase para ambiente de prueba
 
