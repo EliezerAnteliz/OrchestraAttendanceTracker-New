@@ -59,6 +59,8 @@ interface PendingConfirm {
     brand: string | null;
     full_code: string | null;
     assigned_to_text: string | null;
+    assigned_student_id: string | null;
+    current_program_id: string | null;
     status_code: string;
   };
   mismatchProgramName?: string | null;
@@ -137,7 +139,7 @@ export default function AuditSessionPage() {
   // reporte y esto se pierde junto con la posibilidad de deshacer, que
   // es justo el comportamiento pedido). Se usa para revertir el activo
   // automáticamente si se deshace ese evento.
-  const [previousAssetStates, setPreviousAssetStates] = useState<Record<string, { assetId: string; assigned_to_text: string | null; status_code: string }>>({});
+  const [previousAssetStates, setPreviousAssetStates] = useState<Record<string, { assetId: string; assigned_to_text: string | null; assigned_student_id: string | null; status_code: string }>>({});
 
   useEffect(() => {
     loadSession();
@@ -240,7 +242,7 @@ export default function AuditSessionPage() {
       try {
         const { data: assetInfo, error: assetError } = await inventorySupabase
           .from('assets')
-          .select('id, description, brand, full_code, assigned_to_text, status_code, current_program_id')
+          .select('id, description, brand, full_code, assigned_to_text, assigned_student_id, status_code, current_program_id')
           .eq('id', assetId)
           .single();
 
@@ -311,13 +313,15 @@ export default function AuditSessionPage() {
     }
   }
 
-  async function handleConfirmAudit(assignedToText: string | null, statusCode: string) {
+  async function handleConfirmAudit(assignedToText: string | null, assignedStudentId: string | null, statusCode: string) {
     if (!pendingConfirm) return;
     const { assetId, code, result, source, asset } = pendingConfirm;
 
     setSavingConfirm(true);
     try {
-      const assignmentChanged = (assignedToText || null) !== (asset.assigned_to_text || null);
+      const assignmentChanged =
+        (assignedToText || null) !== (asset.assigned_to_text || null) ||
+        (assignedStudentId || null) !== (asset.assigned_student_id || null);
       const statusChanged = statusCode !== asset.status_code;
 
       if (assignmentChanged || statusChanged) {
@@ -325,6 +329,7 @@ export default function AuditSessionPage() {
           .from('assets')
           .update({
             assigned_to_text: assignedToText,
+            assigned_student_id: assignedStudentId,
             status_code: statusCode,
           })
           .eq('id', assetId);
@@ -343,6 +348,7 @@ export default function AuditSessionPage() {
           [newEventId]: {
             assetId,
             assigned_to_text: asset.assigned_to_text,
+            assigned_student_id: asset.assigned_student_id,
             status_code: asset.status_code,
           },
         }));
@@ -375,6 +381,7 @@ export default function AuditSessionPage() {
           .from('assets')
           .update({
             assigned_to_text: prevState.assigned_to_text,
+            assigned_student_id: prevState.assigned_student_id,
             status_code: prevState.status_code,
           })
           .eq('id', prevState.assetId);
