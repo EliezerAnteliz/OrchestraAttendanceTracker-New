@@ -27,6 +27,7 @@ interface AssetInfo {
   assigned_student_id: string | null;
   current_program_id: string | null;
   status_code: string;
+  condition_code: string;
 }
 
 interface StudentOption {
@@ -39,7 +40,7 @@ interface AssetConfirmModalProps {
   asset: AssetInfo;
   result: 'found' | 'mismatch_site';
   mismatchProgramName?: string | null;
-  onConfirm: (assignedToText: string | null, assignedStudentId: string | null, statusCode: string) => void;
+  onConfirm: (assignedToText: string | null, assignedStudentId: string | null, statusCode: string, conditionCode: string) => void;
   onCancel: () => void;
   saving?: boolean;
 }
@@ -52,6 +53,11 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
     { value: 'repair', label: t('inv_status_repair') },
     { value: 'on_loan', label: t('inv_status_on_loan') },
   ];
+  const CONDITION_OPTIONS = [
+    { value: 'good', label: t('inv_condition_good') },
+    { value: 'needs_repair', label: t('inv_condition_needs_repair') },
+    { value: 'damaged', label: t('inv_condition_damaged') },
+  ];
 
   const [programStudents, setProgramStudents] = useState<StudentOption[]>([]);
   const [assignedStudentId, setAssignedStudentId] = useState(asset.assigned_student_id || '');
@@ -62,6 +68,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
   const [assignToOther, setAssignToOther] = useState(!asset.assigned_student_id && !!asset.assigned_to_text);
   const [assignedToOtherText, setAssignedToOtherText] = useState(!asset.assigned_student_id ? (asset.assigned_to_text || '') : '');
   const [statusCode, setStatusCode] = useState(asset.status_code || 'available');
+  const [conditionCode, setConditionCode] = useState(asset.condition_code || 'good');
 
   // Estudiantes activos de la sede de este activo, para el selector de
   // "Asignado a" — mismo patrón que Detalle de Activo / Nuevo Activo, así
@@ -115,7 +122,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
 
   function handleConfirm() {
     const finalStudentId = !assignToOther && assignedStudentId ? assignedStudentId : null;
-    onConfirm(currentAssignedName(), finalStudentId, statusCode);
+    onConfirm(currentAssignedName(), finalStudentId, statusCode, conditionCode);
   }
 
   const newAssignedName = currentAssignedName();
@@ -124,6 +131,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
     newAssignedName !== (asset.assigned_to_text || null) ||
     newStudentId !== (asset.assigned_student_id || null);
   const statusChanged = statusCode !== asset.status_code;
+  const conditionChanged = conditionCode !== (asset.condition_code || 'good');
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[60]">
@@ -246,6 +254,24 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
             )}
           </div>
 
+          {/* Condición física — independiente de disponibilidad; un
+              instrumento puede estar "Asignado" y a la vez "Dañado" */}
+          <div>
+            <label className="block text-[13px] font-medium text-[#56504A] mb-1.5">{t('inv_condition_label')}</label>
+            <select
+              value={conditionCode}
+              onChange={(e) => setConditionCode(e.target.value)}
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
+            >
+              {CONDITION_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            {conditionChanged && (
+              <p className="text-[11.5px] text-[#C2492B] font-medium mt-1.5">{t('inv_condition_changed')}</p>
+            )}
+          </div>
+
           <div className="flex gap-2">
             <button
               onClick={onCancel}
@@ -259,7 +285,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
               disabled={saving}
               className="flex-[2] px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
             >
-              {saving ? t('saving') : (assignmentChanged || statusChanged) ? t('inv_save_and_confirm') : t('inv_confirm_audit')}
+              {saving ? t('saving') : (assignmentChanged || statusChanged || conditionChanged) ? t('inv_save_and_confirm') : t('inv_confirm_audit')}
             </button>
           </div>
           <p className="text-[11.5px] text-[#A29889] text-center">
