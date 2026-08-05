@@ -566,6 +566,11 @@ const translations: Translations = {
   inv_save_and_confirm: { es: "Guardar cambios y confirmar", en: "Save changes and confirm" },
   inv_confirm_audit: { es: "Confirmar auditoría", en: "Confirm audit" },
   inv_wrong_instrument_hint: { es: "¿Seleccionaste el instrumento equivocado? Cancela y busca el correcto — nada se guarda hasta confirmar.", en: "Selected the wrong instrument? Cancel and search for the right one — nothing is saved until you confirm." },
+  inv_condition_label: { es: "Condición del instrumento", en: "Instrument condition" },
+  inv_condition_good: { es: "Buen estado", en: "Good condition" },
+  inv_condition_needs_repair: { es: "Necesita reparación", en: "Needs repair" },
+  inv_condition_damaged: { es: "Dañado", en: "Damaged" },
+  inv_condition_changed: { es: "Se va a actualizar la condición", en: "Condition will be updated" },
 
   // ========================================
   // Inventory module — ManualSelector.tsx
