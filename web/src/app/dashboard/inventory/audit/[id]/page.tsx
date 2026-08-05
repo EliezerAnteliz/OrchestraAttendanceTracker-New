@@ -48,6 +48,23 @@ interface AuditEvent {
 
 type AuditMode = 'scan' | 'manual' | 'photo' | null;
 
+// Fila mínima de un activo "Faltante" (de la sede, no auditado en esta
+// sesión) mostrada en la pantalla de revisión obligatoria antes de
+// Finalizar. Mismos campos que usa el reporte final (report/page.tsx) más
+// los que hacen falta para decidir su destino.
+interface MissingAssetRow {
+  id: string;
+  full_code: string | null;
+  description: string;
+  brand: string | null;
+  size: string | null;
+  assigned_to_text: string | null;
+  assigned_student_id: string | null;
+  status_code: string;
+}
+
+type MissingAction = 'keep' | 'available' | 'investigating' | 'lost';
+
 interface PendingConfirm {
   assetId: string;
   code: string;
@@ -141,6 +158,18 @@ export default function AuditSessionPage() {
   // es justo el comportamiento pedido). Se usa para revertir el activo
   // automáticamente si se deshace ese evento.
   const [previousAssetStates, setPreviousAssetStates] = useState<Record<string, { assetId: string; assigned_to_text: string | null; assigned_student_id: string | null; status_code: string; condition_code: string }>>({});
+
+  // Pantalla obligatoria de revisión de "Faltantes" antes de poder cerrar la
+  // auditoría (Task #220): si al pulsar Finalizar quedan activos de esta
+  // sede sin escanear, no se cierra directo — primero hay que decidir qué
+  // pasó con cada uno. Sin esto, "Finalizar Auditoría" no tocaba la tabla
+  // de activos para nada y el estatus de disponible/asignado quedaba
+  // desactualizado silenciosamente.
+  const [showMissingReview, setShowMissingReview] = useState(false);
+  const [loadingMissing, setLoadingMissing] = useState(false);
+  const [missingAssets, setMissingAssets] = useState<MissingAssetRow[]>([]);
+  const [missingDecisions, setMissingDecisions] = useState<Record<string, { action: MissingAction; note: string }>>({});
+  const [finalizingWithDecisions, setFinalizingWithDecisions] = useState(false);
 
   useEffect(() => {
     loadSession();
@@ -417,6 +446,96 @@ export default function AuditSessionPage() {
       setError(err.message || t('inv_error_removing_audited'));
     } finally {
       setUndoingId(null);
+    }
+  }
+
+  // Punto de entrada del botón "Finalizar Auditoría": antes de mostrar la
+  // confirmación de siempre, calcula los Faltantes (mismo criterio que el
+  // reporte final: activos de esta sede, sin contar Owner=Stafford, que no
+  // tienen un evento found/mismatch_site en esta sesión). Si no hay
+  // ninguno, sigue igual que antes. Si hay, obliga a pasar por la pantalla
+  // de revisión antes de poder cerrar.
+  async function handleFinalizeClick() {
+    if (!session) return;
+    setLoadingMissing(true);
+    try {
+      const auditedIds = new Set(
+        events
+          .filter(e => e.result === 'found' || e.result === 'mismatch_site')
+          .map(e => (Array.isArray(e.assets) ? (e.assets as any)[0]?.id : e.assets?.id))
+          .filter(Boolean)
+      );
+
+      const { data: allAssets, error: assetsError } = await inventorySupabase
+        .from('assets')
+        .select('id, full_code, description, brand, size, assigned_to_text, assigned_student_id, status_code')
+        .eq('current_program_id', session.program_id)
+        .or('owner.neq.Stafford,owner.is.null');
+
+      if (assetsError) throw assetsError;
+
+      const missing = (allAssets || []).filter(a => !auditedIds.has(a.id));
+
+      if (missing.length === 0) {
+        setShowCloseConfirm(true);
+      } else {
+        setMissingAssets(missing);
+        setMissingDecisions({});
+        setShowMissingReview(true);
+      }
+    } catch (err: any) {
+      console.error('Error loading missing assets:', err);
+      setError(err.message || t('inv_error_loading_missing'));
+    } finally {
+      setLoadingMissing(false);
+    }
+  }
+
+  // Aplica la decisión tomada para cada Faltante y, si todo sale bien,
+  // cierra la sesión igual que closeSession(). "keep" no toca la base de
+  // datos (es explícitamente "no pasó nada, solo no se escaneó esta vez").
+  async function handleFinalizeWithDecisions() {
+    setFinalizingWithDecisions(true);
+    try {
+      const updates = missingAssets
+        .filter(a => missingDecisions[a.id] && missingDecisions[a.id].action !== 'keep')
+        .map(a => {
+          const decision = missingDecisions[a.id];
+          if (decision.action === 'available') {
+            // Se retiró: ya no tiene dueño, queda disponible de verdad.
+            return inventorySupabase
+              .from('assets')
+              .update({
+                status_code: 'available',
+                assigned_student_id: null,
+                assigned_to_text: null,
+                follow_up_note: null,
+              })
+              .eq('id', a.id);
+          }
+          // 'investigating' o 'lost': se deja la asignación tal cual (para
+          // no perder el rastro de quién lo tenía por última vez) y solo se
+          // actualiza el estado + la nota de contexto.
+          return inventorySupabase
+            .from('assets')
+            .update({
+              status_code: decision.action,
+              follow_up_note: decision.note.trim() || null,
+            })
+            .eq('id', a.id);
+        });
+
+      const results = await Promise.all(updates);
+      const failed = results.find(r => r.error);
+      if (failed?.error) throw failed.error;
+
+      setShowMissingReview(false);
+      await closeSession();
+    } catch (err: any) {
+      console.error('Error applying missing decisions:', err);
+      setError(err.message || t('inv_error_finalizing_with_decisions'));
+    } finally {
+      setFinalizingWithDecisions(false);
     }
   }
 
@@ -792,10 +911,11 @@ export default function AuditSessionPage() {
               {t('inv_cancel_audit')}
             </button>
             <button
-              onClick={() => setShowCloseConfirm(true)}
-              className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium"
+              onClick={handleFinalizeClick}
+              disabled={loadingMissing}
+              className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
             >
-              {t('inv_finalize_audit')}
+              {loadingMissing ? t('inv_loading_missing') : t('inv_finalize_audit')}
             </button>
           </div>
         </div>
@@ -832,6 +952,112 @@ export default function AuditSessionPage() {
           </div>
         </div>
       )}
+
+      {/* Pantalla de revisión de Faltantes — obligatoria antes de Finalizar
+          cuando quedan activos sin escanear. Cada uno necesita una decisión
+          explícita (ninguna viene preseleccionada) antes de poder cerrar. */}
+      {showMissingReview && (() => {
+        const decidedCount = missingAssets.filter(a => missingDecisions[a.id]).length;
+        const allDecided = decidedCount === missingAssets.length;
+        const actions: MissingAction[] = ['keep', 'available', 'investigating', 'lost'];
+        return (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
+            <div className="bg-[#FFFDFA] border border-[#EAE3D6] w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[92vh]">
+              <div className="p-5 sm:p-6 pb-4 border-b border-[#F2ECE1]">
+                <h2
+                  className="text-xl text-[#1B1917] mb-1.5"
+                  style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                >
+                  {t('inv_missing_review_title')}
+                </h2>
+                <p className="text-[13.5px] text-[#6E675E]">
+                  {t('inv_missing_review_desc', { n: missingAssets.length })}
+                </p>
+                <p className="text-[12px] text-[#8A8177] mt-2">
+                  {t('inv_missing_decided_count', { done: decidedCount, total: missingAssets.length })}
+                </p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-3">
+                {missingAssets.map(asset => {
+                  const decision = missingDecisions[asset.id];
+                  return (
+                    <div key={asset.id} className="border border-[#EAE3D6] rounded-xl p-3.5">
+                      <div className="font-medium text-[#1B1917] text-[13.5px]">
+                        {asset.description}{asset.brand ? ` — ${asset.brand}` : ''}
+                      </div>
+                      <div className="text-[11.5px] text-[#8A8177] mt-0.5">
+                        {asset.full_code || t('inv_no_code')}
+                        {asset.assigned_to_text ? ` · ${t('inv_assigned_to')}: ${asset.assigned_to_text}` : ''}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mt-2.5">
+                        {actions.map(action => (
+                          <button
+                            key={action}
+                            type="button"
+                            onClick={() => setMissingDecisions(prev => ({
+                              ...prev,
+                              [asset.id]: { action, note: prev[asset.id]?.note || '' },
+                            }))}
+                            className={`px-2 py-1.5 text-[11.5px] rounded-lg border transition-colors ${
+                              decision?.action === action
+                                ? 'bg-[#C2492B] text-white border-[#C2492B]'
+                                : 'border-[#DED7C9] text-[#56504A] hover:border-[#C2492B] hover:text-[#C2492B]'
+                            }`}
+                          >
+                            {t(`inv_missing_action_${action}`)}
+                          </button>
+                        ))}
+                      </div>
+                      {decision && (
+                        <p className="text-[11px] text-[#8A8177] mt-1.5">
+                          {t(`inv_missing_action_${decision.action}_hint`)}
+                        </p>
+                      )}
+                      {decision && (decision.action === 'investigating' || decision.action === 'lost') && (
+                        <input
+                          type="text"
+                          value={decision.note}
+                          onChange={(e) => setMissingDecisions(prev => ({
+                            ...prev,
+                            [asset.id]: { ...prev[asset.id], note: e.target.value },
+                          }))}
+                          placeholder={t('inv_missing_note_placeholder')}
+                          className="mt-2 w-full px-3 py-2 text-[12.5px] border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B]"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="p-5 sm:p-6 pt-4 border-t border-[#F2ECE1]">
+                {!allDecided && (
+                  <p className="text-[11.5px] text-[#A8402A] mb-2.5">
+                    {t('inv_missing_all_decided_hint', { n: missingAssets.length - decidedCount })}
+                  </p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowMissingReview(false)}
+                    disabled={finalizingWithDecisions}
+                    className="flex-1 px-4 py-2.5 border border-[#DED7C9] text-[#56504A] rounded-lg hover:border-[#C2492B] hover:text-[#C2492B] transition-colors font-medium disabled:opacity-50"
+                  >
+                    {t('inv_missing_back')}
+                  </button>
+                  <button
+                    onClick={handleFinalizeWithDecisions}
+                    disabled={!allDecided || finalizingWithDecisions}
+                    className="flex-1 px-4 py-2.5 bg-[#C2492B] text-white rounded-lg hover:bg-[#A83A20] transition-colors font-medium disabled:opacity-50"
+                  >
+                    {finalizingWithDecisions ? t('inv_finalizing') : t('inv_missing_finalize_button')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Cancel Confirmation Modal */}
       {showCancelConfirm && (

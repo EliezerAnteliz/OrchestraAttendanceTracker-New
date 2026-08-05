@@ -39,6 +39,7 @@ interface Asset {
   assigned_student_id: string | null;
   owner: string | null;
   notes: string | null;
+  follow_up_note: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -707,8 +708,13 @@ export default function AssetDetailPage() {
                 <option value="assigned">{t('inv_status_assigned')}</option>
                 <option value="repair">{t('inv_status_repair')}</option>
                 <option value="on_loan">{t('inv_status_on_loan')}</option>
+                <option value="investigating">{t('inv_status_investigating')}</option>
+                <option value="lost">{t('inv_status_lost')}</option>
                 <option value="retired">{t('inv_filter_status_retired')}</option>
               </select>
+              {(formData.status_code === 'investigating' || formData.status_code === 'lost') && asset?.follow_up_note && (
+                <p className="text-[11.5px] text-[#8A6A22] mt-1.5">{asset.follow_up_note}</p>
+              )}
             </div>
 
             {/* Programa/Sede */}

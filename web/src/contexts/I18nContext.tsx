@@ -550,6 +550,8 @@ const translations: Translations = {
   inv_status_assigned: { es: "Asignado a estudiante", en: "Assigned to student" },
   inv_status_repair: { es: "En reparación", en: "In repair" },
   inv_status_on_loan: { es: "Prestado a taller externo", en: "Loaned to external workshop" },
+  inv_status_investigating: { es: "En seguimiento", en: "Under investigation" },
+  inv_status_lost: { es: "Perdido", en: "Lost" },
   inv_confirm_found_same_site: { es: "Encontrado en esta sede", en: "Found at this site" },
   inv_confirm_found_other_site: { es: "Encontrado — en otra sede", en: "Found — at another site" },
   inv_confirm_belongs_to: { es: "Pertenece a:", en: "Belongs to:" },
@@ -707,6 +709,28 @@ const translations: Translations = {
   inv_error_cancelling_session: { es: "Error al cancelar la auditoría", en: "Error cancelling the audit" },
   inv_keep_going: { es: "No, seguir auditando", en: "No, keep auditing" },
 
+  // Pantalla de revisión de Faltantes antes de Finalizar (obligatoria si
+  // quedan activos sin escanear) — cada uno necesita una decisión explícita
+  // antes de poder cerrar la sesión.
+  inv_missing_review_title: { es: "Revisión de Faltantes", en: "Missing Review" },
+  inv_missing_review_desc: { es: "Estos {n} instrumentos de esta sede no fueron escaneados en esta auditoría. Antes de finalizar, decide qué pasó con cada uno.", en: "These {n} instruments from this site were not scanned in this audit. Before finishing, decide what happened with each one." },
+  inv_missing_decided_count: { es: "{done} de {total} decididos", en: "{done} of {total} decided" },
+  inv_missing_action_keep: { es: "Sigue igual", en: "No change" },
+  inv_missing_action_keep_hint: { es: "Se asume que sigue asignado / disponible como está, solo no se escaneó esta vez.", en: "Assumed to remain assigned/available as-is, it just wasn't scanned this time." },
+  inv_missing_action_available: { es: "Se retiró — disponible", en: "Withdrawn — available" },
+  inv_missing_action_available_hint: { es: "Se le quitó al estudiante y ya no tiene dueño.", en: "Taken back from the student and no longer has an owner." },
+  inv_missing_action_investigating: { es: "En seguimiento", en: "Under investigation" },
+  inv_missing_action_investigating_hint: { es: "No se sabe qué pasó todavía (ej. puede que un alumno se lo haya llevado a casa). Queda marcado para seguirle la pista.", en: "Not sure yet what happened (e.g. a student may have taken it home). Flagged to keep track of it." },
+  inv_missing_action_lost: { es: "Perdido", en: "Lost" },
+  inv_missing_action_lost_hint: { es: "Ya se confirmó que no aparece.", en: "Already confirmed it can't be found." },
+  inv_missing_note_placeholder: { es: "Nota (opcional): ej. se cree que se lo llevó a casa", en: "Note (optional): e.g. thought to have been taken home" },
+  inv_missing_back: { es: "Volver", en: "Back" },
+  inv_missing_finalize_button: { es: "Finalizar auditoría", en: "Finish audit" },
+  inv_missing_all_decided_hint: { es: "Decide los {n} restantes para poder finalizar.", en: "Decide the remaining {n} to be able to finish." },
+  inv_loading_missing: { es: "Cargando faltantes...", en: "Loading missing items..." },
+  inv_error_loading_missing: { es: "Error al cargar los faltantes", en: "Error loading missing items" },
+  inv_error_finalizing_with_decisions: { es: "Error al aplicar las decisiones de Faltantes", en: "Error applying Missing decisions" },
+
   // ========================================
   // Inventory module — audit/[id]/report/page.tsx
   // ========================================
@@ -763,6 +787,9 @@ const translations: Translations = {
   inv_filter_status_repair: { es: "En reparación", en: "In repair" },
   inv_filter_status_retired: { es: "Dado de baja", en: "Retired" },
   inv_filter_status_on_loan: { es: "Prestado", en: "Loaned" },
+  inv_filter_status_investigating: { es: "En seguimiento", en: "Under investigation" },
+  inv_filter_status_lost: { es: "Perdido", en: "Lost" },
+  inv_follow_up_note_label: { es: "Nota de seguimiento", en: "Follow-up note" },
   inv_filter_all_categories: { es: "Todas las categorías", en: "All categories" },
   inv_filter_all_sites: { es: "Todas las sedes", en: "All sites" },
   inv_filter_all_instruments: { es: "Todos los instrumentos", en: "All instruments" },

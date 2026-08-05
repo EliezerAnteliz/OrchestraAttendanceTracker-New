@@ -34,6 +34,7 @@ interface Asset {
   assigned_to_text: string | null;
   assigned_student_id: string | null;
   notes: string | null;
+  follow_up_note: string | null;
   is_active: boolean;
   created_at: string;
   asset_status?: {
@@ -89,6 +90,8 @@ const STATUS_LABEL_KEYS: Record<string, string> = {
   repair: 'inv_status_repair',
   on_loan: 'inv_status_on_loan',
   retired: 'inv_filter_status_retired',
+  investigating: 'inv_status_investigating',
+  lost: 'inv_status_lost',
 };
 
 function getStatusLabel(statusCode: string, description: string | undefined, t: (key: string) => string): string {
@@ -254,6 +257,7 @@ export default function AssetsListPage() {
           assigned_to_text,
           assigned_student_id,
           notes,
+          follow_up_note,
           created_at,
           is_active,
           group_id,
@@ -489,6 +493,8 @@ export default function AssetsListPage() {
             <option value="repair">{t('inv_filter_status_repair')}</option>
             <option value="retired">{t('inv_filter_status_retired')}</option>
             <option value="on_loan">{t('inv_filter_status_on_loan')}</option>
+            <option value="investigating">{t('inv_filter_status_investigating')}</option>
+            <option value="lost">{t('inv_filter_status_lost')}</option>
           </select>
 
           <select
@@ -663,7 +669,12 @@ export default function AssetsListPage() {
                   {asset.model && <div className="text-[11.5px] text-[#8A8177]">{asset.model}</div>}
                 </div>
                 <span className="text-[#56504A] pt-0.5">{asset.size || '-'}</span>
-                <span className="text-[#56504A] pt-0.5">{getStatusLabel(asset.status_code, asset.asset_status?.description, t)}</span>
+                <div className="text-[#56504A] pt-0.5">
+                  <div>{getStatusLabel(asset.status_code, asset.asset_status?.description, t)}</div>
+                  {(asset.status_code === 'investigating' || asset.status_code === 'lost') && asset.follow_up_note && (
+                    <div className="text-[11px] text-[#8A6A22] mt-0.5" title={t('inv_follow_up_note_label')}>{asset.follow_up_note}</div>
+                  )}
+                </div>
                 <span className="text-[#8A8177] pt-0.5">{getAssignedToDisplay(asset) || '-'}</span>
                 <span className="text-[#8A8177] pt-0.5">{asset.current_program?.name || '-'}</span>
                 <span className="text-[#56504A] tabular-nums text-right pt-0.5">
