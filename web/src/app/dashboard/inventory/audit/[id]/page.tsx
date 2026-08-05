@@ -62,6 +62,7 @@ interface PendingConfirm {
     assigned_student_id: string | null;
     current_program_id: string | null;
     status_code: string;
+    condition_code: string;
   };
   mismatchProgramName?: string | null;
 }
@@ -139,7 +140,7 @@ export default function AuditSessionPage() {
   // reporte y esto se pierde junto con la posibilidad de deshacer, que
   // es justo el comportamiento pedido). Se usa para revertir el activo
   // automáticamente si se deshace ese evento.
-  const [previousAssetStates, setPreviousAssetStates] = useState<Record<string, { assetId: string; assigned_to_text: string | null; assigned_student_id: string | null; status_code: string }>>({});
+  const [previousAssetStates, setPreviousAssetStates] = useState<Record<string, { assetId: string; assigned_to_text: string | null; assigned_student_id: string | null; status_code: string; condition_code: string }>>({});
 
   useEffect(() => {
     loadSession();
@@ -242,7 +243,7 @@ export default function AuditSessionPage() {
       try {
         const { data: assetInfo, error: assetError } = await inventorySupabase
           .from('assets')
-          .select('id, description, brand, full_code, assigned_to_text, assigned_student_id, status_code, current_program_id')
+          .select('id, description, brand, full_code, assigned_to_text, assigned_student_id, status_code, condition_code, current_program_id')
           .eq('id', assetId)
           .single();
 
@@ -271,7 +272,7 @@ export default function AuditSessionPage() {
     await saveAuditEvent(assetId, code, result, source);
   }
 
-  async function saveAuditEvent(assetId: string | null, code: string, result: 'found' | 'mismatch_site' | 'unknown_code', source: 'scan' | 'manual' | 'photo_assist'): Promise<string | null> {
+  async function saveAuditEvent(assetId: string | null, code: string, result: 'found' | 'mismatch_site' | 'unknown_code', source: 'scan' | 'manual' | 'photo_assist', conditionCode?: string | null): Promise<string | null> {
     try {
       // Quién registra el evento — en el ambiente de prueba (sin login)
       // siempre da null, igual que hasta ahora; en producción, con sesión
@@ -289,6 +290,7 @@ export default function AuditSessionPage() {
           scanned_code: source === 'scan' ? code : null,
           result,
           scanned_by: scannedBy,
+          condition_code: conditionCode || null,
         })
         .select('id')
         .single();
@@ -313,7 +315,7 @@ export default function AuditSessionPage() {
     }
   }
 
-  async function handleConfirmAudit(assignedToText: string | null, assignedStudentId: string | null, statusCode: string) {
+  async function handleConfirmAudit(assignedToText: string | null, assignedStudentId: string | null, statusCode: string, conditionCode: string) {
     if (!pendingConfirm) return;
     const { assetId, code, result, source, asset } = pendingConfirm;
 
@@ -323,26 +325,28 @@ export default function AuditSessionPage() {
         (assignedToText || null) !== (asset.assigned_to_text || null) ||
         (assignedStudentId || null) !== (asset.assigned_student_id || null);
       const statusChanged = statusCode !== asset.status_code;
+      const conditionChanged = conditionCode !== (asset.condition_code || 'good');
 
-      if (assignmentChanged || statusChanged) {
+      if (assignmentChanged || statusChanged || conditionChanged) {
         const { error: updateError } = await inventorySupabase
           .from('assets')
           .update({
             assigned_to_text: assignedToText,
             assigned_student_id: assignedStudentId,
             status_code: statusCode,
+            condition_code: conditionCode,
           })
           .eq('id', assetId);
 
         if (updateError) throw updateError;
       }
 
-      const newEventId = await saveAuditEvent(assetId, code, result, source);
+      const newEventId = await saveAuditEvent(assetId, code, result, source, conditionCode);
 
       // Si de verdad se cambió algo, se guarda el estado ANTERIOR ligado
       // al nuevo evento — así, si luego se deshace este evento por error,
       // se puede revertir el activo automáticamente a como estaba.
-      if (newEventId && (assignmentChanged || statusChanged)) {
+      if (newEventId && (assignmentChanged || statusChanged || conditionChanged)) {
         setPreviousAssetStates(prev => ({
           ...prev,
           [newEventId]: {
@@ -350,6 +354,7 @@ export default function AuditSessionPage() {
             assigned_to_text: asset.assigned_to_text,
             assigned_student_id: asset.assigned_student_id,
             status_code: asset.status_code,
+            condition_code: asset.condition_code,
           },
         }));
       }
@@ -383,6 +388,7 @@ export default function AuditSessionPage() {
             assigned_to_text: prevState.assigned_to_text,
             assigned_student_id: prevState.assigned_student_id,
             status_code: prevState.status_code,
+            condition_code: prevState.condition_code,
           })
           .eq('id', prevState.assetId);
 
