@@ -13,9 +13,10 @@
  * corregirlo, sin tener que ir aparte a Editar Activo.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdCheckCircle, MdWarning, MdClose } from 'react-icons/md';
 import { useI18n } from '@/contexts/I18nContext';
+import { inventorySupabase } from '@/lib/inventorySupabaseClient';
 
 interface AssetInfo {
   id: string;
@@ -23,14 +24,22 @@ interface AssetInfo {
   brand: string | null;
   full_code: string | null;
   assigned_to_text: string | null;
+  assigned_student_id: string | null;
+  current_program_id: string | null;
   status_code: string;
+}
+
+interface StudentOption {
+  id: string;
+  first_name: string;
+  last_name: string;
 }
 
 interface AssetConfirmModalProps {
   asset: AssetInfo;
   result: 'found' | 'mismatch_site';
   mismatchProgramName?: string | null;
-  onConfirm: (assignedToText: string | null, statusCode: string) => void;
+  onConfirm: (assignedToText: string | null, assignedStudentId: string | null, statusCode: string) => void;
   onCancel: () => void;
   saving?: boolean;
 }
@@ -43,11 +52,47 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
     { value: 'repair', label: t('inv_status_repair') },
     { value: 'on_loan', label: t('inv_status_on_loan') },
   ];
-  const [assignedTo, setAssignedTo] = useState(asset.assigned_to_text || '');
+
+  const [programStudents, setProgramStudents] = useState<StudentOption[]>([]);
+  const [assignedStudentId, setAssignedStudentId] = useState(asset.assigned_student_id || '');
+  // Texto libre para casos que NO son un estudiante real registrado (ej.
+  // préstamo a un hijo de maestro aún no inscrito, un proveedor, etc.) —
+  // arranca en modo "otro" si ya había texto sin un estudiante enlazado,
+  // para que el caso suelto quede visible de inmediato.
+  const [assignToOther, setAssignToOther] = useState(!asset.assigned_student_id && !!asset.assigned_to_text);
+  const [assignedToOtherText, setAssignedToOtherText] = useState(!asset.assigned_student_id ? (asset.assigned_to_text || '') : '');
   const [statusCode, setStatusCode] = useState(asset.status_code || 'available');
 
+  // Estudiantes activos de la sede de este activo, para el selector de
+  // "Asignado a" — mismo patrón que Detalle de Activo / Nuevo Activo, así
+  // el staff elige de la lista real en vez de tipear el nombre a mano.
+  useEffect(() => {
+    async function loadProgramStudents() {
+      if (!asset.current_program_id) {
+        setProgramStudents([]);
+        return;
+      }
+      const { data, error } = await inventorySupabase
+        .from('students')
+        .select('id, first_name, last_name')
+        .eq('program_id', asset.current_program_id)
+        .eq('is_active', true)
+        .order('first_name');
+
+      if (error) {
+        console.error('Error loading students for program:', error);
+        setProgramStudents([]);
+        return;
+      }
+      setProgramStudents(data || []);
+    }
+    loadProgramStudents();
+  }, [asset.current_program_id]);
+
   function handleClearAssignment() {
-    setAssignedTo('');
+    setAssignedStudentId('');
+    setAssignToOther(false);
+    setAssignedToOtherText('');
     // Si estaba "asignado", lo natural al quitarle el estudiante es que
     // pase a disponible — pero solo si no está en reparación/prestado,
     // esos estados se mantienen porque son independientes de a quién
@@ -57,11 +102,27 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
     }
   }
 
-  function handleConfirm() {
-    onConfirm(assignedTo.trim() ? assignedTo.trim() : null, statusCode);
+  function currentAssignedName(): string | null {
+    if (assignToOther) {
+      return assignedToOtherText.trim() ? assignedToOtherText.trim() : null;
+    }
+    if (assignedStudentId) {
+      const s = programStudents.find(s => s.id === assignedStudentId);
+      return s ? `${s.first_name} ${s.last_name}`.trim() : null;
+    }
+    return null;
   }
 
-  const assignmentChanged = (assignedTo.trim() || null) !== (asset.assigned_to_text || null);
+  function handleConfirm() {
+    const finalStudentId = !assignToOther && assignedStudentId ? assignedStudentId : null;
+    onConfirm(currentAssignedName(), finalStudentId, statusCode);
+  }
+
+  const newAssignedName = currentAssignedName();
+  const newStudentId = !assignToOther && assignedStudentId ? assignedStudentId : null;
+  const assignmentChanged =
+    newAssignedName !== (asset.assigned_to_text || null) ||
+    newStudentId !== (asset.assigned_student_id || null);
   const statusChanged = statusCode !== asset.status_code;
 
   return (
@@ -110,7 +171,7 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
             </div>
           </div>
 
-          {/* Asignación — editable */}
+          {/* Asignación — editable, selector real de estudiantes de la sede */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-[13px] font-medium text-[#56504A]">{t('inv_assigned_to')}</label>
@@ -124,13 +185,44 @@ export default function AssetConfirmModal({ asset, result, mismatchProgramName, 
                 </button>
               )}
             </div>
-            <input
-              type="text"
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-              placeholder={t('inv_assigned_to_placeholder')}
-              className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
-            />
+            <select
+              value={assignToOther ? '__other__' : assignedStudentId}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '__other__') {
+                  setAssignToOther(true);
+                  setAssignedStudentId('');
+                } else if (val === '') {
+                  setAssignToOther(false);
+                  setAssignedStudentId('');
+                  setAssignedToOtherText('');
+                } else {
+                  setAssignToOther(false);
+                  setAssignedStudentId(val);
+                  setAssignedToOtherText('');
+                }
+              }}
+              className="w-full appearance-none px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
+              disabled={!asset.current_program_id}
+            >
+              <option value="">{t('inv_unassigned')}</option>
+              {programStudents.map((s) => (
+                <option key={s.id} value={s.id}>{s.first_name} {s.last_name}</option>
+              ))}
+              <option value="__other__">{t('inv_assigned_other_option')}</option>
+            </select>
+            {!asset.current_program_id && (
+              <p className="text-[11.5px] text-[#8A8177] mt-1.5">{t('inv_assigned_to_needs_site')}</p>
+            )}
+            {assignToOther && (
+              <input
+                type="text"
+                value={assignedToOtherText}
+                onChange={(e) => setAssignedToOtherText(e.target.value)}
+                placeholder={t('inv_assigned_to_placeholder_short')}
+                className="w-full px-3.5 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917] mt-2"
+              />
+            )}
             <p className="text-[11.5px] text-[#8A8177] mt-1.5">
               {t('inv_system_said')} {asset.assigned_to_text || t('inv_unassigned')}
               {assignmentChanged && <span className="text-[#C2492B] font-medium"> — {t('inv_will_update_inline')}</span>}
