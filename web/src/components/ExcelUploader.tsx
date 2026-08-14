@@ -5,6 +5,16 @@ import { FiDownload, FiUpload, FiAlertCircle, FiCheckCircle, FiFile, FiX, FiUser
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 
+// Datos médicos/de retiro autorizado del formulario "Ascend Enrollment" (13/08) —
+// se suben a mano vía esta misma plantilla, sin sincronización en vivo con el
+// formulario de Google. Se guardan tal cual vienen (texto libre), sin
+// interpretar ni normalizar el contenido.
+interface AuthorizedPickupPerson {
+  first_name: string;
+  last_name: string;
+  phone: string;
+}
+
 interface Student {
   student_id?: string; // Hacemos student_id opcional para que no se envíe en inserciones nuevas
   first_name: string;
@@ -14,6 +24,15 @@ interface Student {
   age?: number;
   orchestra_position?: string;
   is_active?: boolean;
+  dietary_restrictions?: string;
+  dietary_restrictions_details?: string;
+  requires_special_care?: string;
+  special_care_details?: string;
+  takes_medication?: string;
+  medication_details?: string;
+  has_allergies_or_illness?: string;
+  allergies_illness_details?: string;
+  authorized_pickup?: AuthorizedPickupPerson[];
 }
 
 interface Parent {
@@ -211,6 +230,40 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
       .replace(/\s+/g, ' '); // Normalizar espacios
   };
 
+  // Arma el array authorized_pickup a partir de las 6 columnas planas del
+  // Excel (authorized_pickup_1_first_name, _last_name, _phone, y lo mismo
+  // para _2) — la plantilla solo trae 2 personas (así viene el formulario de
+  // origen), pero se guarda como jsonb para no atarse a ese número. Se
+  // saltea a la persona #N si no trajo ni nombre ni apellido en el Excel.
+  const buildAuthorizedPickup = (row: any): AuthorizedPickupPerson[] => {
+    const people: AuthorizedPickupPerson[] = [];
+    for (const n of [1, 2]) {
+      const first = row[`authorized_pickup_${n}_first_name`];
+      const last = row[`authorized_pickup_${n}_last_name`];
+      const phone = row[`authorized_pickup_${n}_phone`];
+      if ((first && String(first).trim()) || (last && String(last).trim())) {
+        people.push({
+          first_name: first ? String(first).trim() : '',
+          last_name: last ? String(last).trim() : '',
+          phone: phone ? String(phone).trim() : '',
+        });
+      }
+    }
+    return people;
+  };
+
+  // true si el Excel trajo AL MENOS UNA de las 6 columnas de retiro
+  // autorizado con algo — se usa para decidir si esta fila debe pisar el
+  // authorized_pickup ya guardado (si la fila no trae nada de esto, se deja
+  // el valor existente tal cual, igual que el resto de campos opcionales).
+  const hasAuthorizedPickupData = (row: any): boolean => {
+    return [1, 2].some((n) =>
+      [`authorized_pickup_${n}_first_name`, `authorized_pickup_${n}_last_name`, `authorized_pickup_${n}_phone`].some(
+        (key) => row[key] && String(row[key]).trim()
+      )
+    );
+  };
+
   // Función para normalizar y dividir nombres
   const parseFullName = (fullName: string) => {
     const normalized = normalizeText(fullName);
@@ -383,9 +436,22 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         current_grade: row.current_grade ? row.current_grade.toString().trim() : null,
         age: row.age ? parseInt(row.age.toString()) : null,
         orchestra_position: row.orchestra_position ? row.orchestra_position.trim() : null,
-        is_active: row.active !== undefined ? Boolean(row.active) : true
+        is_active: row.active !== undefined ? Boolean(row.active) : true,
+        // Alergias/condiciones médicas (form Ascend Enrollment, cols AE-AL) —
+        // texto libre, tal cual viene del Excel.
+        dietary_restrictions: row.dietary_restrictions ? String(row.dietary_restrictions).trim() : null,
+        dietary_restrictions_details: row.dietary_restrictions_details ? String(row.dietary_restrictions_details).trim() : null,
+        requires_special_care: row.requires_special_care ? String(row.requires_special_care).trim() : null,
+        special_care_details: row.special_care_details ? String(row.special_care_details).trim() : null,
+        takes_medication: row.takes_medication ? String(row.takes_medication).trim() : null,
+        medication_details: row.medication_details ? String(row.medication_details).trim() : null,
+        has_allergies_or_illness: row.has_allergies_or_illness ? String(row.has_allergies_or_illness).trim() : null,
+        allergies_illness_details: row.allergies_illness_details ? String(row.allergies_illness_details).trim() : null,
+        // Personas autorizadas para retirar (cols BX-CC) — jsonb, [] si el
+        // Excel no trajo ninguna de las 6 columnas para esta fila.
+        authorized_pickup: buildAuthorizedPickup(row)
       };
-      
+
       console.log('Datos preparados para procesamiento:', studentData);
 
       // Verificar si el estudiante ya existe (coincidencia con normalización)
@@ -460,6 +526,17 @@ export default function ExcelUploader({ onComplete }: ExcelUploaderProps) {
         if (studentData.is_active !== undefined) {
           updateData.is_active = studentData.is_active;
         }
+        if (studentData.dietary_restrictions) updateData.dietary_restrictions = studentData.dietary_restrictions;
+        if (studentData.dietary_restrictions_details) updateData.dietary_restrictions_details = studentData.dietary_restrictions_details;
+        if (studentData.requires_special_care) updateData.requires_special_care = studentData.requires_special_care;
+        if (studentData.special_care_details) updateData.special_care_details = studentData.special_care_details;
+        if (studentData.takes_medication) updateData.takes_medication = studentData.takes_medication;
+        if (studentData.medication_details) updateData.medication_details = studentData.medication_details;
+        if (studentData.has_allergies_or_illness) updateData.has_allergies_or_illness = studentData.has_allergies_or_illness;
+        if (studentData.allergies_illness_details) updateData.allergies_illness_details = studentData.allergies_illness_details;
+        // authorized_pickup: solo pisa lo existente si el Excel trajo algo
+        // en esta fila — si no, se deja el valor ya guardado tal cual.
+        if (hasAuthorizedPickupData(row)) updateData.authorized_pickup = studentData.authorized_pickup;
 
         // Solo actualizar si hay campos para actualizar
         if (Object.keys(updateData).length > 0) {

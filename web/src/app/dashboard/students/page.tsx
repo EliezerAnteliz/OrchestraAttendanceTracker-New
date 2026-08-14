@@ -9,6 +9,15 @@ import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
 import { useUserRole } from '@/hooks/useUserRole';
 
+// Persona autorizada para retirar al estudiante — form "Ascend Enrollment"
+// (cols BX-CC), carga manual vía plantilla Excel (13/08). Ver también
+// ExcelUploader.tsx.
+type AuthorizedPickupPerson = {
+  first_name: string;
+  last_name: string;
+  phone: string;
+};
+
 type Student = {
   id: string;
   first_name: string;
@@ -19,6 +28,18 @@ type Student = {
   age?: number;
   orchestra_position?: string;
   orchestra_id?: string;
+  // Alergias/condiciones médicas (form Ascend Enrollment, cols AE-AL) y
+  // personas autorizadas para retirar (cols BX-CC) — texto libre tal cual
+  // viene del formulario, cargado a mano vía la plantilla de carga masiva.
+  dietary_restrictions?: string | null;
+  dietary_restrictions_details?: string | null;
+  requires_special_care?: string | null;
+  special_care_details?: string | null;
+  takes_medication?: string | null;
+  medication_details?: string | null;
+  has_allergies_or_illness?: string | null;
+  allergies_illness_details?: string | null;
+  authorized_pickup?: AuthorizedPickupPerson[];
 };
 
 // Listas fijas para estandarizar "Grado" y "Posición" — antes eran texto
@@ -357,7 +378,20 @@ export default function StudentsPage() {
           instrument_size: editFormData.instrument_size,
           orchestra_position: editFormData.orchestra_position,
           orchestra_id: editFormData.orchestra_id || null,
-          is_active: editFormData.is_active
+          is_active: editFormData.is_active,
+          dietary_restrictions: editFormData.dietary_restrictions || null,
+          dietary_restrictions_details: editFormData.dietary_restrictions_details || null,
+          requires_special_care: editFormData.requires_special_care || null,
+          special_care_details: editFormData.special_care_details || null,
+          takes_medication: editFormData.takes_medication || null,
+          medication_details: editFormData.medication_details || null,
+          has_allergies_or_illness: editFormData.has_allergies_or_illness || null,
+          allergies_illness_details: editFormData.allergies_illness_details || null,
+          // Filtra entradas vacías (agregadas con "+" y nunca completadas)
+          // antes de guardar.
+          authorized_pickup: (editFormData.authorized_pickup || []).filter(
+            (p: any) => (p.first_name && p.first_name.trim()) || (p.last_name && p.last_name.trim())
+          )
         })
         .eq('id', selectedStudent.id);
 
@@ -399,6 +433,26 @@ export default function StudentsPage() {
     const updatedParents = [...(editFormData.parents || [])];
     updatedParents[index] = { ...updatedParents[index], [field]: value };
     setEditFormData({ ...editFormData, parents: updatedParents });
+  };
+
+  // Personas autorizadas para retirar al estudiante — a diferencia de los
+  // padres (que se administran aparte, ver "manage_contacts"), esta lista no
+  // tiene una pantalla propia, así que el modal de la ficha permite
+  // agregar/quitar directo (no solo editar las que ya vinieron del Excel).
+  const handleAuthorizedPickupChange = (index: number, field: string, value: any) => {
+    const updated = [...(editFormData.authorized_pickup || [])];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditFormData({ ...editFormData, authorized_pickup: updated });
+  };
+
+  const handleAddAuthorizedPickup = () => {
+    const updated = [...(editFormData.authorized_pickup || []), { first_name: '', last_name: '', phone: '' }];
+    setEditFormData({ ...editFormData, authorized_pickup: updated });
+  };
+
+  const handleRemoveAuthorizedPickup = (index: number) => {
+    const updated = (editFormData.authorized_pickup || []).filter((_: any, i: number) => i !== index);
+    setEditFormData({ ...editFormData, authorized_pickup: updated });
   };
 
   const handleNewStudentChange = (field: string, value: any) => {
@@ -1037,6 +1091,140 @@ export default function StudentsPage() {
                       </div>
                       </div>
 
+                      {/* Alergias y Condiciones Médicas — form Ascend Enrollment
+                          (cols AE-AL), carga manual vía plantilla Excel (13/08).
+                          Mismo patrón sin caja/borde. En modo vista solo se
+                          muestran los pares con algo cargado, para no llenar
+                          la ficha de "No especificado" quíntuple cuando el
+                          estudiante todavía no tiene este dato subido. */}
+                      <div>
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
+                          {t('medical_info')}
+                        </h3>
+                        {isEditMode ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('dietary_restrictions')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.dietary_restrictions || ''}
+                                onChange={(e) => handleInputChange('dietary_restrictions', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('dietary_restrictions_details')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.dietary_restrictions_details || ''}
+                                onChange={(e) => handleInputChange('dietary_restrictions_details', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('requires_special_care')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.requires_special_care || ''}
+                                onChange={(e) => handleInputChange('requires_special_care', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('special_care_details')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.special_care_details || ''}
+                                onChange={(e) => handleInputChange('special_care_details', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('takes_medication')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.takes_medication || ''}
+                                onChange={(e) => handleInputChange('takes_medication', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('medication_details')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.medication_details || ''}
+                                onChange={(e) => handleInputChange('medication_details', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('has_allergies_or_illness')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.has_allergies_or_illness || ''}
+                                onChange={(e) => handleInputChange('has_allergies_or_illness', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                {t('allergies_illness_details')}
+                              </label>
+                              <input
+                                type="text"
+                                value={editFormData.allergies_illness_details || ''}
+                                onChange={(e) => handleInputChange('allergies_illness_details', e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          [
+                            [t('dietary_restrictions'), studentDetails.dietary_restrictions, studentDetails.dietary_restrictions_details],
+                            [t('requires_special_care'), studentDetails.requires_special_care, studentDetails.special_care_details],
+                            [t('takes_medication'), studentDetails.takes_medication, studentDetails.medication_details],
+                            [t('has_allergies_or_illness'), studentDetails.has_allergies_or_illness, studentDetails.allergies_illness_details],
+                          ].some(([, value]) => !!value) ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                              {[
+                                [t('dietary_restrictions'), studentDetails.dietary_restrictions, studentDetails.dietary_restrictions_details],
+                                [t('requires_special_care'), studentDetails.requires_special_care, studentDetails.special_care_details],
+                                [t('takes_medication'), studentDetails.takes_medication, studentDetails.medication_details],
+                                [t('has_allergies_or_illness'), studentDetails.has_allergies_or_illness, studentDetails.allergies_illness_details],
+                              ].map(([label, value, details], i) =>
+                                value ? (
+                                  <div key={i}>
+                                    <p className="text-[12.5px] text-[#8A8177] mb-1">{label}</p>
+                                    <p className="text-[14px] text-[#1B1917]">
+                                      {value}
+                                      {details ? ` — ${details}` : ''}
+                                    </p>
+                                  </div>
+                                ) : null
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-[13px] text-[#8A8177]">
+                              {t('no_medical_info')}
+                            </p>
+                          )
+                        )}
+                      </div>
+
                       {/* Información de Padres — sin caja/borde, mismo patrón. */}
                       <div>
                         <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
@@ -1114,6 +1302,98 @@ export default function StudentsPage() {
                         ) : (
                           <p className="text-[13px] text-[#8A8177]">
                             {t('no_parent_info') || 'No hay información de padres registrada'}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Personas Autorizadas para Retirar — form Ascend
+                          Enrollment (cols BX-CC), carga manual vía plantilla
+                          Excel (13/08). A diferencia de Padres, esta lista se
+                          agrega/quita directo acá (no tiene pantalla propia
+                          de contactos). */}
+                      <div>
+                        <h3 className="text-[11.5px] tracking-[0.09em] uppercase text-[#8A8177] pb-3 border-b border-[#E3DDD1] mb-3 sm:mb-4">
+                          {t('authorized_pickup_info')}
+                        </h3>
+                        {isEditMode ? (
+                          <div className="space-y-3">
+                            {(editFormData.authorized_pickup || []).map((person: any, index: number) => (
+                              <div
+                                key={index}
+                                className={`flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-end ${
+                                  index > 0 ? 'pt-3 border-t border-[#EFE9DD]' : ''
+                                }`}
+                              >
+                                <div className="flex-1">
+                                  <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                    {t('first_name')}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={person.first_name || ''}
+                                    onChange={(e) => handleAuthorizedPickupChange(index, 'first_name', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                    {t('last_name')}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={person.last_name || ''}
+                                    onChange={(e) => handleAuthorizedPickupChange(index, 'last_name', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-[12.5px] text-[#8A8177] mb-1 block">
+                                    {t('phone')}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={person.phone || ''}
+                                    onChange={(e) => handleAuthorizedPickupChange(index, 'phone', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 font-medium"
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveAuthorizedPickup(index)}
+                                  className="shrink-0 w-9 h-9 flex items-center justify-center border border-[#DED7C9] rounded-lg text-[#6E675E] hover:border-[#C2492B] hover:text-[#C2492B] transition-colors"
+                                  aria-label={t('remove') || 'Quitar'}
+                                >
+                                  <MdClose size={16} />
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              onClick={handleAddAuthorizedPickup}
+                              className="text-[13px] text-[#C2492B] hover:underline font-medium flex items-center gap-1"
+                            >
+                              <MdAdd size={14} /> {t('add_authorized_pickup_person')}
+                            </button>
+                          </div>
+                        ) : studentDetails.authorized_pickup && studentDetails.authorized_pickup.length > 0 ? (
+                          <div className="space-y-2">
+                            {studentDetails.authorized_pickup.map((person: any, index: number) => (
+                              <div key={index} className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                <p className="text-[14px] text-[#1B1917]">
+                                  {person.first_name} {person.last_name}
+                                </p>
+                                {person.phone && (
+                                  <a
+                                    href={`tel:${person.phone}`}
+                                    className="text-[14px] text-[#1B1917] hover:text-[#C2492B]"
+                                  >
+                                    {person.phone}
+                                  </a>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[13px] text-[#8A8177]">
+                            {t('no_authorized_pickup_info')}
                           </p>
                         )}
                       </div>

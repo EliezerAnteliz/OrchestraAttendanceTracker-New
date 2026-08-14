@@ -199,6 +199,25 @@ const translations: Translations = {
     en: "Assigned directly from Inventory — the instrument stays linked to this student.",
   },
 
+  // Alergias/condiciones médicas y retiro autorizado — form "Ascend
+  // Enrollment", carga manual vía plantilla Excel (13/08). Ver
+  // ExcelUploader.tsx y MEMORIA/notas del proyecto.
+  medical_info: { es: "Alergias y Condiciones Médicas", en: "Allergies & Medical Conditions" },
+  dietary_restrictions: { es: "Restricciones Dietarias", en: "Dietary Restrictions" },
+  dietary_restrictions_details: { es: "Detalle de Restricciones/Alergias Dietarias", en: "Dietary Restrictions/Allergies Details" },
+  requires_special_care: { es: "¿Requiere Cuidado Especial o Discapacidad?", en: "Requires Special Care or Disability?" },
+  special_care_details: { es: "Detalle de Cuidado Especial", en: "Special Care Details" },
+  takes_medication: { es: "¿Toma Medicamento Recetado?", en: "Takes Prescribed Medication?" },
+  medication_details: { es: "Detalle de Medicamento", en: "Medication Details" },
+  has_allergies_or_illness: { es: "¿Tiene Alergias o Enfermedad Existente/Previa?", en: "Has Allergies or Existing/Previous Illness?" },
+  allergies_illness_details: { es: "Detalle de Alergias/Enfermedad", en: "Allergies/Illness Details" },
+  no_medical_info: { es: "No hay información médica registrada", en: "No medical information recorded" },
+
+  authorized_pickup_info: { es: "Personas Autorizadas para Retirar", en: "Authorized Pickup Persons" },
+  add_authorized_pickup_person: { es: "Agregar persona autorizada", en: "Add authorized person" },
+  no_authorized_pickup_info: { es: "No hay personas autorizadas registradas", en: "No authorized pickup persons recorded" },
+  remove: { es: "Quitar", en: "Remove" },
+
   parents_info: { es: "Información de Padres", en: "Parents Information" },
   manage_contacts: { es: "Administrar contactos", en: "Manage contacts" },
   phone_not_registered: { es: "Teléfono no registrado", en: "Phone not registered" },
@@ -380,8 +399,8 @@ const translations: Translations = {
   },
   bulk_upload_required_fields: { es: "Campos requeridos: first_name, last_name", en: "Required fields: first_name, last_name" },
   bulk_upload_optional_fields: {
-    es: "Campos opcionales: current_grade, age, instrument, instrument_size, orchestra_position, active, parent_first_name, parent_last_name, parent_phone_number, parent_email, parent_preferred_contact_method",
-    en: "Optional fields: current_grade, age, instrument, instrument_size, orchestra_position, active, parent_first_name, parent_last_name, parent_phone_number, parent_email, parent_preferred_contact_method"
+    es: "Campos opcionales: current_grade, age, instrument, instrument_size, orchestra_position, active, parent_first_name, parent_last_name, parent_phone_number, parent_email, parent_preferred_contact_method, dietary_restrictions, dietary_restrictions_details, requires_special_care, special_care_details, takes_medication, medication_details, has_allergies_or_illness, allergies_illness_details, authorized_pickup_1_first_name, authorized_pickup_1_last_name, authorized_pickup_1_phone, authorized_pickup_2_first_name, authorized_pickup_2_last_name, authorized_pickup_2_phone",
+    en: "Optional fields: current_grade, age, instrument, instrument_size, orchestra_position, active, parent_first_name, parent_last_name, parent_phone_number, parent_email, parent_preferred_contact_method, dietary_restrictions, dietary_restrictions_details, requires_special_care, special_care_details, takes_medication, medication_details, has_allergies_or_illness, allergies_illness_details, authorized_pickup_1_first_name, authorized_pickup_1_last_name, authorized_pickup_1_phone, authorized_pickup_2_first_name, authorized_pickup_2_last_name, authorized_pickup_2_phone"
   },
   select_file: { es: "Seleccionar archivo", en: "Select file" },
   no_file_selected: { es: "Ningún archivo seleccionado", en: "No file selected" },
