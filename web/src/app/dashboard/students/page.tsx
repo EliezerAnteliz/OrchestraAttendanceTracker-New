@@ -662,11 +662,6 @@ export default function StudentsPage() {
   return (
     <div className="h-full p-4 md:p-7 bg-[#FAF7F2]">
     <div className="max-w-[1420px] mx-auto">
-      {!activeProgram?.id && (
-        <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4 text-black">
-          {t('select_program_to_view_students') || 'Please select a program to view students.'}
-        </div>
-      )}
       <div className="flex flex-col sm:flex-row justify-between items-end sm:items-end gap-4 pb-5 border-b border-[#E3DDD1]">
         <div>
           <h1
