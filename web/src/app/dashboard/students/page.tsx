@@ -190,8 +190,13 @@ export default function StudentsPage() {
   };
 
   useEffect(() => {
+    // Esperamos a que ProgramContext resuelva activeProgram antes de
+    // consultar. Si no, fetchStudents entra a la rama "!activeProgram?.id"
+    // y muestra "0 de 0 estudiantes" un instante antes de que llegue el
+    // programa real — el flash que reportó Eliezer (14/08).
+    if (programLoading) return;
     fetchStudents();
-  }, [activeProgram?.id]);
+  }, [activeProgram?.id, programLoading]);
 
   useEffect(() => {
     const fetchOrchestraNames = async () => {
@@ -638,7 +643,7 @@ export default function StudentsPage() {
     });
   };
 
-  if (loading) {
+  if (loading || programLoading) {
     return (
       <div className="flex items-center justify-center h-64 p-4 md:p-6">
         <div className="text-center">
