@@ -47,7 +47,7 @@ type AttendanceRecord = {
 
 export default function AttendancePage() {
   const { t, lang } = useI18n();
-  const { activeProgram } = useProgram();
+  const { activeProgram, loading: programLoading } = useProgram();
   const { canEditStudents } = useUserRole();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
@@ -257,6 +257,11 @@ export default function AttendancePage() {
 
 
   useEffect(() => {
+    // Esperamos a que ProgramContext resuelva activeProgram — mismo caso
+    // que en Estudiantes/Dashboard (14/08), para no mostrar "sin
+    // estudiantes" un instante antes de que llegue el programa real.
+    if (programLoading) return;
+
     async function fetchData() {
       try {
         setLoading(true);
@@ -402,7 +407,7 @@ export default function AttendancePage() {
     }
     
     fetchData();
-  }, [currentDate, activeProgram?.id]);
+  }, [currentDate, activeProgram?.id, programLoading]);
 
   // Reaplicar filtros cuando cambien los estudiantes (después de cambiar fecha)
   useEffect(() => {
@@ -1272,7 +1277,7 @@ export default function AttendancePage() {
           </div>
         )}
 
-        {loading ? (
+        {loading || programLoading ? (
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="w-12 h-12 border-4 border-t-[#C2492B] border-r-[#C2492B] border-b-[#EAE3D6] border-l-[#EAE3D6] rounded-full animate-spin mx-auto mb-4"></div>
