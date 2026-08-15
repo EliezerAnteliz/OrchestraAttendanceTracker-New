@@ -131,7 +131,7 @@ async function fetchAllAttendanceRecords(programId: string, startDate: string, e
 // Componente principal
 export default function ReportsPage() {
   const { t, lang } = useI18n();
-  const { activeProgram } = useProgram();
+  const { activeProgram, loading: programLoading } = useProgram();
   const { isAdmin } = useUserRole();
   // Estados
   const [unexcusedAbsencesModalVisible, setUnexcusedAbsencesModalVisible] = useState(false);
@@ -335,6 +335,11 @@ export default function ReportsPage() {
 
   // Cargar estudiantes al inicio
   useEffect(() => {
+    // Esperamos a que ProgramContext resuelva activeProgram — mismo caso
+    // que en las otras páginas (14/08), para no renderizar el reporte con
+    // la lista de estudiantes vacía un instante antes de que llegue la sede.
+    if (programLoading) return;
+
     const loadStudents = async () => {
       try {
         setLoading(true);
@@ -395,7 +400,7 @@ export default function ReportsPage() {
     };
 
     loadStudents();
-  }, [activeProgram?.id]);
+  }, [activeProgram?.id, programLoading]);
 
   // Al cambiar de sede (programa activo) limpiar cualquier reporte ya
   // generado — antes se quedaba visible el reporte de la sede anterior
@@ -1631,7 +1636,7 @@ ${dateTableEN}`;
     );
   };
 
-  if (loading) {
+  if (loading || programLoading) {
     return (
       <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full">
         <LoadingIndicator message="Cargando datos de reportes..." />
