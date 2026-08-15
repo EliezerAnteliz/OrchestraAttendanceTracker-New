@@ -67,7 +67,7 @@ const dashboardStatsCache: Record<string, DashboardCacheEntry> = {};
 
 export default function DashboardPage() {
   const { t, lang } = useI18n();
-  const { activeProgram } = useProgram();
+  const { activeProgram, loading: programLoading } = useProgram();
   const { name, greetingKey, dateTimeLabel } = useGreeting();
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -82,6 +82,11 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Esperamos a que ProgramContext resuelva activeProgram — mismo caso
+    // que en Estudiantes (14/08): si no, el "!activeProgram?.id" de abajo
+    // pone stats en cero un instante antes de que llegue el programa real.
+    if (programLoading) return;
+
     async function fetchDashboardData() {
       const programId = activeProgram?.id;
       const cached = programId ? dashboardStatsCache[programId] : undefined;
@@ -226,13 +231,13 @@ export default function DashboardPage() {
     }
     
     fetchDashboardData();
-  }, [activeProgram?.id]);
+  }, [activeProgram?.id, programLoading]);
 
   // Solo mostrar skeleton en la primera carga inicial — mismos colores/
   // estructura que el Dashboard real (bg-[#FFFDFA] + borde [#EAE3D6], sin
   // íconos) para que la transición no salte al modelo gris/azul viejo
   // mientras carga.
-  if (loading && initialLoad) {
+  if (programLoading || (loading && initialLoad)) {
     return (
       <div className="p-4 md:p-7 bg-[#FAF7F2] min-h-full animate-fadeIn">
       <div className="max-w-[1420px] mx-auto space-y-6">
