@@ -114,13 +114,18 @@ export default function StudentsPage() {
   const [savingNewStudent, setSavingNewStudent] = useState(false);
   // Instrumentos de Inventario disponibles (sin asignar) para el programa
   // activo — se ofrecen para enlazar al crear un estudiante en vez de
-  // escribir el nombre del instrumento como texto suelto.
+  // escribir el nombre del instrumento como texto suelto. Mismo picker se
+  // reutiliza en modo edición de un alumno ya existente.
   const [availableAssets, setAvailableAssets] = useState<any[]>([]);
   const [loadingAssets, setLoadingAssets] = useState(false);
+  // Selección del picker de instrumento en modo edición: '' = sin
+  // instrumento, '__other__' = texto libre, uuid = activo real de
+  // Inventario (puede ser el ya enlazado o uno nuevo de availableAssets).
+  const [editAssetSelection, setEditAssetSelection] = useState('');
 
   useEffect(() => {
     const fetchAvailableAssets = async () => {
-      if (!showNewStudentModal || !activeProgram?.id) return;
+      if (!(showNewStudentModal || isEditMode) || !activeProgram?.id) return;
       try {
         setLoadingAssets(true);
         const { data, error: assetsError } = await supabase
@@ -143,7 +148,7 @@ export default function StudentsPage() {
     };
 
     fetchAvailableAssets();
-  }, [showNewStudentModal, activeProgram?.id]);
+  }, [showNewStudentModal, isEditMode, activeProgram?.id]);
 
   const fetchStudents = async (silent = false) => {
     try {
@@ -358,15 +363,48 @@ export default function StudentsPage() {
     setIsEditMode(false);
     setEditFormData(null);
     setLinkedAssets([]);
+    setEditAssetSelection('');
   };
 
   const handleEditClick = () => {
+    // Precarga el picker de instrumento: si ya tiene un activo de Inventario
+    // enlazado, lo deja seleccionado (para poder cambiarlo o quitarlo); si
+    // solo tiene texto libre en "instrument", arranca en modo "Otro"; si no
+    // tiene nada, arranca vacío.
+    if (linkedAssets.length > 0) {
+      setEditAssetSelection(linkedAssets[0].id);
+    } else if (editFormData?.instrument) {
+      setEditAssetSelection('__other__');
+    } else {
+      setEditAssetSelection('');
+    }
     setIsEditMode(true);
   };
 
   const handleCancelEdit = () => {
     setIsEditMode(false);
     setEditFormData(studentDetails);
+    setEditAssetSelection('');
+  };
+
+  // Maneja el selector de instrumento en modo edición — mismo patrón que
+  // handleNewStudentAssetChange (crear estudiante), pero sobre editFormData.
+  const handleEditAssetChange = (value: string) => {
+    setEditAssetSelection(value);
+    if (value === '__other__') {
+      setEditFormData({ ...editFormData, instrument: '', instrument_size: '' });
+    } else if (value === '') {
+      setEditFormData({ ...editFormData, instrument: '', instrument_size: '' });
+    } else {
+      const fromLinked = linkedAssets.find((a) => a.id === value);
+      const fromAvailable = availableAssets.find((a) => a.id === value);
+      const asset = fromLinked || fromAvailable;
+      setEditFormData({
+        ...editFormData,
+        instrument: asset?.description || '',
+        instrument_size: asset?.size || '',
+      });
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -401,6 +439,29 @@ export default function StudentsPage() {
         .eq('id', selectedStudent.id);
 
       if (updateError) throw updateError;
+
+      // Sincronizar el enlace con Inventario si cambió el activo elegido en
+      // el picker de instrumento. previousAssetId = lo que tenía enlazado
+      // antes de entrar en modo edición; newAssetId = lo que quedó
+      // seleccionado ahora ('' o '__other__' cuentan como "sin activo").
+      const previousAssetId = linkedAssets[0]?.id || null;
+      const newAssetId =
+        editAssetSelection && editAssetSelection !== '__other__' ? editAssetSelection : null;
+
+      if (previousAssetId !== newAssetId) {
+        if (previousAssetId) {
+          await supabase
+            .from('assets')
+            .update({ assigned_student_id: null, assigned_to_text: null, status_code: 'available' })
+            .eq('id', previousAssetId);
+        }
+        if (newAssetId) {
+          await supabase
+            .from('assets')
+            .update({ assigned_student_id: selectedStudent.id, assigned_to_text: null, status_code: 'assigned' })
+            .eq('id', newAssetId);
+        }
+      }
 
       // Actualizar padres si existen
       if (editFormData.parents && editFormData.parents.length > 0) {
@@ -988,7 +1049,65 @@ export default function StudentsPage() {
                           {t('orchestra_info')}
                         </h3>
                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                          {linkedAssets.length > 0 ? (
+                          {isEditMode ? (
+                            <div className="col-span-2">
+                              <p className="text-[12.5px] text-[#8A8177] mb-1">
+                                {t('instrument')}
+                              </p>
+                              <select
+                                value={editAssetSelection}
+                                onChange={(e) => handleEditAssetChange(e.target.value)}
+                                disabled={loadingAssets}
+                                className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                              >
+                                <option value="">{t('no_instrument_assigned_option')}</option>
+                                {linkedAssets.map((asset) => (
+                                  <option key={asset.id} value={asset.id}>
+                                    {asset.description}
+                                    {asset.size ? ` · ${asset.size}` : ''}
+                                    {asset.serial_number
+                                      ? ` — S/N ${asset.serial_number}`
+                                      : asset.full_code
+                                      ? ` — #${asset.full_code}`
+                                      : ''}
+                                  </option>
+                                ))}
+                                {availableAssets.map((asset) => (
+                                  <option key={asset.id} value={asset.id}>
+                                    {asset.description}
+                                    {asset.size ? ` · ${asset.size}` : ''}
+                                    {asset.serial_number
+                                      ? ` — S/N ${asset.serial_number}`
+                                      : asset.full_code
+                                      ? ` — #${asset.full_code}`
+                                      : ''}
+                                  </option>
+                                ))}
+                                <option value="__other__">{t('instrument_other_option')}</option>
+                              </select>
+                              {editAssetSelection === '__other__' && (
+                                <div className="grid grid-cols-2 gap-3 mt-2">
+                                  <input
+                                    type="text"
+                                    value={editFormData.instrument || ''}
+                                    onChange={(e) => handleInputChange('instrument', e.target.value)}
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                                    placeholder={t('instrument_placeholder')}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={editFormData.instrument_size || ''}
+                                    onChange={(e) => handleInputChange('instrument_size', e.target.value)}
+                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
+                                    placeholder="3/4, 4/4"
+                                  />
+                                </div>
+                              )}
+                              {editAssetSelection && editAssetSelection !== '__other__' && (
+                                <p className="text-[11.5px] text-[#8A8177] mt-1">{t('instrument_from_inventory_hint')}</p>
+                              )}
+                            </div>
+                          ) : linkedAssets.length > 0 ? (
                             <div className="col-span-2">
                               <p className="text-[12.5px] text-[#8A8177] mb-1">
                                 {t('instrument')}
@@ -1012,36 +1131,17 @@ export default function StudentsPage() {
                                 <p className="text-[12.5px] text-[#8A8177] mb-1">
                                   {t('instrument')}
                                 </p>
-                                {isEditMode ? (
-                                  <input
-                                    type="text"
-                                    value={editFormData.instrument || ''}
-                                    onChange={(e) => handleInputChange('instrument', e.target.value)}
-                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
-                                  />
-                                ) : (
-                                  <p className="text-[14px] text-[#1B1917]">
-                                    {studentDetails.instrument || t('not_assigned')}
-                                  </p>
-                                )}
+                                <p className="text-[14px] text-[#1B1917]">
+                                  {studentDetails.instrument || t('not_assigned')}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-[12.5px] text-[#8A8177] mb-1">
                                   {t('instrument_size') || 'Tamaño'}
                                 </p>
-                                {isEditMode ? (
-                                  <input
-                                    type="text"
-                                    value={editFormData.instrument_size || ''}
-                                    onChange={(e) => handleInputChange('instrument_size', e.target.value)}
-                                    className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917]"
-                                    placeholder="3/4, 4/4"
-                                  />
-                                ) : (
-                                  <p className="text-[14px] text-[#1B1917]">
-                                    {studentDetails.instrument_size || t('not_specified')}
-                                  </p>
-                                )}
+                                <p className="text-[14px] text-[#1B1917]">
+                                  {studentDetails.instrument_size || t('not_specified')}
+                                </p>
                               </div>
                             </>
                           )}
