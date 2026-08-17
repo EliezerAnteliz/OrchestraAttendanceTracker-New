@@ -984,14 +984,18 @@ export default function StudentsPage() {
                           En modo edición se puede tocar/clickear para subir
                           o reemplazar la foto. */}
                       <div className="relative flex-shrink-0">
+                        {/* Formato "foto de pasaporte" — cuadrado con
+                            esquinas redondeadas en vez de círculo, y más
+                            grande (80px/96px vs los 56px/64px originales)
+                            para poder distinguir bien al estudiante. */}
                         <div
                           onClick={() => isEditMode && !uploadingPhoto && photoInputRef.current?.click()}
-                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-[#EFE9DC] border border-[#E3DDD1] flex items-center justify-center ${isEditMode ? 'cursor-pointer' : ''}`}
+                          className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-[#EFE9DC] border border-[#E3DDD1] flex items-center justify-center ${isEditMode ? 'cursor-pointer' : ''}`}
                         >
                           {photoSignedUrl ? (
                             <img src={photoSignedUrl} alt={t('student_photo')} className="w-full h-full object-cover" />
                           ) : (
-                            <MdPerson size={28} className="text-[#A29889]" />
+                            <MdPerson size={38} className="text-[#A29889]" />
                           )}
                         </div>
                         {isEditMode && (
@@ -1000,9 +1004,9 @@ export default function StudentsPage() {
                             onClick={() => !uploadingPhoto && photoInputRef.current?.click()}
                             disabled={uploadingPhoto}
                             title={photoSignedUrl ? t('change_photo') : t('add_photo')}
-                            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#C2492B] text-white flex items-center justify-center border-2 border-[#FAF7F2] disabled:opacity-60"
+                            className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-full bg-[#C2492B] text-white flex items-center justify-center border-2 border-[#FAF7F2] disabled:opacity-60"
                           >
-                            <MdCameraAlt size={14} />
+                            <MdCameraAlt size={15} />
                           </button>
                         )}
                         <input
