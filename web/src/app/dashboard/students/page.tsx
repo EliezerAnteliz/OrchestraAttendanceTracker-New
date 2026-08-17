@@ -1000,9 +1000,9 @@ export default function StudentsPage() {
                             onClick={() => !uploadingPhoto && photoInputRef.current?.click()}
                             disabled={uploadingPhoto}
                             title={photoSignedUrl ? t('change_photo') : t('add_photo')}
-                            className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#C2492B] text-white flex items-center justify-center border-2 border-[#FAF7F2] disabled:opacity-60"
+                            className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#C2492B] text-white flex items-center justify-center border-2 border-[#FAF7F2] disabled:opacity-60"
                           >
-                            <MdCameraAlt size={13} />
+                            <MdCameraAlt size={14} />
                           </button>
                         )}
                         <input
