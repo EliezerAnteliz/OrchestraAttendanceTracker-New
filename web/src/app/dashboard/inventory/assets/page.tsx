@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { INVENTORY_SUPABASE_CONFIG } from '../../../../../supabase.inventory.config';
 import { inventorySupabase } from '@/lib/inventorySupabaseClient';
-import { MdFilterList, MdSearch, MdWarning, MdFileDownload, MdAdd } from 'react-icons/md';
+import { MdFilterList, MdSearch, MdWarning, MdFileDownload, MdAdd, MdExpandMore, MdExpandLess } from 'react-icons/md';
 import * as XLSX from 'xlsx';
 import { useI18n } from '@/contexts/I18nContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -132,6 +132,11 @@ export default function AssetsListPage() {
   const [selectedInstrument, setSelectedInstrument] = useState<string>('');
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
+  // En mobile los 6 selects + "Limpiar filtros" ocupaban toda la pantalla
+  // apilados (grid-cols-1) y tapaban los resultados — quedan colapsados
+  // detrás de este toggle, con la búsqueda siempre visible arriba. En
+  // sm+ siempre se muestran todos (ver className condicional abajo).
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   // Valores dinámicos para filtros
   const [instruments, setInstruments] = useState<string[]>([]);
@@ -469,19 +474,38 @@ export default function AssetsListPage() {
       <div className="bg-[#FFFDFA] border border-[#EAE3D6] rounded-xl px-5 py-[18px] mt-6">
         <div className="text-[11.5px] uppercase tracking-[0.09em] text-[#8A8177]">{t('inv_filters_header')}</div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3.5">
-          {/* Search */}
-          <div className="relative">
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A29889]" size={18} />
-            <input
-              type="text"
-              placeholder={t('inv_search_placeholder_assets')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
-            />
-          </div>
+        {/* Búsqueda — siempre visible, es lo que más se usa (ver caso de uso
+            "buscar violín y no encontrarlo entre 7 filtros apilados" en
+            mobile). El resto de los filtros van colapsados debajo en mobile. */}
+        <div className="relative mt-3.5">
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A29889]" size={18} />
+          <input
+            type="text"
+            placeholder={t('inv_search_placeholder_assets')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-3 py-2.5 border border-[#E3DDD1] rounded-[9px] bg-[#FFFDFA] focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30 focus:border-[#C2492B] text-[#1B1917]"
+          />
+        </div>
 
+        {/* Toggle solo en mobile — en sm+ el resto de filtros ya se ve
+            siempre, este botón queda oculto. */}
+        <button
+          type="button"
+          onClick={() => setShowMoreFilters(!showMoreFilters)}
+          className="sm:hidden mt-2.5 flex items-center gap-1.5 text-[13px] text-[#6E675E] font-medium"
+        >
+          <MdFilterList size={16} />
+          {t('inv_more_filters')}
+          {[selectedStatus, selectedGroup, selectedProgram, selectedInstrument, selectedBrand, selectedSize].filter(Boolean).length > 0 && (
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#C2492B] text-white text-[10px]">
+              {[selectedStatus, selectedGroup, selectedProgram, selectedInstrument, selectedBrand, selectedSize].filter(Boolean).length}
+            </span>
+          )}
+          {showMoreFilters ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+        </button>
+
+        <div className={`${showMoreFilters ? 'grid' : 'hidden'} sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3.5`}>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}

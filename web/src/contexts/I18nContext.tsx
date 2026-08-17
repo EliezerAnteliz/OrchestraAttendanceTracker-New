@@ -805,6 +805,7 @@ const translations: Translations = {
   inv_export_excel_button: { es: "Exportar a Excel", en: "Export to Excel" },
   inv_new_asset_button: { es: "Nuevo Activo", en: "New Asset" },
   inv_filters_header: { es: "Filtros", en: "Filters" },
+  inv_more_filters: { es: "Más filtros", en: "More filters" },
   inv_search_placeholder_assets: { es: "Buscar por código, descripción, marca, serial...", en: "Search by code, description, brand, serial..." },
   inv_filter_all_statuses: { es: "Todos los estados", en: "All statuses" },
   inv_filter_status_available: { es: "Disponible", en: "Available" },
