@@ -101,6 +101,9 @@ export default function StudentsPage() {
   const [photoSignedUrl, setPhotoSignedUrl] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
+  // Lightbox para ver la foto en grande — clic en el avatar en modo vista
+  // (en modo edición el clic sigue abriendo el selector de archivo).
+  const [showPhotoLightbox, setShowPhotoLightbox] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [showNewStudentModal, setShowNewStudentModal] = useState(false);
   const [newStudentData, setNewStudentData] = useState({
@@ -392,6 +395,7 @@ export default function StudentsPage() {
     setEditAssetSelection('');
     setPhotoSignedUrl(null);
     setPhotoUploadError(null);
+    setShowPhotoLightbox(false);
   };
 
   const handleEditClick = () => {
@@ -989,8 +993,14 @@ export default function StudentsPage() {
                             grande (80px/96px vs los 56px/64px originales)
                             para poder distinguir bien al estudiante. */}
                         <div
-                          onClick={() => isEditMode && !uploadingPhoto && photoInputRef.current?.click()}
-                          className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-[#EFE9DC] border border-[#E3DDD1] flex items-center justify-center ${isEditMode ? 'cursor-pointer' : ''}`}
+                          onClick={() => {
+                            if (isEditMode) {
+                              if (!uploadingPhoto) photoInputRef.current?.click();
+                            } else if (photoSignedUrl) {
+                              setShowPhotoLightbox(true);
+                            }
+                          }}
+                          className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-[#EFE9DC] border border-[#E3DDD1] flex items-center justify-center ${isEditMode || photoSignedUrl ? 'cursor-pointer' : ''}`}
                         >
                           {photoSignedUrl ? (
                             <img src={photoSignedUrl} alt={t('student_photo')} className="w-full h-full object-cover" />
@@ -1671,6 +1681,30 @@ export default function StudentsPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lightbox de la foto del estudiante — clic en el avatar (modo
+          vista) la agranda para verla mejor; clic afuera, en la X, o Esc
+          la cierra. z-[60] para quedar por encima del drawer (z-50). */}
+      {showPhotoLightbox && photoSignedUrl && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80"
+          onClick={() => setShowPhotoLightbox(false)}
+        >
+          <button
+            onClick={() => setShowPhotoLightbox(false)}
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+            aria-label={t('close')}
+          >
+            <MdClose size={20} />
+          </button>
+          <img
+            src={photoSignedUrl}
+            alt={t('student_photo')}
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-full rounded-2xl object-contain"
+          />
         </div>
       )}
 
