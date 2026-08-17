@@ -198,6 +198,12 @@ const translations: Translations = {
     es: "Se asigna directo desde Inventario — el instrumento queda enlazado a este estudiante.",
     en: "Assigned directly from Inventory — the instrument stays linked to this student.",
   },
+  student_photo: { es: "Foto del estudiante", en: "Student photo" },
+  change_photo: { es: "Cambiar foto", en: "Change photo" },
+  add_photo: { es: "Agregar foto", en: "Add photo" },
+  uploading_photo: { es: "Subiendo…", en: "Uploading…" },
+  photo_upload_error: { es: "Error al subir la foto. Intenta de nuevo.", en: "Error uploading photo. Try again." },
+  photo_too_large: { es: "La imagen no puede pesar más de 5 MB.", en: "Image can't be larger than 5 MB." },
 
   // Alergias/condiciones médicas y retiro autorizado — form "Ascend
   // Enrollment", carga manual vía plantilla Excel (13/08). Ver
