@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
-import { MdSearch, MdAdd, MdEdit, MdDelete, MdUpload, MdClose, MdCheckCircle } from 'react-icons/md';
+import { MdSearch, MdAdd, MdEdit, MdDelete, MdUpload, MdClose, MdCheckCircle, MdCameraAlt, MdPerson } from 'react-icons/md';
 import ExcelUploader from '@/components/ExcelUploader';
 import { useI18n } from '@/contexts/I18nContext';
 import { useProgram } from '@/contexts/ProgramContext';
@@ -94,6 +94,14 @@ export default function StudentsPage() {
   // Activos de Inventario enlazados a este estudiante (assigned_student_id) —
   // instrumento físico real, no el texto declarado en el propio estudiante.
   const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
+  // Foto de perfil del estudiante — vive en el bucket privado
+  // "student-photos" de Supabase Storage (students.profile_photo guarda la
+  // ruta del objeto, no la URL: hay que firmarla cada vez que se muestra
+  // porque el bucket no es público — son fotos de menores).
+  const [photoSignedUrl, setPhotoSignedUrl] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [showNewStudentModal, setShowNewStudentModal] = useState(false);
   const [newStudentData, setNewStudentData] = useState({
     first_name: '',
@@ -341,6 +349,24 @@ export default function StudentsPage() {
         parents: parentsData
       };
 
+      // Firma la URL de la foto (bucket privado) — falla en silencio si no
+      // tiene foto o si el objeto ya no existe, no debe bloquear la ficha.
+      if (details.profile_photo) {
+        try {
+          const { data: signedData, error: signedError } = await supabase
+            .storage
+            .from('student-photos')
+            .createSignedUrl(details.profile_photo, 3600);
+          if (signedError) throw signedError;
+          setPhotoSignedUrl(signedData?.signedUrl || null);
+        } catch (photoErr) {
+          console.error('Error signing student photo URL:', photoErr);
+          setPhotoSignedUrl(null);
+        }
+      } else {
+        setPhotoSignedUrl(null);
+      }
+
       setStudentDetails(details);
       setEditFormData(details);
       setShowStudentDrawer(true);
@@ -364,6 +390,8 @@ export default function StudentsPage() {
     setEditFormData(null);
     setLinkedAssets([]);
     setEditAssetSelection('');
+    setPhotoSignedUrl(null);
+    setPhotoUploadError(null);
   };
 
   const handleEditClick = () => {
@@ -404,6 +432,56 @@ export default function StudentsPage() {
         instrument: asset?.description || '',
         instrument_size: asset?.size || '',
       });
+    }
+  };
+
+  // Sube/reemplaza la foto de perfil del estudiante en el bucket privado
+  // "student-photos". Se guarda de inmediato (no espera al botón "Guardar"
+  // del resto de la ficha) — mismo patrón que la asignación de instrumento
+  // desde Inventario, que también escribe directo. Ruta: {program_id}/
+  // {student.id}.{ext}, upsert:true para que reemplazar una foto anterior
+  // no deje archivos huérfanos en el bucket.
+  const handlePhotoUpload = async (file: File) => {
+    if (!selectedStudent?.id || !activeProgram?.id) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoUploadError(t('photo_too_large'));
+      return;
+    }
+    setPhotoUploadError(null);
+    setUploadingPhoto(true);
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const path = `${activeProgram.id}/${selectedStudent.id}.${ext}`;
+
+      const { error: uploadError } = await supabase
+        .storage
+        .from('student-photos')
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { error: updateError } = await supabase
+        .from('students')
+        .update({ profile_photo: path })
+        .eq('id', selectedStudent.id);
+      if (updateError) throw updateError;
+
+      const { data: signedData, error: signedError } = await supabase
+        .storage
+        .from('student-photos')
+        .createSignedUrl(path, 3600);
+      if (signedError) throw signedError;
+
+      setPhotoSignedUrl(signedData?.signedUrl || null);
+      setStudentDetails((prev: any) => (prev ? { ...prev, profile_photo: path } : prev));
+      setEditFormData((prev: any) => (prev ? { ...prev, profile_photo: path } : prev));
+      // Silent: no queremos que la lista de fondo se ponga en loading solo
+      // por haber cambiado una foto.
+      fetchStudents(true);
+    } catch (err) {
+      console.error('Error uploading student photo:', err);
+      setPhotoUploadError(t('photo_upload_error'));
+    } finally {
+      setUploadingPhoto(false);
     }
   };
 
@@ -900,18 +978,63 @@ export default function StudentsPage() {
                 {/* Header */}
                 <div className="px-4 sm:px-[30px] py-4 sm:pt-[26px] sm:pb-[22px] border-b border-[#E3DDD1]">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2
-                        className="text-2xl sm:text-[32px] leading-none text-[#1B1917]"
-                        style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
-                      >
-                        {selectedStudent?.first_name} {selectedStudent?.last_name}
-                      </h2>
-                      <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
-                        {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
-                          <span className="inline-flex items-center gap-1 text-[12.5px] tracking-[0.09em] uppercase text-[#C2492B]">
-                            {linkedAssets[0]?.description || selectedStudent.instrument}
-                          </span>
+                    <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                      {/* Avatar — foto real si existe (bucket privado
+                          "student-photos", URL firmada), si no, iniciales.
+                          En modo edición se puede tocar/clickear para subir
+                          o reemplazar la foto. */}
+                      <div className="relative flex-shrink-0">
+                        <div
+                          onClick={() => isEditMode && !uploadingPhoto && photoInputRef.current?.click()}
+                          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-[#EFE9DC] border border-[#E3DDD1] flex items-center justify-center ${isEditMode ? 'cursor-pointer' : ''}`}
+                        >
+                          {photoSignedUrl ? (
+                            <img src={photoSignedUrl} alt={t('student_photo')} className="w-full h-full object-cover" />
+                          ) : (
+                            <MdPerson size={28} className="text-[#A29889]" />
+                          )}
+                        </div>
+                        {isEditMode && (
+                          <button
+                            type="button"
+                            onClick={() => !uploadingPhoto && photoInputRef.current?.click()}
+                            disabled={uploadingPhoto}
+                            title={photoSignedUrl ? t('change_photo') : t('add_photo')}
+                            className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#C2492B] text-white flex items-center justify-center border-2 border-[#FAF7F2] disabled:opacity-60"
+                          >
+                            <MdCameraAlt size={13} />
+                          </button>
+                        )}
+                        <input
+                          ref={photoInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handlePhotoUpload(file);
+                            e.target.value = '';
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <h2
+                          className="text-2xl sm:text-[32px] leading-none text-[#1B1917] truncate"
+                          style={{ fontFamily: 'var(--font-newsreader), serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+                        >
+                          {selectedStudent?.first_name} {selectedStudent?.last_name}
+                        </h2>
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
+                          {(linkedAssets[0]?.description || selectedStudent?.instrument) && (
+                            <span className="inline-flex items-center gap-1 text-[12.5px] tracking-[0.09em] uppercase text-[#C2492B]">
+                              {linkedAssets[0]?.description || selectedStudent.instrument}
+                            </span>
+                          )}
+                        </div>
+                        {isEditMode && (uploadingPhoto || photoUploadError) && (
+                          <p className={`text-[11.5px] mt-1 ${photoUploadError ? 'text-[#A8402A]' : 'text-[#8A8177]'}`}>
+                            {uploadingPhoto ? t('uploading_photo') : photoUploadError}
+                          </p>
                         )}
                       </div>
                     </div>
