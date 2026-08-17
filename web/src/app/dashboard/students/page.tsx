@@ -65,6 +65,20 @@ const GRADE_OPTIONS = [
 // Jerarquía típica dentro de una orquesta escolar.
 const POSITION_OPTIONS = ['Concert Master', 'Principal', 'Assistant', 'Section'];
 
+// El campo students.instrument tiene 3 formas distintas de decir "sin
+// instrumento" en producción: NULL, "" (vacío) y el texto literal
+// "Not Assigned". El filtro comparaba con === así que solo encontraba la
+// tercera — Aaliyah Trochez (instrument: "") quedaba invisible al filtrar
+// por "Not Assigned" (17/08). Esta función unifica los 3 casos.
+const isUnassignedInstrument = (instrument?: string | null) => {
+  const value = (instrument || '').trim().toLowerCase();
+  return value === '' || value === 'not assigned';
+};
+
+// Valor especial para la opción "Sin instrumento" del selector de filtro,
+// distinto de "" (que sigue significando "todos los instrumentos").
+const UNASSIGNED_FILTER_VALUE = '__unassigned__';
+
 export default function StudentsPage() {
   const { t } = useI18n();
   const { activeProgram, loading: programLoading } = useProgram();
@@ -194,8 +208,28 @@ export default function StudentsPage() {
       setStudents(sortedData);
       setFilteredStudents(sortedData);
       
-      // Extraer instrumentos únicos para el filtro
-      const instruments = [...new Set(sortedData.map(s => s.instrument).filter(Boolean))].sort();
+      // Extraer instrumentos únicos para el filtro. El campo "instrument"
+      // trae datos sucios (mayúsculas/minúsculas mezcladas, espacios,
+      // el texto literal "Not Assigned"), así que lo normalizamos para
+      // no mostrar duplicados como "Violin"/"violin" en el dropdown, y
+      // excluimos cualquier variante de "sin instrumento" (se maneja
+      // aparte con isUnassignedInstrument, ver más abajo — caso Aaliyah
+      // Trochez, 17/08).
+      const instrumentCounts = new Map<string, { label: string; count: number }>();
+      sortedData.forEach(s => {
+        const raw = (s.instrument || '').trim();
+        if (!raw || isUnassignedInstrument(raw)) return;
+        const key = raw.toLowerCase();
+        const existing = instrumentCounts.get(key);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          instrumentCounts.set(key, { label: raw, count: 1 });
+        }
+      });
+      const instruments = [...instrumentCounts.values()]
+        .map(v => v.label)
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
       setAvailableInstruments(instruments);
     } catch (err: any) {
       console.error('Error al cargar estudiantes:', err);
@@ -247,16 +281,22 @@ export default function StudentsPage() {
     // Filtrar por búsqueda
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(student => 
-        student.first_name.toLowerCase().includes(query) || 
+      result = result.filter(student =>
+        student.first_name.toLowerCase().includes(query) ||
         student.last_name.toLowerCase().includes(query) ||
-        student.instrument.toLowerCase().includes(query)
+        (student.instrument || '').toLowerCase().includes(query)
       );
     }
-    
-    // Filtrar por instrumento
-    if (selectedInstrument) {
-      result = result.filter(student => student.instrument === selectedInstrument);
+
+    // Filtrar por instrumento — "Sin instrumento" agrupa NULL/""/"Not
+    // Assigned" (ver isUnassignedInstrument); el resto compara sin
+    // distinguir mayúsculas ni espacios sobrantes, porque el dato en la
+    // base tiene variantes tipo "Violin"/"violin"/"Violin ".
+    if (selectedInstrument === UNASSIGNED_FILTER_VALUE) {
+      result = result.filter(student => isUnassignedInstrument(student.instrument));
+    } else if (selectedInstrument) {
+      const target = selectedInstrument.trim().toLowerCase();
+      result = result.filter(student => (student.instrument || '').trim().toLowerCase() === target);
     }
     
     // Filtrar por estado activo
@@ -864,6 +904,7 @@ export default function StudentsPage() {
             className="sm:w-56 px-3 py-3 border border-[#E3DDD1] rounded-lg bg-[#FFFDFA] text-[#1B1917] font-medium focus:outline-none focus:ring-2 focus:ring-[#C2492B]/30"
           >
             <option value="">{t('all_instruments')}</option>
+            <option value={UNASSIGNED_FILTER_VALUE}>{t('not_assigned')}</option>
             {availableInstruments.map((instrument) => (
               <option key={instrument} value={instrument}>{instrument}</option>
             ))}
