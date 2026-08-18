@@ -79,6 +79,33 @@ const isUnassignedInstrument = (instrument?: string | null) => {
 // distinto de "" (que sigue significando "todos los instrumentos").
 const UNASSIGNED_FILTER_VALUE = '__unassigned__';
 
+// Mapea la descripción cruda del activo de Inventario (VIOLIN/VIOLONCELLO/
+// VIOLA/BASS, siempre en mayúsculas ahí) al nombre "bonito" que se muestra
+// en la ficha del estudiante y en los filtros — mismo mapeo que el trigger
+// de base de datos sync_student_instrument_from_asset(), para que la UI
+// muestre el resultado correcto de inmediato, sin depender de un refetch
+// para ver el texto bien formateado (17/08).
+const FRIENDLY_INSTRUMENT_BY_DESCRIPTION: Record<string, string> = {
+  VIOLIN: 'Violin',
+  VIOLONCELLO: 'Cello',
+  CELLO: 'Cello',
+  VIOLA: 'Viola',
+  BASS: 'Bass',
+};
+const friendlyInstrumentName = (description?: string | null) => {
+  const key = (description || '').trim().toUpperCase();
+  if (FRIENDLY_INSTRUMENT_BY_DESCRIPTION[key]) return FRIENDLY_INSTRUMENT_BY_DESCRIPTION[key];
+  const trimmed = (description || '').trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase() : '';
+};
+
+// Opciones del selector de "instrumento funcional" cuando un alumno usa un
+// instrumento distinto al catalogado en Inventario — adaptación temporal sin
+// fecha determinada (ej. violín con cuerdas de viola). Caso Issac Hernandez
+// Ibarra, 17/08 — antes había que hacerlo manual por SQL, ahora se gestiona
+// desde esta misma página.
+const INSTRUMENT_OVERRIDE_OPTIONS = ['Violin', 'Viola', 'Cello', 'Bass'];
+
 export default function StudentsPage() {
   const { t } = useI18n();
   const { activeProgram, loading: programLoading } = useProgram();
@@ -147,6 +174,12 @@ export default function StudentsPage() {
   // instrumento, '__other__' = texto libre, uuid = activo real de
   // Inventario (puede ser el ya enlazado o uno nuevo de availableAssets).
   const [editAssetSelection, setEditAssetSelection] = useState('');
+  // Override de "instrumento funcional" (adaptación temporal distinta al
+  // activo catalogado en Inventario, ver INSTRUMENT_OVERRIDE_OPTIONS más
+  // arriba) — solo aplica cuando hay un activo real seleccionado en el
+  // picker de arriba (editAssetSelection no es '' ni '__other__').
+  const [instrumentOverrideEnabled, setInstrumentOverrideEnabled] = useState(false);
+  const [overrideInstrumentValue, setOverrideInstrumentValue] = useState('');
 
   useEffect(() => {
     const fetchAvailableAssets = async () => {
@@ -433,6 +466,8 @@ export default function StudentsPage() {
     setEditFormData(null);
     setLinkedAssets([]);
     setEditAssetSelection('');
+    setInstrumentOverrideEnabled(false);
+    setOverrideInstrumentValue('');
     setPhotoSignedUrl(null);
     setPhotoUploadError(null);
     setShowPhotoLightbox(false);
@@ -450,6 +485,13 @@ export default function StudentsPage() {
     } else {
       setEditAssetSelection('');
     }
+    // Precarga el override de "instrumento funcional" (ver caso Issac,
+    // 17/08) — solo tiene sentido si hay un activo real de Inventario
+    // enlazado; el caso "Otro" (texto libre) ya es override por definición
+    // y se resuelve aparte en handleSaveEdit.
+    const hasOverride = studentDetails?.settings?.instrument_override === true && linkedAssets.length > 0;
+    setInstrumentOverrideEnabled(hasOverride);
+    setOverrideInstrumentValue(hasOverride ? (studentDetails?.instrument || '') : '');
     setIsEditMode(true);
   };
 
@@ -457,15 +499,20 @@ export default function StudentsPage() {
     setIsEditMode(false);
     setEditFormData(studentDetails);
     setEditAssetSelection('');
+    setInstrumentOverrideEnabled(false);
+    setOverrideInstrumentValue('');
   };
 
   // Maneja el selector de instrumento en modo edición — mismo patrón que
   // handleNewStudentAssetChange (crear estudiante), pero sobre editFormData.
   const handleEditAssetChange = (value: string) => {
     setEditAssetSelection(value);
-    if (value === '__other__') {
-      setEditFormData({ ...editFormData, instrument: '', instrument_size: '' });
-    } else if (value === '') {
+    if (value === '__other__' || value === '') {
+      // Al salir del activo con override activo, o al quitar el instrumento
+      // por completo, el override deja de aplicar — "Otro" es su propio
+      // mecanismo de texto libre (ver handleSaveEdit).
+      setInstrumentOverrideEnabled(false);
+      setOverrideInstrumentValue('');
       setEditFormData({ ...editFormData, instrument: '', instrument_size: '' });
     } else {
       const fromLinked = linkedAssets.find((a) => a.id === value);
@@ -473,10 +520,32 @@ export default function StudentsPage() {
       const asset = fromLinked || fromAvailable;
       setEditFormData({
         ...editFormData,
-        instrument: asset?.description || '',
+        // Si el override sigue activo al cambiar de activo físico, el texto
+        // mostrado lo sigue controlando overrideInstrumentValue; si no, se
+        // deriva del catálogo del activo recién elegido.
+        instrument: instrumentOverrideEnabled ? overrideInstrumentValue : friendlyInstrumentName(asset?.description),
         instrument_size: asset?.size || '',
       });
     }
+  };
+
+  // Activa/desactiva el override de "instrumento funcional" sobre el activo
+  // actualmente seleccionado en el picker (ver INSTRUMENT_OVERRIDE_OPTIONS).
+  const handleToggleInstrumentOverride = (checked: boolean) => {
+    setInstrumentOverrideEnabled(checked);
+    const asset = linkedAssets.find((a) => a.id === editAssetSelection) || availableAssets.find((a) => a.id === editAssetSelection);
+    if (checked) {
+      const initial = overrideInstrumentValue || friendlyInstrumentName(asset?.description) || INSTRUMENT_OVERRIDE_OPTIONS[0];
+      setOverrideInstrumentValue(initial);
+      setEditFormData({ ...editFormData, instrument: initial });
+    } else {
+      setEditFormData({ ...editFormData, instrument: friendlyInstrumentName(asset?.description) });
+    }
+  };
+
+  const handleOverrideInstrumentValueChange = (value: string) => {
+    setOverrideInstrumentValue(value);
+    setEditFormData({ ...editFormData, instrument: value });
   };
 
   // Sube/reemplaza la foto de perfil del estudiante en el bucket privado
@@ -531,6 +600,38 @@ export default function StudentsPage() {
 
   const handleSaveEdit = async () => {
     try {
+      // Resuelve de forma determinista el texto final de "instrument" y el
+      // flag settings.instrument_override, sin depender del orden en que
+      // corran los triggers de auto-sync de Inventario (que solo respetan
+      // el override si YA está marcado en la fila — ver
+      // sync_student_instrument_from_asset() en la base de datos):
+      //  - "Otro" (sin activo real en Inventario): siempre override=true,
+      //    el texto es el que escribió el staff a mano.
+      //  - Activo real + checkbox de "instrumento distinto" activo: caso
+      //    Issac (adaptación temporal) — override=true, texto = el elegido
+      //    en el selector Violin/Viola/Cello/Bass.
+      //  - Activo real sin override: override=false, el texto se deriva del
+      //    catálogo del activo (mismo mapeo que el trigger de la BD).
+      //  - Sin instrumento: override=false, texto vacío.
+      let finalOverride = false;
+      let finalInstrument = '';
+      let finalInstrumentSize = '';
+      if (editAssetSelection === '__other__') {
+        finalOverride = true;
+        finalInstrument = editFormData.instrument || '';
+        finalInstrumentSize = editFormData.instrument_size || '';
+      } else if (editAssetSelection) {
+        const asset = linkedAssets.find((a) => a.id === editAssetSelection) || availableAssets.find((a) => a.id === editAssetSelection);
+        finalInstrumentSize = asset?.size || '';
+        if (instrumentOverrideEnabled) {
+          finalOverride = true;
+          finalInstrument = overrideInstrumentValue || '';
+        } else {
+          finalOverride = false;
+          finalInstrument = friendlyInstrumentName(asset?.description);
+        }
+      }
+
       // Actualizar información del estudiante
       const { error: updateError } = await supabase
         .from('students')
@@ -539,8 +640,9 @@ export default function StudentsPage() {
           last_name: editFormData.last_name,
           age: editFormData.age,
           current_grade: editFormData.current_grade,
-          instrument: editFormData.instrument,
-          instrument_size: editFormData.instrument_size,
+          instrument: finalInstrument,
+          instrument_size: finalInstrumentSize,
+          settings: { ...(studentDetails?.settings || {}), instrument_override: finalOverride },
           orchestra_position: editFormData.orchestra_position,
           orchestra_id: editFormData.orchestra_id || null,
           is_active: editFormData.is_active,
@@ -660,7 +762,7 @@ export default function StudentsPage() {
       setNewStudentData({
         ...newStudentData,
         asset_id: value,
-        instrument: asset?.description || '',
+        instrument: friendlyInstrumentName(asset?.description),
         instrument_size: asset?.size || '',
       });
     }
@@ -1282,7 +1384,29 @@ export default function StudentsPage() {
                                 </div>
                               )}
                               {editAssetSelection && editAssetSelection !== '__other__' && (
-                                <p className="text-[11.5px] text-[#8A8177] mt-1">{t('instrument_from_inventory_hint')}</p>
+                                <>
+                                  <p className="text-[11.5px] text-[#8A8177] mt-1">{t('instrument_from_inventory_hint')}</p>
+                                  <label className="flex items-center gap-2 mt-2 text-[12.5px] text-[#1B1917]">
+                                    <input
+                                      type="checkbox"
+                                      checked={instrumentOverrideEnabled}
+                                      onChange={(e) => handleToggleInstrumentOverride(e.target.checked)}
+                                    />
+                                    {t('instrument_override_label')}
+                                  </label>
+                                  <p className="text-[11px] text-[#8A8177] mt-0.5">{t('instrument_override_hint')}</p>
+                                  {instrumentOverrideEnabled && (
+                                    <select
+                                      value={overrideInstrumentValue}
+                                      onChange={(e) => handleOverrideInstrumentValueChange(e.target.value)}
+                                      className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-md text-[14px] text-[#1B1917] mt-2"
+                                    >
+                                      {INSTRUMENT_OVERRIDE_OPTIONS.map((opt) => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </>
                               )}
                             </div>
                           ) : linkedAssets.length > 0 ? (
@@ -1290,6 +1414,16 @@ export default function StudentsPage() {
                               <p className="text-[12.5px] text-[#8A8177] mb-1">
                                 {t('instrument')}
                               </p>
+                              {studentDetails?.settings?.instrument_override === true && (
+                                <>
+                                  <p className="text-[14px] text-[#1B1917]">
+                                    {studentDetails.instrument || t('not_assigned')}
+                                  </p>
+                                  <p className="text-[11.5px] text-[#8A8177] mb-1.5">
+                                    {t('instrument_override_active_hint')}
+                                  </p>
+                                </>
+                              )}
                               <div className="space-y-1.5">
                                 {linkedAssets.map((asset) => (
                                   <div key={asset.id}>

@@ -198,6 +198,18 @@ const translations: Translations = {
     es: "Se asigna directo desde Inventario — el instrumento queda enlazado a este estudiante.",
     en: "Assigned directly from Inventory — the instrument stays linked to this student.",
   },
+  instrument_override_label: {
+    es: "El instrumento que usa es distinto al del inventario",
+    en: "The instrument they use is different from the inventory catalog",
+  },
+  instrument_override_hint: {
+    es: "Para adaptaciones temporales (ej. un violín con cuerdas de viola). El activo físico se mantiene catalogado correctamente; solo cambia lo que se ve aquí y en los filtros.",
+    en: "For temporary adaptations (e.g. a violin strung as a viola). The physical asset stays correctly cataloged in Inventory; only what's shown here and in filters changes.",
+  },
+  instrument_override_active_hint: {
+    es: "Adaptación temporal — el instrumento físico en Inventario es distinto (ver abajo).",
+    en: "Temporary adaptation — the physical instrument in Inventory is different (see below).",
+  },
   student_photo: { es: "Foto del estudiante", en: "Student photo" },
   change_photo: { es: "Cambiar foto", en: "Change photo" },
   add_photo: { es: "Agregar foto", en: "Add photo" },
