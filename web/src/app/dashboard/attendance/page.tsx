@@ -1232,12 +1232,19 @@ export default function AttendancePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {/* Mismos 3 colores sólidos del badge de asistencia
+                  (AttendanceStatusIndicator) — antes solo "Mark Present"
+                  tenía color (el acento naranja del sistema, sin relación
+                  con el verde real de "Present"), y Excused/Unexcused eran
+                  botones outline neutros indistinguibles entre sí. Ahora
+                  cada botón anticipa visualmente el color del estado que va
+                  a aplicar (18/08). */}
               <button
                 onClick={() => markAttendance('A')}
                 disabled={selectedStudentCount === 0}
-                className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
                   selectedStudentCount > 0
-                    ? 'bg-[#C2492B] text-white hover:bg-[#A83A20]'
+                    ? 'bg-[#3F8F46] text-white hover:bg-[#35753A]'
                     : 'bg-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
@@ -1246,10 +1253,10 @@ export default function AttendancePage() {
               <button
                 onClick={() => markAttendance('EA')}
                 disabled={selectedStudentCount === 0}
-                className={`rounded-lg px-4 py-2.5 text-sm border transition-colors ${
+                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
                   selectedStudentCount > 0
-                    ? 'border-[#DED7C9] text-[#56504A] hover:border-[#B08A3C] hover:text-[#8A6A22]'
-                    : 'border-[#DED7C9] text-[#A29889] cursor-not-allowed'
+                    ? 'bg-[#C98A1D] text-white hover:bg-[#A86F14]'
+                    : 'bg-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
                 {t('mark_excused_absence')}
@@ -1257,10 +1264,10 @@ export default function AttendancePage() {
               <button
                 onClick={() => markAttendance('UA')}
                 disabled={selectedStudentCount === 0}
-                className={`rounded-lg px-4 py-2.5 text-sm border transition-colors ${
+                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
                   selectedStudentCount > 0
-                    ? 'border-[#DED7C9] text-[#56504A] hover:border-[#A8402A] hover:text-[#A8402A]'
-                    : 'border-[#DED7C9] text-[#A29889] cursor-not-allowed'
+                    ? 'bg-[#B23A22] text-white hover:bg-[#92301B]'
+                    : 'bg-[#DED7C9] text-[#A29889] cursor-not-allowed'
                 }`}
               >
                 {t('mark_unexcused_absence')}
