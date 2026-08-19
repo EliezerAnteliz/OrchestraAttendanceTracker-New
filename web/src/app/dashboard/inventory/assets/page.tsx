@@ -310,10 +310,18 @@ export default function AssetsListPage() {
         query = query.or(`description.ilike.%${term}%,brand.ilike.%${term}%,full_code.ilike.%${term}%,serial_number.ilike.%${term}%,assigned_to_text.ilike.%${term}%`);
       }
 
-      // Aplicar paginaci\u00f3n
+      // Aplicar paginaci\u00f3n \u2014 orden por propietario primero (pedido de
+      // Eliezer 19/08): TOSA/CMI (propio) arriba, luego Academy, y Stafford
+      // al final, usando la columna generada owner_sort_rank (1/2/3) en vez
+      // de orden alfab\u00e9tico de "owner" (que dejar\u00eda Academy antes que
+      // TOSA/CMI, y Stafford en medio). created_at sigue como desempate
+      // dentro de cada grupo de propietario, igual que antes.
       const from = (currentPage - 1) * pageSize;
       const to = from + pageSize - 1;
-      query = query.range(from, to).order('created_at', { ascending: false });
+      query = query
+        .range(from, to)
+        .order('owner_sort_rank', { ascending: true })
+        .order('created_at', { ascending: false });
 
       const { data: assetsData, error: assetsError, count } = await query;
 
