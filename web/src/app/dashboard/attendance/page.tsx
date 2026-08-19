@@ -45,6 +45,19 @@ type AttendanceRecord = {
   [key: string]: any; // For other properties
 };
 
+// Mismo criterio que la página de Estudiantes: agrupa NULL, "" y el texto
+// literal "Not Assigned" (con cualquier mayúscula/espacio) bajo un solo
+// filtro "Sin instrumento", en vez de tratarlos como instrumentos distintos.
+const isUnassignedInstrument = (instrument?: string | null) => {
+  const value = (instrument || '').trim().toLowerCase();
+  return value === '' || value === 'not assigned';
+};
+
+// Valor especial para la opción "Sin instrumento" del filtro — el orden
+// deseado (18/08, a pedido de Eliezer) es: Sin instrumento primero, luego
+// el resto alfabético (Bass, Cello, Viola, Violin), igual que en Estudiantes.
+const UNASSIGNED_FILTER_VALUE = '__unassigned__';
+
 export default function AttendancePage() {
   const { t, lang } = useI18n();
   const { activeProgram, loading: programLoading } = useProgram();
@@ -386,7 +399,7 @@ export default function AttendancePage() {
         const instrumentLabelByKey = new Map<string, string>();
         studentsWithAttendance.forEach(student => {
           const raw = (student.instrument || '').trim();
-          if (!raw) return;
+          if (!raw || isUnassignedInstrument(raw)) return;
           const key = raw.toLowerCase();
           if (!instrumentLabelByKey.has(key)) {
             instrumentLabelByKey.set(key, raw);
@@ -514,7 +527,9 @@ export default function AttendancePage() {
     // crudo en students.instrument puede traer espacios de más (ej. Aaliyah
     // Trochez Espinoza = "Violin " con espacio final), y sin trim() aquí la
     // comparación fallaba aunque el dropdown mostrara "Violin" (18/08).
-    if (instrument !== 'all') {
+    if (instrument === UNASSIGNED_FILTER_VALUE) {
+      filtered = filtered.filter(student => isUnassignedInstrument(student.instrument));
+    } else if (instrument !== 'all') {
       filtered = filtered.filter(student =>
         student.instrument && student.instrument.trim().toLowerCase() === instrument.trim().toLowerCase()
       );
@@ -1220,6 +1235,7 @@ export default function AttendancePage() {
             aria-label={t('filter_by_instrument')}
           >
             <option value="all">{t('all_instruments')}</option>
+            <option value={UNASSIGNED_FILTER_VALUE}>{t('not_assigned')}</option>
             {availableInstruments.map((instrument) => (
               <option key={instrument} value={instrument}>
                 {instrument}
