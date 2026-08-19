@@ -376,13 +376,24 @@ export default function AttendancePage() {
         
         console.log(`Procesados ${studentsWithAttendance.length} estudiantes con sus estados de asistencia para la fecha ${currentDate}`);
         
-        // Extraer instrumentos únicos para el filtro
-        const instruments = Array.from(new Set(
-          studentsWithAttendance
-            .map(student => student.instrument)
-            .filter(instrument => instrument && instrument.trim() !== '')
-            .sort()
-        ));
+        // Extraer instrumentos únicos para el filtro — igual que en la
+        // página de Estudiantes, "instrument" trae datos sucios (mayúsculas/
+        // minúsculas y espacios mezclados, ej. "Violin"/"violin "), así que
+        // antes salían como 2 opciones distintas en el dropdown aunque el
+        // filtro las tratara igual al comparar (18/08, reportado por
+        // Eliezer). Se agrupan sin distinguir mayúsculas/espacios, quedando
+        // la primera forma vista como etiqueta.
+        const instrumentLabelByKey = new Map<string, string>();
+        studentsWithAttendance.forEach(student => {
+          const raw = (student.instrument || '').trim();
+          if (!raw) return;
+          const key = raw.toLowerCase();
+          if (!instrumentLabelByKey.has(key)) {
+            instrumentLabelByKey.set(key, raw);
+          }
+        });
+        const instruments = Array.from(instrumentLabelByKey.values())
+          .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
         
         // Extraer orquestas únicas para el filtro
         const orchestraMap = new Map<string, {id: string, name: string}>();
