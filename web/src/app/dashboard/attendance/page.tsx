@@ -508,10 +508,15 @@ export default function AttendancePage() {
       );
     }
     
-    // Filtrar por instrumento
+    // Filtrar por instrumento — comparar recortando espacios además de
+    // mayúsculas/minúsculas: el dropdown ya muestra la etiqueta recortada
+    // (ver extracción de availableInstruments más arriba), pero el valor
+    // crudo en students.instrument puede traer espacios de más (ej. Aaliyah
+    // Trochez Espinoza = "Violin " con espacio final), y sin trim() aquí la
+    // comparación fallaba aunque el dropdown mostrara "Violin" (18/08).
     if (instrument !== 'all') {
-      filtered = filtered.filter(student => 
-        student.instrument && student.instrument.toLowerCase() === instrument.toLowerCase()
+      filtered = filtered.filter(student =>
+        student.instrument && student.instrument.trim().toLowerCase() === instrument.trim().toLowerCase()
       );
     }
     
