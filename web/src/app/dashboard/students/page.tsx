@@ -186,13 +186,20 @@ export default function StudentsPage() {
       if (!(showNewStudentModal || isEditMode) || !activeProgram?.id) return;
       try {
         setLoadingAssets(true);
+        // Mismo criterio de orden que la lista de Activos de Inventario
+        // (19/08, a pedido de Eliezer): primero los instrumentos propios de
+        // TOSA/CMI, luego los prestados de Academy, y los de Stafford
+        // (uso de emergencia del colegio) al final — usando la columna
+        // generada owner_sort_rank. "description" queda como desempate para
+        // seguir agrupando por tipo de instrumento dentro de cada dueño.
         const { data, error: assetsError } = await supabase
           .from('assets')
-          .select('id, full_code, description, brand, size, serial_number')
+          .select('id, full_code, description, brand, size, serial_number, owner')
           .eq('current_program_id', activeProgram.id)
           .eq('status_code', 'available')
           .eq('is_active', true)
           .is('assigned_student_id', null)
+          .order('owner_sort_rank', { ascending: true })
           .order('description', { ascending: true });
 
         if (assetsError) throw assetsError;
