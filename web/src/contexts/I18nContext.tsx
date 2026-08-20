@@ -237,6 +237,7 @@ const translations: Translations = {
   remove: { es: "Quitar", en: "Remove" },
 
   parents_info: { es: "Información de Padres", en: "Parents Information" },
+  no_parent_info: { es: "No hay información de padres registrada", en: "No parent information recorded" },
   manage_contacts: { es: "Administrar contactos", en: "Manage contacts" },
   phone_not_registered: { es: "Teléfono no registrado", en: "Phone not registered" },
   email_not_registered: { es: "Email no registrado", en: "Email not registered" },
