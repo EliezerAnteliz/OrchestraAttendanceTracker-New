@@ -323,7 +323,12 @@ export default function DashboardPage() {
         <StatCard
           title={t('total_students')}
           value={stats.totalStudents}
-          subtitle={lang === 'es' ? 'en todos los sitios' : 'across all sites'}
+          // La consulta ya filtra por activeProgram.id (ver fetchDashboardData
+          // más arriba) — este número es el histórico de ESTE sitio (activos
+          // + inactivos, todos los que han pasado por Ascend aquí), nunca
+          // "todos los sitios" como decía antes por error (21/08, aclarado
+          // por Eliezer).
+          subtitle={lang === 'es' ? `histórico en ${activeProgram?.name || 'este sitio'}` : `all-time at ${activeProgram?.name || 'this site'}`}
         />
         <StatCard
           title={t('active_students')}
